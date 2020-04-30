@@ -1,3 +1,5 @@
+alias YaggServer.Actions
+
 defmodule YaggServer.Endpoint do
   use Plug.Router
 
@@ -12,11 +14,18 @@ defmodule YaggServer.Endpoint do
   plug :match
   plug :dispatch
 
-  put "/test" do
+  put "/action" do
     :ok = GenServer.call(
       YaggServer.EventManager,
       {:event, conn.params})
     send_resp(conn, 204, "")
+  end
+
+  put "/game" do
+    resp = Actions.game_action(conn.params)
+    conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(200, Poison.encode!(resp))
   end
 
   get "/sse/events" do
