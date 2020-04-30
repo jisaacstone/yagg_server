@@ -9,7 +9,7 @@ defmodule YaggServer.Application do
         port: 4000,
         protocol_options: [idle_timeout: :infinity]
       ),
-      {PubSub, []}
+      {YaggServer.EventManager, []}
     ]
 
     opts = [strategy: :one_for_one, name: YaggServer.Supervisor]

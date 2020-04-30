@@ -25,7 +25,7 @@ defmodule YaggServer.MixProject do
       {:plug, "~> 1.10"},
       {:cowboy, "~> 2.7"},
       {:poison, "~> 4.0"},
-      {:pubsub, "~> 1.1"},
+      {:gen_stage, "~> 1.0"},
       {:plug_cowboy, "~> 2.2"}
     ]
   end

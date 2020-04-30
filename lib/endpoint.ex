@@ -13,7 +13,7 @@ defmodule YaggServer.Endpoint do
   plug :dispatch
 
   put "/test" do
-    PubSub.publish(:event, conn.params)
+    YaggServer.EventManager.sync_notify(conn.params)
     send_resp(conn, 204, "")
   end
 
@@ -25,36 +25,19 @@ defmodule YaggServer.Endpoint do
       |> put_resp_header("Content-Type", "text/event-stream; charset=utf-8")
       |> send_chunked(200)
 
-    PubSub.subscribe(self(), :event)
-    chunk(conn, "event: game_event\ndata: {\"yes\": 1}\n\n")
-    sse_loop(conn, self())
+    chunk(conn, "event: game_event\ndata: {\"yes\": 0}\n\n")
+    # can't use start_link because then the function would return and
+    # we'd drop the connection.
+    # init will create the link with the EventManager
+    {:ok, things} = GenStage.init({YaggServer.EventHandler, conn})
+    IO.inspect(things)
+    # enter_loop turns this process into a GenServer process
+    # for some reason not exposed by elixir so we call the erlang module
+    :gen_server.enter_loop(YaggServer.EventHandler, [], things)
+    conn
   end
 
   match _ do
     send_resp(conn, 404, "oops")
-  end
-
-  defp sse_loop(conn, pid) do
-    # receive is what stops the router from processing
-    # and waits for an event to come in
-    receive do
-      # Send updates when :cagg is finished.
-      {:event, data} ->
-        # Query for updates.
-        # Send update.
-        chunk(conn, "event: game_event\ndata: #{Poison.encode!(data)}\n\n")
-
-        # Wait for next publish.
-        sse_loop(conn, pid)
-
-      # Stop SSE if this conn is actually down.
-      # Ignore other processes finishing.
-      {:DOWN, _reference, :process, ^pid, _type} ->
-        nil
-
-      # Don't stop SSE because of unrelated events.
-      _other ->
-        sse_loop(conn, pid)
-    end
   end
 end
