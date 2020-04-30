@@ -9,10 +9,10 @@ defmodule YaggServer.Application do
         port: 4000,
         protocol_options: [idle_timeout: :infinity]
       ),
-      {YaggServer.EventManager, []}
+      {YaggServer.EventManager, name: YaggServer.EventManager}
     ]
 
     opts = [strategy: :one_for_one, name: YaggServer.Supervisor]
-    Supervisor.start_link(children, opts)
+    IO.inspect(Supervisor.start_link(children, opts))
   end
 end

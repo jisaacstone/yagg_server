@@ -13,7 +13,9 @@ defmodule YaggServer.Endpoint do
   plug :dispatch
 
   put "/test" do
-    YaggServer.EventManager.sync_notify(conn.params)
+    :ok = GenServer.call(
+      YaggServer.EventManager,
+      {:event, conn.params})
     send_resp(conn, 204, "")
   end
 
@@ -25,19 +27,28 @@ defmodule YaggServer.Endpoint do
       |> put_resp_header("Content-Type", "text/event-stream; charset=utf-8")
       |> send_chunked(200)
 
-    chunk(conn, "event: game_event\ndata: {\"yes\": 0}\n\n")
-    # can't use start_link because then the function would return and
-    # we'd drop the connection.
-    # init will create the link with the EventManager
-    {:ok, things} = GenStage.init({YaggServer.EventHandler, conn})
-    IO.inspect(things)
-    # enter_loop turns this process into a GenServer process
-    # for some reason not exposed by elixir so we call the erlang module
-    :gen_server.enter_loop(YaggServer.EventHandler, [], things)
-    conn
+    {:ok, conn} = chunk(conn, "event: game_event\ndata: {\"yes\": 0}\n\n")
+    :ok = GenServer.call(
+      YaggServer.EventManager,
+      :subscribe)
+    sse_loop(conn, self())
   end
 
   match _ do
     send_resp(conn, 404, "oops")
+  end
+
+  defp sse_loop(conn, pid) do
+    receive do
+      {:event, event} ->
+        IO.inspect(['EVENT', event])
+        {:ok, conn} = chunk(conn, "event: game_event\ndata: #{Poison.encode!(event)}\n\n")
+        sse_loop(conn, pid)
+      {:DOWN, _reference, :process, ^pid, _type} ->
+        conn
+      other ->
+        IO.inspect(['OTHER', other])
+        sse_loop(conn, pid)
+    end
   end
 end

@@ -1,41 +1,24 @@
-# copied from the example here
-# https://github.com/elixir-lang/gen_stage/blob/master/examples/gen_event.exs
 defmodule YaggServer.EventManager do
-  use GenStage
+  use GenServer
 
-  def start_link(_) do
-    GenStage.start_link(__MODULE__, :ok, name: __MODULE__)
+  def start_link(options) do
+    GenServer.start_link(__MODULE__, [], options)
   end
 
-  def sync_notify(event, timeout \\ 5000) do
-    GenStage.call(__MODULE__, {:notify, event}, timeout)
-  end 
-
-  ## Callbacks
-
-  def init(:ok) do
+  def init(_) do
     IO.inspect('EM started')
-    {:producer, {:queue.new, 0}, dispatcher: GenStage.BroadcastDispatcher}
+    {:ok, []}
   end
 
-  def handle_call({:notify, event}, from, {queue, demand}) do
-    IO.inspect(['Call Recieved', event, from, queue, demand])
-    dispatch_events(:queue.in({from, event}, queue), demand, [])
+  def handle_call({:event, event}, _from, subscribers) do
+    IO.inspect(['EM event', event, subscribers])
+    subs = Enum.filter(subscribers, &Process.alive?/1)
+    Enum.map(subs, &Kernel.send(&1, {:event, event}))
+    {:reply, :ok, subs}
   end
 
-  def handle_demand(incoming_demand, {queue, demand}) do
-    IO.inspect(['Demand Recieved', incoming_demand, queue, demand])
-    dispatch_events(queue, incoming_demand + demand, [])
-  end
-
-  defp dispatch_events(queue, demand, events) do
-    IO.inspect(['dispatch', queue, demand, events])
-    with d when d > 0 <- demand,
-         {{:value, {from, event}}, queue} <- :queue.out(queue) do
-      GenStage.reply(from, :ok)
-      dispatch_events(queue, demand - 1, [event | events])
-    else
-      _ -> {:noreply, Enum.reverse(events), {queue, demand}}
-    end
+  def handle_call(:subscribe, {pid, _tag}, subscribers) do
+    IO.inspect('subscribe')
+    {:reply, :ok, [pid|subscribers]}
   end
 end
