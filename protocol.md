@@ -21,6 +21,7 @@ when all players are ready game will start
 or is that an action?
 
 ------
+[Email from Jan]
 
 I couldnt help myself, just had to write some example data, I hope it makes sense:
 
