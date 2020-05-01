@@ -14,7 +14,7 @@ defmodule YaggServer.Game do
     GenServer.start_link(__MODULE__, [], options)
   end
 
-  def init(:ok) do
+  def init(_) do
     {:ok, %Game{state: :open, players: []}}
   end
 
