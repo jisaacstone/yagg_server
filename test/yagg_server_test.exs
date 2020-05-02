@@ -24,7 +24,7 @@ defmodule YaggServerTest.Endpoint do
         IO.inspect([unexpected: other])
         recieve_event()
       after
-        0 -> raise "no_message"
+        1 -> raise "no_message"
     end
   end
 
@@ -33,8 +33,12 @@ defmodule YaggServerTest.Endpoint do
     assert status == 200
     assert %{"id" => gid} = Poison.decode!(body)
     {:ok, pid} = Game.get(gid)
-    :ok = GenServer.call(pid, {:join, "testplayer"})
-    {sse_pid, _ref} = spawn_monitor(fn -> conn(:get, "/game_events/#{gid}") end)
+    :ok = GenServer.call(pid, {:join, "player1"})
+    {sse_pid, _ref} = spawn_monitor(
+      fn -> Endpoint.call(
+        conn(:get, "/game_events/#{gid}?player=player2"),
+        @opts)
+      end)
     assert Process.alive?(sse_pid)
     %{"event" => event_type} = recieve_event()
     assert event_type == "player_joined"

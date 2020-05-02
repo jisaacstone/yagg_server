@@ -46,10 +46,11 @@ defmodule YaggServer.Endpoint do
   end
 
   get "/game_events/:gid" do
+    IO.inspect(conn.query_params)
     %{"player" => player} = conn.query_params
     {:ok, pid} = YaggServer.Game.get(gid)
     Process.monitor(pid)
-    GenServer.call(pid, {:join, player})
+    :ok = GenServer.call(pid, {:join, player})
     sse_loop(conn, pid)
   end
 
@@ -58,6 +59,7 @@ defmodule YaggServer.Endpoint do
   end
 
   defp sse_loop(conn, pid) do
+    IO.inspect(['in the loop', pid])
     receive do
       {:event, event} ->
         {:ok, conn} = chunk(conn, "event: game_event\ndata: #{Poison.encode!(event)}\n\n")

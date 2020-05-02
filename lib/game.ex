@@ -48,11 +48,11 @@ defmodule YaggServer.Game do
     {:reply, {:err, {:unknown_msg, msg}}, state}
   end
 
-  def handle_info({:DOWN, _ref, :process, pid, :shutdown}, %Game{players: players} = game) do
+  def handle_info({:DOWN, _ref, :process, pid, reason}, %Game{players: players} = game) do
     case Enum.find(players, fn p -> elem(p, 1) == pid end) do
       :nil -> {:noreply, game}
       {name, _} -> 
-        :ok = notify(game, %{"event" => "player_disconnect", "player" => name})
+        :ok = notify(game, %{"event" => "player_disconnect", "player" => name, "reason" => reason})
         {:noreply, game}
     end
   end
@@ -71,6 +71,7 @@ defmodule YaggServer.Game do
   end
 
   defp notify(%{players: players}, message) do
+    IO.inspect([notify: message])
     Enum.each(players, fn({_player, pid}) -> send(pid, message) end)
   end
 end
