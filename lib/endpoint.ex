@@ -14,18 +14,12 @@ defmodule YaggServer.Endpoint do
   plug :match
   plug :dispatch
 
+  ## These are for testing
   put "/action" do
     :ok = GenServer.call(
       YaggServer.EventManager,
       {:event, conn.params})
     send_resp(conn, 204, "")
-  end
-
-  put "/game" do
-    resp = Actions.game_action(conn.params)
-    conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(200, Poison.encode!(resp))
   end
 
   get "/sse/events" do
@@ -42,6 +36,22 @@ defmodule YaggServer.Endpoint do
       :subscribe)
     sse_loop(conn, self())
   end
+  ## End Testing Routs
+
+  post "/game" do
+    resp = Actions.game_action(conn.params)
+    conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(200, Poison.encode!(resp))
+  end
+
+  get "/game_events/:gid" do
+    %{"player" => player} = conn.query_params
+    {:ok, pid} = YaggServer.Game.get(gid)
+    Process.monitor(pid)
+    GenServer.call(pid, {:join, player})
+    sse_loop(conn, pid)
+  end
 
   match _ do
     send_resp(conn, 404, "oops")
@@ -50,13 +60,12 @@ defmodule YaggServer.Endpoint do
   defp sse_loop(conn, pid) do
     receive do
       {:event, event} ->
-        IO.inspect(['EVENT', event])
         {:ok, conn} = chunk(conn, "event: game_event\ndata: #{Poison.encode!(event)}\n\n")
         sse_loop(conn, pid)
       {:DOWN, _reference, :process, ^pid, _type} ->
         conn
       other ->
-        IO.inspect(['OTHER', other])
+        IO.inspect(['OTHER MESSAGE', other])
         sse_loop(conn, pid)
     end
   end
