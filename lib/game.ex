@@ -21,7 +21,7 @@ defmodule YaggServer.Game do
 
   def handle_call({:join, player}, {pid, _tag}, %Game{state: :open} = game) do
     _ref = Process.monitor(pid)
-    :ok = notify(game, %{"event" => "player_joined", "player" => player})
+    :ok = notify(game, %{event: :player_joined, player: player})
     {:reply, :ok, %{game | players: [{player, pid} | game.players]}}
   end
   def handle_call({:join, _player}, _from, game) do
@@ -32,12 +32,12 @@ defmodule YaggServer.Game do
     {:reply, {:err, :no_players}, game}
   end
   def handle_call(:start, _from, %Game{state: :open} = game) do
-    :ok = notify(game, %{"event" => "game_started"})
+    :ok = notify(game, %{event: :game_started})
     {:reply, :ok, %{game | state: :place}}
   end
 
   def handle_call(:end, _from, %Game{state: :started} = game) do
-    :ok = notify(game, %{"event" => "game_ended"})
+    :ok = notify(game, %{event: :game_ended})
     {:reply, :ok, %{game | state: :end}}
   end
   def handle_call(:end, _from, game) do
@@ -52,7 +52,7 @@ defmodule YaggServer.Game do
     case Enum.find(players, fn p -> elem(p, 1) == pid end) do
       :nil -> {:noreply, game}
       {name, _} -> 
-        :ok = notify(game, %{"event" => "player_disconnect", "player" => name, "reason" => reason})
+        :ok = notify(game, %{event: :player_disconnect, player: name, reason: reason})
         {:noreply, game}
     end
   end
@@ -70,6 +70,7 @@ defmodule YaggServer.Game do
     end
   end
 
+  # TODO: Event types, move to another module?
   defp notify(%{players: players}, message) do
     IO.inspect([notify: message])
     Enum.each(players, fn({_player, pid}) -> send(pid, message) end)

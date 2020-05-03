@@ -46,7 +46,14 @@ defmodule YaggServer.Endpoint do
   end
 
   get "/game_events/:gid" do
-    IO.inspect(conn.query_params)
+    conn =
+      conn
+      |> put_resp_header("Cache-Control", "no-cache")
+      |> put_resp_header("connection", "keep-alive")
+      |> put_resp_header("Content-Type", "text/event-stream; charset=utf-8")
+      |> send_chunked(200)
+    {:ok, conn} = chunk(conn, ~s(event: info\ndata: {"subscription": "success"}\n\n))
+
     %{"player" => player} = conn.query_params
     {:ok, pid} = YaggServer.Game.get(gid)
     Process.monitor(pid)
@@ -61,7 +68,7 @@ defmodule YaggServer.Endpoint do
   defp sse_loop(conn, pid) do
     IO.inspect(['in the loop', pid])
     receive do
-      {:event, event} ->
+      %{event: _} = event ->
         {:ok, conn} = chunk(conn, "event: game_event\ndata: #{Poison.encode!(event)}\n\n")
         sse_loop(conn, pid)
       {:DOWN, _reference, :process, ^pid, _type} ->
