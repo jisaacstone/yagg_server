@@ -14,30 +14,6 @@ defmodule YaggServer.Endpoint do
   plug :match
   plug :dispatch
 
-  ## These are for testing
-  put "/action" do
-    :ok = GenServer.call(
-      YaggServer.EventManager,
-      {:event, conn.params})
-    send_resp(conn, 204, "")
-  end
-
-  get "/sse/events" do
-    conn =
-      conn
-      |> put_resp_header("Cache-Control", "no-cache")
-      |> put_resp_header("connection", "keep-alive")
-      |> put_resp_header("Content-Type", "text/event-stream; charset=utf-8")
-      |> send_chunked(200)
-
-    {:ok, conn} = chunk(conn, "event: game_event\ndata: {\"yes\": 0}\n\n")
-    :ok = GenServer.call(
-      YaggServer.EventManager,
-      :subscribe)
-    sse_loop(conn, self())
-  end
-  ## End Testing Routs
-
   post "/game" do
     resp = Actions.game_action(conn.params)
     conn

@@ -10,7 +10,6 @@ defmodule YaggServer.Application do
         protocol_options: [idle_timeout: :infinity]
       ),
       {DynamicSupervisor, name: YaggServer.GameSupervisor, strategy: :one_for_one},
-      {YaggServer.EventManager, name: YaggServer.EventManager}
     ]
 
     opts = [strategy: :one_for_one, name: YaggServer.Supervisor]
