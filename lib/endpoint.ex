@@ -1,4 +1,4 @@
-alias YaggServer.Actions
+alias YaggServer.Game
 
 defmodule YaggServer.Endpoint do
   use Plug.Router
@@ -14,26 +14,43 @@ defmodule YaggServer.Endpoint do
   plug :match
   plug :dispatch
 
-  post "/game" do
-    resp = Actions.game_action(conn.params)
-    conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(200, Poison.encode!(resp))
+  post "/game/create" do
+    {:ok, pid} = YaggServer.Game.new()
+    gid = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
+    respond(conn, 200, %{id: gid})
   end
 
-  get "/game_events/:gid" do
+  post "/game/:gid/action" do
+    %{"player" => player} = conn.query_params
+    case Game.act(gid, player, conn.params) do
+      {:ok, resp} -> respond(conn, 200, resp)
+      {:err, err} -> respond(conn, 400, err)
+      other -> respond(conn, 501, other)
+    end
+  end
+
+  get "/game/:gid/state" do
+    case Game.get_state(gid) do
+      {:ok, state} -> respond(conn, 200, state)
+      {:err, err} -> respond(conn, 400, err)
+      other -> respond(conn, 501, other)
+    end
+  end
+
+  get "sse/game/:gid/events" do
     conn =
       conn
-      |> put_resp_header("Cache-Control", "no-cache")
+      |> put_resp_header("cache-control", "no-cache")
       |> put_resp_header("connection", "keep-alive")
-      |> put_resp_header("Content-Type", "text/event-stream; charset=utf-8")
+      |> put_resp_header("content-type", "text/event-stream; charset=utf-8")
       |> send_chunked(200)
     {:ok, conn} = chunk(conn, ~s(event: info\ndata: {"subscription": "success"}\n\n))
 
-    %{"player" => player} = conn.query_params
-    {:ok, pid} = YaggServer.Game.get(gid)
-    Process.monitor(pid)
-    :ok = GenServer.call(pid, {:join, player})
+    player = case conn.query_params do
+      %{"player" => p} -> p
+      :default -> :spectate
+    end
+    {:ok, pid} = Game.subscribe(gid, player)
     sse_loop(conn, pid)
   end
 
@@ -53,5 +70,11 @@ defmodule YaggServer.Endpoint do
         IO.inspect(['OTHER MESSAGE', other])
         sse_loop(conn, pid)
     end
+  end
+
+  defp respond(conn, code, data) do
+    conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(code, Poison.encode!(data))
   end
 end

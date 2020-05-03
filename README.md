@@ -4,12 +4,14 @@ Curl commands:
 
 Create Game:
 
-    curl localhost:4000/game -H'Content-Type: application/json' -d'{"action": "create"}'
+    curl localhost:4000/game/create -H'Content-Type: application/json' -d'{}'
 
-Subscribe/join:
+Subscribe:
 
-    curl 'localhost:4000/game_events/GID?player=foo'
+    curl 'localhost:4000/sse/game/GID/events?player=foo'
 
-Start:
+Join:
 
-    curl localhost:4000/game -H'Content-Type: application/json' -d'{"action": "start", "game": "GID"}'
+    curl localhost:4000/game/action?player=foo -H'Content-Type: application/json' -d'{"action": "join"}'
+
+Game Id is ignored right now

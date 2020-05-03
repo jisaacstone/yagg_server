@@ -3,7 +3,7 @@ defmodule YaggServer.Game do
   alias __MODULE__  # so we can do %Game{} instead of %YaggServer.Game{}
 
   @enforce_keys [:state, :players]
-  defstruct state: :open, players: []
+  defstruct state: :open, players: [], subscribors: []
 
   @type game_state :: :open | :place | :battle | :end
   @type t :: %__MODULE__{
@@ -15,33 +15,61 @@ defmodule YaggServer.Game do
     GenServer.start_link(__MODULE__, [], options)
   end
 
+  def get(gid) do
+    # will be a lookup by id eventually
+    pid = gid |> to_charlist() |> :erlang.list_to_pid
+    case Process.alive?(pid) do
+      :true -> {:ok, pid}
+      :false -> {:err, :process_ended}
+    end
+  end
+
+  def new() do
+    # For now just one game all the time
+    case Supervisor.which_children(YaggServer.GameSupervisor) do
+      [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
+      [] -> DynamicSupervisor.start_child(YaggServer.GameSupervisor, YaggServer.Game)
+    end
+  end
+
+  # API
+
+  def get_state(_gid) do
+    {:ok, pid} = new()
+    GenServer.call(pid, :get_state)
+  end
+
+  def subscribe(_gid, player) do
+    {:ok, pid} = new()
+    Process.monitor(pid)
+    GenServer.call(pid, {:subscribe, player})
+    {:ok, pid}
+  end
+
+  def act(_gid, player, action) do
+    {:ok, pid} = new()
+    GenServer.call(pid, {:act, player, action})
+  end
+
+  # Callbacks
+
   def init(_) do
     {:ok, %Game{state: :open, players: []}}
   end
-
-  def handle_call({:join, player}, {pid, _tag}, %Game{state: :open} = game) do
-    _ref = Process.monitor(pid)
-    :ok = notify(game, %{event: :player_joined, player: player})
-    {:reply, :ok, %{game | players: [{player, pid} | game.players]}}
+  def handle_call(:get_state, _from, game) do
+    {:reply, {:ok, game}, game}
   end
-  def handle_call({:join, _player}, _from, game) do
-    {:reply, {:err, :bad_state}, game}
+  def handle_call({:subscribe, player}, {pid, _tag}, %{subscribors: subs} = game) do
+    {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
   end
-
-  def handle_call(:start, _from, %Game{players: []} = game) do
-    {:reply, {:err, :no_players}, game}
-  end
-  def handle_call(:start, _from, %Game{state: :open} = game) do
-    :ok = notify(game, %{event: :game_started})
-    {:reply, :ok, %{game | state: :place}}
-  end
-
-  def handle_call(:end, _from, %Game{state: :started} = game) do
-    :ok = notify(game, %{event: :game_ended})
-    {:reply, :ok, %{game | state: :end}}
-  end
-  def handle_call(:end, _from, game) do
-    {:reply, {:err, :bad_state}, game}
+  def handle_call({:act, player, action}, _from, game) do
+    case YaggServer.Action.resolve(action, game, player) do
+      {:err, _} = err -> {:reply, err, game}
+      {:notify, game, event} ->
+        notify(game, event)
+        {:reply, :ok, game}
+      {:nonotify, game} -> {:reply, :ok, game}
+    end
   end
 
   def handle_call(msg, _from, state) do
@@ -61,18 +89,9 @@ defmodule YaggServer.Game do
     {:noreply, game}
   end
 
-  def get(gid) do
-    # will be a lookup by id eventually
-    pid = gid |> to_charlist() |> :erlang.list_to_pid
-    case Process.alive?(pid) do
-      :true -> {:ok, pid}
-      :false -> {:err, :process_ended}
-    end
-  end
-
   # TODO: Event types, move to another module?
-  defp notify(%{players: players}, message) do
+  defp notify(%{subscribors: subs}, message) do
     IO.inspect([notify: message])
-    Enum.each(players, fn({_player, pid}) -> send(pid, message) end)
+    Enum.each(subs, fn({_player, pid}) -> send(pid, message) end)
   end
 end
