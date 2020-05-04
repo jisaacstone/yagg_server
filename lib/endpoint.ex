@@ -21,8 +21,8 @@ defmodule Yagg.Endpoint do
   end
 
   post "/game/:gid/action" do
-    %{"player" => player} = conn.query_params
-    case Game.act(gid, player, conn.params) do
+    %{"player" => player} = conn.params
+    case Game.act(gid, player, conn.body_params) do
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, err)
       other -> respond(conn, 501, other)
@@ -31,7 +31,7 @@ defmodule Yagg.Endpoint do
 
   get "/game/:gid/state" do
     case Game.get_state(gid) do
-      {:ok, state} -> respond(conn, 200, state)
+      {:ok, game} -> respond(conn, 200, %{state: game.state, players: Enum.map(game.players, fn(p) -> p.name end)})
       {:err, err} -> respond(conn, 400, err)
       other -> respond(conn, 501, other)
     end

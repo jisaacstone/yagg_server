@@ -22,9 +22,10 @@ defmodule Yagg.Action do
       _other -> {:err, :notenoughplayers}
     end
   end
+  # action: move
       
   def resolve(action, _game, _player) do
-    {:err, :unknown, action}
+    {:err, %{unknown: action}}
   end
 
   defp initial_setup(%{players: players} = game) do
