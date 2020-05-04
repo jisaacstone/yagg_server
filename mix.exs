@@ -15,7 +15,7 @@ defmodule YaggServer.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {YaggServer.Application, []}
+      mod: {Yagg.Application, []}
     ]
   end
 

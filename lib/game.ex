@@ -1,9 +1,10 @@
-defmodule YaggServer.Game do
+defmodule Yagg.Game do
   use GenServer
-  alias __MODULE__  # so we can do %Game{} instead of %YaggServer.Game{}
+  alias __MODULE__  # so we can do %Game{} instead of %Yagg.Game{}
+  alias Yagg.Game.Board
 
   @enforce_keys [:state, :players]
-  defstruct state: :open, players: [], subscribors: []
+  defstruct state: :open, players: [], subscribors: [], board: :nil
 
   @type game_state :: :open | :place | :battle | :end
   @type t :: %__MODULE__{
@@ -26,9 +27,10 @@ defmodule YaggServer.Game do
 
   def new() do
     # For now just one game all the time
-    case Supervisor.which_children(YaggServer.GameSupervisor) do
+    # TODO: game args
+    case Supervisor.which_children(Yagg.GameSupervisor) do
       [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
-      [] -> DynamicSupervisor.start_child(YaggServer.GameSupervisor, YaggServer.Game)
+      [] -> DynamicSupervisor.start_child(Yagg.GameSupervisor, Yagg.Game)
     end
   end
 
@@ -54,7 +56,7 @@ defmodule YaggServer.Game do
   # Callbacks
 
   def init(_) do
-    {:ok, %Game{state: :open, players: []}}
+    {:ok, %Game{state: :open, players: [], subscribors: [], board: Board.new()}}
   end
   def handle_call(:get_state, _from, game) do
     {:reply, {:ok, game}, game}
@@ -63,7 +65,7 @@ defmodule YaggServer.Game do
     {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
   end
   def handle_call({:act, player, action}, _from, game) do
-    case YaggServer.Action.resolve(action, game, player) do
+    case Yagg.Action.resolve(action, game, player) do
       {:err, _} = err -> {:reply, err, game}
       {:notify, game, event} ->
         notify(game, event)
@@ -88,6 +90,8 @@ defmodule YaggServer.Game do
     IO.inspect([unexpected_info: other])
     {:noreply, game}
   end
+
+  # Private
 
   # TODO: Event types, move to another module?
   defp notify(%{subscribors: subs}, message) do

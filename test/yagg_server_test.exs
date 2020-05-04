@@ -1,7 +1,7 @@
-alias YaggServer.Endpoint
-alias YaggServer.Game
+alias Yagg.Endpoint
+alias Yagg.Game
 
-defmodule YaggServerTest.Endpoint do
+defmodule YaggTest.Endpoint do
   use ExUnit.Case
   use Plug.Test
 
@@ -29,22 +29,21 @@ defmodule YaggServerTest.Endpoint do
   end
 
   test "game join" do
-    %{status: status, resp_body: body} = send_json("/game", %{"action" => "create"})
+    %{status: status, resp_body: body} = send_json("/game/create", %{})
     assert status == 200
     assert %{"id" => gid} = Poison.decode!(body)
-    {:ok, pid} = Game.get(gid)
-    :ok = GenServer.call(pid, {:join, "player1"})
+    :ok = Game.act(gid, "player1", %{"action" => "join"})
     {sse_pid, _ref} = spawn_monitor(
       fn -> Endpoint.call(
-        conn(:get, "/game_events/#{gid}?player=player2"),
+        conn(:get, "/sse/game/#{gid}/events?player=player2"),
         @opts)
       end)
+    :ok = Game.act(gid, "player2", %{"action" => "join"})
     assert Process.alive?(sse_pid)
     %{"event" => event_type} = recieve_event()
     assert event_type == "player_joined"
     Process.exit(sse_pid, :kill)
     %{"event" => event_type} = recieve_event()
     assert event_type == "player_disconnect"
-    Process.exit(pid, :kill)
   end
 end

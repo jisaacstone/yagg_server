@@ -1,6 +1,6 @@
-alias YaggServer.Game
+alias Yagg.Game
 
-defmodule YaggServer.Endpoint do
+defmodule Yagg.Endpoint do
   use Plug.Router
 
   # plug(CORSPlug)
@@ -15,7 +15,7 @@ defmodule YaggServer.Endpoint do
   plug :dispatch
 
   post "/game/create" do
-    {:ok, pid} = YaggServer.Game.new()
+    {:ok, pid} = Yagg.Game.new()
     gid = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
     respond(conn, 200, %{id: gid})
   end
