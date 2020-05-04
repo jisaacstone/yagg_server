@@ -1,5 +1,6 @@
 defmodule Yagg.Game.Player do
   alias __MODULE__
+  @derive {Poison.Encoder, only: [:name, :position]}
   defstruct [
     name: "nil",
     position: :north,

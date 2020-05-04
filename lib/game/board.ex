@@ -6,6 +6,20 @@ defmodule Yagg.Game.Board do
     features: %{},
   ]
 
+  defimpl Poison.Encoder, for: Board do
+    def encode(%Board{features: features} = board, options) do
+      encodeable = features
+        |> Map.to_list()
+        |> Map.new(fn({{x, y}, f}) -> {"#{x},#{y}", f} end)
+      Poison.Encoder.Map.encode(
+        %{width: board.width,
+          height: board.height,
+          features: encodeable},
+        options
+      )
+    end
+  end
+
   def new() do
     %Board{width: 5, height: 5, features: %{{1, 2} => :water, {3, 2} => :water}}
   end

@@ -31,7 +31,7 @@ defmodule Yagg.Endpoint do
 
   get "/game/:gid/state" do
     case Game.get_state(gid) do
-      {:ok, game} -> respond(conn, 200, %{state: game.state, players: Enum.map(game.players, fn(p) -> p.name end)})
+      {:ok, game} -> respond(conn, 200, game)
       {:err, err} -> respond(conn, 400, err)
       other -> respond(conn, 501, other)
     end

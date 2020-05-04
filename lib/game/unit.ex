@@ -1,31 +1,33 @@
 defmodule Yagg.Game.Unit do
   alias __MODULE__
+  @derive {Poison.Encoder, only: [:name, :attack, :defense, :abilities]}
   defstruct [
     attack: :nil,
     defense: :nil,
     name: "nil",
-    abilities: []
+    abilities: [],
+    player: :nil
   ]
 
-  def new(name, attack, defense) do
-    %Unit{name: name, attack: attack, defense: defense}
+  def new(player, name, attack, defense) do
+    %Unit{player: player, name: name, attack: attack, defense: defense}
   end
 
   @doc """
   Returns ten standard units in a random order
   """
-  def starting_units() do
+  def starting_units(player) do
     Enum.shuffle([
-      new(:monarch, 2, 1),
-      new(:general, 4, 3),
-      new(:bezerker, 5, 1),
-      new(:fullarmorcoward, 1, 5),
-      new(:recruit, 2, 3),
-      new(:pacifist, 1, 4),
-      new(:solid, 3, 3),
-      new(:novice, 3, 2),
-      new(:triggerhappy, 3, 1),
-      new(:cannonfodder, 1, 2),
+      new(player, :monarch, 2, 1),
+      new(player, :general, 4, 3),
+      new(player, :bezerker, 5, 1),
+      new(player, :fullarmorcoward, 1, 5),
+      new(player, :recruit, 2, 3),
+      new(player, :pacifist, 1, 4),
+      new(player, :solid, 3, 3),
+      new(player, :novice, 3, 2),
+      new(player, :triggerhappy, 3, 1),
+      new(player, :cannonfodder, 1, 2),
     ])
   end
 end

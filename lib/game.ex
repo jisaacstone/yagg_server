@@ -4,6 +4,7 @@ defmodule Yagg.Game do
   alias Yagg.Game.Board
 
   @enforce_keys [:state, :players]
+  @derive {Poison.Encoder, only: [:state, :players, :board]}
   defstruct state: :open, players: [], subscribors: [], board: :nil
 
   @type game_state :: :open | :place | :battle | :end

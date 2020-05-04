@@ -20,4 +20,4 @@ Game Id is ignored right now
 State:
 
     curl -i 'localhost:4000/game/foo/state'
-    {"state":"open","players":["mee","bar"]} Chickens-MacBook-Pro//larpy (:)
+    {"state":"open","players":["mee","bar"]}
