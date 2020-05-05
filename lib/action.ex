@@ -6,18 +6,26 @@ defmodule Yagg.Action do
   # TODO: send events instead of collecting them?
   def resolve(%{"action" => "join"}, %{state: :open} = game, player_name) do
     case game.players do
-      [] -> {:nonotify, %{game | players: [Player.new(player_name, :north)]}}
-      [p1] -> {:notify, %{game | players: [p1, Player.new(player_name, :south)]}, %{event: :player_joined, player: player_name}}
-      _ -> {:err, :game_full}
+      [] -> {:notify, [Event.new(:player_joined, player: player_name)], %{game | players: [Player.new(player_name, :north)]}}
+      [p1] -> {:notify, [Event.new(:player_joined, player: player_name)], %{game | players: [p1, Player.new(player_name, :south)]}}
+      [_p1, _p2] -> {:err, :game_full}
     end
   end
   def resolve(%{"action" => "join"}, _game, _player) do
     {:err, :bad_state}
   end
+
+  def resolve(%{"action" => "leave"}, game, player_name) do
+    case Enum.find_index(game.players, fn(p) -> p.name == player_name end) do
+      :nil -> {:nonotify, game}
+      index -> {:notify, [Event.new(:player_left, player: player_name)], %{game | players: List.delete_at(game.players, index)}}
+    end
+  end
+
   def resolve(%{"action" => "start"}, game, _player) do
     case game.players do
       [_north, _south] ->
-        {game, notifications} = initial_setup(game)
+        {notifications, game} = initial_setup(game)
         {:notify, [Event.new(:game_started) | notifications], game}
       _other -> {:err, :notenoughplayers}
     end
@@ -39,7 +47,7 @@ defmodule Yagg.Action do
         ) |> Enum.reduce({board, player, notifications}, &place_unit/2)
       end
     )
-    {%{game | board: board}, notifications}
+    {notifications, %{game | board: board}}
   end
 
   defp place_unit({{x, y}, unit}, {board, player, notifications}) do

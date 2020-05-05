@@ -1,6 +1,7 @@
 defmodule Yagg.Game do
   use GenServer
   alias __MODULE__  # so we can do %Game{} instead of %Yagg.Game{}
+  alias Yagg.Event
   alias Yagg.Game.Board
 
   @enforce_keys [:state, :players]
@@ -63,12 +64,13 @@ defmodule Yagg.Game do
     {:reply, {:ok, game}, game}
   end
   def handle_call({:subscribe, player}, {pid, _tag}, %{subscribors: subs} = game) do
+    IO.inspect(sub: player, pid: pid)
     {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
   end
   def handle_call({:act, player, action}, _from, game) do
     case Yagg.Action.resolve(action, game, player) do
       {:err, _} = err -> {:reply, err, game}
-      {:notify, game, event} ->
+      {:notify, event, game} ->
         notify(game, event)
         {:reply, :ok, game}
       {:nonotify, game} -> {:reply, :ok, game}
@@ -95,8 +97,15 @@ defmodule Yagg.Game do
   # Private
 
   # TODO: Event types, move to another module?
-  defp notify(%{subscribors: subs}, message) do
-    IO.inspect([notify: message])
+  defp notify(_game, []) do
+    :ok
+  end
+  defp notify(game, [msg | messages]) do
+    notify(game, msg)
+    notify(game, messages)
+  end
+  defp notify(%{subscribors: subs}, %Event{} = message) do
+    IO.inspect(notify: message, subs: subs)
     Enum.each(subs, fn({_player, pid}) -> send(pid, message) end)
   end
 end

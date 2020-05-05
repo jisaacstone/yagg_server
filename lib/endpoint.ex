@@ -1,9 +1,9 @@
-alias Yagg.Game
+alias Yagg.{Game, Event}
 
 defmodule Yagg.Endpoint do
   use Plug.Router
 
-  # plug(CORSPlug)
+  plug(CORSPlug)
 
   plug(Plug.Parsers,
     parsers: [:json, :urlencoded],
@@ -23,6 +23,7 @@ defmodule Yagg.Endpoint do
   post "/game/:gid/action" do
     %{"player" => player} = conn.params
     case Game.act(gid, player, conn.body_params) do
+      :ok -> respond(conn, 204, "")
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, err)
       other -> respond(conn, 501, other)
@@ -61,7 +62,7 @@ defmodule Yagg.Endpoint do
   defp sse_loop(conn, pid) do
     IO.inspect(['in the loop', pid])
     receive do
-      %{event: _} = event ->
+      %Event{} = event ->
         {:ok, conn} = chunk(conn, "event: game_event\ndata: #{Poison.encode!(event)}\n\n")
         sse_loop(conn, pid)
       {:DOWN, _reference, :process, ^pid, _type} ->
