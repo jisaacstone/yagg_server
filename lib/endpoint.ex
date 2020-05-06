@@ -45,7 +45,7 @@ defmodule Yagg.Endpoint do
       |> put_resp_header("connection", "keep-alive")
       |> put_resp_header("content-type", "text/event-stream; charset=utf-8")
       |> send_chunked(200)
-    {:ok, conn} = chunk(conn, ~s(event: info\ndata: {"subscription": "success"}\n\n))
+    {:ok, conn} = chunk(conn, ~s(event: game_event\ndata: {"subscription": "success"}\n\n))
 
     player = case conn.query_params do
       %{"player" => p} -> p
@@ -60,7 +60,6 @@ defmodule Yagg.Endpoint do
   end
 
   defp sse_loop(conn, pid) do
-    IO.inspect(['in the loop', pid])
     receive do
       %Event{} = event ->
         {:ok, conn} = chunk(conn, "event: game_event\ndata: #{Poison.encode!(event)}\n\n")

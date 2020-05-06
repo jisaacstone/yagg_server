@@ -4,6 +4,7 @@ defmodule Yagg.Game.Board do
     width: 5,
     height: 5,
     features: %{},
+    units: %{},
   ]
 
   defimpl Poison.Encoder, for: Board do
@@ -21,7 +22,7 @@ defmodule Yagg.Game.Board do
   end
 
   def new() do
-    %Board{width: 5, height: 5, features: %{{1, 2} => :water, {3, 2} => :water}}
+    %Board{width: 5, height: 5, units: %{}, features: %{{1, 2} => :water, {3, 2} => :water}}
   end
 
   # assumes there can only be one feature per space

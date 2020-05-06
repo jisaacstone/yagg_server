@@ -100,12 +100,23 @@ defmodule Yagg.Game do
   defp notify(_game, []) do
     :ok
   end
-  defp notify(game, [msg | messages]) do
-    notify(game, msg)
-    notify(game, messages)
+  defp notify(game, [event | events]) do
+    notify(game, event)
+    notify(game, events)
   end
-  defp notify(%{subscribors: subs}, %Event{} = message) do
-    IO.inspect(notify: message, subs: subs)
-    Enum.each(subs, fn({_player, pid}) -> send(pid, message) end)
+  defp notify(%{subscribors: subs, players: players}, %Event{} = event) do
+    Enum.each(
+      subs,
+      fn({player, pid}) ->
+        case event.stream do
+          :global -> send(pid, event)
+          stream ->
+            IO.inspect([stream, players, player])
+            if Enum.any?(players, fn(p) -> p.name == player and p.position == stream end) do
+              send(pid, event)
+            end
+        end
+      end
+    )
   end
 end

@@ -1,4 +1,29 @@
 /* jshint esversion: 6 */
+const eventHandlers = {
+  'game_started': function() {
+    document.getElementById('gamestate').innterHTML = 'started';
+  },
+  'player_joined': function(event) {
+    console.log({e: event, p: event.position});
+    document.getElementById(`${event.position}name`).innerHTML = event.name;
+    document.getElementById(`${event.position}name`).class = event.name;
+  },
+  'player_left': function(event) {
+    document.getElementsByClassName(event.name)[0].innerHTML = '';
+  },
+  'unit_placed': function(event) {
+    console.log(event);
+    console.log(`c${event.x}-${event.y}`);
+    document.getElementById(`c${event.x}-${event.y}`).innerHTML = event.id;
+  },
+  'new_unit': function(event){
+    console.log({nu: event});
+      const newElement = document.createElement('p');
+      newElement.innerHTML = `id: ${event.id}, unit: ${event.unit}`;
+      document.getElementById('units').appendChild(newElement);
+  }
+};
+
 window.onload = function() {
   const eventDiv = document.getElementById('events'),
     nameForm = document.getElementById('name'),
@@ -10,7 +35,6 @@ window.onload = function() {
   var eventListener = null;
 
   function ingame() {
-    leaveButton.style.display = 'block';
     startButton.style.display = 'block';
     nameForm.style.display = 'none';
     hostForm.style.display = 'none';
@@ -20,7 +44,6 @@ window.onload = function() {
   }
 
   function leavegame() {
-    leaveButton.style.display = 'none';
     startButton.style.display = 'none';
     nameForm.style.display = 'block';
     hostForm.style.display = 'block';
@@ -29,11 +52,17 @@ window.onload = function() {
   function createEventListener() {
     const host = document.getElementById('host').value;
     const playername = document.getElementById('name').value;
-    eventListener = new EventSource(`http://${host}/sse/game/ID/events?player=${name}`);
-    eventListener.addEventListener('game_event', function(event) {
+    eventListener = new EventSource(`http://${host}/sse/game/ID/events?player=${playername}`);
+    eventListener.addEventListener('game_event', function(ssevent) {
       const newElement = document.createElement('p');
-      newElement.innerHTML = 'message: ' + event.data;
+      newElement.innerHTML = 'message: ' + ssevent.data;
       eventDiv.appendChild(newElement);
+      const evt = JSON.parse(ssevent.data);
+      if (eventHandlers[evt.event]) {
+        eventHandlers[evt.event](evt);
+      } else {
+        console.log(`no event handler for ${evt.event}`);
+      }
     });
   }
 
@@ -73,7 +102,14 @@ window.onload = function() {
   }
 
   function setstate(gamedata) {
-    document.getElementById('gamestate').innerHTML = `state: ${gamedata.state}, players: ${JSON.stringify(gamedata.players)}`;
+    document.getElementById('gamestate').innerHTML = `state: ${gamedata.state}`;
+    for (const player of gamedata.players) {
+      eventHandlers.player_joined(player);
+    }
+    for (const [k, v] of Object.entries(gamedata.board.features)) {
+      const [x, y] = k.split(',');
+      document.getElementById(`c${x}-${y}`).innerHTML = v;
+    }
   }
 
   leaveButton.onclick = function() {
