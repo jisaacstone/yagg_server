@@ -1,32 +1,7 @@
 <!DOCTYPE HTML>
 <head>
   <title>Yagg</title>
-  <script type="text/javascript">
-    window.onload = function() {
-      document.getElementById('joinbutton').onclick = function() {
-        const host = document.getElementById('host').value;
-        const playername = document.getElementById('name').value;
-        const evtSource = new EventSource(`//${host}/sse/game/ID/events?player=${name}`);
-        const baseUrl = `http://${host}/game/ID/action?player=${playername}`;  
-        const eventDiv = document.getElementById('events');
-        evtSource.onmessage = function(event) {
-          const newElement = document.createElement('p');
-          newElement.innerHTML = 'message: ' + event.data;
-          eventDiv.appendChild(newElement);
-        }
-        function gameaction(actionJson) {
-          function listener() {
-            console.log(this.responseText);
-          }
-          var oReq = new XMLHttpRequest();
-          oReq.addEventListener('load', listener);
-          oReq.open('POST', baseUrl);
-          oReq.setRequestHeader('Content-Type', 'application/json');
-          oReq.send(JSON.stringify(actionJson));
-        }
-        gameaction({action: 'join'});
-      }
-    }
+  <script type="text/javascript" src="static/index.js">
   </script>
 </head>
 <body>
@@ -36,7 +11,11 @@
     <label for="name">Name</label>
     <input type="text" id="name" name="name"/>
     <button type="button" id="joinbutton">join</button>
+    <button type="button" id="leavebutton">leave</button>
+    <button type="button" id="startbutton">start</button>
+    <div id="error"></div>
   </form>
+  <div id="gamestate"></div>
   <table id="board" summary="board">
     <tr><td id="c0-4"></td><td id="c1-4"></td><td id="c2-4"></td><td id="c3-4"></td><td id="c4-4"></td>
     <tr><td id="c0-3"></td><td id="c1-3"></td><td id="c2-3"></td><td id="c3-3"></td><td id="c4-3"></td>

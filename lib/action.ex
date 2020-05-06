@@ -41,17 +41,18 @@ defmodule Yagg.Action do
       players,
       {Board.new(), []},
       fn(player, {board, notifications}) ->
-        Enum.zip(
+        {b, _p, n} = Enum.zip(
           Player.starting_squares(player, board),
           Unit.starting_units(player)
         ) |> Enum.reduce({board, player, notifications}, &place_unit/2)
+        {b, n}
       end
     )
     {notifications, %{game | board: board}}
   end
 
   defp place_unit({{x, y}, unit}, {board, player, notifications}) do
-    board = Board.place(board, unit, x, y)
+    {:ok, board} = Board.place(board, unit, x, y)
     notifications = [
       Event.new(player.position, :new_unit, %{unit: unit, x: x, y: y}),
       Event.new(:global, :unit_placed, %{x: x, y: y})

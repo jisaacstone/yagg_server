@@ -21,3 +21,5 @@ State:
 
     curl -i 'localhost:4000/game/foo/state'
     {"state":"open","players":["mee","bar"]}
+
+point a browser at the `index.html` for a barebones UI (under construction)
