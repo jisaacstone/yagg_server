@@ -6,7 +6,7 @@ const eventHandlers = {
   'player_joined': function(event) {
     console.log({e: event, p: event.position});
     document.getElementById(`${event.position}name`).innerHTML = event.name;
-    document.getElementById(`${event.position}name`).class = event.name;
+    document.getElementById(`${event.position}name`).className = event.name;
   },
   'player_left': function(event) {
     document.getElementsByClassName(event.name)[0].innerHTML = '';
@@ -14,7 +14,13 @@ const eventHandlers = {
   'unit_placed': function(event) {
     console.log(event);
     console.log(`c${event.x}-${event.y}`);
-    document.getElementById(`c${event.x}-${event.y}`).innerHTML = event.id;
+    const square = document.getElementById(`c${event.x}-${event.y}`);
+    square.innerHTML = event.id;
+    if (event.id.startsWith('north')) {
+      square.dataset.unitowner = 'north';
+    } else if (event.id.startsWith('south')) {
+      square.dataset.unitowner = 'south';
+    }
   },
   'new_unit': function(event){
     console.log({nu: event});
@@ -24,7 +30,7 @@ const eventHandlers = {
   }
 };
 
-window.onload = function() {
+function game() {
   const eventDiv = document.getElementById('events'),
     nameForm = document.getElementById('name'),
     hostForm = document.getElementById('host'),
@@ -106,28 +112,61 @@ window.onload = function() {
     for (const player of gamedata.players) {
       eventHandlers.player_joined(player);
     }
-    for (const [k, v] of Object.entries(gamedata.board.features)) {
-      const [x, y] = k.split(',');
-      document.getElementById(`c${x}-${y}`).innerHTML = v;
+    for (const [coor, id] of Object.entries(gamedata.board.features)) {
+      const [x, y] = coor.split(',');
+      eventHandlers.unit_placed({x, y, id});
     }
   }
 
-  leaveButton.onclick = function() {
-    gameaction({action: 'leave'}, function() {
-      leavegame();
+  return {
+    ingame,
+    leavegame,
+    gameaction,
+    gamestate,
+  };
+}
+
+window.onload = function() {
+  const G = game();
+  var selected = {};
+
+  document.getElementById('leavebutton').onclick = function() {
+    G.gameaction({action: 'leave'}, function() {
+      G.leavegame();
     });
   };
 
-  joinButton.onclick = function() {
-    gameaction({action: 'join'}, function() {
-      ingame();
+  document.getElementById('joinbutton').onclick = function() {
+    G.gameaction({action: 'join'}, function() {
+      G.ingame();
     });
-    gamestate();
+    G.gamestate();
   };
 
-  startButton.onclick = function() {
-    gameaction({action: 'start'});
+  document.getElementById('startbutton').onclick = function() {
+    G.gameaction({action: 'start'});
   };
 
-  leavegame();
+  for (const el of document.getElementsByTagName('td')) {
+    el.onclick = function() {
+      if (selected.element == this) {
+        this.className = '';
+        selected = {};
+        return;
+      }
+      const id = this.id,
+        x = +id.charAt(1),
+        y = +id.charAt(3);
+      if (selected.element) {
+        G.gameaction({action: 'move', id: selected.unitId, x, y});
+        selected.element.className = '';
+        selected = {};
+      } else if (this.textContent) {
+        selected = {element: this, unitId: this.textContent};
+        this.className = 'selected';
+      }
+    };
+  }
+
+  G.leavegame();
 };
