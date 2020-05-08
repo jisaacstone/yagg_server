@@ -4,12 +4,19 @@ defmodule Yagg.Game.Player do
   defstruct [
     name: "nil",
     position: :north,
-    units: [],
     event_listener: :nil,
   ]
 
   def new(name, position) do
     %Player{name: name, position: position}
+  end
+
+  def by_name(game, name) do
+    case game.players do
+      [%Player{name: ^name} = player|_] -> player
+      [_|%Player{name: ^name} = player] -> player
+      _other -> :notfound
+    end
   end
 
   def starting_squares(%Player{position: :north}, _board) do

@@ -72,10 +72,10 @@ function game() {
     });
   }
 
-  function gameaction(actionJson, callback) {
+  function gameaction(action, data, callback) {
     const host = hostForm.value;
     const playername = nameForm.value;
-    const baseUrl = `http://${host}/game/ID/action?player=${playername}`;  
+    const baseUrl = `http://${host}/game/ID/action/${action}?player=${playername}`;  
     function listener() {
       if (this.status >= 400) {
          errorDiv.innerHTML = `error: ${this.status}, message: ${this.responseText}`;
@@ -90,7 +90,7 @@ function game() {
     oReq.addEventListener('load', listener);
     oReq.open('POST', baseUrl);
     oReq.setRequestHeader('Content-Type', 'application/json');
-    oReq.send(JSON.stringify(actionJson));
+    oReq.send(JSON.stringify(data || {}));
   }
 
   function gamestate() {
@@ -131,20 +131,21 @@ window.onload = function() {
   var selected = {};
 
   document.getElementById('leavebutton').onclick = function() {
-    G.gameaction({action: 'leave'}, function() {
+    G.gameaction('leave', {}, function() {
       G.leavegame();
     });
   };
 
   document.getElementById('joinbutton').onclick = function() {
-    G.gameaction({action: 'join'}, function() {
+    const name = document.getElementById('name').value;
+    G.gameaction('join', {player: name}, function() {
       G.ingame();
     });
     G.gamestate();
   };
 
   document.getElementById('startbutton').onclick = function() {
-    G.gameaction({action: 'start'});
+    G.gameaction('start');
   };
 
   for (const el of document.getElementsByTagName('td')) {
@@ -158,7 +159,7 @@ window.onload = function() {
         x = +id.charAt(1),
         y = +id.charAt(3);
       if (selected.element) {
-        G.gameaction({action: 'move', id: selected.unitId, x, y});
+        G.gameaction('move', {id: selected.unitId, x, y});
         selected.element.className = '';
         selected = {};
       } else if (this.textContent) {

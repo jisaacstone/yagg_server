@@ -1,15 +1,10 @@
 alias Yagg.{Game, Event}
+alias Plug.Conn
 
 defmodule Yagg.Endpoint do
   use Plug.Router
 
   plug(CORSPlug)
-
-  plug(Plug.Parsers,
-    parsers: [:json, :urlencoded],
-    json_decoder: Poison,
-    pass: ["application/json", "application/x-www-form-urlencoded"]
-  )
 
   plug :match
   plug :dispatch
@@ -20,9 +15,14 @@ defmodule Yagg.Endpoint do
     respond(conn, 200, %{id: gid})
   end
 
-  post "/game/:gid/action" do
-    %{"player" => player} = conn.params
-    case Game.act(gid, player, conn.body_params) do
+  post "/game/:gid/action/:action" do
+    act_struct = struct(Module.safe_concat(Yagg.Action, String.capitalize(action)))
+    {:ok, body, conn} = Conn.read_body(conn)
+    conn = Conn.fetch_query_params(conn)
+    actiondata = Poison.decode!(body, as: act_struct)
+    player_name = Map.get(actiondata, :player, conn.query_params["player"])
+
+    case Game.act(gid, player_name, actiondata) do
       :ok -> respond(conn, 204, "")
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, err)
@@ -41,6 +41,7 @@ defmodule Yagg.Endpoint do
   get "sse/game/:gid/events" do
     conn =
       conn
+      |> Conn.fetch_query_params()
       |> put_resp_header("cache-control", "no-cache")
       |> put_resp_header("connection", "keep-alive")
       |> put_resp_header("content-type", "text/event-stream; charset=utf-8")

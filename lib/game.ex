@@ -1,8 +1,9 @@
+alias Yagg.Event
+alias Yagg.Game.{Board, Player}
+
 defmodule Yagg.Game do
   use GenServer
   alias __MODULE__  # so we can do %Game{} instead of %Yagg.Game{}
-  alias Yagg.Event
-  alias Yagg.Game.Board
 
   @enforce_keys [:state, :players]
   @derive {Poison.Encoder, only: [:state, :players, :board]}
@@ -50,9 +51,9 @@ defmodule Yagg.Game do
     {:ok, pid}
   end
 
-  def act(_gid, player, action) do
+  def act(_gid, player_name, action) do
     {:ok, pid} = new()
-    GenServer.call(pid, {:act, player, action})
+    GenServer.call(pid, {:act, player_name, action})
   end
 
   # Callbacks
@@ -67,7 +68,9 @@ defmodule Yagg.Game do
     IO.inspect(sub: player, pid: pid)
     {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
   end
-  def handle_call({:act, player, action}, _from, game) do
+  def handle_call({:act, player_name, action}, _from, game) do
+    IO.inspect([game.players, player_name])
+    player = Player.by_name(game, player_name)
     case Yagg.Action.resolve(action, game, player) do
       {:err, _} = err -> {:reply, err, game}
       {:notify, event, game} ->

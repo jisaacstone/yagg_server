@@ -1,3 +1,6 @@
+alias Yagg.Game.Unit
+alias Yagg.Event
+
 defmodule Yagg.Game.Board do
   alias __MODULE__
   defstruct [
@@ -25,7 +28,12 @@ defmodule Yagg.Game.Board do
     %Board{width: 5, height: 5, units: %{}, features: %{{1, 2} => :water, {3, 2} => :water}}
   end
 
-  # assumes there can only be one feature per space
+  def place(%Board{features: features, units: units} = board, %Unit{} = unit, x, y) do
+    case features[{x, y}] do
+      :nil -> {:ok, %{board | features: Map.put_new(features, {x, y}, unit), units: Map.put(units, unit.id, {x, y})}}
+      _something -> {:err, :occupied}
+    end
+  end
   def place(%Board{features: features} = board, feature, x, y) do
     case features[{x, y}] do
       :nil -> {:ok, %{board | features: Map.put_new(features, {x, y}, feature)}}
@@ -39,4 +47,64 @@ defmodule Yagg.Game.Board do
       _something -> {:ok, %{board | features: Map.delete(features, {x, y})}}
     end
   end
+
+  def move(%Board{units: units} = board, unit, to_x, to_y) do
+    case units[unit.id] do
+      :nil -> {:err, :notonboard}
+      {x, y} ->
+        unless can_move?(x, to_x, y, to_y) do
+          {:err, :illegal}
+        else
+          case board.features[{to_x, to_y}] do
+            :water -> {:err, :illegal}
+            :nil -> 
+              {board, events} = do_move(board, unit, {x, y}, {to_x, to_y})
+              {:ok, board, events}
+            feature -> 
+              {board, events} = do_battle(board, unit, feature, {x, y}, {to_x, to_y})
+              {:ok, board, events}
+          end
+      end
+    end
+  end
+
+  defp can_move?(x, to_x, y, to_y) do
+    Enum.sort([abs(x - to_x), abs(y - to_y)]) == [1, 0]
+  end
+
+  defp do_move(board, unit, from, to) do
+    units = %{board.units | unit.id => to}
+    features = board.features
+      |> Map.delete(from)
+      |> Map.put_new(to, unit)
+    {
+      %{board | units: units, features: features},
+      [Event.new(:unit_moved, %{id: unit.id, from: from, to: to})]
+    }
+  end
+
+  defp unit_death(board, unit) do
+    {coords, units} = Map.pop!(board.units, unit.id)
+    features = Map.delete(board.features, coords)
+    {
+      %{board | units: units, features: features},
+      [Event.new(:unit_died, %{id: unit.id})]
+    }
+  end
+
+  defp do_battle(board, unit, opponent, from, to) do
+    cond do
+      unit.attack > opponent.defense ->
+        {board, e1} = unit_death(board, opponent)
+        {board, e2} = do_move(board, unit, from, to)
+        {board, e1 ++ e2}
+      unit.attack == opponent.defense ->
+        {board, e1} = unit_death(board, opponent)
+        {board, e2} = unit_death(board, unit)
+        {board, e1 ++ e2}
+      unit.attack < opponent.defense ->
+        unit_death(board, unit)
+    end
+  end
+
 end

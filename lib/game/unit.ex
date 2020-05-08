@@ -6,28 +6,28 @@ defmodule Yagg.Game.Unit do
     defense: :nil,
     name: "nil",
     abilities: [],
-    player: :nil
+    position: :nil
   ]
 
-  def new(player, name, attack, defense) do
-    %Unit{player: player, name: name, attack: attack, defense: defense}
+  def new(position, name, attack, defense) do
+    %Unit{position: position, name: name, attack: attack, defense: defense}
   end
 
   @doc """
   Returns ten standard units in a random order
   """
-  def starting_units(player) do
+  def starting_units(position) do
     Enum.shuffle([
-      new(player, :monarch, 2, 1),
-      new(player, :general, 4, 3),
-      new(player, :bezerker, 5, 1),
-      new(player, :fullarmorcoward, 1, 5),
-      new(player, :recruit, 2, 3),
-      new(player, :pacifist, 1, 4),
-      new(player, :solid, 3, 3),
-      new(player, :novice, 3, 2),
-      new(player, :triggerhappy, 3, 1),
-      new(player, :cannonfodder, 1, 2),
+      new(position, :monarch, 2, 1),
+      new(position, :general, 4, 3),
+      new(position, :bezerker, 5, 1),
+      new(position, :fullarmorcoward, 1, 5),
+      new(position, :recruit, 2, 3),
+      new(position, :pacifist, 1, 4),
+      new(position, :solid, 3, 3),
+      new(position, :novice, 3, 2),
+      new(position, :triggerhappy, 3, 1),
+      new(position, :cannonfodder, 1, 2),
     ])
   end
 end
