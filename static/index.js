@@ -4,7 +4,6 @@ const eventHandlers = {
     document.getElementById('gamestate').innterHTML = 'started';
   },
   player_joined: function(event) {
-    console.log({e: event, p: event.position});
     document.getElementById(`${event.position}name`).innerHTML = event.name;
     document.getElementById(`${event.position}name`).className = event.name;
   },
@@ -12,7 +11,6 @@ const eventHandlers = {
     document.getElementsByClassName(event.name)[0].innerHTML = '';
   },
   new_unit: function(event){
-    console.log({nu: event});
     const newElement = document.createElement('p');
     event.unit.id = event.id;
     for (const [att, val] of Object.entries(event.unit)) {
@@ -24,24 +22,27 @@ const eventHandlers = {
     document.getElementById('units').appendChild(newElement);
   },
   unit_placed: function(event) {
-    console.log({event});
     const square = document.getElementById(`c${event.x}-${event.y}`);
     square.innerHTML = event.id;
+    square.dataset.unit = event.id;
     if (event.id.startsWith('north')) {
       square.dataset.unitowner = 'north';
     } else if (event.id.startsWith('south')) {
       square.dataset.unitowner = 'south';
     }
   },
+  unit_died: function(event) {
+    const el = document.querySelector(`td[data-unit="${event.id}"]`);
+    console.log({E: 'unit_died', event, el});
+    el.dataset.unitowner = null;
+    el.dataset.unit = null;
+    el.innerHTML = '';
+  },
   unit_moved: function(event) {
+    console.log({E: 'unit_moved', event});
     const from = document.getElementById(`c${event.from.x}-${event.from.y}`);
-    const to = document.getElementById(`c${event.to.x}-${event.to.y}`);
-    to.innerHTML = event.id;
-    if (event.id.startsWith('north')) {
-      to.dataset.unitowner = 'north';
-    } else if (event.id.startsWith('south')) {
-      to.dataset.unitowner = 'south';
-    }
+    eventHandlers.unit_placed({id: event.id, x: event.to.x, y: event.to.y});
+    from.dataset.unit = null;
     from.dataset.unitowner = null;
     from.innerHTML = '';
   }
@@ -61,15 +62,18 @@ function game() {
     startButton.style.display = 'block';
     nameForm.style.display = 'none';
     hostForm.style.display = 'none';
-    if (eventListener == null) {
-      createEventListener();
-    }
   }
 
   function leavegame() {
     startButton.style.display = 'none';
     nameForm.style.display = 'block';
     hostForm.style.display = 'block';
+  }
+
+  function listen() {
+    if (eventListener === null) {
+      createEventListener();
+    }
   }
 
   function createEventListener() {
@@ -84,7 +88,7 @@ function game() {
       if (eventHandlers[evt.event]) {
         eventHandlers[evt.event](evt);
       } else {
-        console.log(`no event handler for ${evt.event}`);
+        console.log({msg: `no event handler for ${evt.event}`, evt});
       }
     });
   }
@@ -140,6 +144,7 @@ function game() {
     leavegame,
     gameaction,
     gamestate,
+    listen,
   };
 }
 
@@ -153,7 +158,6 @@ function Selected(G) {
     data.unitId = el.textContent;
     for (const neighbor of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
       const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-      console.log({neighbor, nel});
       if (nel) {
         nel.dataset.uistate = 'moveoption';
         data.moveoptions.push(nel);
@@ -180,7 +184,6 @@ function Selected(G) {
   }
   function clickhandler(el) {
     function handleclick() {
-      console.log({ev: 'handleclc', el});
       if (data.selected) {
         if (el == data.element) {
           deselect();
@@ -211,6 +214,7 @@ window.onload = function() {
     G.gameaction('join', {player: name}, function() {
       G.ingame();
     });
+    G.listen();
     G.gamestate();
   };
 
