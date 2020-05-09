@@ -13,11 +13,18 @@ const eventHandlers = {
   },
   new_unit: function(event){
     console.log({nu: event});
-      const newElement = document.createElement('p');
-      newElement.innerHTML = `id: ${event.id}, unit: ${event.unit}`;
-      document.getElementById('units').appendChild(newElement);
+    const newElement = document.createElement('p');
+    event.unit.id = event.id;
+    for (const [att, val] of Object.entries(event.unit)) {
+      const subel = document.createElement('span');
+      subel.className = `unit-${att}`;
+      subel.innerHTML = val;
+      newElement.appendChild(subel);
+    }
+    document.getElementById('units').appendChild(newElement);
   },
   unit_placed: function(event) {
+    console.log({event});
     const square = document.getElementById(`c${event.x}-${event.y}`);
     square.innerHTML = event.id;
     if (event.id.startsWith('north')) {
@@ -136,9 +143,62 @@ function game() {
   };
 }
 
+function Selected(G) {
+  const data = {moveoptions: []};
+  function select(el) {
+    const x = +el.id.charAt(1), y = +el.id.charAt(3);
+    el.dataset.uistate = 'selected';
+    data.selected = true;
+    data.element = el;
+    data.unitId = el.textContent;
+    for (const neighbor of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
+      const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
+      console.log({neighbor, nel});
+      if (nel) {
+        nel.dataset.uistate = 'moveoption';
+        data.moveoptions.push(nel);
+      }
+    }
+  }
+  function deselect() {
+    data.element.uistate = '';
+    while(data.moveoptions.length) {
+      const nel = data.moveoptions.pop();
+      nel.dataset.uistate = '';
+    }
+    data.selected = false;
+    data.element = null;
+    data.unitId = '';
+  }
+  function move(to_el) {
+    const id = to_el.id,
+      x = +id.charAt(1),
+      y = +id.charAt(3),
+      from_el = data.element;
+    G.gameaction('move', {id: data.unitId, to_x: x, to_y: y});
+    deselect();
+  }
+  function clickhandler(el) {
+    function handleclick() {
+      console.log({ev: 'handleclc', el});
+      if (data.selected) {
+        if (el == data.element) {
+          deselect();
+        } else {
+          move(el);
+        }
+      } else if (el.dataset.unitowner) {
+        select(el);
+      }
+    }
+    return handleclick;
+  }
+  return { clickhandler };
+}
+
 window.onload = function() {
-  const G = game();
-  var selected = {};
+  const G = game(),
+    selected = Selected(G);
 
   document.getElementById('leavebutton').onclick = function() {
     G.gameaction('leave', {}, function() {
@@ -159,33 +219,7 @@ window.onload = function() {
   };
 
   for (const el of document.getElementsByTagName('td')) {
-    el.onclick = function() {
-      if (selected.element == this) {
-        this.className = '';
-        selected = {};
-        return;
-      }
-      const id = this.id,
-        x = +id.charAt(1),
-        y = +id.charAt(3);
-      if (selected.element) {
-        G.gameaction('move', {id: selected.unitId, to_x: x, to_y: y});
-        selected.element.className = '';
-        for (const nel of document.getElementsByClassName('moveoption')) {
-          nel.className = '';
-        }
-        selected = {};
-      } else if (this.textContent) {
-        selected = {element: this, unitId: this.textContent};
-        this.className = 'selected';
-        for (const neighbor of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
-          const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-          if (nel) {
-            nel.className = 'moveoption';
-          }
-        }
-      }
-    };
+    el.onclick = selected.clickhandler(el);
   }
 
   G.leavegame();

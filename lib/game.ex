@@ -65,13 +65,10 @@ defmodule Yagg.Game do
     {:reply, {:ok, game}, game}
   end
   def handle_call({:subscribe, player}, {pid, _tag}, %{subscribors: subs} = game) do
-    IO.inspect(sub: player, pid: pid)
     {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
   end
   def handle_call({:act, player_name, action}, _from, game) do
-    IO.inspect([game.players, player_name])
     player = Player.by_name(game, player_name)
-    IO.inspect(player: player)
     case Yagg.Action.resolve(action, game, player) do
       {:err, _} = err -> {:reply, err, game}
       {:notify, event, game} ->

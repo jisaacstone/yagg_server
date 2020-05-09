@@ -14,7 +14,7 @@ defmodule Yagg.Game.Board do
     def encode(%Board{features: features} = board, options) do
       encodeable = features
         |> Map.to_list()
-        |> Map.new(fn({{x, y}, f}) -> {"#{x},#{y}", f} end)
+        |> Map.new(fn({{x, y}, f}) -> {"#{x},#{y}", encode_feature(f)} end)
       Poison.Encoder.Map.encode(
         %{width: board.width,
           height: board.height,
@@ -22,6 +22,9 @@ defmodule Yagg.Game.Board do
         options
       )
     end
+
+    defp encode_feature(%Unit{id: id}), do: id
+    defp encode_feature(other), do: other
   end
 
   def new() do

@@ -11,10 +11,13 @@ td {
   box-sizing: border-box;
   border: 4px solid rgba(95, 95, 95, 0.6);
 }
-td.selected {
+td[data-uistate='selected'] {
   border-width: 6px;
 }
-td.moveoption:hover {
+td[data-uistate='moveoption'] {
+  border-color: rgba(95, 125, 45, 0.6);
+}
+td[data-uistate='moveoption']:hover {
   cursor: pointer;
   border-style: double;
 }

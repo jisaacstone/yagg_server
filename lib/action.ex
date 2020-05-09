@@ -56,7 +56,7 @@ defmodule Yagg.Action do
     end
   end
   def resolve(%Action.Move{} = move, _game, player) do
-    {:err, IO.inspect(%{move: move, player: player})}
+    {:err, %{move: move, player: player}}
   end
   def resolve(action, _game, _player) do
     {:err, %{unknown: action}}
