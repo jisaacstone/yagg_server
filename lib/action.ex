@@ -3,9 +3,8 @@ alias Yagg.Event
 defmodule Yagg.Action do
   alias __MODULE__
   defmodule Join do
-    defstruct [
-      player: "",
-    ]
+    @enforce_keys [:player]
+    defstruct @enforce_keys
   end
   defmodule Leave do
     defstruct []
@@ -14,11 +13,8 @@ defmodule Yagg.Action do
     defstruct []
   end
   defmodule Move do
-    defstruct [
-      id: "",
-      to_x: 0,
-      to_y: 0,
-    ]
+    @enforce_keys [:id, :to_x, :to_y]
+    defstruct @enforce_keys
   end
   def resolve(%Action.Join{player: player_name}, %{state: :open} = game, :notfound) do
     case game.players do
@@ -54,14 +50,9 @@ defmodule Yagg.Action do
   end
   # action: move
   def resolve(%Action.Move{id: id, to_x: to_x, to_y: to_y}, game, %Player{position: position}) do
-    case game.board.units[id] do
-      :nil -> {:err, :nosuchunit}
-      %Unit{position: p} when p != position -> {:err, :unowned}
-      unit ->
-        case Board.move(game.board, unit, to_x, to_y) do
-          {:err, _} = err -> err
-          {board, events} -> {:notify, events, %{game | board: board}}
-        end
+    case Board.move(game.board, position, id, to_x, to_y) do
+      {:err, _} = err -> err
+      {:ok, board, events} -> {:notify, events, %{game | board: board}}
     end
   end
   def resolve(%Action.Move{} = move, _game, player) do
@@ -88,12 +79,11 @@ defmodule Yagg.Action do
   end
 
   defp place_unit({{x, y}, unit}, {board, player, index, notifications}) do
-    id = "#{player.position}-#{index}"
-    {:ok, board} = Board.place(board, id, x, y)
-    board = %{board | units: Map.put(board.units, id, unit)}
+    unit = %{unit | id: "#{player.position}-#{index}"}
+    {:ok, board} = Board.place(board, unit, x, y)
     notifications = [
-      Event.new(player.position, :new_unit, %{unit: unit, id: id}),
-      Event.new(:global, :unit_placed, %{x: x, y: y, id: id})
+      Event.new(player.position, :new_unit, %{unit: unit}),
+      Event.new(:global, :unit_placed, %{x: x, y: y, id: unit.id})
       | notifications]
     {board, player, index + 1, notifications}
   end

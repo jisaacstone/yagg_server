@@ -71,6 +71,7 @@ defmodule Yagg.Game do
   def handle_call({:act, player_name, action}, _from, game) do
     IO.inspect([game.players, player_name])
     player = Player.by_name(game, player_name)
+    IO.inspect(player: player)
     case Yagg.Action.resolve(action, game, player) do
       {:err, _} = err -> {:reply, err, game}
       {:notify, event, game} ->
@@ -108,14 +109,18 @@ defmodule Yagg.Game do
     notify(game, events)
   end
   defp notify(%{subscribors: subs, players: players}, %Event{} = event) do
+    IO.inspect([subs: subs, event: event])
     Enum.each(
       subs,
       fn({player, pid}) ->
         case event.stream do
-          :global -> send(pid, event)
+          :global ->
+            IO.inspect([send: event, pid: pid])
+            send(pid, event)
           stream ->
-            IO.inspect([stream, players, player])
+            IO.inspect(stream: stream)
             if Enum.any?(players, fn(p) -> p.name == player and p.position == stream end) do
+              IO.inspect([send: event])
               send(pid, event)
             end
         end

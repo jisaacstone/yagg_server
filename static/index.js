@@ -1,19 +1,23 @@
 /* jshint esversion: 6 */
 const eventHandlers = {
-  'game_started': function() {
+  game_started: function() {
     document.getElementById('gamestate').innterHTML = 'started';
   },
-  'player_joined': function(event) {
+  player_joined: function(event) {
     console.log({e: event, p: event.position});
     document.getElementById(`${event.position}name`).innerHTML = event.name;
     document.getElementById(`${event.position}name`).className = event.name;
   },
-  'player_left': function(event) {
+  player_left: function(event) {
     document.getElementsByClassName(event.name)[0].innerHTML = '';
   },
-  'unit_placed': function(event) {
-    console.log(event);
-    console.log(`c${event.x}-${event.y}`);
+  new_unit: function(event){
+    console.log({nu: event});
+      const newElement = document.createElement('p');
+      newElement.innerHTML = `id: ${event.id}, unit: ${event.unit}`;
+      document.getElementById('units').appendChild(newElement);
+  },
+  unit_placed: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
     square.innerHTML = event.id;
     if (event.id.startsWith('north')) {
@@ -22,11 +26,17 @@ const eventHandlers = {
       square.dataset.unitowner = 'south';
     }
   },
-  'new_unit': function(event){
-    console.log({nu: event});
-      const newElement = document.createElement('p');
-      newElement.innerHTML = `id: ${event.id}, unit: ${event.unit}`;
-      document.getElementById('units').appendChild(newElement);
+  unit_moved: function(event) {
+    const from = document.getElementById(`c${event.from.x}-${event.from.y}`);
+    const to = document.getElementById(`c${event.to.x}-${event.to.y}`);
+    to.innerHTML = event.id;
+    if (event.id.startsWith('north')) {
+      to.dataset.unitowner = 'north';
+    } else if (event.id.startsWith('south')) {
+      to.dataset.unitowner = 'south';
+    }
+    from.dataset.unitowner = null;
+    from.innerHTML = '';
   }
 };
 
@@ -159,12 +169,21 @@ window.onload = function() {
         x = +id.charAt(1),
         y = +id.charAt(3);
       if (selected.element) {
-        G.gameaction('move', {id: selected.unitId, x, y});
+        G.gameaction('move', {id: selected.unitId, to_x: x, to_y: y});
         selected.element.className = '';
+        for (const nel of document.getElementsByClassName('moveoption')) {
+          nel.className = '';
+        }
         selected = {};
       } else if (this.textContent) {
         selected = {element: this, unitId: this.textContent};
         this.className = 'selected';
+        for (const neighbor of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
+          const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
+          if (nel) {
+            nel.className = 'moveoption';
+          }
+        }
       }
     };
   }

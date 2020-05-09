@@ -13,9 +13,11 @@ defmodule Yagg.Game.Player do
 
   def by_name(game, name) do
     case game.players do
-      [%Player{name: ^name} = player|_] -> player
-      [_|%Player{name: ^name} = player] -> player
-      _other -> :notfound
+      [%Player{name: ^name} = player | _] -> player
+      [_, %Player{name: ^name} = player | _] -> player
+      other ->
+        IO.inspect([other, name, game.players])
+        :notfound
     end
   end
 

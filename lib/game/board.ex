@@ -30,7 +30,11 @@ defmodule Yagg.Game.Board do
 
   def place(%Board{features: features, units: units} = board, %Unit{} = unit, x, y) do
     case features[{x, y}] do
-      :nil -> {:ok, %{board | features: Map.put_new(features, {x, y}, unit), units: Map.put(units, unit.id, {x, y})}}
+      :nil -> {
+          :ok,
+          %{board |
+            features: Map.put_new(features, {x, y}, unit),
+            units: Map.put(units, unit.id, {x, y})}}
       _something -> {:err, :occupied}
     end
   end
@@ -48,11 +52,12 @@ defmodule Yagg.Game.Board do
     end
   end
 
-  def move(%Board{units: units} = board, unit, to_x, to_y) do
-    case units[unit.id] do
+  def move(board, position, unit_id, to_x, to_y) do
+    case Unit.by_id(board, unit_id) do
       :nil -> {:err, :notonboard}
-      {x, y} ->
-        unless can_move?(x, to_x, y, to_y) do
+      :dead -> {:err, :dead}
+      {%{position: ^position} = unit, {x, y}} ->
+        unless can_move?({x, y}, {to_x, to_y}) do
           {:err, :illegal}
         else
           case board.features[{to_x, to_y}] do
@@ -64,12 +69,13 @@ defmodule Yagg.Game.Board do
               {board, events} = do_battle(board, unit, feature, {x, y}, {to_x, to_y})
               {:ok, board, events}
           end
-      end
+        end
+      {_unit, _coords} -> {:err, :illegal}
     end
   end
 
-  defp can_move?(x, to_x, y, to_y) do
-    Enum.sort([abs(x - to_x), abs(y - to_y)]) == [1, 0]
+  defp can_move?({x, y}, {to_x, to_y}) do
+    Enum.sort([abs(x - to_x), abs(y - to_y)]) == [0, 1]
   end
 
   defp do_move(board, unit, from, to) do

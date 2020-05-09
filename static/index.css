@@ -14,6 +14,10 @@ td {
 td.selected {
   border-width: 6px;
 }
+td.moveoption:hover {
+  cursor: pointer;
+  border-style: double;
+}
 td[data-unitowner]:hover {
   cursor: pointer;
   border-color: rgba(95, 65, 45, 0.8);

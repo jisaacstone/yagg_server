@@ -6,11 +6,23 @@ defmodule Yagg.Game.Unit do
     defense: :nil,
     name: "nil",
     abilities: [],
-    position: :nil
+    position: :nil,
+    id: :nil
   ]
 
-  def new(position, name, attack, defense) do
-    %Unit{position: position, name: name, attack: attack, defense: defense}
+  def new(position, name, attack, defense, id \\ :nil) do
+    %Unit{position: position, name: name, attack: attack, defense: defense, id: id}
+  end
+
+  def by_id(board, unit_id) do
+    case board.units[unit_id] do
+      :nil -> :nil
+      coords ->
+        case board.features[coords] do
+          %Unit{} = unit -> {unit, coords}
+          _other -> :dead
+        end
+    end
   end
 
   @doc """

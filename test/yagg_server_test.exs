@@ -1,4 +1,4 @@
-alias Yagg.{Endpoint, Game, Event}
+alias Yagg.{Endpoint, Game, Event, Action.Join}
 
 defmodule YaggTest.Endpoint do
   use ExUnit.Case
@@ -31,18 +31,9 @@ defmodule YaggTest.Endpoint do
     %{status: status, resp_body: body} = send_json("/game/create", %{})
     assert status == 200
     assert %{"id" => gid} = Poison.decode!(body)
-    {sse_pid, _ref} = spawn_monitor(
-      fn -> Endpoint.call(
-        conn(:get, "/sse/game/#{gid}/events?player=player2"),
-        @opts)
-      end)
-    :ok = Game.act(gid, "player1", %{"action" => "join"})
-    :ok = Game.act(gid, "player2", %{"action" => "join"})
-    assert Process.alive?(sse_pid)
+    {:ok, _pid} = Game.subscribe(gid, "player1")
+    :ok = Game.act(gid, "player1", %Join{player: "player1"})
     %{kind: event_type} = recieve_event()
-    assert event_type == "player_joined"
-    Process.exit(sse_pid, :kill)
-    %{kind: event_type} = recieve_event()
-    assert event_type == "player_disconnect"
+    assert event_type == :player_joined
   end
 end
