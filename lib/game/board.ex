@@ -69,8 +69,7 @@ defmodule Yagg.Game.Board do
               {board, events} = do_move(board, unit, {x, y}, {to_x, to_y})
               {:ok, board, events}
             feature -> 
-              {board, events} = do_battle(board, unit, feature, {x, y}, {to_x, to_y})
-              {:ok, board, events}
+              do_battle(board, unit, feature, {x, y}, {to_x, to_y})
           end
         end
       {_unit, _coords} -> {:err, :illegal}
@@ -106,14 +105,30 @@ defmodule Yagg.Game.Board do
       unit.attack > opponent.defense ->
         {board, e1} = unit_death(board, opponent)
         {board, e2} = do_move(board, unit, from, to)
-        {board, e1 ++ e2}
+        {state, events} = unless opponent.name == :monarch do
+          {:ok, e1 ++ e2}
+        else
+          {:gameover, [Event.new(:gameover, %{winner: unit.position}) | e1] ++ e2}
+        end
+        {state, board, events}
       unit.attack == opponent.defense ->
         {board, e1} = unit_death(board, opponent)
         {board, e2} = unit_death(board, unit)
-        {board, e1 ++ e2}
+        {state, events} = case {unit.name, opponent.name} do
+          {:monarch, :monarch} -> {:gameover, [Event.new(:gameover, %{winner: :draw}) | e1] ++ e2}
+          {:monarch, _} -> {:gameover, [Event.new(:gameover, %{winner: opponent.position}) | e1] ++ e2}
+          {_, :monarch} -> {:gameover, [Event.new(:gameover, %{winner: unit.position}) | e1] ++ e2}
+          _ -> {:ok, e1 ++ e2}
+        end
+        {state, board, events}
       unit.attack < opponent.defense ->
-        unit_death(board, unit)
+        {board, events} = unit_death(board, unit)
+        {state, events} = unless unit.name == :monarch do
+          {:ok, events}
+        else
+          {:gameover, [Event.new(:gameover, %{winner: unit.position}) | events]}
+        end
+        {state, board, events}
     end
   end
-
 end

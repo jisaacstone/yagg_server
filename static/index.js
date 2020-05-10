@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 const eventHandlers = {
   game_started: function() {
-    document.getElementById('gamestate').innterHTML = 'started';
+    document.getElementById('gamestate').innerHTML = 'state: battle!';
   },
   player_joined: function(event) {
     document.getElementById(`${event.position}name`).innerHTML = event.name;
@@ -11,40 +11,38 @@ const eventHandlers = {
     document.getElementsByClassName(event.name)[0].innerHTML = '';
   },
   new_unit: function(event){
-    const newElement = document.createElement('p');
-    event.unit.id = event.id;
-    for (const [att, val] of Object.entries(event.unit)) {
+    const unit = document.getElementById(`unit-${event.unit.id}`);
+    unit.innerHTML = '';
+    for (const att of ['id', 'name', 'attack', 'defense']) {
       const subel = document.createElement('span');
       subel.className = `unit-${att}`;
-      subel.innerHTML = val;
-      newElement.appendChild(subel);
+      subel.innerHTML = event.unit[att];
+      unit.appendChild(subel);
     }
-    document.getElementById('units').appendChild(newElement);
   },
   unit_placed: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
-    square.innerHTML = event.id;
-    square.dataset.unit = event.id;
+    const unit = document.createElement('span');
+    unit.id = `unit-${event.id}`;
+    unit.innerHTML = event.id;
+    unit.dataset.id = event.id;
     if (event.id.startsWith('north')) {
-      square.dataset.unitowner = 'north';
+      unit.className = 'unit north';
     } else if (event.id.startsWith('south')) {
-      square.dataset.unitowner = 'south';
+      unit.className = 'unit south';
     }
+    square.appendChild(unit);
   },
   unit_died: function(event) {
-    const el = document.querySelector(`td[data-unit="${event.id}"]`);
-    console.log({E: 'unit_died', event, el});
-    el.dataset.unitowner = null;
-    el.dataset.unit = null;
-    el.innerHTML = '';
+    document.getElementById(`unit-${event.id}`).parentNode.innerHTML = '';
   },
   unit_moved: function(event) {
     console.log({E: 'unit_moved', event});
-    const from = document.getElementById(`c${event.from.x}-${event.from.y}`);
-    eventHandlers.unit_placed({id: event.id, x: event.to.x, y: event.to.y});
-    from.dataset.unit = null;
-    from.dataset.unitowner = null;
-    from.innerHTML = '';
+    const to = document.getElementById(`c${event.to.x}-${event.to.y}`);
+    to.appendChild(document.getElementById(`unit-${event.id}`));
+  },
+  gameover: function(event) {
+    document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
   }
 };
 
@@ -151,11 +149,15 @@ function game() {
 function Selected(G) {
   const data = {moveoptions: []};
   function select(el) {
+    console.log({action: 'selelct', el});
     const x = +el.id.charAt(1), y = +el.id.charAt(3);
+    const unit = el.children[0];
     el.dataset.uistate = 'selected';
     data.selected = true;
     data.element = el;
-    data.unitId = el.textContent;
+    if (unit) {
+      data.unitId = unit.dataset.id;
+    }
     for (const neighbor of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
       const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
       if (nel) {
@@ -184,13 +186,14 @@ function Selected(G) {
   }
   function clickhandler(el) {
     function handleclick() {
+      console.log({data, el});
       if (data.selected) {
         if (el == data.element) {
           deselect();
         } else {
           move(el);
         }
-      } else if (el.dataset.unitowner) {
+      } else if (el.children[0]) {
         select(el);
       }
     }

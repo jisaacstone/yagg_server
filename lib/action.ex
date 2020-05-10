@@ -53,6 +53,7 @@ defmodule Yagg.Action do
     case Board.move(game.board, position, id, to_x, to_y) do
       {:err, _} = err -> err
       {:ok, board, events} -> {:notify, events, %{game | board: board}}
+      {:gameover, board, events} -> {:notify, events, %{game | board: board, state: :over}}
     end
   end
   def resolve(%Action.Move{} = move, _game, player) do
@@ -82,8 +83,8 @@ defmodule Yagg.Action do
     unit = %{unit | id: "#{player.position}-#{index}"}
     {:ok, board} = Board.place(board, unit, x, y)
     notifications = [
-      Event.new(player.position, :new_unit, %{unit: unit}),
-      Event.new(:global, :unit_placed, %{x: x, y: y, id: unit.id})
+      Event.new(:global, :unit_placed, %{x: x, y: y, id: unit.id}),
+      Event.new(player.position, :new_unit, %{unit: unit})
       | notifications]
     {board, player, index + 1, notifications}
   end
