@@ -12,6 +12,11 @@ td {
   border: 4px solid rgba(95, 95, 95, 0.6);
 }
 
+[data-active=true] {
+  background-color: darkgrey;
+  color: white;
+}
+
 td[data-uistate='selected'] {
   border-width: 6px;
 }
@@ -99,7 +104,17 @@ div {
 #northname, #southname {
   text-align: center;
   font-size: 120%;
+  font-weight: bold;
+  width: 40%;
+  margin: 5px auto;
+  border-radius: 3px;
 }
+
+#northname {
+  text-shadow: #1DF 1px 1px 0;
+}
+#southname {
+  text-shadow: #FD1 1px 1px 0;
 
 #error {
   color: #EF9590;

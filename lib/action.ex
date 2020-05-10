@@ -1,5 +1,5 @@
 alias Yagg.Game.{Board, Unit, Player}
-alias Yagg.Event
+alias Yagg.{Event, Game}
 defmodule Yagg.Action do
   alias __MODULE__
   defmodule Join do
@@ -49,12 +49,18 @@ defmodule Yagg.Action do
     end
   end
   # action: move
-  def resolve(%Action.Move{id: id, to_x: to_x, to_y: to_y}, game, %Player{position: position}) do
+  def resolve(%Action.Move{id: id, to_x: to_x, to_y: to_y}, %Game{turn: position} = game, %Player{position: position}) do
     case Board.move(game.board, position, id, to_x, to_y) do
       {:err, _} = err -> err
-      {:ok, board, events} -> {:notify, events, %{game | board: board}}
-      {:gameover, board, events} -> {:notify, events, %{game | board: board, state: :over}}
+      {:ok, board, events} ->
+        game = nxtrn(%{game | board: board})
+        events = [Event.new(:turn, %{player: game.turn}) | events]
+        {:notify, events, game}
+      {:gameover, board, events} -> {:notify, events, nxtrn(%{game | board: board, state: :over, turn: :nil})}
     end
+  end
+  def resolve(%Action.Move{}, _game, %Player{}) do
+    {:err, :notyourturn}
   end
   def resolve(%Action.Move{} = move, _game, player) do
     {:err, %{move: move, player: player}}
@@ -62,6 +68,9 @@ defmodule Yagg.Action do
   def resolve(action, _game, _player) do
     {:err, %{unknown: action}}
   end
+
+  defp nxtrn(%Game{turn: :north} = game), do: %{game | turn: :south}
+  defp nxtrn(%Game{turn: :south} = game), do: %{game | turn: :north}
 
   # TODO: fix this mess
   defp initial_setup(%{players: players} = game) do

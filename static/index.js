@@ -46,6 +46,15 @@ const eventHandlers = {
   },
   gameover: function(event) {
     document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
+  },
+  turn: function(event) {
+    if (event.player === 'north') {
+      document.getElementById('northname').dataset.active = true;
+      document.getElementById('southname').dataset.active = false;
+    } else if (event.player == 'south') {
+      document.getElementById('southname').dataset.active = true;
+      document.getElementById('northname').dataset.active = false;
+    }
   }
 };
 
@@ -147,6 +156,7 @@ function game() {
       const [x, y] = coor.split(',');
       eventHandlers.unit_placed({x, y, id});
     }
+    eventHandlers.turn({player: gamedata.turn});
   }
 
   return {
@@ -179,7 +189,7 @@ function Selected(G) {
     }
   }
   function deselect() {
-    data.element.uistate = '';
+    data.element.dataset.uistate = '';
     while(data.moveoptions.length) {
       const nel = data.moveoptions.pop();
       nel.dataset.uistate = '';
