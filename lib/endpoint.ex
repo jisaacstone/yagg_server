@@ -38,6 +38,14 @@ defmodule Yagg.Endpoint do
     end
   end
 
+  get "/game/:gid/units/:player" do
+    case Game.get_units(gid, player) do
+      {:ok, units} -> respond(conn, 200, units)
+      {:err, err} -> respond(conn, 400, err)
+      other -> respond(conn, 501, IO.inspect(other))
+    end
+  end
+
   get "sse/game/:gid/events" do
     conn =
       conn

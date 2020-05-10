@@ -31,48 +31,66 @@ td .unit {
   box-sizing: border-box;
   border: 2px solid rgba(222, 222, 243, 0.6);
   border-radius: 9% 31%;
+  border-style: inset;
 }
 td .unit:hover {
   cursor: pointer;
   border-color: rgba(95, 65, 45, 0.8);
 }
 td .north {
-  background-color: rgba(105, 72, 210, 1);
+  background-color: rgba(45, 198, 221, 1);
 }
 td .south {
-  background-color: rgba(120, 90, 157, 1);
+  background-color: rgba(230, 188, 62, 1);
 }
 
 td .unit span {
   display: block;
 }
 
+td .unit-id {
+  font-family: monospace;
+  font-size: 80%;
+}
+
+td .unit-name {
+  color: #253;
+  background-color: rgba(180, 185, 187, 0.4);
+  margin-bottom: 2px;
+}
+td .monarch .unit-name {
+  color: #301;
+  background-color: rgba(80, 85, 87, 0.2);
+}
+
 .unit-attack {
   float: left;
   margin-left: 2em;
   color: rgba(95, 12, 6, 1);
-  background-color: rgba(199, 45, 46, 0.4);
+  border-color: rgba(199, 45, 46, 0.4);
 }
 .unit-defense {
   float: right;
   margin-right: 2em;
   color: rgba(15, 89, 6, 1);
-  background-color: rgba(82, 189, 6, 0.4);
+  border-color: rgba(82, 189, 6, 0.4);
 }
 .unit-attack, .unit-defense {
   font-weight: bold;
-  padding: 1px 4px;
+  padding: 2px 4px 0px;;
   border-radius: 48%;
+  border-width: 2px;
+  border-style: inset;
+  background-color: rgba(245, 248, 246, 0.1);
 }
-
 
 tr:nth-child(even) td:nth-child(even),
 tr:nth-child(odd) td:nth-child(odd) {
-  background-color: #90A5B1;
+  background-color: #C9C8CA;
 }
 tr:nth-child(odd) td:nth-child(even),
 tr:nth-child(even) td:nth-child(odd) {
-  background-color: #95B1A0;
+  background-color: #BAA;
 }
 div {
   padding: 1em;

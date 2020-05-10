@@ -19,6 +19,9 @@ const eventHandlers = {
       subel.innerHTML = event.unit[att];
       unit.appendChild(subel);
     }
+    if (event.unit.name === 'monarch') {
+      unit.className = `monarch ${unit.className}`;
+    }
   },
   unit_placed: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
@@ -93,8 +96,8 @@ function game() {
 
   function gameaction(action, data, callback) {
     const host = hostForm.value;
-    const playername = nameForm.value;
-    const baseUrl = `http://${host}/game/ID/action/${action}?player=${playername}`;  
+    const name = nameForm.value;
+    const baseUrl = `http://${host}/game/ID/action/${action}?player=${name}`;
     function listener() {
       if (this.status >= 400) {
          errorDiv.innerHTML = `error: ${this.status}, message: ${this.responseText}`;
@@ -113,17 +116,26 @@ function game() {
   }
 
   function gamestate() {
-    const host = hostForm.value;
-    const baseUrl = `http://${host}/game/ID/state`;  
-    function listener() {
+    const host = hostForm.value, name = nameForm.value;
+    const oReq = new XMLHttpRequest();
+    oReq.addEventListener('load', function () {
       const gamedata = JSON.parse(this.responseText);
       setstate(gamedata);
-    }
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener('load', listener);
-    oReq.open('GET', baseUrl);
+    });
+    oReq.open('GET', `http://${host}/game/ID/state`);  
     oReq.setRequestHeader('Content-Type', 'application/json');
     oReq.send();
+    const oReq2 = new XMLHttpRequest();
+    oReq2.addEventListener('load', function () {
+      const unitdata = JSON.parse(this.responseText);
+      console.log({unitdata});
+      for (const [_, unit] of Object.entries(unitdata)) {
+        eventHandlers.new_unit({unit});
+      }
+    });
+    oReq2.open('GET', `http://${host}/game/ID/units/${name}`);  
+    oReq2.setRequestHeader('Content-Type', 'application/json');
+    oReq2.send();
   }
 
   function setstate(gamedata) {

@@ -1,5 +1,5 @@
 alias Yagg.Event
-alias Yagg.Game.{Board, Player}
+alias Yagg.Game.{Board, Player, Unit}
 
 defmodule Yagg.Game do
   use GenServer
@@ -42,6 +42,30 @@ defmodule Yagg.Game do
   def get_state(_gid) do
     {:ok, pid} = new()
     GenServer.call(pid, :get_state)
+  end
+
+  def get_units(_gid, player_name) do
+    {:ok, pid} = new()
+    case GenServer.call(pid, :get_state) do
+      {:err, _} = err -> err
+      {:ok, game} ->
+        case Player.by_name(game, player_name) do
+          %Player{position: position} ->
+            Enum.reduce(
+              game.board.units,
+              %{},
+              fn ({unit_id, _}, units) ->
+                case Unit.by_id(game.board, unit_id) do
+                  {%Unit{position: ^position} = unit, _} ->
+                    Map.put(units, unit_id, unit)
+                  other ->
+                    IO.inspect([units: :skipping, id: unit_id, unit: other, position: position])
+                    units
+                end
+              end)
+          _ -> {:err, :unknown_player}
+        end
+    end
   end
 
   def subscribe(_gid, player) do
