@@ -56,7 +56,7 @@ defmodule Yagg.Action do
         game = nxtrn(%{game | board: board})
         events = [Event.new(:turn, %{player: game.turn}) | events]
         {:notify, events, game}
-      {:gameover, board, events} -> {:notify, events, nxtrn(%{game | board: board, state: :over, turn: :nil})}
+      {:gameover, board, events} -> {:notify, events, %{game | board: board, state: :over, turn: :nil}}
     end
   end
   def resolve(%Action.Move{}, _game, %Player{}) do
