@@ -1,5 +1,5 @@
 alias Yagg.Event
-alias Yagg.Game.{Board, Player, Unit}
+alias Yagg.Game.{Board, Player}
 
 defmodule Yagg.Game do
   use GenServer
@@ -44,19 +44,7 @@ defmodule Yagg.Game do
       {:err, _} = err -> err
       {:ok, game} ->
         case Player.by_name(game, player_name) do
-          %Player{position: position} ->
-            Enum.reduce(
-              game.board.units,
-              %{},
-              fn ({unit_id, _}, units) ->
-                case Unit.by_id(game.board, unit_id) do
-                  {%Unit{position: ^position} = unit, _} ->
-                    Map.put(units, unit_id, unit)
-                  other ->
-                    IO.inspect([units: :skipping, id: unit_id, unit: other, position: position])
-                    units
-                end
-              end)
+          %Player{position: position} -> Board.units(game.board, position)
           _ -> {:err, :unknown_player}
         end
     end
@@ -129,12 +117,9 @@ defmodule Yagg.Game do
       fn({player, pid}) ->
         case event.stream do
           :global ->
-            IO.inspect([send: event, pid: pid])
             send(pid, event)
           stream ->
-            IO.inspect(stream: stream)
             if Enum.any?(players, fn(p) -> p.name == player and p.position == stream end) do
-              IO.inspect([send: event])
               send(pid, event)
             end
         end

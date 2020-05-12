@@ -5,8 +5,9 @@ defmodule Yagg.Application do
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
+        ip: {0, 0, 0, 0},
         plug: Yagg.Endpoint,
-        port: 4000,
+        port: 8000,
         protocol_options: [idle_timeout: :infinity]
       ),
       {DynamicSupervisor, name: Yagg.GameSupervisor, strategy: :one_for_one},

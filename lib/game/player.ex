@@ -3,8 +3,7 @@ defmodule Yagg.Game.Player do
   @derive {Poison.Encoder, only: [:name, :position]}
   defstruct [
     name: "nil",
-    position: :north,
-    event_listener: :nil,
+    position: :north
   ]
 
   def new(name, position) do

@@ -1,22 +1,11 @@
 defmodule Yagg.Game.Unit do
   alias __MODULE__
-  @derive {Poison.Encoder, only: [:id, :name, :attack, :defense, :abilities]}
-  @enforce_keys [:attack, :defense, :name, :position, :id]
+  @derive {Poison.Encoder, only: [:name, :attack, :defense, :abilities]}
+  @enforce_keys [:attack, :defense, :name, :position]
   defstruct [:abilities | @enforce_keys]
 
-  def new(position, name, attack, defense, id \\ :nil) do
-    %Unit{position: position, name: name, attack: attack, defense: defense, id: id}
-  end
-
-  def by_id(board, unit_id) do
-    case board.units[unit_id] do
-      :nil -> :nil
-      coords ->
-        case board.features[coords] do
-          %Unit{} = unit -> {unit, coords}
-          _other -> :dead
-        end
-    end
+  def new(position, name, attack, defense) do
+    %Unit{position: position, name: name, attack: attack, defense: defense}
   end
 
   @doc """

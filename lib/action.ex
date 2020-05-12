@@ -13,7 +13,7 @@ defmodule Yagg.Action do
     defstruct []
   end
   defmodule Move do
-    @enforce_keys [:id, :to_x, :to_y]
+    @enforce_keys [:from_x, :from_y, :to_x, :to_y]
     defstruct @enforce_keys
   end
   def resolve(%Action.Join{player: player_name}, %{state: :open} = game, :notfound) do
@@ -49,8 +49,8 @@ defmodule Yagg.Action do
     end
   end
   # action: move
-  def resolve(%Action.Move{id: id, to_x: to_x, to_y: to_y}, %Game{turn: position} = game, %Player{position: position}) do
-    case Board.move(game.board, position, id, to_x, to_y) do
+  def resolve(%Action.Move{} = move, %Game{turn: position} = game, %Player{position: position}) do
+    case Board.move(game.board, position, {move.from_x, move.from_y}, {move.to_x, move.to_y}) do
       {:err, _} = err -> err
       {:ok, board, events} ->
         game = nxtrn(%{game | board: board})
@@ -89,11 +89,10 @@ defmodule Yagg.Action do
   end
 
   defp place_unit({{x, y}, unit}, {board, player, index, notifications}) do
-    unit = %{unit | id: "#{player.position}-#{index}"}
     {:ok, board} = Board.place(board, unit, x, y)
     notifications = [
-      Event.new(:global, :unit_placed, %{x: x, y: y, id: unit.id}),
-      Event.new(player.position, :new_unit, %{unit: unit})
+      Event.new(:global, :unit_placed, %{x: x, y: y, player: player.position}),
+      Event.new(player.position, :new_unit, %{unit: unit, x: x, y: y})
       | notifications]
     {board, player, index + 1, notifications}
   end

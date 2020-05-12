@@ -11,9 +11,12 @@ const eventHandlers = {
     document.getElementsByClassName(event.name)[0].innerHTML = '';
   },
   new_unit: function(event){
-    const unit = document.getElementById(`unit-${event.unit.id}`);
+    const unit = document.getElementById(`c${event.x}-${event.y}`).firstChild;
+    if (!unit) {
+      return console.log({err: 'unitnotfound', event, unit});
+    }
     unit.innerHTML = '';
-    for (const att of ['id', 'name', 'attack', 'defense']) {
+    for (const att of ['name', 'attack', 'defense']) {
       const subel = document.createElement('span');
       subel.className = `unit-${att}`;
       subel.innerHTML = event.unit[att];
@@ -26,23 +29,21 @@ const eventHandlers = {
   unit_placed: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
     const unit = document.createElement('span');
-    unit.id = `unit-${event.id}`;
-    unit.innerHTML = event.id;
-    unit.dataset.id = event.id;
-    if (event.id.startsWith('north')) {
-      unit.className = 'unit north';
-    } else if (event.id.startsWith('south')) {
-      unit.className = 'unit south';
-    }
+    unit.className = `unit ${event.player}`;
     square.appendChild(unit);
   },
+  feature: function(event) {
+    const square = document.getElementById(`c${event.x}-${event.y}`);
+    square.innerHTML = event.feature;
+  },
   unit_died: function(event) {
-    document.getElementById(`unit-${event.id}`).parentNode.innerHTML = '';
+    document.getElementById(`c${event.x}-${event.y}`).innerHTML = '';
   },
   unit_moved: function(event) {
     console.log({E: 'unit_moved', event});
-    const to = document.getElementById(`c${event.to.x}-${event.to.y}`);
-    to.appendChild(document.getElementById(`unit-${event.id}`));
+    const to = document.getElementById(`c${event.to.x}-${event.to.y}`),
+      unit = document.getElementById(`c${event.from.x}-${event.from.y}`).firstChild;
+    to.appendChild(unit);
   },
   gameover: function(event) {
     document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
@@ -125,26 +126,28 @@ function game() {
   }
 
   function gamestate() {
-    const host = hostForm.value, name = nameForm.value;
-    const oReq = new XMLHttpRequest();
+    const host = hostForm.value,
+      name = nameForm.value,
+      oReq = new XMLHttpRequest(),
+      oReq2 = new XMLHttpRequest();
+
+    oReq2.addEventListener('load', function () {
+      const unitdata = JSON.parse(this.responseText);
+      console.log({unitdata});
+      for (const unitdatum of unitdata) {
+        eventHandlers.new_unit(unitdatum);
+      }
+    });
     oReq.addEventListener('load', function () {
       const gamedata = JSON.parse(this.responseText);
       setstate(gamedata);
+      oReq2.open('GET', `http://${host}/game/ID/units/${name}`);  
+      oReq2.setRequestHeader('Content-Type', 'application/json');
+      oReq2.send();
     });
     oReq.open('GET', `http://${host}/game/ID/state`);  
     oReq.setRequestHeader('Content-Type', 'application/json');
     oReq.send();
-    const oReq2 = new XMLHttpRequest();
-    oReq2.addEventListener('load', function () {
-      const unitdata = JSON.parse(this.responseText);
-      console.log({unitdata});
-      for (const [_, unit] of Object.entries(unitdata)) {
-        eventHandlers.new_unit({unit});
-      }
-    });
-    oReq2.open('GET', `http://${host}/game/ID/units/${name}`);  
-    oReq2.setRequestHeader('Content-Type', 'application/json');
-    oReq2.send();
   }
 
   function setstate(gamedata) {
@@ -152,9 +155,13 @@ function game() {
     for (const player of gamedata.players) {
       eventHandlers.player_joined(player);
     }
-    for (const [coor, id] of Object.entries(gamedata.board.features)) {
+    for (const [coor, feature] of Object.entries(gamedata.board.grid)) {
       const [x, y] = coor.split(',');
-      eventHandlers.unit_placed({x, y, id});
+      if (feature.kind === 'unit') {
+        eventHandlers.unit_placed({x, y, player: feature.player});
+      } else {
+        eventHandlers.feature({x, y, feature});
+      }
     }
     eventHandlers.turn({player: gamedata.turn});
   }
@@ -177,6 +184,8 @@ function Selected(G) {
     el.dataset.uistate = 'selected';
     data.selected = true;
     data.element = el;
+    data.x = x;
+    data.y = y;
     if (unit) {
       data.unitId = unit.dataset.id;
     }
@@ -197,13 +206,14 @@ function Selected(G) {
     data.selected = false;
     data.element = null;
     data.unitId = '';
+    data.x = null;
+    data.y = null;
   }
   function move(to_el) {
     const id = to_el.id,
       x = +id.charAt(1),
-      y = +id.charAt(3),
-      from_el = data.element;
-    G.gameaction('move', {id: data.unitId, to_x: x, to_y: y});
+      y = +id.charAt(3);
+    G.gameaction('move', {from_x: data.x, from_y: data.y, to_x: x, to_y: y});
     deselect();
   }
   function clickhandler(el) {
@@ -226,7 +236,9 @@ function Selected(G) {
 
 window.onload = function() {
   const G = game(),
-    selected = Selected(G);
+    selected = Selected(G),
+    host = window.location.hostname,
+    port = window.location.port;
 
   document.getElementById('leavebutton').onclick = function() {
     G.gameaction('leave', {}, function() {
@@ -251,5 +263,6 @@ window.onload = function() {
     el.onclick = selected.clickhandler(el);
   }
 
+  document.getElementById('host').value = port ? `${host}:${port}` : host;
   G.leavegame();
 };

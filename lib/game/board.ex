@@ -6,104 +6,111 @@ defmodule Yagg.Game.Board do
   defstruct [
     width: 5,
     height: 5,
-    features: %{},
-    units: %{},
+    grid: %{}
   ]
 
   defimpl Poison.Encoder, for: Board do
-    def encode(%Board{features: features} = board, options) do
-      encodeable = features
+    def encode(%Board{grid: grid} = board, options) do
+      encodeable = grid
         |> Map.to_list()
         |> Map.new(fn({{x, y}, f}) -> {"#{x},#{y}", encode_feature(f)} end)
       Poison.Encoder.Map.encode(
         %{width: board.width,
           height: board.height,
-          features: encodeable},
+          grid: encodeable},
         options
       )
     end
 
-    defp encode_feature(%Unit{id: id}), do: id
+    defp encode_feature(%Unit{position: pos}), do: %{kind: :unit, player: pos}
     defp encode_feature(other), do: other
   end
 
   def new() do
-    %Board{width: 5, height: 5, units: %{}, features: %{{1, 2} => :water, {3, 2} => :water}}
+    %Board{width: 5, height: 5, grid: %{{1, 2} => :water, {3, 2} => :water}}
   end
 
-  def place(%Board{features: features, units: units} = board, %Unit{} = unit, x, y) do
-    case features[{x, y}] do
+  def place(%Board{grid: grid} = board, %Unit{} = unit, x, y) do
+    case grid[{x, y}] do
       :nil -> {
           :ok,
-          %{board |
-            features: Map.put_new(features, {x, y}, unit),
-            units: Map.put(units, unit.id, {x, y})}}
+          %{board | grid: Map.put_new(grid, {x, y}, unit)}
+      }
       _something -> {:err, :occupied}
     end
   end
-  def place(%Board{features: features} = board, feature, x, y) do
-    case features[{x, y}] do
-      :nil -> {:ok, %{board | features: Map.put_new(features, {x, y}, feature)}}
+  def place(%Board{grid: grid} = board, feature, x, y) do
+    case grid[{x, y}] do
+      :nil -> {:ok, %{board | grid: Map.put_new(grid, {x, y}, feature)}}
       _something -> {:err, :occupied}
     end
   end
 
-  def remove(%Board{features: features} = board, x, y) do
-    case features[{x, y}] do
-      :nil -> {:err, :noexist}
-      _something -> {:ok, %{board | features: Map.delete(features, {x, y})}}
-    end
+  def units(board, position) do
+    Enum.reduce(
+      board.grid,
+      [],
+      fn
+        ({{x, y}, %Unit{position: ^position} = unit}, units) ->
+          [%{x: x, y: y, unit: unit} | units]
+        (_, units) ->
+          units
+      end
+    )
   end
 
-  def move(board, position, unit_id, to_x, to_y) do
-    case Unit.by_id(board, unit_id) do
-      :nil -> {:err, :notonboard}
-      :dead -> {:err, :dead}
-      {%{position: ^position} = unit, {x, y}} ->
-        unless can_move?({x, y}, {to_x, to_y}) do
+  def move(board, position, from, to) do
+    case board.grid[from] do
+      %Unit{position: ^position} = unit ->
+        unless can_move?(from, to) do
           {:err, :illegal}
         else
-          case board.features[{to_x, to_y}] do
+          case board.grid[to] do
             :water -> {:err, :illegal}
             :nil -> 
-              {board, events} = do_move(board, unit, {x, y}, {to_x, to_y})
+              {board, events} = do_move(board, unit, from, to)
               {:ok, board, events}
             feature -> 
-              do_battle(board, unit, feature, {x, y}, {to_x, to_y})
+              do_battle(board, unit, feature, from, to)
           end
         end
-      {_unit, _coords} -> {:err, :illegal}
+      {%Unit{}, _coords} -> {:err, :nocontrol}
+      :nil -> {:err, :empty}
+      _ -> {:err, :illegal}
     end
   end
+
+  ## Private
 
   defp can_move?({x, y}, {to_x, to_y}) do
     Enum.sort([abs(x - to_x), abs(y - to_y)]) == [0, 1]
   end
 
   defp do_move(board, unit, from, to) do
-    units = %{board.units | unit.id => to}
-    features = board.features
+    grid = board.grid
       |> Map.delete(from)
       |> Map.put_new(to, unit)
     {
-      %{board | units: units, features: features},
-      [Event.new(:unit_moved, %{id: unit.id, from: from, to: to})]
+      %{board | grid: grid},
+      [Event.new(:unit_moved, %{from: from, to: to})]
     }
   end
 
-  defp unit_death(board, unit) do
-    {coords, units} = Map.pop!(board.units, unit.id)
-    features = Map.delete(board.features, coords)
+  defp unit_death(board, {x, y}) do
+    grid = Map.delete(board.grid, {x, y})
     {
-      %{board | units: units, features: features},
-      [Event.new(:unit_died, %{id: unit.id})]
+      %{board | grid: grid},
+      [Event.new(:unit_died, %{x: x, y: y})]
     }
   end
 
+  defp do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _) do
+    {:err, :noselfattack}
+  end
   defp do_battle(board, unit, opponent, from, to) do
     cond do
       unit.attack > opponent.defense ->
-        {board, e1} = unit_death(board, opponent)
+        {board, e1} = unit_death(board, to)
         {board, e2} = do_move(board, unit, from, to)
         {state, events} = unless opponent.name == :monarch do
           {:ok, e1 ++ e2}
@@ -112,8 +119,8 @@ defmodule Yagg.Game.Board do
         end
         {state, board, events}
       unit.attack == opponent.defense ->
-        {board, e1} = unit_death(board, opponent)
-        {board, e2} = unit_death(board, unit)
+        {board, e1} = unit_death(board, from)
+        {board, e2} = unit_death(board, to)
         {state, events} = case {unit.name, opponent.name} do
           {:monarch, :monarch} -> {:gameover, [Event.new(:gameover, %{winner: :draw}) | e1] ++ e2}
           {:monarch, _} -> {:gameover, [Event.new(:gameover, %{winner: opponent.position}) | e1] ++ e2}
@@ -122,7 +129,7 @@ defmodule Yagg.Game.Board do
         end
         {state, board, events}
       unit.attack < opponent.defense ->
-        {board, events} = unit_death(board, unit)
+        {board, events} = unit_death(board, from)
         {state, events} = unless unit.name == :monarch do
           {:ok, events}
         else

@@ -53,11 +53,6 @@ td .unit span {
   display: block;
 }
 
-td .unit-id {
-  font-family: monospace;
-  font-size: 80%;
-}
-
 td .unit-name {
   color: #253;
   background-color: rgba(180, 185, 187, 0.4);
