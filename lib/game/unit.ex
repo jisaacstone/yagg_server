@@ -1,7 +1,7 @@
 defmodule Yagg.Game.Unit do
   alias __MODULE__
-  @derive {Poison.Encoder, only: [:name, :attack, :defense, :abilities]}
   @enforce_keys [:attack, :defense, :name, :position]
+  @derive {Poison.Encoder, only: [:name, :attack, :defense, :abilities, :position]}
   defstruct [:abilities | @enforce_keys]
 
   def new(position, name, attack, defense) do
@@ -20,9 +20,7 @@ defmodule Yagg.Game.Unit do
       new(position, :recruit, 2, 3),
       new(position, :pacifist, 1, 4),
       new(position, :solid, 3, 3),
-      new(position, :novice, 3, 2),
       new(position, :triggerhappy, 3, 1),
-      new(position, :cannonfodder, 1, 2),
     ])
   end
 end

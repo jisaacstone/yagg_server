@@ -1,14 +1,96 @@
 /* jshint esversion: 6 */
+const global = {};
+
+function select(el, meta) {
+  function select() {
+    const sel = global.selected;
+    console.log({el, meta, sel});
+    if (sel) {
+      sel.element.dataset.unstate = 'selected';
+      if (sel.element !== el) {
+        if (sel.meta.ongrid && sel.meta.inhand) {
+          return;
+        }
+        if (sel.meta.inhand) {
+          global.game.gameaction('place', {index: sel.meta.index, x: meta.x, y: meta.y});
+        } else {
+          global.game.gameaction('move', {from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y});
+        }
+      }
+      sel.element.dataset.uistate = '';
+      for (const opt of sel.options) {
+        opt.dataset.uistate = '';
+      }
+      global.selected = null;
+    } else {
+      const options = [];
+      if (meta.inhand) {
+        for (const el of document.getElementsByClassName(`${meta.player}option`)) {
+          el.dataset.uistate = 'moveoption';
+          options.push(el);
+        }
+      } else {
+        for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
+          const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
+          if (nel) {
+            nel.dataset.uistate = 'moveoption';
+            options.push(nel);
+          }
+        }
+      }
+      global.selected = {element: el, meta: meta, options: options};
+    }
+  }
+  return select;
+}
+
 const eventHandlers = {
   game_started: function() {
-    document.getElementById('gamestate').innerHTML = 'state: battle!';
+    document.getElementById('gamestate').innerHTML = 'state: placement';
+    for (const el of document.getElementsByClassName('playername')) {
+      el.dataset.ready = null;
+    }
   },
   player_joined: function(event) {
     document.getElementById(`${event.position}name`).innerHTML = event.name;
-    document.getElementById(`${event.position}name`).className = event.name;
+    document.getElementById(`${event.position}name`).dataset.playername = event.name;
+    if (event.name === document.getElementById('name').value) {
+      document.getElementById(event.position).appendChild(document.getElementById('hand'));
+    }
   },
   player_left: function(event) {
-    document.getElementsByClassName(event.name)[0].innerHTML = '';
+    document.getElementById(`${event.player}name`).innerHTML = '';
+  },
+  new_hand: function(event){
+    const hand = document.getElementById('hand'),
+      card = document.createElement('span'),
+      unit = document.createElement('span');
+    card.dataset.index = event.index;
+    card.className = 'card';
+    card.onclick = select(card, {index: event.index, inhand: true, player: event.unit.position});
+    hand.appendChild(card);
+    unit.className = `unit ${event.unit.position}`;
+    for (const att of ['name', 'attack', 'defense']) {
+      const subel = document.createElement('span');
+      subel.className = `unit-${att}`;
+      subel.innerHTML = event.unit[att];
+      unit.appendChild(subel);
+    }
+    if (event.unit.name === 'monarch') {
+      unit.className = `monarch ${unit.className}`;
+    }
+    card.appendChild(unit);
+  },
+  unit_assigned: function(event) {
+    const hand = document.getElementById('hand'),
+      square = document.getElementById(`c${event.x}-${event.y}`);
+    for (const card of hand.children) {
+      console.log({i: card.dataset.index, event, card});
+      if (+card.dataset.index === +event.index) {
+        square.appendChild(card.firstChild);
+        return;
+      }
+    }
   },
   new_unit: function(event){
     const unit = document.getElementById(`c${event.x}-${event.y}`).firstChild;
@@ -28,9 +110,15 @@ const eventHandlers = {
   },
   unit_placed: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
-    const unit = document.createElement('span');
-    unit.className = `unit ${event.player}`;
-    square.appendChild(unit);
+    if (! square.firstChild) {
+      const unit = document.createElement('span');
+      unit.className = `unit ${event.player}`;
+      square.appendChild(unit);
+    }
+  },
+
+  player_ready: function(event) {
+    document.getElementById(`${event.player}name`).dataset.ready = true;
   },
   feature: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
@@ -66,17 +154,17 @@ function game() {
     errorDiv = document.getElementById('error'),
     joinButton = document.getElementById('joinbutton'),
     leaveButton = document.getElementById('leavebutton'),
-    startButton = document.getElementById('startbutton');
+    readyButton = document.getElementById('readybutton');
   var eventListener = null;
 
   function ingame() {
-    startButton.style.display = 'block';
+    readyButton.style.display = 'block';
     nameForm.style.display = 'none';
     hostForm.style.display = 'none';
   }
 
   function leavegame() {
-    startButton.style.display = 'none';
+    readyButton.style.display = 'none';
     nameForm.style.display = 'block';
     hostForm.style.display = 'block';
   }
@@ -129,21 +217,27 @@ function game() {
     const host = hostForm.value,
       name = nameForm.value,
       oReq = new XMLHttpRequest(),
-      oReq2 = new XMLHttpRequest();
+      uReq = new XMLHttpRequest();
 
-    oReq2.addEventListener('load', function () {
+    uReq.addEventListener('load', function () {
       const unitdata = JSON.parse(this.responseText);
       console.log({unitdata});
-      for (const unitdatum of unitdata) {
-        eventHandlers.new_unit(unitdatum);
+      for (const ob of unitdata.grid) {
+        eventHandlers.new_unit(ob);
+      }
+      for (const [index, card] of Object.entries(unitdata.hand)) {
+        eventHandlers.new_hand({index: +index, unit: card.unit});
+        if (card.assigned) {
+          eventHandlers.unit_assigned({index: +index, x: card.assigned.x, y: card.assigned.y});
+        }
       }
     });
     oReq.addEventListener('load', function () {
       const gamedata = JSON.parse(this.responseText);
       setstate(gamedata);
-      oReq2.open('GET', `http://${host}/game/ID/units/${name}`);  
-      oReq2.setRequestHeader('Content-Type', 'application/json');
-      oReq2.send();
+      uReq.open('GET', `http://${host}/game/ID/units/${name}`);  
+      uReq.setRequestHeader('Content-Type', 'application/json');
+      uReq.send();
     });
     oReq.open('GET', `http://${host}/game/ID/state`);  
     oReq.setRequestHeader('Content-Type', 'application/json');
@@ -175,71 +269,12 @@ function game() {
   };
 }
 
-function Selected(G) {
-  const data = {moveoptions: []};
-  function select(el) {
-    console.log({action: 'selelct', el});
-    const x = +el.id.charAt(1), y = +el.id.charAt(3);
-    const unit = el.children[0];
-    el.dataset.uistate = 'selected';
-    data.selected = true;
-    data.element = el;
-    data.x = x;
-    data.y = y;
-    if (unit) {
-      data.unitId = unit.dataset.id;
-    }
-    for (const neighbor of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
-      const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-      if (nel) {
-        nel.dataset.uistate = 'moveoption';
-        data.moveoptions.push(nel);
-      }
-    }
-  }
-  function deselect() {
-    data.element.dataset.uistate = '';
-    while(data.moveoptions.length) {
-      const nel = data.moveoptions.pop();
-      nel.dataset.uistate = '';
-    }
-    data.selected = false;
-    data.element = null;
-    data.unitId = '';
-    data.x = null;
-    data.y = null;
-  }
-  function move(to_el) {
-    const id = to_el.id,
-      x = +id.charAt(1),
-      y = +id.charAt(3);
-    G.gameaction('move', {from_x: data.x, from_y: data.y, to_x: x, to_y: y});
-    deselect();
-  }
-  function clickhandler(el) {
-    function handleclick() {
-      console.log({data, el});
-      if (data.selected) {
-        if (el == data.element) {
-          deselect();
-        } else {
-          move(el);
-        }
-      } else if (el.children[0]) {
-        select(el);
-      }
-    }
-    return handleclick;
-  }
-  return { clickhandler };
-}
-
 window.onload = function() {
   const G = game(),
-    selected = Selected(G),
     host = window.location.hostname,
     port = window.location.port;
 
+  global.game = G;
   document.getElementById('leavebutton').onclick = function() {
     G.gameaction('leave', {}, function() {
       G.leavegame();
@@ -248,19 +283,19 @@ window.onload = function() {
 
   document.getElementById('joinbutton').onclick = function() {
     const name = document.getElementById('name').value;
-    G.gameaction('join', {player: name}, function() {
-      G.ingame();
-    });
+    G.gameaction('join', {player: name});
     G.listen();
     G.gamestate();
+    G.ingame();
   };
 
-  document.getElementById('startbutton').onclick = function() {
-    G.gameaction('start');
+  document.getElementById('readybutton').onclick = function() {
+    G.gameaction('ready');
   };
 
   for (const el of document.getElementsByTagName('td')) {
-    el.onclick = selected.clickhandler(el);
+    const x = +el.id.charAt(1), y = +el.id.charAt(3);
+    el.onclick = select(el, {x, y, ongrid: true});
   }
 
   document.getElementById('host').value = port ? `${host}:${port}` : host;

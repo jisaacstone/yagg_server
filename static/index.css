@@ -17,20 +17,18 @@ td {
   color: white;
 }
 
-td[data-uistate='selected'] {
+[data-uistate='selected'] {
   border-width: 6px;
 }
-td[data-uistate='moveoption'] {
+[data-uistate='moveoption'] {
   border-color: rgba(95, 125, 45, 0.9);
 }
-td[data-uistate='moveoption']:hover {
+[data-uistate='moveoption']:hover {
   cursor: pointer;
   border-width: 6px;
 }
-td .unit {
-  margin: auto;
+.unit {
   padding-top: 0.4em;
-  width: 80%;
   height: 5em;
   display: block;
   box-sizing: border-box;
@@ -38,27 +36,41 @@ td .unit {
   border-radius: 9% 31%;
   border-style: inset;
 }
-td .unit:hover {
+#board .unit {
+  margin: auto;
+  width: 80%;
+}
+#hand {
+  margin-left: 2em;
+}
+#hand .unit {
+  float: left;
+  width: 11.2%;
+  margin: 6px;
+}
+.unit:hover {
   cursor: pointer;
   border-color: rgba(95, 65, 45, 0.8);
 }
-td .north {
+.unit.north {
   background-color: rgba(45, 198, 221, 1);
 }
-td .south {
+.unit.south {
   background-color: rgba(230, 188, 62, 1);
 }
 
-td .unit span {
+.unit span {
   display: block;
 }
 
-td .unit-name {
+.unit-name {
   color: #253;
   background-color: rgba(180, 185, 187, 0.4);
   margin-bottom: 2px;
+  margin-right: 10px;
+  border-radius: 0 10px 2px 0;
 }
-td .monarch .unit-name {
+.unit.monarch .unit-name {
   color: #301;
   background-color: rgba(80, 85, 87, 0.2);
 }
@@ -96,7 +108,7 @@ div {
   padding: 1em;
 }
 
-#northname, #southname {
+.playername {
   text-align: center;
   font-size: 120%;
   font-weight: bold;
@@ -105,17 +117,29 @@ div {
   border-radius: 3px;
 }
 
+.playername[data-ready=true] {
+  color: limegreen;
+}
+
 #northname {
   text-shadow: #1DF 1px 1px 0;
 }
 #southname {
   text-shadow: #FD1 1px 1px 0;
+}
 
 #error {
   color: #EF9590;
   font-family: monospace;
 }
 
+#board {
+  clear: both;
+}
+#events {
+  clear: both;
+  padding-top: 2em;
+}
 #events p {
   color: #213023;
 }

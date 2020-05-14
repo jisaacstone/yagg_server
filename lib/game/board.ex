@@ -3,11 +3,8 @@ alias Yagg.Event
 
 defmodule Yagg.Game.Board do
   alias __MODULE__
-  defstruct [
-    width: 5,
-    height: 5,
-    grid: %{}
-  ]
+  @enforce_keys [:width, :height, :grid, :hands]
+  defstruct @enforce_keys
 
   defimpl Poison.Encoder, for: Board do
     def encode(%Board{grid: grid} = board, options) do
@@ -27,27 +24,48 @@ defmodule Yagg.Game.Board do
   end
 
   def new() do
-    %Board{width: 5, height: 5, grid: %{{1, 2} => :water, {3, 2} => :water}}
+    %Board{
+      grid: %{{1, 2} => :water, {3, 2} => :water},
+      hands: %{north: %{}, south: %{}},
+      width: 5,
+      height: 5
+    }
   end
 
-  def place(%Board{grid: grid} = board, %Unit{} = unit, x, y) do
-    case grid[{x, y}] do
-      :nil -> {
-          :ok,
-          %{board | grid: Map.put_new(grid, {x, y}, unit)}
-      }
+  def assign(board, position, hand_index, coords) do
+    if can_place?(position, coords) do
+      hand = board.hands[position] |> Map.update!(hand_index, fn({u, _}) -> {u, coords} end)
+      {:ok, %{board | hands: Map.put(board.hands, position, hand)}}
+    else
+      {:err, :illegal_square}
+    end
+  end
+
+  def place!(%Board{} = board, %Unit{} = unit, coords) do
+    case place(board, unit, coords) do
+      {:ok, board} -> board
+      err -> throw(err)
+    end
+  end
+  def place(%Board{grid: grid} = board, %Unit{} = unit, coords) do
+    case grid[coords] do
+      :nil ->
+        if can_place?(unit.position, coords) do
+          {:ok, %{board | grid: Map.put_new(grid, coords, unit)}}
+        else
+          {:err, :illegal_square}
+        end
       _something -> {:err, :occupied}
     end
   end
-  def place(%Board{grid: grid} = board, feature, x, y) do
-    case grid[{x, y}] do
-      :nil -> {:ok, %{board | grid: Map.put_new(grid, {x, y}, feature)}}
-      _something -> {:err, :occupied}
-    end
-  end
+
+  defp can_place?(:north, {_, y}) when y in 3..4, do: :true
+  defp can_place?(:north, _), do: :false
+  defp can_place?(:south, {_, y}) when y in 0..1, do: :true
+  defp can_place?(:south, _), do: :false
 
   def units(board, position) do
-    Enum.reduce(
+    ongrid = Enum.reduce(
       board.grid,
       [],
       fn
@@ -57,6 +75,9 @@ defmodule Yagg.Game.Board do
           units
       end
     )
+    hand = Enum.map(board.hands[position],
+      fn({i, {u, p}}) -> {i, %{unit: u, assigned: p}} end) |> Enum.into(%{})
+    %{grid: ongrid, hand: hand}
   end
 
   def move(board, position, from, to) do

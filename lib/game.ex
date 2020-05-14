@@ -5,8 +5,8 @@ defmodule Yagg.Game do
   use GenServer
   alias __MODULE__  # so we can do %Game{} instead of %Yagg.Game{}
 
-  @enforce_keys [:state, :players, :board, :turn]
-  @derive {Poison.Encoder, only: [:state, :players, :board, :turn]}
+  @enforce_keys [:state, :players, :board, :turn, :ready]
+  @derive {Poison.Encoder, only: [:state, :players, :board, :turn, :ready]}
   defstruct [:subscribors | @enforce_keys]
 
   def start_link(options) do
@@ -65,7 +65,14 @@ defmodule Yagg.Game do
   # Callbacks
 
   def init(_) do
-    {:ok, %Game{state: :open, players: [], subscribors: [], board: Board.new(), turn: :north}}
+    {:ok, %Game{
+      state: :open,
+      players: [],
+      subscribors: [],
+      board: Board.new(),
+      turn: :north,
+      ready: :nil,
+    }}
   end
   def handle_call(:get_state, _from, game) do
     {:reply, {:ok, game}, game}
