@@ -1,4 +1,4 @@
-defmodule Yagg.Game.Player do
+defmodule Yagg.Table.Player do
   alias __MODULE__
   @derive {Poison.Encoder, only: [:name, :position]}
   defstruct [
@@ -9,6 +9,9 @@ defmodule Yagg.Game.Player do
   def new(name, position) do
     %Player{name: name, position: position}
   end
+
+  def opposite(:north), do: :south
+  def opposite(:south), do: :north
 
   def by_name(game, name) do
     case game.players do

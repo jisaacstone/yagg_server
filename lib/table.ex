@@ -1,12 +1,12 @@
-alias Yagg.Event
-alias Yagg.Game.{Board, Player}
+alias Yagg.{Event, Board}
+alias Yagg.Table.Player
 
-defmodule Yagg.Game do
+defmodule Yagg.Table do
   use GenServer
-  alias __MODULE__  # so we can do %Game{} instead of %Yagg.Game{}
+  alias __MODULE__
 
-  @enforce_keys [:state, :players, :board, :turn, :ready]
-  @derive {Poison.Encoder, only: [:state, :players, :board, :turn, :ready]}
+  @enforce_keys [:players, :board, :turn, :ready]
+  @derive {Poison.Encoder, only: [:players, :board, :turn, :ready]}
   defstruct [:subscribors | @enforce_keys]
 
   def start_link(options) do
@@ -25,9 +25,9 @@ defmodule Yagg.Game do
   def new() do
     # For now just one game all the time
     # TODO: game args
-    case Supervisor.which_children(Yagg.GameSupervisor) do
+    case Supervisor.which_children(Yagg.TableSupervisor) do
       [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
-      [] -> DynamicSupervisor.start_child(Yagg.GameSupervisor, Yagg.Game)
+      [] -> DynamicSupervisor.start_child(Yagg.TableSupervisor, Yagg.Table)
     end
   end
 
@@ -62,14 +62,18 @@ defmodule Yagg.Game do
     GenServer.call(pid, {:act, player_name, action})
   end
 
+  def move(_gid, player_name, action) do
+    {:ok, pid} = new()
+    GenServer.call(pid, {:move, player_name, action})
+  end
+
   # Callbacks
 
   def init(_) do
-    {:ok, %Game{
-      state: :open,
+    {:ok, %Table{
       players: [],
       subscribors: [],
-      board: Board.new(),
+      board: :nil,
       turn: :north,
       ready: :nil,
     }}
@@ -82,12 +86,28 @@ defmodule Yagg.Game do
   end
   def handle_call({:act, player_name, action}, _from, game) do
     player = Player.by_name(game, player_name)
-    case Yagg.Action.resolve(action, game, player) do
+    case Yagg.Table.Actions.resolve(action, game, player) do
       {:err, _} = err -> {:reply, err, game}
-      {:notify, event, game} ->
-        notify(game, event)
+      {game, events} ->
+        notify(game, events)
         {:reply, :ok, game}
-      {:nonotify, game} -> {:reply, :ok, game}
+    end
+  end
+  def handle_call({:move, player_name, move}, _from, game) do
+    player = Player.by_name(game, player_name)
+    cond do
+      player == :nil -> {:err, :player_invalid}
+      game.board.state == :gameover -> {:err, :gameover}
+      game.board.state == :battle and game.turn != player.position -> {:err, :notyourturn}
+      :true ->
+        case Board.Actions.resolve(move, game.board, player.position) do
+          {:err, _} = err -> {:reply, err, game}
+          {board, events} ->
+            # One "Move" per turn. Successful move == next turn
+            game = %{game | board: board} |> nxtrn()
+            notify(game, [Event.new(:turn, %{player: game.turn}) | events])
+            {:reply, :ok, game}
+        end
     end
   end
 
@@ -95,7 +115,7 @@ defmodule Yagg.Game do
     {:reply, {:err, {:unknown_msg, msg}}, state}
   end
 
-  def handle_info({:DOWN, _ref, :process, pid, reason}, %Game{players: players} = game) do
+  def handle_info({:DOWN, _ref, :process, pid, reason}, %Table{players: players} = game) do
     case Enum.find(players, fn p -> elem(p, 1) == pid end) do
       :nil -> {:noreply, game}
       {name, _} -> 
@@ -133,4 +153,8 @@ defmodule Yagg.Game do
       end
     )
   end
+
+  defp nxtrn(%Table{board: %Board{state: :placement}} = game), do: game
+  defp nxtrn(%Table{turn: :north} = game), do: %{game | turn: :south}
+  defp nxtrn(%Table{turn: :south} = game), do: %{game | turn: :north}
 end

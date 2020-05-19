@@ -1,4 +1,4 @@
-alias Yagg.{Game, Event}
+alias Yagg.{Table, Event, Board}
 alias Plug.Conn
 
 defmodule Yagg.Endpoint do
@@ -11,19 +11,34 @@ defmodule Yagg.Endpoint do
   plug :dispatch
 
   post "/game/create" do
-    {:ok, pid} = Yagg.Game.new()
+    {:ok, pid} = Yagg.Table.new()
     gid = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
     respond(conn, 200, %{id: gid})
   end
 
-  post "/game/:gid/action/:action" do
-    act_struct = struct(Module.safe_concat(Yagg.Action, String.capitalize(action)))
+  post "/game/:gid/move/:move" do
+    module_name = Module.safe_concat(Board.Actions, String.capitalize(move))
     {:ok, body, conn} = Conn.read_body(conn)
     conn = Conn.fetch_query_params(conn)
-    actiondata = Poison.decode!(body, as: act_struct)
+    movedata = Poison.decode!(body, as: struct(module_name))
+    player_name = Map.get(movedata, :player, conn.query_params["player"])
+
+    case Table.move(gid, player_name, movedata) do
+      :ok -> respond(conn, 204, "")
+      {:ok, resp} -> respond(conn, 200, resp)
+      {:err, err} -> respond(conn, 400, err)
+      other -> respond(conn, 501, other)
+    end
+  end
+
+  post "/game/:gid/action/:action" do
+    module_name = Module.safe_concat(Table.Actions, String.capitalize(action))
+    {:ok, body, conn} = Conn.read_body(conn)
+    conn = Conn.fetch_query_params(conn)
+    actiondata = Poison.decode!(body, as: struct(module_name))
     player_name = Map.get(actiondata, :player, conn.query_params["player"])
 
-    case Game.act(gid, player_name, actiondata) do
+    case Table.act(gid, player_name, actiondata) do
       :ok -> respond(conn, 204, "")
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, err)
@@ -32,7 +47,7 @@ defmodule Yagg.Endpoint do
   end
 
   get "/game/:gid/state" do
-    case Game.get_state(gid) do
+    case Table.get_state(gid) do
       {:ok, game} -> respond(conn, 200, game)
       {:err, err} -> respond(conn, 400, err)
       other -> respond(conn, 501, other)
@@ -40,7 +55,7 @@ defmodule Yagg.Endpoint do
   end
 
   get "/game/:gid/units/:player" do
-    case Game.get_units(gid, player) do
+    case Table.get_units(gid, player) do
       {:ok, units} -> respond(conn, 200, units)
       {:err, err} -> respond(conn, 400, err)
       other -> respond(conn, 501, IO.inspect(other))
@@ -61,7 +76,7 @@ defmodule Yagg.Endpoint do
       %{"player" => p} -> p
       :default -> :spectate
     end
-    {:ok, pid} = Game.subscribe(gid, player)
+    {:ok, pid} = Table.subscribe(gid, player)
     sse_loop(conn, pid)
   end
 

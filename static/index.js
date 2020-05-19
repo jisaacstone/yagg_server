@@ -12,9 +12,9 @@ function select(el, meta) {
           return;
         }
         if (sel.meta.inhand) {
-          global.game.gameaction('place', {index: sel.meta.index, x: meta.x, y: meta.y});
+          global.game.gameaction('place', {index: sel.meta.index, x: meta.x, y: meta.y}, null, 'move');
         } else {
-          global.game.gameaction('move', {from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y});
+          global.game.gameaction('move', {from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y}, null, 'move');
         }
       }
       sel.element.dataset.uistate = '';
@@ -23,6 +23,10 @@ function select(el, meta) {
       }
       global.selected = null;
     } else {
+      if (global.gamestate === 'placement' && meta.x) {
+        // changing placement not supported yet
+        return;
+      }
       const options = [];
       if (meta.inhand) {
         for (const el of document.getElementsByClassName(`${meta.player}option`)) {
@@ -44,12 +48,20 @@ function select(el, meta) {
   return select;
 }
 
+function gamestatechange(newstate) {
+  document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
+  global.gamestate = newstate;
+  for (const el of document.getElementsByClassName('playername')) {
+    el.dataset.ready = null;
+  }
+}
+
 const eventHandlers = {
   game_started: function() {
-    document.getElementById('gamestate').innerHTML = 'state: placement';
-    for (const el of document.getElementsByClassName('playername')) {
-      el.dataset.ready = null;
-    }
+    gamestatechange('placement');
+  },
+  battle_started: function() {
+    gamestatechange('battle');
   },
   player_joined: function(event) {
     document.getElementById(`${event.position}name`).innerHTML = event.name;
@@ -123,6 +135,7 @@ const eventHandlers = {
   feature: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
     square.innerHTML = event.feature;
+    square.dataset.feature = event.feature;
   },
   unit_died: function(event) {
     document.getElementById(`c${event.x}-${event.y}`).innerHTML = '';
@@ -134,6 +147,7 @@ const eventHandlers = {
     to.appendChild(unit);
   },
   gameover: function(event) {
+    gamestatechange('over');
     document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
   },
   turn: function(event) {
@@ -192,10 +206,10 @@ function game() {
     });
   }
 
-  function gameaction(action, data, callback) {
+  function gameaction(action, data, callback, key = 'action') {
     const host = hostForm.value;
     const name = nameForm.value;
-    const baseUrl = `http://${host}/game/ID/action/${action}?player=${name}`;
+    const baseUrl = `http://${host}/game/ID/${key}/${action}?player=${name}`;
     function listener() {
       if (this.status >= 400) {
          errorDiv.innerHTML = `error: ${this.status}, message: ${this.responseText}`;
@@ -246,6 +260,7 @@ function game() {
 
   function setstate(gamedata) {
     document.getElementById('gamestate').innerHTML = `state: ${gamedata.state}`;
+    global.gamestate = gamedata.state;
     for (const player of gamedata.players) {
       eventHandlers.player_joined(player);
     }

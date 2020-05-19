@@ -10,7 +10,7 @@ defmodule Yagg.Application do
         port: 8000,
         protocol_options: [idle_timeout: :infinity]
       ),
-      {DynamicSupervisor, name: Yagg.GameSupervisor, strategy: :one_for_one},
+      {DynamicSupervisor, name: Yagg.TableSupervisor, strategy: :one_for_one},
     ]
 
     opts = [strategy: :one_for_one, name: Yagg.Supervisor]

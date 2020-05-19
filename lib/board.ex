@@ -1,9 +1,11 @@
-alias Yagg.Game.Unit
+alias Yagg.Board.Unit
+alias Yagg.Table.Player
 alias Yagg.Event
 
-defmodule Yagg.Game.Board do
+defmodule Yagg.Board do
   alias __MODULE__
-  @enforce_keys [:width, :height, :grid, :hands]
+
+  @enforce_keys [:grid, :hands, :state]
   defstruct @enforce_keys
 
   defimpl Poison.Encoder, for: Board do
@@ -12,8 +14,7 @@ defmodule Yagg.Game.Board do
         |> Map.to_list()
         |> Map.new(fn({{x, y}, f}) -> {"#{x},#{y}", encode_feature(f)} end)
       Poison.Encoder.Map.encode(
-        %{width: board.width,
-          height: board.height,
+        %{state: board.state,
           grid: encodeable},
         options
       )
@@ -25,19 +26,62 @@ defmodule Yagg.Game.Board do
 
   def new() do
     %Board{
-      grid: %{{1, 2} => :water, {3, 2} => :water},
+      grid: %{{1, 2} => :water, {4, 2} => :water},
       hands: %{north: %{}, south: %{}},
-      width: 5,
-      height: 5
+      state: :placement,
     }
+  end
+
+  defmodule Actions do
+    defmodule Move do
+      # naming things is hard
+      @enforce_keys [:from_x, :from_y, :to_x, :to_y]
+      defstruct @enforce_keys
+
+      def resolve(move, %Board{state: :battle} = board, position) do
+        case Board.move(board, position, {move.from_x, move.from_y}, {move.to_x, move.to_y}) do
+          {:err, _} = err ->
+            err
+          {:ok, board, events} ->
+            {board, events}
+        end
+      end
+    end
+    defmodule Place do
+      @enforce_keys [:index, :x, :y]
+      defstruct @enforce_keys
+
+      def resolve(act, %Board{state: :placement} = board, position) do
+        case Board.assign(board, position, act.index, {act.x, act.y}) do
+          {:ok, board} -> 
+            {
+              board,
+              [Event.new(position, :unit_assigned, %{index: act.index, x: act.x, y: act.y})]
+            }
+          err -> err
+        end
+      end
+    end
+
+    def resolve(%{__struct__: mod} = action, board, position) do
+      mod.resolve(action, board, position)
+    end
   end
 
   def assign(board, position, hand_index, coords) do
     if can_place?(position, coords) do
-      hand = board.hands[position] |> Map.update!(hand_index, fn({u, _}) -> {u, coords} end)
+      hand = hand_assign(board.hands[position], hand_index, coords)
       {:ok, %{board | hands: Map.put(board.hands, position, hand)}}
     else
       {:err, :illegal_square}
+    end
+  end
+
+  defp hand_assign(hand, index, coords) do
+    case hand[index] do
+      :nil -> {:err, :invalid_index}
+      {_unit, {_x, _y}} -> {:err, :already_assigned}
+      {unit, :nil} -> %{hand | index => {unit, coords}}
     end
   end
 
@@ -117,12 +161,19 @@ defmodule Yagg.Game.Board do
     }
   end
 
-  defp unit_death(board, {x, y}) do
+  defp unit_death(board, unit, {x, y}) do
     grid = Map.delete(board.grid, {x, y})
-    {
-      %{board | grid: grid},
-      [Event.new(:unit_died, %{x: x, y: y})]
-    }
+    if (unit.name == :monarch) do
+      {
+        %{board | grid: grid, state: :gameover},
+        [Event.new(:unit_died, %{x: x, y: y}), Event.new(:gameover, %{winner: Player.opposite(unit.position)})]
+      }
+    else
+      {
+        %{board | grid: grid},
+        [Event.new(:unit_died, %{x: x, y: y})]
+      }
+    end
   end
 
   defp do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _) do
@@ -131,32 +182,16 @@ defmodule Yagg.Game.Board do
   defp do_battle(board, unit, opponent, from, to) do
     cond do
       unit.attack > opponent.defense ->
-        {board, e1} = unit_death(board, to)
+        {board, e1} = unit_death(board, opponent, to)
         {board, e2} = do_move(board, unit, from, to)
-        {state, events} = unless opponent.name == :monarch do
-          {:ok, e1 ++ e2}
-        else
-          {:gameover, [Event.new(:gameover, %{winner: unit.position}) | e1] ++ e2}
-        end
-        {state, board, events}
+        {:ok, board, e1 ++ e2}
       unit.attack == opponent.defense ->
-        {board, e1} = unit_death(board, from)
-        {board, e2} = unit_death(board, to)
-        {state, events} = case {unit.name, opponent.name} do
-          {:monarch, :monarch} -> {:gameover, [Event.new(:gameover, %{winner: :draw}) | e1] ++ e2}
-          {:monarch, _} -> {:gameover, [Event.new(:gameover, %{winner: opponent.position}) | e1] ++ e2}
-          {_, :monarch} -> {:gameover, [Event.new(:gameover, %{winner: unit.position}) | e1] ++ e2}
-          _ -> {:ok, e1 ++ e2}
-        end
-        {state, board, events}
+        {board, e1} = unit_death(board, unit, from)
+        {board, e2} = unit_death(board, opponent, to)
+        {:ok, board, e1 ++ e2}
       unit.attack < opponent.defense ->
-        {board, events} = unit_death(board, from)
-        {state, events} = unless unit.name == :monarch do
-          {:ok, events}
-        else
-          {:gameover, [Event.new(:gameover, %{winner: unit.position}) | events]}
-        end
-        {state, board, events}
+        {board, events} = unit_death(board, unit, from)
+        {:ok, board, events}
     end
   end
 end
