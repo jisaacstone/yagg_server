@@ -235,7 +235,6 @@ function game() {
 
     uReq.addEventListener('load', function () {
       const unitdata = JSON.parse(this.responseText);
-      console.log({unitdata});
       for (const ob of unitdata.grid) {
         eventHandlers.new_unit(ob);
       }
@@ -305,7 +304,11 @@ window.onload = function() {
   };
 
   document.getElementById('readybutton').onclick = function() {
-    G.gameaction('ready');
+    G.gameaction('ready', {}, null, 'move');
+  };
+
+  document.getElementById('restartbutton').onclick = function() {
+    G.gameaction('restart');
   };
 
   for (const el of document.getElementsByTagName('td')) {

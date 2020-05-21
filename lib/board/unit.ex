@@ -4,8 +4,8 @@ defmodule Yagg.Board.Unit do
   @derive {Poison.Encoder, only: [:name, :attack, :defense, :ability, :position]}
   defstruct [:ability | @enforce_keys]
 
-  def new(position, name, attack, defense) do
-    %Unit{position: position, name: name, attack: attack, defense: defense}
+  def new(position, name, attack, defense, ability \\ :nil) do
+    %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability}
   end
 
   @doc """

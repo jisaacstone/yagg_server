@@ -1,5 +1,6 @@
 alias Yagg.{Event, Board}
 alias Yagg.Table.Player
+alias Yagg.Board.State.Placement
 
 defmodule Yagg.Table do
   use GenServer
@@ -84,30 +85,40 @@ defmodule Yagg.Table do
   def handle_call({:subscribe, player}, {pid, _tag}, %{subscribors: subs} = game) do
     {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
   end
+
   def handle_call({:act, player_name, action}, _from, game) do
     player = Player.by_name(game, player_name)
-    case Yagg.Table.Actions.resolve(action, game, player) do
-      {:err, _} = err -> {:reply, err, game}
-      {game, events} ->
-        notify(game, events)
-        {:reply, :ok, game}
+    try do
+      case Yagg.Table.Actions.resolve(action, game, player) do
+        {:err, _} = err -> {:reply, err, game}
+        {game, events} ->
+          notify(game, events)
+          {:reply, :ok, game}
+      end
+    rescue
+      FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
     end
   end
+
   def handle_call({:move, player_name, move}, _from, game) do
     player = Player.by_name(game, player_name)
-    cond do
-      player == :nil -> {:err, :player_invalid}
-      game.board.state == :gameover -> {:err, :gameover}
-      game.board.state == :battle and game.turn != player.position -> {:err, :notyourturn}
-      :true ->
-        case Board.Actions.resolve(move, game.board, player.position) do
-          {:err, _} = err -> {:reply, err, game}
-          {board, events} ->
-            # One "Move" per turn. Successful move == next turn
-            game = %{game | board: board} |> nxtrn()
-            notify(game, [Event.new(:turn, %{player: game.turn}) | events])
-            {:reply, :ok, game}
-        end
+    try do
+      cond do
+        player == :nil -> {:reply, {:err, :player_invalid}, game}
+        game.board.state == :gameover -> {:reply, {:err, :gameover}, game}
+        game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
+        :true ->
+          case Board.Actions.resolve(move, game.board, player.position) do
+            {:err, _} = err -> {:reply, err, game}
+            {board, events} ->
+              # One "Move" per turn. Successful move == next turn
+              game = %{game | board: board} |> nxtrn()
+              notify(game, [Event.new(:turn, %{player: game.turn}) | events])
+              {:reply, :ok, game}
+          end
+      end
+    rescue
+      FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
     end
   end
 
@@ -154,7 +165,7 @@ defmodule Yagg.Table do
     )
   end
 
-  defp nxtrn(%Table{board: %Board{state: :placement}} = game), do: game
+  defp nxtrn(%Table{board: %Board{state: %Placement{}}} = game), do: game
   defp nxtrn(%Table{turn: :north} = game), do: %{game | turn: :south}
   defp nxtrn(%Table{turn: :south} = game), do: %{game | turn: :north}
 end

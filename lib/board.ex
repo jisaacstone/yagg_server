@@ -2,8 +2,13 @@ alias Yagg.Board.Unit
 alias Yagg.Table.Player
 alias Yagg.Event
 
+defmodule Yagg.Board.State.Placement do
+  defstruct [:ready]
+end
+
 defmodule Yagg.Board do
   alias __MODULE__
+  alias Board.State.Placement
 
   @enforce_keys [:grid, :hands, :state]
   defstruct @enforce_keys
@@ -28,44 +33,8 @@ defmodule Yagg.Board do
     %Board{
       grid: %{{1, 2} => :water, {4, 2} => :water},
       hands: %{north: %{}, south: %{}},
-      state: :placement,
+      state: %Placement{},
     }
-  end
-
-  defmodule Actions do
-    defmodule Move do
-      # naming things is hard
-      @enforce_keys [:from_x, :from_y, :to_x, :to_y]
-      defstruct @enforce_keys
-
-      def resolve(move, %Board{state: :battle} = board, position) do
-        case Board.move(board, position, {move.from_x, move.from_y}, {move.to_x, move.to_y}) do
-          {:err, _} = err ->
-            err
-          {:ok, board, events} ->
-            {board, events}
-        end
-      end
-    end
-    defmodule Place do
-      @enforce_keys [:index, :x, :y]
-      defstruct @enforce_keys
-
-      def resolve(act, %Board{state: :placement} = board, position) do
-        case Board.assign(board, position, act.index, {act.x, act.y}) do
-          {:ok, board} -> 
-            {
-              board,
-              [Event.new(position, :unit_assigned, %{index: act.index, x: act.x, y: act.y})]
-            }
-          err -> err
-        end
-      end
-    end
-
-    def resolve(%{__struct__: mod} = action, board, position) do
-      mod.resolve(action, board, position)
-    end
   end
 
   def assign(board, position, hand_index, coords) do
@@ -145,6 +114,21 @@ defmodule Yagg.Board do
     end
   end
 
+  def unit_death(board, unit, {x, y}) do
+    grid = Map.delete(board.grid, {x, y})
+    if (unit.name == :monarch) do
+      {
+        %{board | grid: grid, state: :gameover},
+        [Event.new(:unit_died, %{x: x, y: y}), Event.new(:gameover, %{winner: Player.opposite(unit.position)})]
+      }
+    else
+      {
+        %{board | grid: grid},
+        [Event.new(:unit_died, %{x: x, y: y})]
+      }
+    end
+  end
+
   ## Private
 
   defp can_move?({x, y}, {to_x, to_y}) do
@@ -159,21 +143,6 @@ defmodule Yagg.Board do
       %{board | grid: grid},
       [Event.new(:unit_moved, %{from: from, to: to})]
     }
-  end
-
-  defp unit_death(board, unit, {x, y}) do
-    grid = Map.delete(board.grid, {x, y})
-    if (unit.name == :monarch) do
-      {
-        %{board | grid: grid, state: :gameover},
-        [Event.new(:unit_died, %{x: x, y: y}), Event.new(:gameover, %{winner: Player.opposite(unit.position)})]
-      }
-    else
-      {
-        %{board | grid: grid},
-        [Event.new(:unit_died, %{x: x, y: y})]
-      }
-    end
   end
 
   defp do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _) do

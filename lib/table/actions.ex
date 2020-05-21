@@ -4,7 +4,6 @@ alias Yagg.Table.Player
 defmodule Yagg.Table.Actions do
   alias __MODULE__
 
-  # Action Types
   defmodule Join do
     @enforce_keys [:player]
     defstruct @enforce_keys
@@ -36,6 +35,7 @@ defmodule Yagg.Table.Actions do
       {:err, :bad_state}
     end
   end
+
   defmodule Leave do
     defstruct []
 
@@ -55,34 +55,17 @@ defmodule Yagg.Table.Actions do
     end
   end
 
-  defmodule Ready do
+  defmodule Restart do
     defstruct []
 
-    def resolve(%{}, game, %{position: pos}) do
-      opp = Enum.find_value(game.players, fn(p) -> if p.position != pos, do: p.position end)
-      case IO.inspect({opp, game.ready, game.state}) do
-        {:nil, _, :open} ->
-          {:err, :notenoughplayers}
-        {position, position, :open} ->
-          {notifications, game} = Actions.initial_setup(game)
-          {%{game | state: :placement, ready: :nil}, notifications}
-        {_, _, :open} ->
-          {
-            %{game | ready: pos},
-            [Event.new(:player_ready, %{player: opp})]
-          }
-        {position, position, :placement} ->
-          {notifications, game} = Actions.start_battle(game)
-          {%{game | ready: :nil}, notifications}
-        {_, _, :placement} ->
-          {
-            %{game | ready: pos},
-            [Event.new(:player_ready, %{player: opp})]
-          }
-      end
+    def resolve(%{}, %{players: [_, _]} = table, %Player{}) do
+      Actions.initial_setup(table)
     end
   end
 
+  def resolve(%{__struct__: mod} = action, game, player) do
+    mod.resolve(action, game, player)
+  end
 
   def initial_setup(%{players: players} = game) do
     board = Board.new()
@@ -114,42 +97,5 @@ defmodule Yagg.Table.Actions do
       end
     )
     {hand, notif}
-  end
-
-  defp place_hand(board, hand) do
-    Enum.reduce(
-      hand,
-      board,
-      fn({_, {unit, {x, y}}}, board) -> Board.place!(board, unit, {x, y})
-        (index, {unit, _}) -> throw({:err, :unassigned, unit.position, index})
-      end
-    )
-  end
-
-  def start_battle(game) do
-    try do
-      board = game.board
-        |> place_hand(game.board.hands[:north])
-        |> place_hand(game.board.hands[:south])
-        |> Map.put(:hands, %{north: %{}, south: %{}})
-
-      notifications = Enum.reduce(
-        board.grid,
-        [],
-        fn
-          ({{x, y}, %Unit{} = unit}, nfcns) ->
-            [Event.new(:global, :unit_placed, %{x: x, y: y, player: unit.position}) | nfcns]
-          (_, nfcns) -> nfcns
-        end
-      )
-      game = %{game | state: :battle, board: board}
-      {[Event.new(:battle_started) | notifications], game}
-    catch
-      err -> err
-    end
-  end
-
-  def resolve(%{__struct__: mod} = action, game, player) do
-    mod.resolve(action, game, player)
   end
 end
