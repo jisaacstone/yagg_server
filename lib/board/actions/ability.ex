@@ -52,14 +52,68 @@ defmodule Yagg.Board.Actions.Ability do
     end
   end
 
-  defmodule Lose do
+  defmodule Concede do
+    # death trigger of the :monarch
     use Action
 
     def resolve(_, board, opts) do
-      IO.inspect({
+      {
         %{board | state: :gameover},
         [Event.new(:gameover, %{winner: Player.opposite(opts[:unit].position)})]
-      })
+      }
+    end
+  end
+
+  defmodule Rowburn do
+    use Action
+
+    def resolve(_, board, opts) do
+      {_, y} = opts[:coords]
+      Enum.reduce(
+        board.grid,
+        {board, []},
+        &burn_unit(&1, &2, y)
+      )
+    end
+
+    defp burn_unit({{x, y}, %Unit{} = unit}, {board, events}, y) do
+      {board, newevents} = Board.unit_death(board, unit, {x, y})
+      {board, newevents ++ events}
+    end
+    defp burn_unit(_, acc, _) do
+      acc
+    end
+  end
+
+  defmodule Colburn do
+    use Action
+
+    def resolve(_, board, opts) do
+      {x, _} = opts[:coords]
+      Enum.reduce(
+        board.grid,
+        {board, []},
+        &burn_unit(&1, &2, x)
+      )
+    end
+
+    defp burn_unit({{x, y}, %Unit{} = unit}, {board, events}, x) do
+      {board, newevents} = Board.unit_death(board, unit, {x, y})
+      {board, newevents ++ events}
+    end
+    defp burn_unit(_, acc, _) do
+      acc
+    end
+  end
+
+  defmodule Poisonblade do
+    use Action
+
+    def resolve(_, board, opts) do
+      case opts[:opponent] do
+        :nil -> {board, []}
+        {unit, coords} -> Board.unit_death(board, unit, coords)
+      end
     end
   end
 end

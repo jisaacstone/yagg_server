@@ -15,14 +15,14 @@ defmodule Yagg.Unit do
   """
   def starting_units(position) do
     Enum.shuffle([
-      new(position, :monarch, 2, 1, :nil, %{death: Ability.Lose}),
-      new(position, :general, 4, 3),
-      new(position, :bezerker, 5, 1),
-      new(position, :fullarmorcoward, 1, 5),
-      new(position, :explody, 2, 3, :nil, %{death: Ability.Selfdestruct}),
-      new(position, :pacifist, 1, 4),
-      new(position, :solid, 3, 3),
-      new(position, :triggerhappy, 3, 1),
+      new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
+      new(position, :general, 5, 4),
+      new(position, :bezerker, 7, 2),
+      new(position, :fullarmorcoward, 1, 6),
+      new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
+      new(position, :colburninator, 1, 2, Ability.Colburn),
+      new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
+      new(position, :rowburninator, 3, 2, Ability.Rowburn),
     ])
   end
 

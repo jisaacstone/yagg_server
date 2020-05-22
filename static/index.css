@@ -101,6 +101,21 @@ td {
   border-style: inset;
   background-color: rgba(245, 248, 246, 0.1);
 }
+.unit-ability {
+  float: right;
+  margin: 3px;
+  background-color: rgba(180, 185, 187, 0.3);
+  border-width: 1px;
+  border-radius: 10% 35%;
+  border-color: #ABA;
+  text-shadow: #EDF -1px -1px 0;
+}
+.unit-ability:hover {
+  cursor: pointer;
+  background-color: rgba(170, 175, 177, 0.4);
+  border-style: solid;
+  border-color: #445;
+}
 
 tr:nth-child(even) td:nth-child(even),
 tr:nth-child(odd) td:nth-child(odd) {

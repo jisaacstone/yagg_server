@@ -113,9 +113,10 @@ defmodule Yagg.Board do
     end
   end
 
-  def unit_death(board, unit, {x, y}) do
+  def unit_death(board, unit, {x, y}, meta \\ []) do
     board = %{board | grid: Map.delete(board.grid, {x, y})}
-    {board, events} = Unit.deathrattle(unit).resolve(board, unit: unit, coords: {x, y})
+    opts = [{:unit, unit}, {:coords, {x, y}} | meta]
+    {board, events} = Unit.deathrattle(unit).resolve(board, opts)
     {
       board,
       [Event.new(:unit_died, %{x: x, y: y}) | events]
@@ -167,15 +168,16 @@ defmodule Yagg.Board do
   defp do_battle(board, unit, opponent, from, to) do
     cond do
       unit.attack > opponent.defense ->
-        {board, e1} = unit_death(board, opponent, to)
+        {board, e1} = unit_death(board, opponent, to, opponent: {unit, from})
         {board, e2} = do_move(board, unit, from, to)
         {:ok, board, e1 ++ e2}
       unit.attack == opponent.defense ->
+        # not currently possible?
         {board, e1} = unit_death(board, unit, from)
         {board, e2} = unit_death(board, opponent, to)
         {:ok, board, e1 ++ e2}
       unit.attack < opponent.defense ->
-        {board, events} = unit_death(board, unit, from)
+        {board, events} = unit_death(board, unit, from, opponent: {opponent, to}, attacking: :true)
         {:ok, board, events}
     end
   end

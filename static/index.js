@@ -48,6 +48,34 @@ function select(el, meta) {
   return select;
 }
 
+function unit_el(unit, el) {
+  for (const att of ['name', 'attack', 'defense']) {
+    const subel = document.createElement('span');
+    subel.className = `unit-${att}`;
+    subel.innerHTML = unit[att];
+    el.appendChild(subel);
+  }
+  if (unit.ability) {
+    const abilbut = document.createElement('button'),
+      abilname = unit.ability.split('.').slice(-1)[0].toLowerCase();
+    console.log({unit: unit, abilname});
+    abilbut.className = 'unit-ability';
+    abilbut.innerHTML = abilname;
+    abilbut.onclick = function(e) {
+      const square = el.parentNode,
+        x = +square.id.charAt(1),
+        y = +square.id.charAt(3);
+      global.game.gameaction('ability', {name: abilname, x: x, y: y}, null, 'move');
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    el.appendChild(abilbut);
+  }
+  if (unit.name === 'monarch') {
+    el.className = `monarch ${el.className}`;
+  }
+}
+
 function gamestatechange(newstate) {
   document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
   global.gamestate = newstate;
@@ -82,15 +110,7 @@ const eventHandlers = {
     card.onclick = select(card, {index: event.index, inhand: true, player: event.unit.position});
     hand.appendChild(card);
     unit.className = `unit ${event.unit.position}`;
-    for (const att of ['name', 'attack', 'defense']) {
-      const subel = document.createElement('span');
-      subel.className = `unit-${att}`;
-      subel.innerHTML = event.unit[att];
-      unit.appendChild(subel);
-    }
-    if (event.unit.name === 'monarch') {
-      unit.className = `monarch ${unit.className}`;
-    }
+    unit_el(event.unit, unit);
     card.appendChild(unit);
   },
   unit_assigned: function(event) {
@@ -110,15 +130,7 @@ const eventHandlers = {
       return console.log({err: 'unitnotfound', event, unit});
     }
     unit.innerHTML = '';
-    for (const att of ['name', 'attack', 'defense']) {
-      const subel = document.createElement('span');
-      subel.className = `unit-${att}`;
-      subel.innerHTML = event.unit[att];
-      unit.appendChild(subel);
-    }
-    if (event.unit.name === 'monarch') {
-      unit.className = `monarch ${unit.className}`;
-    }
+    unit_el(event.unit, unit);
   },
   unit_placed: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
