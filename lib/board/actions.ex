@@ -1,6 +1,6 @@
 alias Yagg.Board
 alias Yagg.Board.State.Placement
-alias Yagg.Board.Unit
+alias Yagg.Unit
 alias Yagg.Event
 
 defmodule Board.Actions do

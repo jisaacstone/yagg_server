@@ -1,18 +1,21 @@
+alias Yagg.Action
 alias Yagg.Board
-alias Yagg.Board.Unit
+alias Yagg.Unit
+alias Yagg.Event
+alias Yagg.Table.Player
 
 defmodule Yagg.Board.Actions.Ability do
   @enforce_keys [:name, :x, :y]
   defstruct [:params | @enforce_keys]
   alias __MODULE__
 
-  def resolve(data, %Board{state: :battle} = board, position) do
+  def resolve(data, %Board{state: :battle} = board, _position) do
     module = Module.safe_concat(Ability, String.capitalize(data.name))
     ability = struct!(module, data.params || [])
     coords = {data.x, data.y}
     case ability_at(board, ability, coords) do
       {:err, _} = err -> err
-      unit -> module.resolve(ability, board, unit: unit, position: position, coords: coords)
+      unit -> module.resolve(ability, board, unit: unit, coords: coords)
     end
   end
 
@@ -24,22 +27,39 @@ defmodule Yagg.Board.Actions.Ability do
     end
   end
 
+  defmodule NOOP do
+    use Action
+
+    def resolve(_, board, _) do
+      {board, []}
+    end
+  end
+
   defmodule Selfdestruct do
-    defstruct []
+    use Action
 
     def resolve(_selfdestuct, board, opts) do
-      {board, events} = Board.unit_death(board, opts[:unit], opts[:coords])
-      {x, y} = opts[:coords]
-      surround = [{x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1}]
-      Enum.reduce(surround, {board, events}, fn (co, {b, e}) -> killunit(board.grid[co], co, b, e) end)
+      surround = Board.features_around(board, opts[:coords])
+      Enum.reduce(surround, {board, []}, &killunit/2)
     end
 
-    defp killunit(%Unit{} = unit, coords, board, events) do
+    defp killunit({coords, %Unit{} = unit}, {board, events}) do
       {board, newevents} = Board.unit_death(board, unit, coords)
       {board, newevents ++ events}
     end
-    defp killunit(_, _, board, events) do
-      {board, events}
+    defp killunit(_, state) do
+      state
+    end
+  end
+
+  defmodule Lose do
+    use Action
+
+    def resolve(_, board, opts) do
+      IO.inspect({
+        %{board | state: :gameover},
+        [Event.new(:gameover, %{winner: Player.opposite(opts[:unit].position)})]
+      })
     end
   end
 end

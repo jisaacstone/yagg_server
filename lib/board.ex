@@ -1,5 +1,4 @@
-alias Yagg.Board.Unit
-alias Yagg.Table.Player
+alias Yagg.Unit
 alias Yagg.Event
 
 defmodule Yagg.Board.State.Placement do
@@ -115,18 +114,35 @@ defmodule Yagg.Board do
   end
 
   def unit_death(board, unit, {x, y}) do
-    grid = Map.delete(board.grid, {x, y})
-    if (unit.name == :monarch) do
-      {
-        %{board | grid: grid, state: :gameover},
-        [Event.new(:unit_died, %{x: x, y: y}), Event.new(:gameover, %{winner: Player.opposite(unit.position)})]
-      }
-    else
-      {
-        %{board | grid: grid},
-        [Event.new(:unit_died, %{x: x, y: y})]
-      }
-    end
+    board = %{board | grid: Map.delete(board.grid, {x, y})}
+    {board, events} = Unit.deathrattle(unit).resolve(board, unit: unit, coords: {x, y})
+    {
+      board,
+      [Event.new(:unit_died, %{x: x, y: y}) | events]
+    }
+  end
+
+  @doc """
+  Returnts a list of {coords, feature} tuple for any features within distance of {x, y}
+  """
+  def features_around(board, {x, y}, distance \\ 1) do
+    # nested reduce gets all permutations
+    Enum.reduce(
+      x-distance..x+distance,
+      [],
+      fn(xa, features) ->
+        Enum.reduce(
+          y-distance..y+distance,
+          features,
+          fn(ya, features) ->
+            case board.grid[{xa, ya}] do
+              :nil -> features
+              feature -> [{{xa, ya}, feature} | features]
+            end
+          end
+        )
+      end
+    )
   end
 
   ## Private

@@ -1,4 +1,4 @@
-alias Yagg.Board.Unit
+alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.Actions.Ability
 alias Yagg.Board.State.Placement
@@ -57,6 +57,23 @@ defmodule YaggTest.Action.Move do
     assert newboard.grid[{4, 3}] == attacker
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
   end
+
+  test "winner winner chicken dinner" do
+    attacker = Unit.new(:north, :test, 3, 3)
+    defender = Unit.new(:south, :monarch, 1, 1, :nil, %{death: Ability.Lose})
+    board =
+      Board.new()
+      |> Map.put(:state, :battle)
+      |> Board.place(attacker, {4, 4}) |> elem(1)
+      |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, defender)} end.()
+    action = %Board.Actions.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
+    assert {newboard, events} = Board.Actions.resolve(action, board, :north)
+    assert newboard.grid[{4, 3}] == attacker
+    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
+    gameover = Enum.find(events, fn(e) -> e.kind == :gameover end)
+    assert gameover.data.winner == :north
+  end
+
  
   test "attackyourself" do
     unit = Unit.new(:north, :test, 3, 3)

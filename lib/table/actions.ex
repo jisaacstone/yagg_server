@@ -1,4 +1,4 @@
-alias Yagg.Board.Unit
+alias Yagg.Unit
 alias Yagg.{Event, Board}
 alias Yagg.Table.Player
 defmodule Yagg.Table.Actions do
