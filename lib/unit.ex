@@ -1,10 +1,23 @@
 alias Yagg.Board.Actions.Ability
+alias Yagg.Action
 
 defmodule Yagg.Unit do
   alias __MODULE__
   @enforce_keys [:attack, :defense, :name, :position]
-  @derive {Poison.Encoder, only: [:name, :attack, :defense, :ability, :position]}
   defstruct [:ability, :triggers | @enforce_keys]
+
+  defimpl Poison.Encoder, for: Unit do
+    def encode(%Unit{} = unit, opts) do
+      %{
+        attack: unit.attack,
+        defense: unit.defense,
+        name: unit.name,
+        player: unit.position,
+        ability: Action.describe(unit.ability),
+        triggers: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Action.describe(v)} end) |> Enum.into(%{})
+      } |> Poison.Encoder.Map.encode(opts)
+    end
+  end
 
   def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}) do
     %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers}

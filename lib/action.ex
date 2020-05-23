@@ -4,6 +4,13 @@ defmodule Yagg.Action do
   """
 
   @callback resolve(Dict.t, Yagg.Board.t, List.t) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
+  @callback description() :: String.t
+
+  def describe(:nil), do: :nil
+  def describe(action) do
+    name = Module.split(action) |> Enum.reverse() |> hd() |> String.downcase()
+    %{name: name, args: action.__struct__(), description: action.description()}
+  end
 
   defmacro __using__(opts) do
     quote do

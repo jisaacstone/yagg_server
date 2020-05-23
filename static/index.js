@@ -48,6 +48,8 @@ function select(el, meta) {
   return select;
 }
 
+const SKULL = String.fromCodePoint(0x1F480);
+
 function unit_el(unit, el) {
   for (const att of ['name', 'attack', 'defense']) {
     const subel = document.createElement('span');
@@ -55,21 +57,39 @@ function unit_el(unit, el) {
     subel.innerHTML = unit[att];
     el.appendChild(subel);
   }
+  if (unit.triggers && unit.triggers.death) {
+    const subel = document.createElement('span'),
+      tt = document.createElement('span');
+    subel.className = 'unit-deathrattle';
+    subel.innerHTML = SKULL;
+    el.firstChild.prepend(subel);  // firstChild should be the name
+    tt.className = 'tooltip';
+    tt.innerHTML = `When this unit dies: ${unit.triggers.death.description}`;
+    subel.appendChild(tt);
+  }
   if (unit.ability) {
     const abilbut = document.createElement('button'),
-      abilname = unit.ability.split('.').slice(-1)[0].toLowerCase();
+      tt = document.createElement('span'),
+      abilname = unit.ability.name;
     console.log({unit: unit, abilname});
     abilbut.className = 'unit-ability';
     abilbut.innerHTML = abilname;
     abilbut.onclick = function(e) {
-      const square = el.parentNode,
-        x = +square.id.charAt(1),
-        y = +square.id.charAt(3);
-      global.game.gameaction('ability', {name: abilname, x: x, y: y}, null, 'move');
-      e.preventDefault();
-      e.stopPropagation();
+      if (el.parentNode.tagName === 'TD') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (window.confirm(unit.ability.description)) {
+          const square = el.parentNode,
+            x = +square.id.charAt(1),
+            y = +square.id.charAt(3);
+          global.game.gameaction('ability', {name: abilname, x: x, y: y}, null, 'move');
+        }
+      }
     };
     el.appendChild(abilbut);
+    tt.className = 'tooltip';
+    tt.innerHTML = unit.ability.description;
+    abilbut.appendChild(tt);
   }
   if (unit.name === 'monarch') {
     el.className = `monarch ${el.className}`;
@@ -107,9 +127,9 @@ const eventHandlers = {
       unit = document.createElement('span');
     card.dataset.index = event.index;
     card.className = 'card';
-    card.onclick = select(card, {index: event.index, inhand: true, player: event.unit.position});
+    card.onclick = select(card, {index: event.index, inhand: true, player: event.unit.player});
     hand.appendChild(card);
-    unit.className = `unit ${event.unit.position}`;
+    unit.className = `unit ${event.unit.player}`;
     unit_el(event.unit, unit);
     card.appendChild(unit);
   },
@@ -150,12 +170,20 @@ const eventHandlers = {
     square.dataset.feature = event.feature;
   },
   unit_died: function(event) {
-    document.getElementById(`c${event.x}-${event.y}`).innerHTML = '';
+    const square = document.getElementById(`c${event.x}-${event.y}`),
+      unit = square.firstChild;
+    unit.innerHTML = SKULL;
+    setTimeout(function() {
+      square.removeChild(unit);
+    }, 750);
   },
   unit_moved: function(event) {
     console.log({E: 'unit_moved', event});
     const to = document.getElementById(`c${event.to.x}-${event.to.y}`),
       unit = document.getElementById(`c${event.from.x}-${event.from.y}`).firstChild;
+    while(to.firstChild) {
+      to.removeChild(to.firstChild);
+    }
     to.appendChild(unit);
   },
   gameover: function(event) {
