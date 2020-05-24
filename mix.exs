@@ -28,6 +28,7 @@ defmodule YaggServer.MixProject do
       {:gen_stage, "~> 1.0"},
       {:cors_plug, "~> 2.0"},
       {:plug_cowboy, "~> 2.2"},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
     ]
   end
 end

@@ -56,9 +56,8 @@ defmodule Yagg.Endpoint do
 
   get "/game/:gid/units/:player" do
     case Table.get_units(gid, player) do
-      {:ok, units} -> respond(conn, 200, units)
       {:err, err} -> respond(conn, 400, err)
-      other -> respond(conn, 501, IO.inspect(other))
+      {:ok, units} -> respond(conn, 200, units)
     end
   end
 
@@ -74,7 +73,7 @@ defmodule Yagg.Endpoint do
 
     player = case conn.query_params do
       %{"player" => p} -> p
-      :default -> :spectate
+      _ -> :spectate
     end
     {:ok, pid} = Table.subscribe(gid, player)
     sse_loop(conn, pid)

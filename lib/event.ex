@@ -1,10 +1,16 @@
+alias Yagg.Table.Player
+
 defmodule Yagg.Event do
   alias __MODULE__
-  defstruct [
-    stream: :global,
-    kind: :none,
-    data: %{},
-  ]
+  @enforce_keys [:stream, :kind, :data]
+  defstruct @enforce_keys
+
+  @type t :: %Event{
+    stream: :global | Player.position(),
+    kind: atom(),
+    data: map(),
+  }
+
   defimpl Poison.Encoder, for: Event do
     def encode(%Event{kind: kind, data: data}, options) do
       Poison.Encoder.Map.encode(Map.put_new(data, :event, kind), options)

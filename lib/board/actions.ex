@@ -1,5 +1,5 @@
 alias Yagg.Board
-alias Yagg.Board.State.Placement
+alias Yagg.Board.State.{Placement,Gameover}
 alias Yagg.Unit
 alias Yagg.Event
 
@@ -57,7 +57,7 @@ defmodule Board.Actions do
   defmodule Ready do
     defstruct []
 
-    def resolve(_, %Board{state: %Placement{ready: position}}, position) do
+    def resolve(_, %Board{state: %{ready: position}}, position) do
       {:err, :already_ready}
     end
     def resolve(_act, %Board{state: %Placement{ready: :nil}} = board, position) do
@@ -71,6 +71,12 @@ defmodule Board.Actions do
         :true -> start_battle(board)
         :false -> {:err, :notready}
       end
+    end
+    def resolve(_, %Board{state: %Gameover{ready: :nil}} = board, position) do
+        {%{board | state: %Gameover{ready: position}}, [Event.new(:player_ready, %{player: position})]}
+    end
+    def resolve(_act, %Board{state: %Gameover{ready: _opponent}} = board, _position) do
+      %{board | state: %Placement{}} |> Board.setup()
     end
 
     defp units_assigned?(%{hands: hands}, position) do

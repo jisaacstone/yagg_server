@@ -3,6 +3,7 @@ alias Yagg.Board
 alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Table.Player
+alias Yagg.Board.State
 
 defmodule Yagg.Board.Actions.Ability do
   @enforce_keys [:name, :x, :y]
@@ -63,7 +64,7 @@ defmodule Yagg.Board.Actions.Ability do
 
     def resolve(_, board, opts) do
       {
-        %{board | state: :gameover},
+        %{board | state: %State.Gameover{}},
         [Event.new(:gameover, %{winner: Player.opposite(opts[:unit].position)})]
       }
     end

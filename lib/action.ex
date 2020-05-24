@@ -3,7 +3,7 @@ defmodule Yagg.Action do
   provides the resolve/1 and resolve/2 shortucts, and defies a stuct
   """
 
-  @callback resolve(Dict.t, Yagg.Board.t, List.t) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
+  @callback resolve(Dict.t, Yagg.Board.t, keyword()) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
   @callback description() :: String.t
 
   def describe(:nil), do: :nil

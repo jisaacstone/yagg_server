@@ -1,14 +1,20 @@
 alias Yagg.{Event, Board}
 alias Yagg.Table.Player
-alias Yagg.Board.State.Placement
+alias Yagg.Board.State
 
 defmodule Yagg.Table do
   use GenServer
   alias __MODULE__
 
-  @enforce_keys [:players, :board, :turn, :ready]
-  @derive {Poison.Encoder, only: [:players, :board, :turn, :ready]}
+  @enforce_keys [:players, :board, :turn]
+  @derive {Poison.Encoder, only: [:players, :board, :turn]}
   defstruct [:subscribors | @enforce_keys]
+
+  @type t() :: %Table{
+    players: [Player.t],
+    board: :nil | Board.t,
+    turn: :nil | Player.position(),
+  }
 
   def start_link(options) do
     GenServer.start_link(__MODULE__, [], options)
@@ -76,7 +82,6 @@ defmodule Yagg.Table do
       subscribors: [],
       board: :nil,
       turn: :north,
-      ready: :nil,
     }}
   end
   def handle_call(:get_state, _from, game) do
@@ -104,8 +109,8 @@ defmodule Yagg.Table do
     player = Player.by_name(game, player_name)
     try do
       cond do
-        player == :nil -> {:reply, {:err, :player_invalid}, game}
-        game.board.state == :gameover -> {:reply, {:err, :gameover}, game}
+        player == :notfound -> {:reply, {:err, :player_invalid}, game}
+        game.board.state == %State.Gameover{} -> {:reply, {:err, :gameover}, game}
         game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
         :true ->
           case Board.Actions.resolve(move, game.board, player.position) do
@@ -130,8 +135,9 @@ defmodule Yagg.Table do
     case Enum.find(players, fn p -> elem(p, 1) == pid end) do
       :nil -> {:noreply, game}
       {name, _} -> 
-        :ok = notify(game, %{event: :player_disconnect, player: name, reason: reason})
-        {:noreply, game}
+        :ok = notify(game, Event.new(:player_disconnect, %{player: name, reason: reason}))
+        subs =  Enum.reject(game.subscribors, fn({_, ^pid}) -> :true; (_) -> :false end)
+        {:noreply, %{game | subscribors: subs}}
     end
   end
   def handle_info(other, game) do
@@ -165,7 +171,7 @@ defmodule Yagg.Table do
     )
   end
 
-  defp nxtrn(%Table{board: %Board{state: %Placement{}}} = game), do: game
+  defp nxtrn(%Table{board: %Board{state: %State.Placement{}}} = game), do: game
   defp nxtrn(%Table{turn: :north} = game), do: %{game | turn: :south}
   defp nxtrn(%Table{turn: :south} = game), do: %{game | turn: :north}
 end

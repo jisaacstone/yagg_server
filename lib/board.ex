@@ -1,16 +1,18 @@
 alias Yagg.Unit
 alias Yagg.Event
 
-defmodule Yagg.Board.State.Placement do
-  defstruct [:ready]
-end
-
 defmodule Yagg.Board do
   alias __MODULE__
-  alias Board.State.Placement
+  alias Board.State
 
   @enforce_keys [:grid, :hands, :state]
   defstruct @enforce_keys
+
+  @type t :: %Board{
+    grid: map(),
+    hands: map(),
+    state: State.t,
+  }
 
   defimpl Poison.Encoder, for: Board do
     def encode(%Board{grid: grid} = board, options) do
@@ -32,7 +34,7 @@ defmodule Yagg.Board do
     %Board{
       grid: %{{1, 2} => :water, {4, 2} => :water},
       hands: %{north: %{}, south: %{}},
-      state: %Placement{},
+      state: %State.Placement{},
     }
   end
 
@@ -89,7 +91,7 @@ defmodule Yagg.Board do
     )
     hand = Enum.map(board.hands[position],
       fn({i, {u, p}}) -> {i, %{unit: u, assigned: p}} end) |> Enum.into(%{})
-    %{grid: ongrid, hand: hand}
+    {:ok, %{grid: ongrid, hand: hand}}
   end
 
   def move(board, position, from, to) do
@@ -146,7 +148,37 @@ defmodule Yagg.Board do
     )
   end
 
+  def setup(board) do
+    events = Enum.map(board.grid, fn({{x, y}, feature}) -> Event.new(:feature, %{x: x, y: y, feature: feature}) end)
+    {board, events} = Enum.reduce(
+      [:north, :south],
+      {board, events},
+      fn(player, {board, notifications}) ->
+        {hand, notif} = create_hand(player, notifications)
+        {%{board | hands: Map.put(board.hands, player, hand)}, notif}
+      end
+    )
+    {
+      board,
+      [Event.new(:game_started) | events]
+    }
+  end
   ## Private
+
+  defp create_hand(position, notifications) do
+    {_, hand, notif} = Enum.reduce(
+      Unit.starting_units(position),
+      {0, %{}, notifications},
+      fn (unit, {i, h, n}) ->
+        {
+          i + 1,
+          Map.put_new(h, i, {unit, :nil}),
+          [Event.new(unit.position, :new_hand, %{unit: unit, index: i}) | n]
+        }
+      end
+    )
+    {hand, notif}
+  end
 
   defp can_move?({x, y}, {to_x, to_y}) do
     Enum.sort([abs(x - to_x), abs(y - to_y)]) == [0, 1]

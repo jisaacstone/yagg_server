@@ -1,10 +1,11 @@
 defmodule Yagg.Table.Player do
   alias __MODULE__
   @derive {Poison.Encoder, only: [:name, :position]}
-  defstruct [
-    name: "nil",
-    position: :north
-  ]
+  @enforce_keys [:name, :position]
+  defstruct @enforce_keys
+
+  @type position() :: :north | :south
+  @type t() :: %Player{name: String.t(), position: position()} 
 
   def new(name, position) do
     %Player{name: name, position: position}
