@@ -75,8 +75,8 @@ defmodule Board.Actions do
     def resolve(_, %Board{state: %Gameover{ready: :nil}} = board, position) do
         {%{board | state: %Gameover{ready: position}}, [Event.new(:player_ready, %{player: position})]}
     end
-    def resolve(_act, %Board{state: %Gameover{ready: _opponent}} = board, _position) do
-      %{board | state: %Placement{}} |> Board.setup()
+    def resolve(_act, %Board{state: %Gameover{ready: _opponent}}, _position) do
+      Board.new() |> Board.setup()
     end
 
     defp units_assigned?(%{hands: hands}, position) do

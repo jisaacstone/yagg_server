@@ -133,10 +133,11 @@ span .tooltip, button .tooltip {
   position: absolute;
   margin-left: 5px;
   width: 10%;
-  background-color: rgba(99, 98, 96, 0.8);
-  border: 2px solid rgba(89, 78, 86, 0.9);
   padding: 4px;
   font-size: 12px;
+  color: #221;
+  background-color: rgba(169, 168, 166, 0.8);
+  border: 2px solid rgba(89, 78, 86, 0.9);
   text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
 }
 

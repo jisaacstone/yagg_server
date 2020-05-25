@@ -1,5 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Event
+alias Yagg.Table.Player
+alias Yagg.Board.Hand
 
 defmodule Yagg.Board do
   alias __MODULE__
@@ -8,9 +10,12 @@ defmodule Yagg.Board do
   @enforce_keys [:grid, :hands, :state]
   defstruct @enforce_keys
 
+  @type coord() :: {0..5, 0..5}
+  @type terrain :: :water | Unit.t
+
   @type t :: %Board{
-    grid: map(),
-    hands: map(),
+    grid: %{coord() => terrain},
+    hands: %{Player.position() => Hand.t},
     state: State.t,
   }
 
@@ -19,9 +24,14 @@ defmodule Yagg.Board do
       encodeable = grid
         |> Map.to_list()
         |> Map.new(fn({{x, y}, f}) -> {"#{x},#{y}", encode_feature(f)} end)
+      map = case board.state do
+        %{ready: ready} ->
+            %{ready: ready, state: board.state.__struct__ |> Module.split() |> Enum.reverse() |> hd()}
+        state when is_atom(state) ->
+          %{state: state}
+      end
       Poison.Encoder.Map.encode(
-        %{state: board.state,
-          grid: encodeable},
+        Map.put_new(map, :grid, encodeable),
         options
       )
     end
@@ -32,7 +42,7 @@ defmodule Yagg.Board do
 
   def new() do
     %Board{
-      grid: %{{1, 2} => :water, {4, 2} => :water},
+      grid: %{},
       hands: %{north: %{}, south: %{}},
       state: %State.Placement{},
     }
@@ -148,13 +158,14 @@ defmodule Yagg.Board do
     )
   end
 
-  def setup(board) do
-    events = Enum.map(board.grid, fn({{x, y}, feature}) -> Event.new(:feature, %{x: x, y: y, feature: feature}) end)
+  def setup(board), do: setup(board, Configuration.Default)
+  def setup(board, configuration) do
+    {board, events} = add_features(board, [], configuration.terrain())
     {board, events} = Enum.reduce(
       [:north, :south],
       {board, events},
       fn(player, {board, notifications}) ->
-        {hand, notif} = create_hand(player, notifications)
+        {hand, notif} = Hand.new(configuration, player, notifications)
         {%{board | hands: Map.put(board.hands, player, hand)}, notif}
       end
     )
@@ -164,20 +175,12 @@ defmodule Yagg.Board do
     }
   end
   ## Private
-
-  defp create_hand(position, notifications) do
-    {_, hand, notif} = Enum.reduce(
-      Unit.starting_units(position),
-      {0, %{}, notifications},
-      fn (unit, {i, h, n}) ->
-        {
-          i + 1,
-          Map.put_new(h, i, {unit, :nil}),
-          [Event.new(unit.position, :new_hand, %{unit: unit, index: i}) | n]
-        }
-      end
-    )
-    {hand, notif}
+  
+  defp add_features(board, events, []), do: {board, events}
+  defp add_features(board, events, [{{x, y}, feature} | features]) do
+    board = %{board | grid: Map.put_new(board.grid, {x, y}, feature)}
+    events = [Event.new(:feature, %{x: x, y: y, feature: feature}) | events]
+    add_features(board, events, features)
   end
 
   defp can_move?({x, y}, {to_x, to_y}) do

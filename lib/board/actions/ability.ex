@@ -4,6 +4,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Table.Player
 alias Yagg.Board.State
+alias Yagg.Board.Hand
 
 defmodule Yagg.Board.Actions.Ability do
   @enforce_keys [:name, :x, :y]
@@ -126,6 +127,18 @@ defmodule Yagg.Board.Actions.Ability do
         :nil -> {board, []}
         {unit, coords} -> Board.unit_death(board, unit, coords)
       end
+    end
+  end
+
+  defmodule Secondwind do
+    @moduledoc "goes back into hand"
+    use Action
+    def description, do: @moduledoc
+
+    def resolve(_, board, opts) do
+      pos = opts[:unit].position
+      newunit = %{opts[:unit] | triggers: %{}}
+      Hand.add_unit(board, pos, newunit)
     end
   end
 end

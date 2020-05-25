@@ -298,10 +298,13 @@ function game() {
   }
 
   function setstate(gamedata) {
-    document.getElementById('gamestate').innerHTML = `state: ${gamedata.state}`;
+    document.getElementById('gamestate').innerHTML = `state: ${gamedata.board.state}`;
     global.gamestate = gamedata.state;
     for (const player of gamedata.players) {
       eventHandlers.player_joined(player);
+    }
+    if (gamedata.board.ready) {
+      eventHandlers.player_ready({player: gamedata.board.ready});
     }
     for (const [coor, feature] of Object.entries(gamedata.board.grid)) {
       const [x, y] = coor.split(',');

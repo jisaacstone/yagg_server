@@ -110,7 +110,6 @@ defmodule Yagg.Table do
     try do
       cond do
         player == :notfound -> {:reply, {:err, :player_invalid}, game}
-        game.board.state == %State.Gameover{} -> {:reply, {:err, :gameover}, game}
         game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
         :true ->
           case Board.Actions.resolve(move, game.board, player.position) do
