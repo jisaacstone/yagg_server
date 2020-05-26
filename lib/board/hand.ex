@@ -1,6 +1,7 @@
 alias Yagg.Board
 alias Yagg.Unit
 alias Yagg.Event
+alias Yagg.Table.Player
 
 defmodule Yagg.Board.Hand do
   @type t() :: %{non_neg_integer() => {Unit.t, :nil | Board.coord()}}
@@ -10,7 +11,10 @@ defmodule Yagg.Board.Hand do
     {%{board | hands: Map.put(board.hands, position, hand)}, events}
   end
   def add_unit(hand, %Unit{} = unit) do
-    index = Enum.max_by(hand, &elem(&1, 0)) + 1
+    index = case Enum.empty?(hand) do
+      :true -> 0
+      :false -> Enum.max_by(hand, &elem(&1, 0)) + 1
+    end
     add_unit_at(hand, index, unit)
   end
   defp add_unit_at(hand, index, %Unit{} = unit, notifications \\ []) do
@@ -20,6 +24,7 @@ defmodule Yagg.Board.Hand do
     }
   end
 
+  @spec new(Player.position(), [Event.t], module()) :: {t(), [Event.t]}
   def new(position, notifications, configuration) do
     {_, hand, notif} = Enum.reduce(
       configuration.starting_units(position),

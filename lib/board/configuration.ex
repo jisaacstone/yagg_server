@@ -9,13 +9,13 @@ defmodule Yagg.Board.Configuration do
 
   def all() do
     [
-      Board.Configuration.Standard,
+      Board.Configuration.Default,
       Board.Configuration.Chain,
     ]
   end
 end
 
-defmodule Configuration.Standard do
+defmodule Board.Configuration.Default do
   @behaviour Board.Configuration
   @doc """
   Returns ten standard units in a random order
@@ -27,7 +27,7 @@ defmodule Configuration.Standard do
       Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
       Unit.new(position, :general, 5, 4),
       Unit.new(position, :bezerker, 7, 2),
-      Unit.new(position, :fullarmorcoward, 1, 6),
+      Unit.new(position, :fullarmorcoward, 1, 6, :nil, %{death: Ability.Secondwind}),
       Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
       Unit.new(position, :colburninator, 1, 2, Ability.Colburn),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
@@ -38,13 +38,13 @@ defmodule Configuration.Standard do
   @impl Board.Configuration
   def terrain() do
     [
-      {{1, 3}, :water},
-      {{3, 3}, :water},
+      {{1, 2}, :water},
+      {{4, 2}, :water},
     ]
   end
 end
 
-defmodule Configuration.Chain do
+defmodule Board.Configuration.Chain do
   @behaviour Board.Configuration
   @doc """
   Returns ten standard units in a random order
@@ -67,8 +67,11 @@ defmodule Configuration.Chain do
   @impl Board.Configuration
   def terrain() do
     [
-      {{1, 3}, :water},
-      {{3, 3}, :water},
+      {{0, 0}, :water},
+      {{4, 4}, :water},
+      {{0, 4}, :water},
+      {{4, 0}, :water},
+      {{2, 2}, :water},
     ]
   end
 end

@@ -26,6 +26,16 @@ defmodule YaggTest.Action.Place do
     assert hands[:north][0] == :nil
     assert grid[{4, 4}] == unit
   end
+
+  test "already_assigned" do
+    unit = Unit.new(:north, :test, 3, 3)
+    board = %{Board.new() | state: %Placement{}}
+    hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
+    board = %{board | hands: hands}
+    action = %Board.Actions.Place{index: 0, x: 4, y: 4}
+    assert {newboard, _events} = Board.Actions.resolve(action, board, :north)
+    assert {:err, _} = Board.Actions.resolve(action, newboard, :north)
+  end
 end
 
 defmodule YaggTest.Action.Move do
@@ -131,4 +141,20 @@ defmodule YaggTest.Action.Ability do
     assert newboard.grid[{4, 3}] == :nil
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
   end
+
+  test "secondwind" do
+    unit = Unit.new(:south, :test, 3, 0, :nil, %{death: Ability.Secondwind})
+    unit2 = Unit.new(:north, :test2, 5, 4)
+    board =
+      Board.new()
+      |> Map.put(:state, :battle)
+      |> Board.place(unit2, {4, 4}) |> elem(1)
+      |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, unit)} end.()
+    action = %Board.Actions.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
+    assert {%Board{} = newboard, events} = Board.Actions.resolve(action, board, :north)
+    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
+    assert Enum.find(events, fn(e) -> e.kind == :new_hand end)
+    assert Enum.find(events, fn(e) -> e.kind == :new_hand end)
+  end
+
 end

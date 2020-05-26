@@ -2,6 +2,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Table.Player
 alias Yagg.Board.Hand
+alias Yagg.Board.Configuration
 
 defmodule Yagg.Board do
   alias __MODULE__
@@ -50,8 +51,10 @@ defmodule Yagg.Board do
 
   def assign(board, position, hand_index, coords) do
     if can_place?(position, coords) do
-      hand = hand_assign(board.hands[position], hand_index, coords)
-      {:ok, %{board | hands: Map.put(board.hands, position, hand)}}
+      case hand_assign(board.hands[position], hand_index, coords) do
+        {:err, _} = err -> err
+        hand -> {:ok, %{board | hands: Map.put(board.hands, position, hand)}}
+      end
     else
       {:err, :illegal_square}
     end
@@ -165,7 +168,7 @@ defmodule Yagg.Board do
       [:north, :south],
       {board, events},
       fn(player, {board, notifications}) ->
-        {hand, notif} = Hand.new(configuration, player, notifications)
+        {hand, notif} = Hand.new(player, notifications, configuration)
         {%{board | hands: Map.put(board.hands, player, hand)}, notif}
       end
     )
