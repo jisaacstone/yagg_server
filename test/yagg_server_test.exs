@@ -29,7 +29,7 @@ defmodule YaggTest.Endpoint do
   end
 
   test "game join" do
-    %{status: status, resp_body: body} = send_json("/game/create", %{})
+    %{status: status, resp_body: body} = send_json("/game/create", "{}")
     assert status == 200
     assert %{"id" => gid} = Poison.decode!(body)
     {:ok, _pid} = Table.subscribe(gid, "player1")

@@ -113,7 +113,8 @@ defmodule Yagg.Board do
         unless can_move?(from, to) do
           {:err, :illegal}
         else
-          case board.grid[to] do
+          case thing_at(board, to) do
+            :out_of_bounds -> {:err, :out_of_bounds}
             :water -> {:err, :illegal}
             :nil -> 
               {board, events} = do_move(board, unit, from, to)
@@ -160,6 +161,13 @@ defmodule Yagg.Board do
       end
     )
   end
+
+  @doc """
+  Returns what is at the coords, :nil if nothing is there, and :out_of_bounds if it is out of the grid
+  """
+  def thing_at(_, {x, y}) when x < 0 or y < 0, do: :out_of_bounds
+  def thing_at(_, {x, y}) when x >= 5 or y >= 5, do: :out_of_bounds
+  def thing_at(board, coords), do: board.grid[coords]
 
   def setup(board), do: setup(board, Configuration.Default)
   def setup(board, configuration) do

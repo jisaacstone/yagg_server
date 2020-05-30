@@ -162,3 +162,46 @@ defmodule Action.Ability.Secondwind do
     Hand.add_unit(board, pos, newunit)
   end
 end
+
+defmodule Action.Ability.Push do
+  @moduledoc """
+  push surrounding units back one square
+  the push is as if the owner had moved the unit (will attack if new square is occupied)
+  units at the edge are pushed off the board (and die)
+  """
+  use Action.Ability
+
+  @impl Action.Ability
+  def resolve(_, board, opts) do
+    push_adjacent_units(board, opts[:coords])
+  end
+
+  def push_adjacent_units(board, {x, y}) do
+    coords = [west: {x - 1, y}, east: {x + 1, y}, south: {x, y - 1}, north: {x, y + 1}]
+    Enum.reduce(
+      coords,
+      {board, []},
+      fn({direction, coord}, b_e) ->
+        case board.grid[coord] do
+          %Unit{} = unit -> push_unit(b_e, direction, coord, unit)
+          _ -> b_e
+        end
+      end
+    )
+  end
+
+  def push_unit({board, events}, direction, coord, unit) do
+    case Board.move(board, unit.position, coord, next(direction, coord)) do
+      {:err, :out_of_bounds} ->
+        {newboard, newevents} = Board.unit_death(board, unit, coord)
+        {newboard, events ++ newevents}
+      {:err, _} -> {board, events}
+      {:ok, newboard, newevents} -> {newboard, events ++ newevents}
+    end
+  end
+
+  def next(:west, {x, y}), do: {x - 1, y}
+  def next(:east, {x, y}), do: {x + 1, y}
+  def next(:north, {x, y}), do: {x, y + 1}
+  def next(:south, {x, y}), do: {x, y - 1}
+end

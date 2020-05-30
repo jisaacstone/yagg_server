@@ -110,7 +110,7 @@ defmodule Yagg.Table do
 
   def handle_call({:move, player_name, move}, _from, game) do
     player = Player.by_name(game, player_name)
-    try do
+    # try do
       cond do
         player == :notfound -> {:reply, {:err, :player_invalid}, game}
         game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
@@ -124,9 +124,9 @@ defmodule Yagg.Table do
               {:reply, :ok, game}
           end
       end
-    rescue
-      FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
-    end
+    # rescue
+      # FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
+    # end
   end
 
   def handle_call(msg, _from, state) do
@@ -176,4 +176,5 @@ defmodule Yagg.Table do
   defp nxtrn(%Table{board: %Board{state: %State.Placement{}}} = game), do: game
   defp nxtrn(%Table{turn: :north} = game), do: %{game | turn: :south}
   defp nxtrn(%Table{turn: :south} = game), do: %{game | turn: :north}
+  defp nxtrn(%Table{turn: :nil} = game), do: %{game | turn: :north}
 end

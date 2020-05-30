@@ -13,7 +13,6 @@ defmodule Yagg.Endpoint do
 
   post "/game/create" do
     {:ok, body, conn} = Conn.read_body(conn)
-    IO.inspect(body: body)
     data = Poison.Parser.parse!(body, %{keys: :atoms!})
     config = if Map.has_key?(data, :configuration) do
       Configuration.all()[data.configuration]

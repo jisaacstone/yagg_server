@@ -54,7 +54,7 @@ defmodule Board.Configuration.Chain do
   def starting_units(position) do
     Enum.shuffle([
       Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
-      Unit.new(position, :general, 5, 4),
+      Unit.new(position, :mosh, 3, 4, Ability.Push),
       Unit.new(position, :bezerker, 7, 2),
       Unit.new(position, :fullarmorcoward, 1, 6),
       Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),

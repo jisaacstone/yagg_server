@@ -212,6 +212,7 @@ const eventHandlers = {
   gameover: function(event) {
     gamestatechange('over');
     document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
+    document.getElementById('config').style.display = 'inline';
   },
   turn: function(event) {
     if (event.player === 'north') {
@@ -375,10 +376,6 @@ window.onload = function() {
 
   document.getElementById('readybutton').onclick = function() {
     G.gameaction('ready', {}, null, 'move');
-  };
-
-  document.getElementById('restartbutton').onclick = function() {
-    G.gameaction('restart');
   };
 
   for (const el of document.getElementsByTagName('td')) {
