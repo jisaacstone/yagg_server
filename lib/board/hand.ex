@@ -13,7 +13,7 @@ defmodule Yagg.Board.Hand do
   def add_unit(hand, %Unit{} = unit) do
     index = case Enum.empty?(hand) do
       :true -> 0
-      :false -> Enum.max_by(hand, &elem(&1, 0)) + 1
+      :false -> hand |> Map.keys() |> Enum.max() |> Kernel.+(1)
     end
     add_unit_at(hand, index, unit)
   end

@@ -1,5 +1,6 @@
 alias Yagg.{Table, Event, Board}
 alias Plug.Conn
+alias Yagg.Board.Configuration
 
 defmodule Yagg.Endpoint do
   use Plug.Router
@@ -11,13 +12,21 @@ defmodule Yagg.Endpoint do
   plug :dispatch
 
   post "/game/create" do
-    {:ok, pid} = Yagg.Table.new()
+    {:ok, body, conn} = Conn.read_body(conn)
+    IO.inspect(body: body)
+    data = Poison.Parser.parse!(body, %{keys: :atoms!})
+    config = if Map.has_key?(data, :configuration) do
+      Configuration.all()[data.configuration]
+    else
+      Configuration.Default
+    end
+    {:ok, pid} = Yagg.Table.new(config)
     gid = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
     respond(conn, 200, %{id: gid})
   end
 
   post "/game/:gid/move/:move" do
-    module_name = Module.safe_concat(Board.Actions, String.capitalize(move))
+    module_name = Module.safe_concat(Board.Action, String.capitalize(move))
     {:ok, body, conn} = Conn.read_body(conn)
     conn = Conn.fetch_query_params(conn)
     movedata = Poison.decode!(body, as: struct(module_name))
@@ -32,7 +41,7 @@ defmodule Yagg.Endpoint do
   end
 
   post "/game/:gid/action/:action" do
-    module_name = Module.safe_concat(Table.Actions, String.capitalize(action))
+    module_name = Module.safe_concat(Table.Action, String.capitalize(action))
     {:ok, body, conn} = Conn.read_body(conn)
     conn = Conn.fetch_query_params(conn)
     actiondata = Poison.decode!(body, as: struct(module_name))
@@ -59,6 +68,10 @@ defmodule Yagg.Endpoint do
       {:err, err} -> respond(conn, 400, err)
       {:ok, units} -> respond(conn, 200, units)
     end
+  end
+
+  get "/configurations" do
+    respond(conn, 200, Board.Configuration.all())
   end
 
   get "sse/game/:gid/events" do

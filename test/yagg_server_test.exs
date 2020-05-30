@@ -1,5 +1,5 @@
 alias Yagg.{Endpoint, Event, Table}
-alias Yagg.Table.Actions.Join
+alias Yagg.Table.Action.Join
 
 defmodule YaggTest.Endpoint do
   use ExUnit.Case
@@ -36,5 +36,10 @@ defmodule YaggTest.Endpoint do
     :ok = Table.act(gid, "player1", %Join{player: "player1"})
     %{kind: event_type} = recieve_event()
     assert event_type == :player_joined
+  end
+
+  test "game configurations" do
+    %{status: 200, resp_body: body} = conn(:get, "/configurations") |> Endpoint.call(@opts)
+    assert %{"alpha" => _} = Poison.decode!(body)
   end
 end

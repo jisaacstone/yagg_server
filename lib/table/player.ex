@@ -18,9 +18,7 @@ defmodule Yagg.Table.Player do
     case game.players do
       [%Player{name: ^name} = player | _] -> player
       [_, %Player{name: ^name} = player | _] -> player
-      other ->
-        IO.inspect([other, name, game.players])
-        :notfound
+      _ -> :notfound
     end
   end
 

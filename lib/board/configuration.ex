@@ -1,6 +1,6 @@
 alias Yagg.Table.Player
 alias Yagg.Unit
-alias Yagg.Board.Actions.Ability
+alias Yagg.Board.Action.Ability
 alias Yagg.Board
 
 defmodule Yagg.Board.Configuration do
@@ -8,10 +8,10 @@ defmodule Yagg.Board.Configuration do
   @callback terrain() :: [{Board.coord(), Board.terrain()}]
 
   def all() do
-    [
-      Board.Configuration.Default,
-      Board.Configuration.Chain,
-    ]
+    %{
+      "alpha" => Board.Configuration.Default,
+      "beta" => Board.Configuration.Chain,
+    }
   end
 end
 

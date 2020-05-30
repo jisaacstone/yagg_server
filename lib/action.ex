@@ -4,7 +4,6 @@ defmodule Yagg.Action do
 
   also defines the description/0 method. Requires @moduledoc to be already defined
   """
-
   @callback resolve(Dict.t, Yagg.Board.t, keyword()) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
   @callback description() :: String.t
 
@@ -15,12 +14,14 @@ defmodule Yagg.Action do
   end
 
   defmacro __using__(opts) do
+    struct = Keyword.get(opts, :keys, [])
     quote do
       @behaviour Yagg.Action
 
-      @imple Yagg.Action
-      def description(), do: unquote(@moduledoc)
-      defstruct unquote(opts)
+      @impl Yagg.Action
+      def description(), do: @moduledoc
+      @enforce_keys unquote(struct)
+      defstruct @enforce_keys
       def resolve(board), do: resolve(%{}, board, [])
       def resolve(board, opts) when is_list(opts), do: resolve(%{}, board, opts)
     end

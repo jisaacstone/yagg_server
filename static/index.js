@@ -1,5 +1,6 @@
 /* jshint esversion: 6 */
 const global = {};
+const SKULL = String.fromCodePoint(0x1F480);
 
 function select(el, meta) {
   function select() {
@@ -48,7 +49,28 @@ function select(el, meta) {
   return select;
 }
 
-const SKULL = String.fromCodePoint(0x1F480);
+function fetchConfigs(hostname) {
+  const baseUrl = `http://${hostname}/configurations`;
+  function listener() {
+    const select = document.getElementById('config');
+    if (this.status != 400) {
+      const configs = JSON.parse(this.response);
+      for (const config of Object.keys(configs)) {
+        const opt = document.createElement('option');
+        opt.value = config;
+        opt.innerHTML = config;
+        select.appendChild(opt);
+      }
+    }
+    select.onchange = function() {
+      global.game.gameaction('rules', {configuration: select.value});
+    };
+  }
+  var oReq = new XMLHttpRequest();
+  oReq.addEventListener('load', listener);
+  oReq.open('GET', baseUrl);
+  oReq.send();
+}
 
 function unit_el(unit, el) {
   for (const att of ['name', 'attack', 'defense']) {
@@ -107,6 +129,7 @@ function gamestatechange(newstate) {
 const eventHandlers = {
   game_started: function() {
     gamestatechange('placement');
+    document.getElementById('config').style.display = 'none';
   },
   battle_started: function() {
     gamestatechange('battle');
@@ -329,9 +352,11 @@ function game() {
 window.onload = function() {
   const G = game(),
     host = window.location.hostname,
-    port = window.location.port;
+    port = window.location.port,
+    hostname = port ? `${host}:${port}` : host;
 
   global.game = G;
+  global.hostname = hostname;
   document.getElementById('leavebutton').onclick = function() {
     G.gameaction('leave', {}, function() {
       G.leavegame();
@@ -340,7 +365,9 @@ window.onload = function() {
 
   document.getElementById('joinbutton').onclick = function() {
     const name = document.getElementById('name').value;
-    G.gameaction('join', {player: name});
+    G.gameaction('join', {player: name}, function() {
+      fetchConfigs(global.hostname);
+    });
     G.listen();
     G.gamestate();
     G.ingame();
@@ -359,6 +386,6 @@ window.onload = function() {
     el.onclick = select(el, {x, y, ongrid: true});
   }
 
-  document.getElementById('host').value = port ? `${host}:${port}` : host;
+  document.getElementById('host').value = hostname;
   G.leavegame();
 };

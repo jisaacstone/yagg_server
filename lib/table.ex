@@ -6,18 +6,19 @@ defmodule Yagg.Table do
   use GenServer
   alias __MODULE__
 
-  @enforce_keys [:players, :board, :turn]
-  @derive {Poison.Encoder, only: [:players, :board, :turn]}
+  @enforce_keys [:players, :board, :turn, :configuration]
+  @derive {Poison.Encoder, only: [:players, :board, :turn, :configuration]}
   defstruct [:subscribors | @enforce_keys]
 
   @type t() :: %Table{
     players: [Player.t],
     board: :nil | Board.t,
     turn: :nil | Player.position(),
+    configuration: module(),
   }
 
-  def start_link(options) do
-    GenServer.start_link(__MODULE__, [], options)
+  def start_link([table]) do
+    GenServer.start_link(__MODULE__, table)
   end
 
   def get(gid) do
@@ -29,12 +30,18 @@ defmodule Yagg.Table do
     end
   end
 
-  def new() do
+  def new(configuration \\ Board.Configuration.Default) do
     # For now just one game all the time
-    # TODO: game args
+    table = %Table{
+      players: [],
+      subscribors: [],
+      board: :nil,
+      turn: :nil,
+      configuration: configuration,
+    }
     case Supervisor.which_children(Yagg.TableSupervisor) do
       [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
-      [] -> DynamicSupervisor.start_child(Yagg.TableSupervisor, Yagg.Table)
+      [] -> DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})
     end
   end
 
@@ -76,14 +83,10 @@ defmodule Yagg.Table do
 
   # Callbacks
 
-  def init(_) do
-    {:ok, %Table{
-      players: [],
-      subscribors: [],
-      board: :nil,
-      turn: :north,
-    }}
+  def init(%Table{} = table) do
+    {:ok, table}
   end
+
   def handle_call(:get_state, _from, game) do
     {:reply, {:ok, game}, game}
   end
@@ -94,7 +97,7 @@ defmodule Yagg.Table do
   def handle_call({:act, player_name, action}, _from, game) do
     player = Player.by_name(game, player_name)
     try do
-      case Yagg.Table.Actions.resolve(action, game, player) do
+      case Yagg.Table.Action.resolve(action, game, player) do
         {:err, _} = err -> {:reply, err, game}
         {game, events} ->
           notify(game, events)
@@ -112,7 +115,7 @@ defmodule Yagg.Table do
         player == :notfound -> {:reply, {:err, :player_invalid}, game}
         game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
         :true ->
-          case Board.Actions.resolve(move, game.board, player.position) do
+          case Board.Action.resolve(move, game.board, player.position) do
             {:err, _} = err -> {:reply, err, game}
             {board, events} ->
               # One "Move" per turn. Successful move == next turn

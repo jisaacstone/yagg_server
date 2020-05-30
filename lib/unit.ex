@@ -1,5 +1,4 @@
-alias Yagg.Board.Actions.Ability
-alias Yagg.Action
+alias Yagg.Board.Action.Ability
 alias Yagg.Table.Player
 
 defmodule Yagg.Unit do
@@ -23,8 +22,8 @@ defmodule Yagg.Unit do
         defense: unit.defense,
         name: unit.name,
         player: unit.position,
-        ability: Action.describe(unit.ability),
-        triggers: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Action.describe(v)} end) |> Enum.into(%{})
+        ability: Ability.describe(unit.ability),
+        triggers: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
       } |> Poison.Encoder.Map.encode(opts)
     end
   end
