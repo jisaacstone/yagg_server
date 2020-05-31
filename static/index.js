@@ -203,11 +203,16 @@ const eventHandlers = {
   unit_moved: function(event) {
     console.log({E: 'unit_moved', event});
     const to = document.getElementById(`c${event.to.x}-${event.to.y}`),
-      unit = document.getElementById(`c${event.from.x}-${event.from.y}`).firstChild;
+      from = document.getElementById(`c${event.from.x}-${event.from.y}`),
+      unit = from.firstChild;
     while(to.firstChild) {
       to.removeChild(to.firstChild);
     }
     to.appendChild(unit);
+    if (from.dataset.feature) {
+      to.dataset.feature = from.dataset.feature;
+      from.dataset.feature = null;
+    }
   },
   gameover: function(event) {
     gamestatechange('over');

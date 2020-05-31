@@ -16,6 +16,9 @@ td {
   border: thick inset #785460;
   background-color: #997876;
 }
+#board td[data-feature=block][data-uistate=moveoption] {
+  border-color: rgba(105, 145, 45, 1);
+}
 
 #board td[data-feature=water] {
   border: thick double #32a1ce;

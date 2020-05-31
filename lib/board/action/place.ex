@@ -22,7 +22,6 @@ defmodule Action.Place do
       err -> err
     end
   end
-
   def resolve(act, %Board{state: :battle} = board, position) do
     {{unit, :nil}, hand} = Map.pop(board.hands[position], act.index)
     case Board.place(board, unit, {act.x, act.y}) do
@@ -36,5 +35,8 @@ defmodule Action.Place do
         }
       err -> err
     end
+  end
+  def resolve(_, _, _) do
+    {:err, :badstate}
   end
 end

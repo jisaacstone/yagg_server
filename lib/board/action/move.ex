@@ -15,4 +15,7 @@ defmodule Action.Move do
         {board, events}
     end
   end
+  def resolve(_, _, _) do
+    {:err, :badstate}
+  end
 end

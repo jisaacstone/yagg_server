@@ -30,6 +30,9 @@ defmodule Action.Ready do
   def resolve(_act, %Board{state: %Gameover{ready: _opponent}}, _position) do
     Board.new() |> Board.setup()
   end
+  def resolve(_, _, _) do
+    {:err, :badstate}
+  end
 
   defp units_assigned?(%{hands: hands}, position) do
     # for not just check if the monarch has been placed
