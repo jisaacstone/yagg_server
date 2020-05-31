@@ -12,6 +12,11 @@ td {
   border: 4px solid rgba(95, 95, 95, 0.6);
 }
 
+#board td[data-feature=block] {
+  border: thick inset #785460;
+  background-color: #997876;
+}
+
 #board td[data-feature=water] {
   border: thick double #32a1ce;
   background-color: #ABC;
