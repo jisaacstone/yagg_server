@@ -116,6 +116,9 @@ defmodule Yagg.Board do
           case thing_at(board, to) do
             :out_of_bounds -> {:err, :out_of_bounds}
             :water -> {:err, :illegal}
+            :block -> 
+              {board, events} = push_block(board, unit, from, to)
+              {:ok, board, events}
             :nil -> 
               {board, events} = do_move(board, unit, from, to)
               {:ok, board, events}
@@ -185,6 +188,34 @@ defmodule Yagg.Board do
       [Event.new(:game_started) | events]
     }
   end
+
+  @doc """
+  direction to coord math
+  """
+  def next(:west, {x, y}), do: {x - 1, y}
+  def next(:east, {x, y}), do: {x + 1, y}
+  def next(:north, {x, y}), do: {x, y + 1}
+  def next(:south, {x, y}), do: {x, y - 1}
+
+  @doc """
+  coord to direction math
+  """
+  def direction({x1, y}, {x2, y}) when x1 > x2, do: :east
+  def direction({x1, y}, {x2, y}) when x1 < x2, do: :west
+  def direction({x, y1}, {x, y2}) when y1 > y2, do: :south
+  def direction({x, y1}, {x, y2}) when y1 < y2, do: :north
+
+  @doc """
+  all adjacent squares (add, sub 1 for x, y)
+  returns {direction, coord} tuples
+  """
+  def surrounding(coords) do
+    Enum.map(
+      [:north, :south, :east, :west],
+      fn(dir) -> {dir, next(dir, coords)} end
+    )
+  end
+
   ## Private
   
   defp add_features(board, events, []), do: {board, events}
@@ -225,6 +256,19 @@ defmodule Yagg.Board do
       unit.attack < opponent.defense ->
         {board, events} = unit_death(board, unit, from, opponent: {opponent, to}, attacking: :true)
         {:ok, board, events}
+    end
+  end
+
+  defp push_block(board, unit, from, to) do
+    dir = direction(from, to)
+    square = next(dir, to)
+    case board.grid[square] do
+      :nil -> 
+        {board, events1} = do_move(board, board.grid[to], to, square)
+        {board, events2} = do_move(board, unit, from, to)
+        {board, events1 ++ events2}
+      _ ->
+        {:err, :occupied}
     end
   end
 end

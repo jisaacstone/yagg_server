@@ -50,7 +50,9 @@ defmodule Action.Ability do
   defp ability_at(board, %{__struct__: struct}, coords) do
     case board.grid[coords] do
       %Unit{ability: ^struct} = unit -> unit
-      %Unit{} -> {:err, :unable}
+      %Unit{} = u-> 
+        IO.inspect([unit: u, s: struct])
+        {:err, :unable}
       _ -> {:err, :empty}
     end
   end
@@ -176,10 +178,9 @@ defmodule Action.Ability.Push do
     push_adjacent_units(board, opts[:coords])
   end
 
-  def push_adjacent_units(board, {x, y}) do
-    coords = [west: {x - 1, y}, east: {x + 1, y}, south: {x, y - 1}, north: {x, y + 1}]
+  def push_adjacent_units(board, coords) do
     Enum.reduce(
-      coords,
+      Board.surrounding(coords),
       {board, []},
       fn({direction, coord}, b_e) ->
         case board.grid[coord] do
@@ -191,7 +192,7 @@ defmodule Action.Ability.Push do
   end
 
   def push_unit({board, events}, direction, coord, unit) do
-    case Board.move(board, unit.position, coord, next(direction, coord)) do
+    case Board.move(board, unit.position, coord, Board.next(direction, coord)) do
       {:err, :out_of_bounds} ->
         {newboard, newevents} = Board.unit_death(board, unit, coord)
         {newboard, events ++ newevents}
@@ -199,9 +200,51 @@ defmodule Action.Ability.Push do
       {:ok, newboard, newevents} -> {newboard, events ++ newevents}
     end
   end
+end
 
-  def next(:west, {x, y}), do: {x - 1, y}
-  def next(:east, {x, y}), do: {x + 1, y}
-  def next(:north, {x, y}), do: {x, y + 1}
-  def next(:south, {x, y}), do: {x, y - 1}
+defmodule Action.Ability.Manuver do
+  @moduledoc """
+  all adjacent friendly units move in the same direction,
+  north, south, east, west
+  """
+  use Action.Ability, keys: [:direction]
+
+  @impl Action.Ability
+  def resolve(%{direction: sdirection}, board, opts) do
+    case dir_from_str(sdirection) do
+      {:err, _} = err -> err
+      direction ->
+        coords =
+          Board.surrounding(opts[:coords])
+          |> Enum.into(%{center: opts[:coords]})
+          |> order(direction)
+        move_units(board, direction, opts[:unit].position, coords, [])
+    end
+  end
+
+  defp order(coord_map, direction) do
+    # order matters because units might bump into things and each other
+    {first, coord_map} = Map.pop(coord_map, direction)
+    {second, coord_map} = Map.pop(coord_map, :center)
+    [first, second | Map.values(coord_map)]
+  end
+
+  defp move_units(board, _direction, _position, [], events), do: {board, events}
+  defp move_units(board, direction, position, [from | coords], events) do
+    case Board.move(board, position, from, Board.next(direction, from)) do
+      {:ok, newboard, newevents} ->
+        move_units(newboard, direction, position, coords, events ++ newevents)
+      _ -> move_units(board, direction, position, coords, events)
+    end
+  end
+
+  defp dir_from_str(str) do
+    str |> String.first() |> String.downcase() |> initial_to_dir()
+  end
+
+  defp initial_to_dir("n"), do: :north
+  defp initial_to_dir("s"), do: :south
+  defp initial_to_dir("e"), do: :east
+  defp initial_to_dir("w"), do: :west
+  defp initial_to_dir(_), do: {:err, :bad_direction}
 end

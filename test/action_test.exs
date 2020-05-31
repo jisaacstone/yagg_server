@@ -83,7 +83,6 @@ defmodule YaggTest.Action.Move do
     gameover = Enum.find(events, fn(e) -> e.kind == :gameover end)
     assert gameover.data.winner == :north
   end
-
  
   test "attackyourself" do
     unit = Unit.new(:north, :test, 3, 3)
@@ -95,6 +94,19 @@ defmodule YaggTest.Action.Move do
       |> Board.place(unit2, {4, 3}) |> elem(1)
     action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
     assert {:err, :noselfattack} = Board.Action.resolve(action, board, :north)
+  end
+
+  test "push block" do
+    unit = Unit.new(:north, :test, 3, 3)
+    board =
+      Board.new()
+      |> Map.put(:state, :battle)
+      |> Board.place(unit, {2, 3}) |> elem(1)
+      |> fn (b) -> %{b | grid: Map.put(b.grid, {2, 2}, :block)} end.()
+    action = %Board.Action.Move{from_x: 2, from_y: 3, to_x: 2, to_y: 2}
+    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
+    assert newboard.grid[{2, 2}] == unit
+    assert newboard.grid[{2, 1}] == :block
   end
 end
 
@@ -127,14 +139,23 @@ end
 defmodule YaggTest.Action.Ability do
   use ExUnit.Case
 
+  defp set_board(board, []), do: board
+  defp set_board(board, [{coord, feature} | features]) do
+    grid = Map.put(board.grid, coord, feature)
+    set_board(%{board | grid: grid}, features)
+  end
+
   test "selfdestruct" do
     unit = Unit.new(:north, :test, 3, 3, Ability.Selfdestruct)
     unit2 = Unit.new(:north, :test2, 3, 3)
     board =
       Board.new()
       |> Map.put(:state, :battle)
-      |> Board.place(unit, {4, 4}) |> elem(1)
-      |> Board.place(unit2, {4, 3}) |> elem(1)
+      |> set_board(
+        [
+          {{4, 4}, unit},
+          {{4, 3}, unit2}
+        ])
     action = %Board.Action.Ability{name: "selfdestruct", x: 4, y: 4}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
     assert newboard.grid[{4, 4}] == :nil
@@ -148,8 +169,11 @@ defmodule YaggTest.Action.Ability do
     board =
       Board.new()
       |> Map.put(:state, :battle)
-      |> Board.place(unit2, {4, 4}) |> elem(1)
-      |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, unit)} end.()
+      |> set_board(
+        [
+          {{4, 4}, unit2},
+          {{4, 3}, unit}
+        ])
     action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
@@ -157,4 +181,24 @@ defmodule YaggTest.Action.Ability do
     assert Enum.find(events, fn(e) -> e.kind == :new_hand end)
   end
 
+  test "Manuver" do
+    unit = Unit.new(:south, :test, 3, 0)
+    unitN = Unit.new(:north, :test2, 5, 4)
+    unitM = Unit.new(:south, :tank_commander, 3, 0, Ability.Manuver)
+    board =
+      Board.new()
+      |> Map.put(:state, :battle)
+      |> set_board(
+        [
+          {{3, 4}, unitM},
+          {{4, 4}, unitN},
+          {{3, 3}, unit},
+        ])
+    action = %Board.Action.Ability{name: "manuver", x: 3, y: 4, params: %{direction: "south"}}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert Enum.find(events, fn(e) -> e.kind == :unit_moved end)
+    assert newboard.grid[{3, 3}] == unitM
+    assert newboard.grid[{3, 2}] == unit
+    assert newboard.grid[{4, 4}] == unitN
+  end
 end

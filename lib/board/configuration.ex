@@ -39,7 +39,7 @@ defmodule Board.Configuration.Default do
   def terrain() do
     [
       {{1, 2}, :water},
-      {{4, 2}, :water},
+      {{4, 2}, :block},
     ]
   end
 end
@@ -56,7 +56,7 @@ defmodule Board.Configuration.Chain do
       Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
       Unit.new(position, :mosh, 3, 4, Ability.Push),
       Unit.new(position, :bezerker, 7, 2),
-      Unit.new(position, :fullarmorcoward, 1, 6),
+      Unit.new(position, :commander, 3, 4, Ability.Manuver),
       Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
       Unit.new(position, :colburninator, 1, 2, Ability.Colburn),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
@@ -71,7 +71,7 @@ defmodule Board.Configuration.Chain do
       {{4, 4}, :water},
       {{0, 4}, :water},
       {{4, 0}, :water},
-      {{2, 2}, :water},
+      {{2, 2}, :block},
     ]
   end
 end
