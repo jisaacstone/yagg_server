@@ -13,9 +13,9 @@ function select(el, meta) {
           return;
         }
         if (sel.meta.inhand) {
-          global.game.gameaction('place', {index: sel.meta.index, x: meta.x, y: meta.y}, null, 'move');
+          global.game.gameaction('place', {index: sel.meta.index, x: meta.x, y: meta.y}, null, 'board');
         } else {
-          global.game.gameaction('move', {from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y}, null, 'move');
+          global.game.gameaction('move', {from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y}, null, 'board');
         }
       }
       sel.element.dataset.uistate = '';
@@ -104,7 +104,7 @@ function unit_el(unit, el) {
           const square = el.parentNode,
             x = +square.id.charAt(1),
             y = +square.id.charAt(3);
-          global.game.gameaction('ability', {name: abilname, x: x, y: y}, null, 'move');
+          global.game.gameaction('ability', {name: abilname, x: x, y: y}, null, 'board');
         }
       }
     };
@@ -261,7 +261,7 @@ function game() {
   function createEventListener() {
     const host = document.getElementById('host').value;
     const playername = document.getElementById('name').value;
-    eventListener = new EventSource(`http://${host}/sse/game/ID/events?player=${playername}`);
+    eventListener = new EventSource(`http://${host}/sse/table/ID/events?player=${playername}`);
     eventListener.addEventListener('game_event', function(ssevent) {
       const newElement = document.createElement('p');
       newElement.innerHTML = 'message: ' + ssevent.data;
@@ -275,10 +275,10 @@ function game() {
     });
   }
 
-  function gameaction(action, data, callback, key = 'action') {
+  function gameaction(action, data, callback, scope = 'table') {
     const host = hostForm.value;
     const name = nameForm.value;
-    const baseUrl = `http://${host}/game/ID/${key}/${action}?player=${name}`;
+    const baseUrl = `http://${host}/${scope}/ID/a/${action}?player=${name}`;
     function listener() {
       if (this.status >= 400) {
          errorDiv.innerHTML = `error: ${this.status}, message: ${this.responseText}`;
@@ -317,11 +317,11 @@ function game() {
     oReq.addEventListener('load', function () {
       const gamedata = JSON.parse(this.responseText);
       setstate(gamedata);
-      uReq.open('GET', `http://${host}/game/ID/units/${name}`);  
+      uReq.open('GET', `http://${host}/board/ID/player_state/${name}`);  
       uReq.setRequestHeader('Content-Type', 'application/json');
       uReq.send();
     });
-    oReq.open('GET', `http://${host}/game/ID/state`);  
+    oReq.open('GET', `http://${host}/table/ID/state`);  
     oReq.setRequestHeader('Content-Type', 'application/json');
     oReq.send();
   }
@@ -380,7 +380,7 @@ window.onload = function() {
   };
 
   document.getElementById('readybutton').onclick = function() {
-    G.gameaction('ready', {}, null, 'move');
+    G.gameaction('ready', {}, null, 'board');
   };
 
   for (const el of document.getElementsByTagName('td')) {

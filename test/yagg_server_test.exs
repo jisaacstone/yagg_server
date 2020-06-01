@@ -29,11 +29,11 @@ defmodule YaggTest.Endpoint do
   end
 
   test "game join" do
-    %{status: status, resp_body: body} = send_json("/game/create", "{}")
+    %{status: status, resp_body: body} = send_json("/table/new", "{}")
     assert status == 200
     assert %{"id" => gid} = Poison.decode!(body)
     {:ok, _pid} = Table.subscribe(gid, "player1")
-    :ok = Table.act(gid, "player1", %Join{player: "player1"})
+    :ok = Table.table_action(gid, "player1", %Join{player: "player1"})
     %{kind: event_type} = recieve_event()
     assert event_type == :player_joined
   end

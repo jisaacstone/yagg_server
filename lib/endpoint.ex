@@ -11,7 +11,7 @@ defmodule Yagg.Endpoint do
   plug :match
   plug :dispatch
 
-  post "/game/create" do
+  post "/table/new" do
     {:ok, body, conn} = Conn.read_body(conn)
     data = Poison.Parser.parse!(body, %{keys: :atoms!})
     config = if Map.has_key?(data, :configuration) do
@@ -20,18 +20,18 @@ defmodule Yagg.Endpoint do
       Configuration.Default
     end
     {:ok, pid} = Yagg.Table.new(config)
-    gid = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
-    respond(conn, 200, %{id: gid})
+    table_id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
+    respond(conn, 200, %{id: table_id})
   end
 
-  post "/game/:gid/move/:move" do
-    module_name = Module.safe_concat(Board.Action, String.capitalize(move))
+  post "/board/:table_id/a/:action" do
+    module_name = Module.safe_concat(Board.Action, String.capitalize(action))
     {:ok, body, conn} = Conn.read_body(conn)
     conn = Conn.fetch_query_params(conn)
     movedata = Poison.decode!(body, as: struct(module_name))
     player_name = Map.get(movedata, :player, conn.query_params["player"])
 
-    case Table.move(gid, player_name, movedata) do
+    case Table.board_action(table_id, player_name, movedata) do
       :ok -> respond(conn, 204, "")
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, err)
@@ -39,14 +39,14 @@ defmodule Yagg.Endpoint do
     end
   end
 
-  post "/game/:gid/action/:action" do
+  post "/table/:table_id/a/:action" do
     module_name = Module.safe_concat(Table.Action, String.capitalize(action))
     {:ok, body, conn} = Conn.read_body(conn)
     conn = Conn.fetch_query_params(conn)
     actiondata = Poison.decode!(body, as: struct(module_name))
     player_name = Map.get(actiondata, :player, conn.query_params["player"])
 
-    case Table.act(gid, player_name, actiondata) do
+    case Table.table_action(table_id, player_name, actiondata) do
       :ok -> respond(conn, 204, "")
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, err)
@@ -54,16 +54,16 @@ defmodule Yagg.Endpoint do
     end
   end
 
-  get "/game/:gid/state" do
-    case Table.get_state(gid) do
+  get "/table/:table_id/state" do
+    case Table.get_state(table_id) do
       {:ok, game} -> respond(conn, 200, game)
       {:err, err} -> respond(conn, 400, err)
       other -> respond(conn, 501, other)
     end
   end
 
-  get "/game/:gid/units/:player" do
-    case Table.get_units(gid, player) do
+  get "/board/:table_id/player_state/:player_name" do
+    case Table.get_player_state(table_id, player_name) do
       {:err, err} -> respond(conn, 400, err)
       {:ok, units} -> respond(conn, 200, units)
     end
@@ -73,7 +73,7 @@ defmodule Yagg.Endpoint do
     respond(conn, 200, Board.Configuration.all())
   end
 
-  get "sse/game/:gid/events" do
+  get "sse/table/:table_id/events" do
     conn =
       conn
       |> Conn.fetch_query_params()
@@ -87,7 +87,7 @@ defmodule Yagg.Endpoint do
       %{"player" => p} -> p
       _ -> :spectate
     end
-    {:ok, pid} = Table.subscribe(gid, player)
+    {:ok, pid} = Table.subscribe(table_id, player)
     sse_loop(conn, pid)
   end
 

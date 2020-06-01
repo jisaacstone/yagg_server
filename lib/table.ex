@@ -52,7 +52,7 @@ defmodule Yagg.Table do
     GenServer.call(pid, :get_state)
   end
 
-  def get_units(_gid, player_name) do
+  def get_player_state(_gid, player_name) do
     {:ok, pid} = new()
     case GenServer.call(pid, :get_state) do
       {:err, _} = err -> err
@@ -71,14 +71,14 @@ defmodule Yagg.Table do
     {:ok, pid}
   end
 
-  def act(_gid, player_name, action) do
+  def table_action(_gid, player_name, action) do
     {:ok, pid} = new()
-    GenServer.call(pid, {:act, player_name, action})
+    GenServer.call(pid, {:table_action, player_name, action})
   end
 
-  def move(_gid, player_name, action) do
+  def board_action(_gid, player_name, action) do
     {:ok, pid} = new()
-    GenServer.call(pid, {:move, player_name, action})
+    GenServer.call(pid, {:board_action, player_name, action})
   end
 
   # Callbacks
@@ -94,7 +94,7 @@ defmodule Yagg.Table do
     {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
   end
 
-  def handle_call({:act, player_name, action}, _from, game) do
+  def handle_call({:table_action, player_name, action}, _from, game) do
     player = Player.by_name(game, player_name)
     try do
       case Yagg.Table.Action.resolve(action, game, player) do
@@ -108,17 +108,17 @@ defmodule Yagg.Table do
     end
   end
 
-  def handle_call({:move, player_name, move}, _from, game) do
+  def handle_call({:board_action, player_name, action}, _from, game) do
     player = Player.by_name(game, player_name)
     # try do
       cond do
         player == :notfound -> {:reply, {:err, :player_invalid}, game}
         game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
         :true ->
-          case Board.Action.resolve(move, game.board, player.position) do
+          case Board.Action.resolve(action, game.board, player.position) do
             {:err, _} = err -> {:reply, err, game}
             {board, events} ->
-              # One "Move" per turn. Successful move == next turn
+              # One action per turn. Successful move == next turn
               game = %{game | board: board} |> nxtrn()
               notify(game, [Event.new(:turn, %{player: game.turn}) | events])
               {:reply, :ok, game}
