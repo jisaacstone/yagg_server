@@ -177,28 +177,6 @@ defmodule YaggTest.Action.Ability do
     action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-    assert Enum.find(events, fn(e) -> e.kind == :new_hand end)
-    assert Enum.find(events, fn(e) -> e.kind == :new_hand end)
-  end
-
-  test "Manuver" do
-    unit = Unit.new(:south, :test, 3, 0)
-    unitN = Unit.new(:north, :test2, 5, 4)
-    unitM = Unit.new(:south, :tank_commander, 3, 0, Ability.Manuver)
-    board =
-      Board.new()
-      |> Map.put(:state, :battle)
-      |> set_board(
-        [
-          {{3, 4}, unitM},
-          {{4, 4}, unitN},
-          {{3, 3}, unit},
-        ])
-    action = %Board.Action.Ability{name: "manuver", x: 3, y: 4, params: %{direction: "south"}}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
-    assert Enum.find(events, fn(e) -> e.kind == :unit_moved end)
-    assert newboard.grid[{3, 3}] == unitM
-    assert newboard.grid[{3, 2}] == unit
-    assert newboard.grid[{4, 4}] == unitN
+    assert Enum.find(events, fn(e) -> e.kind == :add_to_hand end)
   end
 end

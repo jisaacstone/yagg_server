@@ -9,21 +9,20 @@ alias Yagg.Board.Action
 defmodule Action.Ability do
   @behaviour Action
 
-  @callback resolve(Dict.t, Yagg.Board.t, keyword()) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
+  @callback resolve(Yagg.Board.t, keyword()) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
   @callback description() :: String.t
 
   @enforce_keys [:name, :x, :y]
-  defstruct [:params | @enforce_keys]
+  defstruct @enforce_keys
   alias __MODULE__
 
   @impl Action
   def resolve(data, %Board{state: :battle} = board, _position) do
     module = Module.safe_concat(Ability, String.capitalize(data.name))
-    ability = struct!(module, data.params || [])
     coords = {data.x, data.y}
-    case ability_at(board, ability, coords) do
+    case ability_at(board, module, coords) do
       {:err, _} = err -> err
-      unit -> module.resolve(ability, board, unit: unit, coords: coords)
+      unit -> module.resolve(board, unit: unit, coords: coords)
     end
   end
 
@@ -42,17 +41,14 @@ defmodule Action.Ability do
       def description(), do: @moduledoc
       @enforce_keys unquote(struct)
       defstruct @enforce_keys
-      def resolve(board), do: resolve(%{}, board, [])
-      def resolve(board, opts) when is_list(opts), do: resolve(%{}, board, opts)
+      def resolve(%Board{} = board), do: resolve(board, [])
     end
   end
 
-  defp ability_at(board, %{__struct__: struct}, coords) do
+  defp ability_at(board, module, coords) do
     case board.grid[coords] do
-      %Unit{ability: ^struct} = unit -> unit
-      %Unit{} = u-> 
-        IO.inspect([unit: u, s: struct])
-        {:err, :unable}
+      %Unit{ability: ^module} = unit -> unit
+      %Unit{} -> {:err, :unable}
       _ -> {:err, :empty}
     end
   end
@@ -62,7 +58,7 @@ defmodule Action.Ability.NOOP do
   @moduledoc "Does Nothing"
   use Action.Ability
 
-  def resolve(_, board, _) do
+  def resolve(board, _) do
     {board, []}
   end
 end
@@ -71,7 +67,7 @@ defmodule Action.Ability.Selfdestruct do
   @moduledoc "Explode and destroy everything within 1 square radius"
   use Action.Ability
 
-  def resolve(_selfdestuct, board, opts) do
+  def resolve(board, opts) do
     surround = Board.features_around(board, opts[:coords])
     Enum.reduce(surround, {board, []}, &killunit/2)
   end
@@ -89,10 +85,10 @@ defmodule Action.Ability.Concede do
   @moduledoc "Lose the game"
   use Action.Ability
 
-  def resolve(_, board, opts) do
+  def resolve(board, opts) do
     {
       %{board | state: %State.Gameover{}},
-      [Event.new(:gameover, %{winner: Player.opposite(opts[:unit].position)})]
+      [Event.Gameover.new(winner: Player.opposite(opts[:unit].position))]
     }
   end
 end
@@ -101,7 +97,7 @@ defmodule Action.Ability.Rowburn do
   @moduledoc "Destory all units in the same row"
   use Action.Ability
 
-  def resolve(_, board, opts) do
+  def resolve(board, opts) do
     {_, y} = opts[:coords]
     Enum.reduce(
       board.grid,
@@ -123,7 +119,7 @@ defmodule Action.Ability.Colburn do
   @moduledoc "Destory all units in the same column"
   use Action.Ability
 
-  def resolve(_, board, opts) do
+  def resolve(board, opts) do
     {x, _} = opts[:coords]
     Enum.reduce(
       board.grid,
@@ -145,7 +141,7 @@ defmodule Action.Ability.Poisonblade do
   @moduledoc "Poisons any units that touch it"
   use Action.Ability
 
-  def resolve(_, board, opts) do
+  def resolve(board, opts) do
     case opts[:opponent] do
       :nil -> {board, []}
       {unit, coords} -> Board.unit_death(board, unit, coords)
@@ -158,7 +154,7 @@ defmodule Action.Ability.Secondwind do
   use Action.Ability
 
   @impl Action.Ability
-  def resolve(_, board, opts) do
+  def resolve(board, opts) do
     pos = opts[:unit].position
     newunit = %{opts[:unit] | triggers: %{}}
     Hand.add_unit(board, pos, newunit)
@@ -174,7 +170,7 @@ defmodule Action.Ability.Push do
   use Action.Ability
 
   @impl Action.Ability
-  def resolve(_, board, opts) do
+  def resolve(board, opts) do
     push_adjacent_units(board, opts[:coords])
   end
 
@@ -210,9 +206,9 @@ defmodule Action.Ability.Manuver do
   use Action.Ability, keys: [:direction]
 
   @impl Action.Ability
-  def resolve(%{direction: sdirection}, board, opts) do
-    case dir_from_str(sdirection) do
-      {:err, _} = err -> err
+  def resolve(board, opts) do
+    case opts[:direction] do
+      :nil -> {:err, :misconfigured}
       direction ->
         coords =
           Board.surrounding(opts[:coords])
@@ -237,14 +233,4 @@ defmodule Action.Ability.Manuver do
       _ -> move_units(board, direction, position, coords, events)
     end
   end
-
-  defp dir_from_str(str) do
-    str |> String.first() |> String.downcase() |> initial_to_dir()
-  end
-
-  defp initial_to_dir("n"), do: :north
-  defp initial_to_dir("s"), do: :south
-  defp initial_to_dir("e"), do: :east
-  defp initial_to_dir("w"), do: :west
-  defp initial_to_dir(_), do: {:err, :bad_direction}
 end

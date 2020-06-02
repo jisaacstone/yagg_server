@@ -40,3 +40,11 @@ private state only a player knows
     curl -i 'localhost:8000/board/ID/player_state/PLAYER
 
 Very basic ui is at `localhost:8000/front/index.html`
+
+EVENTS:
+
+event spec is in`lib/event.ex` as well as modules for every specific event types
+
+all sse events are send as the `game_event` type
+all events have a stream of `:global`, `:north` or `:south` the filters the SSE stream
+all events have the `kind` key that indicates their structure

@@ -20,7 +20,7 @@ defmodule Yagg.Board.Hand do
   defp add_unit_at(hand, index, %Unit{} = unit, notifications \\ []) do
     {
       Map.put_new(hand, index, {unit, :nil}),
-      [Event.new(unit.position, :new_hand, %{unit: unit, index: index}) | notifications]
+      [Event.AddToHand.new(unit.position, unit: unit, index: index) | notifications]
     }
   end
 

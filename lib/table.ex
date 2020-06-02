@@ -119,8 +119,14 @@ defmodule Yagg.Table do
             {:err, _} = err -> {:reply, err, game}
             {board, events} ->
               # One action per turn. Successful move == next turn
-              game = %{game | board: board} |> nxtrn()
-              notify(game, [Event.new(:turn, %{player: game.turn}) | events])
+              game = %{game | board: board}
+              {game, events} = if (board.state == :battle) do
+                game = nxtrn(game)
+                {game, [Event.Turn.new(player: game.turn) | events]}
+              else
+                {game, events}
+              end
+              notify(game, events)
               {:reply, :ok, game}
           end
       end

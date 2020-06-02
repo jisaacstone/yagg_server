@@ -17,7 +17,7 @@ defmodule Action.Place do
       {:ok, board} -> 
         {
           board,
-          [Event.new(position, :unit_assigned, %{index: act.index, x: act.x, y: act.y})]
+          [Event.UnitAssigned.new(position, index: act.index, x: act.x, y: act.y)]
         }
       err -> err
     end
@@ -29,8 +29,8 @@ defmodule Action.Place do
         {
           %{board | hands: %{board.hands | position => hand}},
           [
-            Event.new(position, :unit_assigned, %{index: act.index, x: act.x, y: act.y}),
-            Event.new(:global, :unit_placed, %{x: act.x, y: act.y, player: position}),
+            Event.UnitAssigned.new(position, index: act.index, x: act.x, y: act.y),
+            Event.UnitPlaced.new(x: act.x, y: act.y, player: position),
           ]
         }
       err -> err

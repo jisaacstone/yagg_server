@@ -1,4 +1,6 @@
 alias Yagg.Table.Player
+alias Yagg.Board
+alias Yagg.Unit
 
 defmodule Yagg.Event do
   alias __MODULE__
@@ -25,6 +27,9 @@ defmodule Yagg.Event do
   def new(kind) do
     new(:global, kind, %{})
   end
+  def new(stream, kind) when is_atom(kind) do
+    new(stream, kind, %{})
+  end
   def new(kind, data) do
     new(:global, kind, data)
   end
@@ -34,4 +39,128 @@ defmodule Yagg.Event do
   def new(stream, kind, data) do
     %Event{stream: stream, kind: kind, data: data}
   end
+
+  defmodule UnitAssigned do
+    @moduledoc """
+    Placement Phase: a unit is assigned, from hand to square. never :global
+    """
+
+    @spec new(
+      Player.position(),
+      [ 
+        index: term,
+        x: 0..4,
+        y: 0..4 
+      ]) :: Event.t
+ 
+    def new(position, params) do
+      Event.new(position, :unit_assigned, params)
+    end
+  end
+
+  defmodule UnitPlaced do
+    @moduledoc """
+    New unit placed on the board
+    """
+
+    @spec new([
+        player: Player.position(),
+        x: 0..4,
+        y: 0..4
+      ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :unit_placed, params)
+    end
+  end
+
+  defmodule Gameover do
+    @spec new([winner: Player.position()]) :: Event.t
+    def new(params) do
+      Event.new(:global, :gameover, params)
+    end
+  end
+
+  defmodule PlayerReady do
+    @spec new([player: Player.position()]) :: Event.t
+    def new(params) do
+      Event.new(:global, :player_ready, params)
+    end
+  end
+
+  defmodule GameStarted do
+    def new() do
+      Event.new(:global, :game_started)
+    end
+  end
+
+  defmodule BattleStarted do
+    def new() do
+      Event.new(:global, :battle_started)
+    end
+  end
+
+  defmodule AddToHand do
+    @spec new(
+      Player.position(),
+      [
+        index: term(),
+        unit: Unit.t
+      ]) :: Event.t
+    def new(position, params) do
+      Event.new(position, :add_to_hand, params)
+    end
+  end
+
+  defmodule UnitDied do
+    @spec new([x: 0..4, y: 0..4]) :: Event.t
+    def new(params) do
+      Event.new(:global, :unit_died, params)
+    end
+  end
+
+  defmodule Feature do
+    @spec new([
+      x: 0..4,
+      y: 0..4,
+      feture: term()
+    ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :feature, params)
+    end
+  end
+
+  defmodule UnitMoved do
+    @spec new([
+      from: Board.coord,
+      to: Board.coord
+    ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :unit_moved, params)
+    end
+  end
+
+  defmodule Turn do
+    @spec new([player: Player.position]) :: Event.t
+    def new(params) do
+      Event.new(:global, :turn, params)
+    end
+  end
+
+  defmodule ConfigChange do
+    @spec new([config: String.t]) :: Event.t
+    def new(params) do
+      Event.new(:global, :config_change, params)
+    end
+  end
+
+  defmodule PlayerJoined do
+    @spec new([
+      name: String.t,
+      position: Player.position
+    ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :player_joined, params)
+    end
+  end
+
 end

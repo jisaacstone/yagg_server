@@ -14,7 +14,7 @@ defmodule Action.Ready do
   end
   def resolve(_act, %Board{state: %Placement{ready: :nil}} = board, position) do
     case units_assigned?(board, position) do
-      :true -> {%{board | state: %Placement{ready: position}}, [Event.new(:player_ready, %{player: position})]}
+      :true -> {%{board | state: %Placement{ready: position}}, [Event.PlayerReady.new(player: position)]}
       :false -> {:err, :notready}
     end
   end
@@ -25,7 +25,7 @@ defmodule Action.Ready do
     end
   end
   def resolve(_, %Board{state: %Gameover{ready: :nil}} = board, position) do
-      {%{board | state: %Gameover{ready: position}}, [Event.new(:player_ready, %{player: position})]}
+      {%{board | state: %Gameover{ready: position}}, [Event.PlayerReady.new(player: position)]}
   end
   def resolve(_act, %Board{state: %Gameover{ready: _opponent}}, _position) do
     Board.new() |> Board.setup()
@@ -48,11 +48,11 @@ defmodule Action.Ready do
         [],
         fn
           ({{x, y}, %Unit{} = unit}, nfcns) ->
-            [Event.new(:global, :unit_placed, %{x: x, y: y, player: unit.position}) | nfcns]
+            [Event.UnitPlaced.new(x: x, y: y, player: unit.position) | nfcns]
           (_, nfcns) -> nfcns
         end
       )
-      {%{board | state: :battle}, [Event.new(:battle_started) | notifications]}
+      {%{board | state: :battle}, [Event.BattleStarted.new() | notifications]}
     catch
       err -> err
     end

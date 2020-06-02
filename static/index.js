@@ -144,7 +144,7 @@ const eventHandlers = {
   player_left: function(event) {
     document.getElementById(`${event.player}name`).innerHTML = '';
   },
-  new_hand: function(event){
+  add_to_hand: function(event){
     const hand = document.getElementById('hand'),
       card = document.createElement('span'),
       unit = document.createElement('span');
@@ -308,7 +308,7 @@ function game() {
         eventHandlers.new_unit(ob);
       }
       for (const [index, card] of Object.entries(unitdata.hand)) {
-        eventHandlers.new_hand({index: +index, unit: card.unit});
+        eventHandlers.add_to_hand({index: +index, unit: card.unit});
         if (card.assigned) {
           eventHandlers.unit_assigned({index: +index, x: card.assigned.x, y: card.assigned.y});
         }

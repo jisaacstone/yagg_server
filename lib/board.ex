@@ -138,7 +138,7 @@ defmodule Yagg.Board do
     {board, events} = Unit.deathrattle(unit).resolve(board, opts)
     {
       board,
-      [Event.new(:unit_died, %{x: x, y: y}) | events]
+      [Event.UnitDied.new(x: x, y: y) | events]
     }
   end
 
@@ -185,7 +185,7 @@ defmodule Yagg.Board do
     )
     {
       board,
-      [Event.new(:game_started) | events]
+      [Event.GameStarted.new() | events]
     }
   end
 
@@ -221,7 +221,7 @@ defmodule Yagg.Board do
   defp add_features(board, events, []), do: {board, events}
   defp add_features(board, events, [{{x, y}, feature} | features]) do
     board = %{board | grid: Map.put_new(board.grid, {x, y}, feature)}
-    events = [Event.new(:feature, %{x: x, y: y, feature: feature}) | events]
+    events = [Event.Feature.new(x: x, y: y, feature: feature) | events]
     add_features(board, events, features)
   end
 
@@ -235,7 +235,7 @@ defmodule Yagg.Board do
       |> Map.put_new(to, unit)
     {
       %{board | grid: grid},
-      [Event.new(:unit_moved, %{from: from, to: to})]
+      [Event.UnitMoved.new(from: from, to: to)]
     }
   end
 

@@ -14,7 +14,7 @@ defmodule Action.Rules do
       conf_mod when is_atom(conf_mod) ->
         {
           %{table | configuration: conf_mod},
-          Event.new(:config_change, %{config: config})
+          Event.ConfigChange.new(config: config)
         }
     end
   end
