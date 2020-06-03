@@ -43,6 +43,7 @@ defmodule Yagg.Endpoint do
     module_name = Module.safe_concat(Table.Action, String.capitalize(action))
     {:ok, body, conn} = Conn.read_body(conn)
     conn = Conn.fetch_query_params(conn)
+    IO.inspect(%{body: body})
     actiondata = Poison.decode!(body, as: struct(module_name))
     player_name = Map.get(actiondata, :player, conn.query_params["player"])
 

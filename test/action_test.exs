@@ -163,6 +163,24 @@ defmodule YaggTest.Action.Ability do
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
   end
 
+  test "selfdestruct death" do
+    unit = Unit.new(:south, :test, 3, 3, :nil, %{death: Ability.Selfdestruct})
+    unit2 = Unit.new(:north, :test2, 5, 4)
+    board =
+      Board.new()
+      |> Map.put(:state, :battle)
+      |> set_board(
+        [
+          {{4, 4}, unit},
+          {{4, 3}, unit2}
+        ])
+    action = %Board.Action.Move{from_x: 4, from_y: 3, to_x: 4, to_y: 4}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
+    assert newboard.grid[{4, 4}] == :nil
+    assert newboard.grid[{4, 3}] == :nil
+    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
+  end
+
   test "secondwind" do
     unit = Unit.new(:south, :test, 3, 0, :nil, %{death: Ability.Secondwind})
     unit2 = Unit.new(:north, :test2, 5, 4)

@@ -16,6 +16,18 @@ defmodule YaggTest.Endpoint do
       |> Endpoint.call(@opts)
   end
 
+  def call_200(url, body) do
+    %{status: status, resp_body: body} = send_json(url, Poison.encode!(body))
+    assert status == 200
+    Poison.Parser.parse!(body, %{keys: :atoms!})
+  end
+
+  def call_204(url, body) do
+    %{status: status, resp_body: body} = send_json(url, Poison.encode!(body))
+    assert status == 204
+    :ok
+  end
+
   def recieve_event() do
     receive do
       %Event{} = event ->
@@ -42,4 +54,12 @@ defmodule YaggTest.Endpoint do
     %{status: 200, resp_body: body} = conn(:get, "/configurations") |> Endpoint.call(@opts)
     assert %{"alpha" => _} = Poison.decode!(body)
   end
+
+  test "start game" do
+    %{id: table_id} = call_200("/table/new", %{})
+    call_204("/table/#{table_id}/a/join", %{player: "p1"})
+    call_204("/table/#{table_id}/a/join", %{player: "p2"})
+    call_204("/board/#{table_id}/a/place?player=p1", %{index: 1, x: 4, y: 4})
+  end
+
 end

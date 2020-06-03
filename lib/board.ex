@@ -117,10 +117,10 @@ defmodule Yagg.Board do
             :out_of_bounds -> {:err, :out_of_bounds}
             :water -> {:err, :illegal}
             :block -> 
-              {board, events} = push_block(board, unit, from, to)
+              {board, events} = push_block(board, from, to)
               {:ok, board, events}
             :nil -> 
-              {board, events} = do_move(board, unit, from, to)
+              {board, events} = do_move(board, from, to)
               {:ok, board, events}
             feature -> 
               do_battle(board, unit, feature, from, to)
@@ -229,10 +229,9 @@ defmodule Yagg.Board do
     Enum.sort([abs(x - to_x), abs(y - to_y)]) == [0, 1]
   end
 
-  defp do_move(board, unit, from, to) do
-    grid = board.grid
-      |> Map.delete(from)
-      |> Map.put_new(to, unit)
+  defp do_move(board, from, to) do
+    {unit, grid} = Map.pop(board.grid, from)
+    grid = Map.put_new(grid, to, unit)
     {
       %{board | grid: grid},
       [Event.UnitMoved.new(from: from, to: to)]
@@ -246,7 +245,7 @@ defmodule Yagg.Board do
     cond do
       unit.attack > opponent.defense ->
         {board, e1} = unit_death(board, opponent, to, opponent: {unit, from})
-        {board, e2} = do_move(board, unit, from, to)
+        {board, e2} = do_move(board, from, to)
         {:ok, board, e1 ++ e2}
       unit.attack == opponent.defense ->
         # not currently possible?
@@ -259,13 +258,13 @@ defmodule Yagg.Board do
     end
   end
 
-  defp push_block(board, unit, from, to) do
+  defp push_block(board, from, to) do
     dir = direction(from, to)
     square = next(dir, to)
     case board.grid[square] do
       :nil -> 
-        {board, events1} = do_move(board, board.grid[to], to, square)
-        {board, events2} = do_move(board, unit, from, to)
+        {board, events1} = do_move(board, to, square)
+        {board, events2} = do_move(board, from, to)
         {board, events1 ++ events2}
       _ ->
         {:err, :occupied}

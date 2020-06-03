@@ -21,9 +21,9 @@ defmodule Yagg.Table do
     GenServer.start_link(__MODULE__, table)
   end
 
-  def get(gid) do
+  def get(table_id) do
     # will be a lookup by id eventually
-    pid = gid |> to_charlist() |> :erlang.list_to_pid
+    pid = "<0.#{table_id}.0>" |> to_charlist() |> :erlang.list_to_pid
     case Process.alive?(pid) do
       :true -> {:ok, pid}
       :false -> {:err, :process_ended}
@@ -31,7 +31,6 @@ defmodule Yagg.Table do
   end
 
   def new(configuration \\ Board.Configuration.Default) do
-    # For now just one game all the time
     table = %Table{
       players: [],
       subscribors: [],
@@ -39,21 +38,32 @@ defmodule Yagg.Table do
       turn: :nil,
       configuration: configuration,
     }
+    DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})
+  end
+
+  def single__(configuration \\ Board.Configuration.Default) do
     case Supervisor.which_children(Yagg.TableSupervisor) do
       [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
-      [] -> DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})
+      [] -> new(configuration)
+    end
+  end
+
+  def get_or_single__(table_id) do
+    case get(table_id) do
+      {:err, _} -> single__()
+      {:ok, pid} -> {:ok, pid}
     end
   end
 
   # API
 
-  def get_state(_gid) do
-    {:ok, pid} = new()
+  def get_state(table_id) do
+    {:ok, pid} = get_or_single__(table_id)
     GenServer.call(pid, :get_state)
   end
 
-  def get_player_state(_gid, player_name) do
-    {:ok, pid} = new()
+  def get_player_state(table_id, player_name) do
+    {:ok, pid} = get_or_single__(table_id)
     case GenServer.call(pid, :get_state) do
       {:err, _} = err -> err
       {:ok, game} ->
@@ -64,20 +74,20 @@ defmodule Yagg.Table do
     end
   end
 
-  def subscribe(_gid, player) do
-    {:ok, pid} = new()
+  def subscribe(table_id, player) do
+    {:ok, pid} = get_or_single__(table_id)
     Process.monitor(pid)
     GenServer.call(pid, {:subscribe, player})
     {:ok, pid}
   end
 
-  def table_action(_gid, player_name, action) do
-    {:ok, pid} = new()
+  def table_action(table_id, player_name, action) do
+    {:ok, pid} = get_or_single__(table_id)
     GenServer.call(pid, {:table_action, player_name, action})
   end
 
-  def board_action(_gid, player_name, action) do
-    {:ok, pid} = new()
+  def board_action(table_id, player_name, action) do
+    {:ok, pid} = get_or_single__(table_id)
     GenServer.call(pid, {:board_action, player_name, action})
   end
 
@@ -113,7 +123,7 @@ defmodule Yagg.Table do
     # try do
       cond do
         player == :notfound -> {:reply, {:err, :player_invalid}, game}
-        game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
+        game.board && game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
         :true ->
           case Board.Action.resolve(action, game.board, player.position) do
             {:err, _} = err -> {:reply, err, game}

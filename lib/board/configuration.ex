@@ -29,7 +29,7 @@ defmodule Board.Configuration.Default do
       Unit.new(position, :bezerker, 7, 2),
       Unit.new(position, :fullarmorcoward, 1, 6, :nil, %{death: Ability.Secondwind}),
       Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
-      Unit.new(position, :colburninator, 1, 2, Ability.Colburn),
+      Unit.new(position, :mosh, 3, 0, Ability.Push),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
     ])
