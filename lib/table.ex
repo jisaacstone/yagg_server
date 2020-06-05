@@ -41,6 +41,7 @@ defmodule Yagg.Table do
     DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})
   end
 
+  # TO ENABLE default table
   def single__(configuration \\ Board.Configuration.Default) do
     case Supervisor.which_children(Yagg.TableSupervisor) do
       [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
@@ -54,6 +55,7 @@ defmodule Yagg.Table do
       {:ok, pid} -> {:ok, pid}
     end
   end
+  # END TO ENABLE
 
   # API
 

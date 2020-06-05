@@ -16,6 +16,13 @@ defmodule YaggTest.Endpoint do
       |> Endpoint.call(@opts)
   end
 
+  # GET request
+  def get_200(url) do
+    %{status: status, resp_body: body} = Endpoint.call(conn(:get, url), @opts)
+    assert status == 200
+    Poison.Parser.parse!(body, %{keys: :atoms})
+  end
+
   def call_200(url, body) do
     %{status: status, resp_body: body} = send_json(url, Poison.encode!(body))
     assert status == 200
@@ -60,6 +67,16 @@ defmodule YaggTest.Endpoint do
     call_204("/table/#{table_id}/a/join", %{player: "p1"})
     call_204("/table/#{table_id}/a/join", %{player: "p2"})
     call_204("/board/#{table_id}/a/place?player=p1", %{index: 1, x: 4, y: 4})
+  end
+
+  test "new with config" do
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "beta"})
+    call_204("/table/#{table_id}/a/join", %{player: "p1"})
+    table = get_200("/table/#{table_id}/state")
+    assert table.configuration == "Elixir.Yagg.Board.Configuration.Chain"
+    call_204("/table/#{table_id}/a/join", %{player: "p2"})
+    table = get_200("/table/#{table_id}/state")
+    assert table.board.grid[:"2,2"] == "block"
   end
 
 end
