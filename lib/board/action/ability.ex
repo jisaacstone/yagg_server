@@ -203,16 +203,18 @@ defmodule Action.Ability.Manuver do
   all adjacent friendly units move in the same direction,
   north, south, east, west
   """
-  use Action.Ability, keys: [:direction]
+  use Action.Ability
 
   @impl Action.Ability
   def resolve(board, opts) do
-    case opts[:direction] do
-      :nil -> {:err, :misconfigured}
-      direction ->
+    case {opts[:from], opts[:to]} do
+      {_,:nil} -> {:err, :misconfigured}
+      {:nil,_} -> {:err, :misconfigured}
+      {from, to} ->
+        direction = Board.direction(from, to)
         coords =
-          Board.surrounding(opts[:coords])
-          |> Enum.into(%{center: opts[:coords]})
+          Board.surrounding(from)
+          |> Enum.into(%{center: from})
           |> order(direction)
         move_units(board, direction, opts[:unit].position, coords, [])
     end
@@ -220,9 +222,9 @@ defmodule Action.Ability.Manuver do
 
   defp order(coord_map, direction) do
     # order matters because units might bump into things and each other
-    {first, coord_map} = Map.pop(coord_map, direction)
-    {second, coord_map} = Map.pop(coord_map, :center)
-    [first, second | Map.values(coord_map)]
+    {_first, coord_map} = Map.pop(coord_map, direction)
+    {center, coord_map} = Map.pop(coord_map, :center)
+    [center | Map.values(coord_map)]
   end
 
   defp move_units(board, _direction, _position, [], events), do: {board, events}

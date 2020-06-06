@@ -30,7 +30,7 @@ defmodule YaggTest.Endpoint do
   end
 
   def call_204(url, body) do
-    %{status: status, resp_body: body} = send_json(url, Poison.encode!(body))
+    %{status: status} = send_json(url, Poison.encode!(body))
     assert status == 204
     :ok
   end

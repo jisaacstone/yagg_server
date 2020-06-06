@@ -50,9 +50,13 @@ defmodule Yagg.Table do
   end
 
   def get_or_single__(table_id) do
-    case get(table_id) do
-      {:err, _} -> single__()
-      {:ok, pid} -> {:ok, pid}
+    try do
+      case get(table_id) do
+        {:err, _} -> single__()
+        {:ok, pid} -> {:ok, pid}
+      end
+    rescue
+      ArgumentError -> single__()
     end
   end
   # END TO ENABLE

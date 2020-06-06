@@ -132,15 +132,19 @@ defmodule Yagg.Board do
     end
   end
 
+  @doc """
+  Unit dies as {x, y}. Returns new board and events
+  """
   def unit_death(board, unit, {x, y}, meta \\ []) do
     board = %{board | grid: Map.delete(board.grid, {x, y})}
     opts = [{:unit, unit}, {:coords, {x, y}} | meta]
-    {board, events} = Unit.deathrattle(unit).resolve(board, opts)
+    {board, events} = Unit.trigger_module(unit, :death).resolve(board, opts)
     {
       board,
       [Event.UnitDied.new(x: x, y: y) | events]
     }
   end
+
 
   @doc """
   Returnts a list of {coords, feature} tuple for any features within distance of {x, y}
@@ -198,12 +202,14 @@ defmodule Yagg.Board do
   def next(:south, {x, y}), do: {x, y - 1}
 
   @doc """
-  coord to direction math
+  Takes two points and retires the direction from the first to the second
+  errors if the points are not on a line.
   """
   def direction({x1, y}, {x2, y}) when x1 > x2, do: :east
   def direction({x1, y}, {x2, y}) when x1 < x2, do: :west
   def direction({x, y1}, {x, y2}) when y1 > y2, do: :south
   def direction({x, y1}, {x, y2}) when y1 < y2, do: :north
+  def direction(_, _), do: {:err, :not_on_line}
 
   @doc """
   all adjacent squares (add, sub 1 for x, y)
@@ -229,12 +235,15 @@ defmodule Yagg.Board do
     Enum.sort([abs(x - to_x), abs(y - to_y)]) == [0, 1]
   end
 
-  defp do_move(board, from, to) do
+  defp do_move(board, from, to, opts \\ []) do
     {unit, grid} = Map.pop(board.grid, from)
     grid = Map.put_new(grid, to, unit)
+    board = %{board | grid: grid}
+    opts = [{:from, from}, {:to, to}, {:unit, unit} | opts]
+    {board, events} = Unit.trigger_module(unit, :move).resolve(board, opts)
     {
-      %{board | grid: grid},
-      [Event.UnitMoved.new(from: from, to: to)]
+      board,
+      [Event.UnitMoved.new(from: from, to: to) | events]
     }
   end
 

@@ -33,11 +33,14 @@ defmodule Yagg.Unit do
   end
 
 
-  def deathrattle(unit) do
-    if unit.triggers && unit.triggers[:death] do
-      unit.triggers.death
+  def trigger_module(%Unit{} = unit, trigger) do
+    if unit.triggers && unit.triggers[trigger] do
+      unit.triggers[trigger]
     else
       Ability.NOOP
     end
+  end
+  def trigger_module(_, _) do
+    Ability.NOOP
   end
 end
