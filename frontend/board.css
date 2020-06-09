@@ -1,0 +1,19 @@
+#board {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  height: calc(100vw * .62);
+}
+
+.boardrow {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+.boardsquare {
+  flex-grow: 1;
+  margin: 10px;
+  border-radius: 10px;
+  border: 2px inset #4B9;
+}

@@ -1,3 +1,4 @@
+import { hostname, getname, tableid } from './urlvars.js';
 const dn = { name: null };
 function _name_() {
     // random name
@@ -8,17 +9,9 @@ function _name_() {
 }
 function add_auth(request, method, url) {
     // still no auth, get player name from query params
-    const urlParams = new URLSearchParams(window.location.search), name = urlParams.get('player') || _name_();
+    const name = getname() || _name_();
     request.open(method, url + `?name=${name}`);
     return request;
-}
-function tableid() {
-    const urlParams = new URLSearchParams(window.location.search), id = urlParams.get('table');
-    return id;
-}
-export function hostname() {
-    const host = window.location.hostname, port = window.location.port, hostname = port ? `${host}:${port}` : host;
-    return hostname;
 }
 export function gameaction(action, data, scope = 'table', id = null) {
     const tableId = id || tableid();

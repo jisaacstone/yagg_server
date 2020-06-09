@@ -1,4 +1,4 @@
-import { request, post, gameaction, hostname } from './request.js';
+import { request, post, gameaction } from './request.js';
 
 function fetchConfigs(sel_el: HTMLElement) {
   request('configurations').then(
@@ -38,7 +38,7 @@ window.onload = function() {
       name = name_el.value || _name_();
     post('table/new', { configuration: conf }).then(({ id }) => {
       gameaction('join', { player: name }, 'table', id).then(() => {
-        window.location.href = `${hostname()}/board.html?game=${id}&player=${name}`;
+        window.location.href = `board.html?table=${id}&player=${name}`;
       });
     });
   };

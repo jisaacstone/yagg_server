@@ -1,0 +1,26 @@
+body {
+  margin-top: 1em;
+}
+
+#nameform {
+  max-width: 80%;
+  max-height: 5em;
+  border: 2px solid #556;
+  background-color: #9AB;
+  border-radius: 10px;
+  padding: 1em;
+  margin: 1em;
+}
+
+#createdialog {
+  max-width: 80%;
+  max-height: 5em;
+  border: 2px solid #556;
+  background-color: #ABB;
+  border-radius: 10px;
+  padding: 1em;
+  margin: 1em;
+}
+
+#tables {
+}
