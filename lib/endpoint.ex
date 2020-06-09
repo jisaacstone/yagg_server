@@ -7,6 +7,7 @@ defmodule Yagg.Endpoint do
 
   plug(CORSPlug)
   plug(Plug.Static, at: "/front", from: "./static")
+  plug(Plug.Static, at: "/fe", from: "./frontend")
 
   plug :match
   plug :dispatch
@@ -19,9 +20,16 @@ defmodule Yagg.Endpoint do
     else
       Configuration.Default
     end
-    {:ok, pid} = Yagg.Table.new(config)
+    {:ok, pid} = Table.new(config)
     table_id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
     respond(conn, 200, %{id: table_id})
+  end
+
+  get "/table" do
+    ids = Table.list() |> Enum.map(
+      fn (pid) -> pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd end
+    )
+    respond(conn, 200, %{ids: ids})
   end
 
   post "/board/:table_id/a/:action" do

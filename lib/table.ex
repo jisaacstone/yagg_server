@@ -30,6 +30,11 @@ defmodule Yagg.Table do
     end
   end
 
+  def list() do
+    Supervisor.which_children(Yagg.TableSupervisor)
+      |> Enum.map(fn ({_, pid, _, _}) -> pid end)
+  end
+
   def new(configuration \\ Board.Configuration.Default) do
     table = %Table{
       players: [],

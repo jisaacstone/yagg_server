@@ -17,7 +17,7 @@ actions are found in `lib/table/actions/*.ex`
 
 example: join:
 
-    curl -i 'localhost:8000/table/ID/action?player=mee' -H'Content-Type: application/json' -d'{"action": "join"}'
+    curl -i 'localhost:8000/table/ID/a/join' -H'Content-Type: application/json' -d'{"player": "laura"}'
 
 Board
 
