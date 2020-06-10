@@ -1,4 +1,5 @@
 import { request, post, gameaction } from './request.js';
+import { _name_ } from './urlvars.js';
 function fetchConfigs(sel_el) {
     request('configurations').then((configs) => {
         for (const config of Object.keys(configs)) {
@@ -8,9 +9,6 @@ function fetchConfigs(sel_el) {
             sel_el.appendChild(opt);
         }
     });
-}
-function _name_() {
-    return [...Array(8)].map(() => Math.random().toString(36)[2]).join('');
 }
 function displayTableData(tables, data) {
 }

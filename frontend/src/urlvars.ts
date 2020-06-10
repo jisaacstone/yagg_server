@@ -14,3 +14,7 @@ export function tableid() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('table');
 }
+
+export function _name_() {
+  return [...Array(8)].map(() => Math.random().toString(36)[2]).join('');
+}

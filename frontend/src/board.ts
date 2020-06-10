@@ -1,20 +1,45 @@
-import { SKULL } from './constants.js';
+import { SKULL, MOVE } from './constants.js';
 import { render_unit } from './unit.js';
 import { gameaction, request } from './request.js';
 import { select } from './select.js';
-import { hostname, getname, tableid } from './urlvars.js';
+import { hostname, getname, tableid, _name_ } from './urlvars.js';
+
+const meta = {
+  position: null,
+  name: null
+};
 
 function boardhtml(el: HTMLElement, width=5, height=5) {
-  for (let y=0; y < height; y++) {
-    let row = document.createElement('div');
-    row.className = 'boardrow';
+  console.log({el, width, height});
+  function makerow(y: number) {
+    let row = document.createElement('div'),
+      className = 'boardrow';
+    if (y === 0 || y === 1) {
+      className += ' southrow startrow';
+    } else if (y === height - 1 || y === height - 2) {
+      className += ' northrow startrow';
+    }
+    row.className = className;
     el.appendChild(row);
+    console.log('ROW');
+
     for (let x=0; x < width; x++) {
       let square = document.createElement('div')
       square.className = 'boardsquare';
       square.id = `c${x}-${y}`;
       square.onclick = select(el, {x, y, ongrid: true});
       row.appendChild(square);
+    }
+  }
+
+  if (meta.position === 'south') {
+    // reverse order
+    for (let y=height - 1; y >= 0; y--) {
+      makerow(y);
+    }
+  } else {
+    for (let y=0; y < height; y++) {
+      makerow(y);
     }
   }
 }
@@ -26,15 +51,27 @@ function unit_el(unit, el) {
     subel.innerHTML = unit[att];
     el.appendChild(subel);
   }
-  if (unit.triggers && unit.triggers.death) {
-    const subel = document.createElement('span'),
-      tt = document.createElement('span');
-    subel.className = 'unit-deathrattle';
-    subel.innerHTML = SKULL;
-    el.firstChild.prepend(subel);  // firstChild should be the name
-    tt.className = 'tooltip';
-    tt.innerHTML = `When this unit dies: ${unit.triggers.death.description}`;
-    subel.appendChild(tt);
+  if (unit.triggers) {
+    if (unit.triggers.death) {
+      const subel = document.createElement('div'),
+        tt = document.createElement('span');
+      subel.className = 'unit-trigger death-trigger';
+      subel.innerHTML = SKULL;
+      el.append(subel);
+      tt.className = 'tooltip';
+      tt.innerHTML = `When this unit dies: ${unit.triggers.death.description}`;
+      subel.appendChild(tt);
+    }
+    if (unit.triggers.move) {
+      const subel = document.createElement('div'),
+        tt = document.createElement('span');
+      subel.className = 'unit-trigger move-trigger';
+      subel.innerHTML = MOVE;
+      el.append(subel);
+      tt.className = 'tooltip';
+      tt.innerHTML = `When this unit moves: ${unit.triggers.move.description}`;
+      subel.appendChild(tt);
+    }
   }
   if (unit.ability) {
     const abilbut = document.createElement('button'),
@@ -79,6 +116,7 @@ function gamestatechange(newstate) {
 
 const eventHandlers = {
   game_started: function() {
+    console.log("GAME STARTED");
     const board = document.getElementById('board');
     gamestatechange('placement');
     boardhtml(board);
@@ -87,11 +125,15 @@ const eventHandlers = {
     gamestatechange('battle');
   },
   player_joined: function(event) {
-    const nameEl = document.getElementById('name') as HTMLInputElement;
-    document.getElementById(`${event.position}name`).innerHTML = event.name;
-    document.getElementById(`${event.position}name`).dataset.playername = event.name;
-    if (event.name === nameEl.value) {
-      document.getElementById(event.position).appendChild(document.getElementById('hand'));
+    console.log({e: 'player_joined', event});
+    const nameEl = document.createElement('div');
+    nameEl.className = 'playername';
+    nameEl.innerHTML = event.name;
+    if (event.name === getname()) {
+      meta.position = event.position;
+      document.getElementById('player').appendChild(nameEl);
+    } else {
+      document.getElementById('opponent').appendChild(nameEl);
     }
   },
   player_left: function(event) {
@@ -101,11 +143,15 @@ const eventHandlers = {
     const hand = document.getElementById('hand'),
       card = document.createElement('span'),
       unit = document.createElement('span');
+    let className = `unit ${event.unit.player}`;
     card.dataset.index = event.index;
     card.className = 'card';
     card.onclick = select(card, {index: event.index, inhand: true, player: event.unit.player});
     hand.appendChild(card);
-    unit.className = `unit ${event.unit.player}`;
+    if (event.unit.player === meta.position) {
+      className += ' owned';
+    }
+    unit.className = className;
     unit_el(event.unit, unit);
     card.appendChild(unit);
   },
@@ -231,8 +277,9 @@ function game() {
       eventHandlers.player_joined(player);
       players ++;
     }
+    eventHandlers.game_started();
+
     if (players >= 2) {
-      //eventHandlers.game_started();
       document.getElementById('gamestate').innerHTML = `state: ${gamedata.board.state}`;
       if (gamedata.board.ready) {
         eventHandlers.player_ready({player: gamedata.board.ready});
@@ -256,8 +303,16 @@ function game() {
 }
 
 window.onload = function() {
-  const G = game();
-  eventHandlers.game_started();
-  G.gamestate();
-  G.listen();
+  const G = game(),
+    name = getname() || _name_();
+  meta.name = name;
+  gameaction('join', { player: name }, 'table')
+    .then(() => {
+      G.gamestate();
+      G.listen();
+    }).catch((err) => {
+      console.log({ joinerror: err });
+      G.gamestate();
+      G.listen();
+    });
 };

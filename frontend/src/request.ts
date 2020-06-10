@@ -13,7 +13,7 @@ function _name_() {
 function add_auth(request, method, url) {
   // still no auth, get player name from query params
   const name = getname() || _name_();
-  request.open(method, url + `?name=${name}`);
+  request.open(method, url + `?player=${name}`);
   return request;
 }
 

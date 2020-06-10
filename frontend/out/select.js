@@ -1,13 +1,13 @@
 import { gameaction } from './request.js';
 const global = { selected: null };
-export function select(el, meta) {
+export function select(thisEl, meta) {
     function select() {
         const sel = global.selected;
         if (sel) {
-            sel.element.dataset.unstate = 'selected';
-            if (sel.element !== el) {
+            // something was perviously selected
+            if (sel.element !== thisEl) {
                 if (sel.meta.ongrid && sel.meta.inhand) {
-                    return;
+                    return; // should not happen
                 }
                 if (sel.meta.inhand) {
                     gameaction('place', { index: sel.meta.index, x: meta.x, y: meta.y }, 'board');
@@ -23,13 +23,10 @@ export function select(el, meta) {
             global.selected = null;
         }
         else {
-            //if (global.gamestate === 'placement' && meta.x) {
-            //  // changing placement not supported yet
-            //  return;
-            //}
+            thisEl.dataset.uistate = 'selected';
             const options = [];
             if (meta.inhand) {
-                Array.prototype.map.call(document.getElementsByClassName(`${meta.player}option`), el => {
+                Array.prototype.map.call(document.querySelectorAll(`.${meta.player}row .boardsquare`), el => {
                     el.dataset.uistate = 'moveoption';
                     options.push(el);
                 });
@@ -43,7 +40,7 @@ export function select(el, meta) {
                     }
                 }
             }
-            global.selected = { element: el, meta: meta, options: options };
+            global.selected = { element: thisEl, meta: meta, options: options };
         }
     }
     return select;

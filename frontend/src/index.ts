@@ -1,4 +1,5 @@
 import { request, post, gameaction } from './request.js';
+import { _name_ } from './urlvars.js';
 
 function fetchConfigs(sel_el: HTMLElement) {
   request('configurations').then(
@@ -11,10 +12,6 @@ function fetchConfigs(sel_el: HTMLElement) {
       }
     }
   );
-}
-
-function _name_() {
-  return [...Array(8)].map(() => Math.random().toString(36)[2]).join('');
 }
 
 function displayTableData(tables, data) {

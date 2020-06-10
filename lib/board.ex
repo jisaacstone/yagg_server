@@ -91,6 +91,7 @@ defmodule Yagg.Board do
   defp can_place?(:south, {_, y}) when y in 0..1, do: :true
   defp can_place?(:south, _), do: :false
 
+  def units(:nil, _), do: {:ok, %{grid: [], hand: []}}
   def units(board, position) do
     ongrid = Enum.reduce(
       board.grid,
