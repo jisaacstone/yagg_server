@@ -3,14 +3,10 @@ import { render_unit } from './unit.js';
 import { gameaction, request } from './request.js';
 import { select } from './select.js';
 import { hostname, getname, tableid, _name_ } from './urlvars.js';
-
-const meta = {
-  position: null,
-  name: null
-};
+import { gmeta } from './state.js';
 
 function boardhtml(el: HTMLElement, width=5, height=5) {
-  console.log({el, width, height});
+  el.innerHTML = '';
   function makerow(y: number) {
     let row = document.createElement('div'),
       className = 'boardrow';
@@ -21,18 +17,17 @@ function boardhtml(el: HTMLElement, width=5, height=5) {
     }
     row.className = className;
     el.appendChild(row);
-    console.log('ROW');
 
     for (let x=0; x < width; x++) {
       let square = document.createElement('div')
       square.className = 'boardsquare';
       square.id = `c${x}-${y}`;
-      square.onclick = select(el, {x, y, ongrid: true});
+      square.onclick = select(square, {x, y, ongrid: true});
       row.appendChild(square);
     }
   }
 
-  if (meta.position === 'south') {
+  if (gmeta.position === 'south') {
     // reverse order
     for (let y=height - 1; y >= 0; y--) {
       makerow(y);
@@ -42,6 +37,13 @@ function boardhtml(el: HTMLElement, width=5, height=5) {
       makerow(y);
     }
   }
+}
+
+function waitingforplayers(el: HTMLElement) {
+  const waiting = document.createElement('div');
+  waiting.className = 'waiting';
+  waiting.innerHTML = 'waiting for opponent';
+  el.appendChild(waiting);
 }
 
 function unit_el(unit, el) {
@@ -77,11 +79,11 @@ function unit_el(unit, el) {
     const abilbut = document.createElement('button'),
       tt = document.createElement('span'),
       abilname = unit.ability.name;
-    console.log({unit: unit, abilname});
     abilbut.className = 'unit-ability';
     abilbut.innerHTML = abilname;
     abilbut.onclick = function(e) {
-      if (el.parentNode.tagName === 'TD') {
+      console.log({gmeta});
+      if (el.parentNode.className === 'square') {
         e.preventDefault();
         e.stopPropagation();
         if (window.confirm(unit.ability.description)) {
@@ -104,22 +106,53 @@ function unit_el(unit, el) {
 
 function gamestatechange(newstate) {
   document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
-  // global.gamestate = newstate;
+  gmeta.boardstate = newstate;
   Array.prototype.forEach.call(
     document.getElementsByClassName('playername') as HTMLCollectionOf<HTMLInputElement>,
     el => {
       el.dataset.ready = null;
-      return null;
     }
   );
 }
 
+function displayerror(message: string) {
+  alert(message);
+}
+
+function displayready() {
+  const readyButton = document.createElement('button');
+  readyButton.id = 'readybutton';
+  readyButton.innerHTML = 'READY';
+  readyButton.onclick = () => {
+    gameaction('ready', {}, 'board').then(() => {
+      readyButton.remove();
+    }).catch(({ request }) => {
+      if (request.status === 400 && request.responseText.includes('notready')) {
+        displayerror('place your monarch first');
+      }
+    });
+  };
+  document.getElementById('player').appendChild(readyButton);
+}
+
+function hideready() {
+  const readyButton = document.getElementById('readybutton');
+  if (readyButton) {
+    readyButton.remove();
+  }
+}
+
+const unitsbyindex = {};
+
 const eventHandlers = {
-  game_started: function() {
-    console.log("GAME STARTED");
-    const board = document.getElementById('board');
-    gamestatechange('placement');
+  game_started: function(event) {
+    const board = document.getElementById('board'),
+      state = (event.state || 'placement').toLowerCase();
     boardhtml(board);
+    gamestatechange(state);
+    if (state === 'placement' || state === 'gameover') {
+      displayready();
+    }
   },
   battle_started: function() {
     gamestatechange('battle');
@@ -130,7 +163,7 @@ const eventHandlers = {
     nameEl.className = 'playername';
     nameEl.innerHTML = event.name;
     if (event.name === getname()) {
-      meta.position = event.position;
+      gmeta.position = event.position;
       document.getElementById('player').appendChild(nameEl);
     } else {
       document.getElementById('opponent').appendChild(nameEl);
@@ -139,6 +172,7 @@ const eventHandlers = {
   player_left: function(event) {
     document.getElementById(`${event.player}name`).innerHTML = '';
   },
+
   add_to_hand: function(event){
     const hand = document.getElementById('hand'),
       card = document.createElement('span'),
@@ -148,23 +182,22 @@ const eventHandlers = {
     card.className = 'card';
     card.onclick = select(card, {index: event.index, inhand: true, player: event.unit.player});
     hand.appendChild(card);
-    if (event.unit.player === meta.position) {
+    if (event.unit.player === gmeta.position) {
       className += ' owned';
     }
     unit.className = className;
+    unit.dataset.index = event.index;
     unit_el(event.unit, unit);
     card.appendChild(unit);
+    unitsbyindex[event.index] = unit;
   },
+
   unit_assigned: function(event) {
-    const hand = document.getElementById('hand'),
-      square = document.getElementById(`c${event.x}-${event.y}`);
-    for (const card of hand.children as HTMLCollectionOf<HTMLElement>) {
-      if (+card.dataset.index === +event.index) {
-        square.appendChild(card.firstChild);
-        return;
-      }
-    }
+    const square = document.getElementById(`c${event.x}-${event.y}`),
+      unit = unitsbyindex[event.index];
+    square.appendChild(unit);
   },
+
   new_unit: function(event){
     const unit = document.getElementById(`c${event.x}-${event.y}`).firstChild as HTMLElement;
     if (!unit) {
@@ -173,6 +206,7 @@ const eventHandlers = {
     unit.innerHTML = '';
     unit_el(event.unit, unit);
   },
+
   unit_placed: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
     if (! square.firstChild) {
@@ -183,7 +217,12 @@ const eventHandlers = {
   },
 
   player_ready: function(event) {
-    document.getElementById(`${event.player}name`).dataset.ready = 'true';
+    if ( event.player === gmeta.position ) {
+      (document.querySelector('#player .playername') as HTMLElement).dataset.ready = 'true';
+      hideready();
+    } else {
+      (document.querySelector('#opponent .playername') as HTMLElement).dataset.ready = 'true';
+    }
   },
   feature: function(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
@@ -213,25 +252,28 @@ const eventHandlers = {
     }
   },
   gameover: function(event) {
-    gamestatechange('over');
+    gamestatechange('gameover');
     document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
+    displayready();
   },
+
   turn: function(event) {
-    if (event.player === 'north') {
-      document.getElementById('north').dataset.active = 'true';
-      document.getElementById('south').dataset.active = 'false';
-    } else if (event.player == 'south') {
-      document.getElementById('south').dataset.active = 'true';
-      document.getElementById('north').dataset.active = 'false';
+    if (event.player === gmeta.position) {
+      (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'true';
+      (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'false';
+    } else {
+      (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'false';
+      (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'true';
     }
   }
 };
 
 function game() {
-  var eventListener = null;
+  let eventListener = null;
 
   function listen() {
     if (eventListener === null) {
+      console.log('creating event listener');
       createEventListener();
     }
   }
@@ -277,22 +319,24 @@ function game() {
       eventHandlers.player_joined(player);
       players ++;
     }
-    eventHandlers.game_started();
-
-    if (players >= 2) {
-      document.getElementById('gamestate').innerHTML = `state: ${gamedata.board.state}`;
-      if (gamedata.board.ready) {
-        eventHandlers.player_ready({player: gamedata.board.ready});
-      }
-      Object.entries(gamedata.board.grid).forEach(([coor, feature]: [string, any]) => {
-        const [x, y] = coor.split(',');
-        if (feature.kind === 'unit') {
-          eventHandlers.unit_placed({x, y, player: feature.player});
-        } else {
-          eventHandlers.feature({x, y, feature});
+    if (gamedata.board) {
+      eventHandlers.game_started({state: gamedata.board.state});
+      if (players >= 2) {
+        if (gamedata.board.ready) {
+          eventHandlers.player_ready({player: gamedata.board.ready});
         }
-      });
-      eventHandlers.turn({player: gamedata.turn});
+        Object.entries(gamedata.board.grid).forEach(([coor, feature]: [string, any]) => {
+          const [x, y] = coor.split(',');
+          if (feature.kind === 'unit') {
+            eventHandlers.unit_placed({x, y, player: feature.player});
+          } else {
+            eventHandlers.feature({x, y, feature});
+          }
+        });
+        eventHandlers.turn({player: gamedata.turn});
+      }
+    } else {
+      waitingforplayers(document.getElementById('board'));
     }
   }
 
@@ -305,7 +349,7 @@ function game() {
 window.onload = function() {
   const G = game(),
     name = getname() || _name_();
-  meta.name = name;
+  gmeta.name = name;
   gameaction('join', { player: name }, 'table')
     .then(() => {
       G.gamestate();

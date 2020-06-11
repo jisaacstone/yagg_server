@@ -23,17 +23,20 @@ defmodule Action.Place do
     end
   end
   def resolve(act, %Board{state: :battle} = board, position) do
-    {{unit, :nil}, hand} = Map.pop(board.hands[position], act.index)
-    case Board.place(board, unit, {act.x, act.y}) do
-      {:ok, board} ->
-        {
-          %{board | hands: %{board.hands | position => hand}},
-          [
-            Event.UnitAssigned.new(position, index: act.index, x: act.x, y: act.y),
-            Event.UnitPlaced.new(x: act.x, y: act.y, player: position),
-          ]
-        }
-      err -> err
+    case Map.pop(board.hands[position], act.index) do
+      {:nil, _} -> {:err, :already_placed}
+      {{unit, :nil}, hand} ->
+        case Board.place(board, unit, {act.x, act.y}) do
+          {:err, _} = err -> err
+          {:ok, board} ->
+            {
+              %{board | hands: %{board.hands | position => hand}},
+              [
+                Event.UnitAssigned.new(position, index: act.index, x: act.x, y: act.y),
+                Event.UnitPlaced.new(x: act.x, y: act.y, player: position),
+              ]
+            }
+        end
     end
   end
   def resolve(_, _, _) do

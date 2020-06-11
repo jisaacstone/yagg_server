@@ -36,12 +36,9 @@ export function gameaction(action, data, scope = 'table', id = null) {
 }
 export function request(path) {
     const host = hostname(), url = `http://${host}/${path}`;
-    console.log({ r: 'request', url });
     return new Promise(function (resolve, reject) {
-        console.log({ r: 'promise', path });
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function () {
-            console.log('XHR load!');
             if (xhr.status < 200 || xhr.status >= 300) {
                 reject({ request: xhr });
             }
@@ -68,7 +65,6 @@ export function post(path, body) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function () {
-            console.log('LOAD!');
             if (xhr.status < 200 || xhr.status >= 300) {
                 console.log({ status: xhr.status, text: xhr.responseText });
                 reject({ request: xhr });
@@ -78,13 +74,11 @@ export function post(path, body) {
                     resolve(JSON.parse(xhr.responseText));
                 }
                 catch (e) {
-                    console.log('NOPARSE ' + xhr.responseText);
                     reject(e);
                 }
             }
         });
         xhr.onerror = function () {
-            console.log('ONERRR');
             reject({ request: xhr });
         };
         xhr.open('POST', url);

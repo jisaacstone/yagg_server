@@ -1,19 +1,29 @@
 import { gameaction } from './request.js';
+import { gmeta } from './state.js';
 const global = { selected: null };
 export function select(thisEl, meta) {
+    function deselect() {
+    }
+    ;
     function select() {
         const sel = global.selected;
         if (sel) {
             // something was perviously selected
             if (sel.element !== thisEl) {
-                if (sel.meta.ongrid && sel.meta.inhand) {
-                    return; // should not happen
-                }
                 if (sel.meta.inhand) {
                     gameaction('place', { index: sel.meta.index, x: meta.x, y: meta.y }, 'board');
                 }
                 else {
-                    gameaction('move', { from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y }, 'board');
+                    console.log({ gmeta });
+                    // clickd on a board square
+                    if (gmeta.boardstate === 'battle') {
+                        gameaction('move', { from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y }, 'board');
+                    }
+                    else {
+                        // change placement
+                        const index = +sel.element.firstChild.dataset.index;
+                        gameaction('place', { index: index, x: meta.x, y: meta.y }, 'board');
+                    }
                 }
             }
             sel.element.dataset.uistate = '';

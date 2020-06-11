@@ -63,8 +63,12 @@ defmodule Yagg.Board do
   defp hand_assign(hand, index, coords) do
     case hand[index] do
       :nil -> {:err, :invalid_index}
-      {_unit, {_x, _y}} -> {:err, :already_assigned}
-      {unit, :nil} -> %{hand | index => {unit, coords}}
+      {unit, _} ->
+        if Enum.any?(hand, fn({_, {_, ^coords}}) -> :true; (_) -> :false end) do
+          {:err, :occupied}
+        else 
+          %{hand | index => {unit, coords}}
+        end
     end
   end
 
@@ -77,10 +81,10 @@ defmodule Yagg.Board do
   def place(%Board{grid: grid} = board, %Unit{} = unit, coords) do
     case grid[coords] do
       :nil ->
-        if can_place?(unit.position, coords) do
-          {:ok, %{board | grid: Map.put_new(grid, coords, unit)}}
-        else
+        unless can_place?(unit.position, coords) do
           {:err, :illegal_square}
+        else
+          {:ok, %{board | grid: Map.put_new(grid, coords, unit)}}
         end
       _something -> {:err, :occupied}
     end

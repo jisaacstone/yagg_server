@@ -36,6 +36,18 @@ defmodule YaggTest.Action.Place do
     assert {newboard, _events} = Board.Action.resolve(action, board, :north)
     assert {:err, _} = Board.Action.resolve(action, newboard, :north)
   end
+
+  test "occupied" do
+    unit1 = Unit.new(:north, :test1, 3, 3)
+    unit2 = Unit.new(:north, :test2, 3, 3)
+    board = %{Board.new() | state: %Placement{}}
+    hands = Map.put(board.hands, :north, %{0 => {unit1, :nil}, 1 => {unit2, :nil}})
+    board = %{board | hands: hands}
+    action = %Board.Action.Place{index: 0, x: 4, y: 4}
+    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
+    action = %Board.Action.Place{index: 1, x: 4, y: 4}
+    assert {:err, _} = Board.Action.resolve(action, newboard, :north)
+  end
 end
 
 defmodule YaggTest.Action.Move do
