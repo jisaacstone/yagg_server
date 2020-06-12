@@ -33,18 +33,25 @@ export function select(thisEl, meta) {
             global.selected = null;
         }
         else {
-            thisEl.dataset.uistate = 'selected';
             const options = [];
             if (meta.inhand) {
-                Array.prototype.map.call(document.querySelectorAll(`.${meta.player}row .boardsquare`), el => {
-                    el.dataset.uistate = 'moveoption';
-                    options.push(el);
+                thisEl.dataset.uistate = 'selected';
+                Array.prototype.forEach.call(document.querySelectorAll(`.${meta.player}row .boardsquare`), el => {
+                    if (!el.firstChild) {
+                        el.dataset.uistate = 'moveoption';
+                        options.push(el);
+                    }
                 });
             }
             else {
+                const childEl = thisEl.firstChild;
+                if (!childEl || !childEl.className.includes(gmeta.position)) {
+                    // Square with no owned unit
+                    return;
+                }
                 for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
                     const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-                    if (nel) {
+                    if (nel && !nel.firstChild) {
                         nel.dataset.uistate = 'moveoption';
                         options.push(nel);
                     }

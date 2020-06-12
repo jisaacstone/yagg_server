@@ -38,8 +38,8 @@ defmodule Board.Configuration.Default do
   @impl Board.Configuration
   def terrain() do
     [
-      {{1, 2}, :water},
-      {{4, 2}, :block},
+      {{1, 2}, :block},
+      {{4, 2}, :water},
     ]
   end
 end

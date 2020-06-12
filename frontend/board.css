@@ -22,7 +22,7 @@ body > div {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
-  height: calc(100vw * .12);
+  height: calc(100vw * .13);
   background-color: #EEE;
   width: 100%;
 }
@@ -56,16 +56,16 @@ body > div {
   flex-wrap: wrap;
   width: 90%;
   margin: auto;
+  order: 3;
 }
 
 .card {
-  margin: 2px;
-  width: 12%;
-  height: calc(100vw * .1);
+  height: calc(100vw * .105);
 }
 
 .card .unit {
-  width: calc(100vw * .095);
+  width: calc(100vw * .1);
+  margin: 5px;
 }
 
 /* UNITS */
@@ -146,6 +146,11 @@ body > div {
   display: block;
 }
 
+.triggers {
+  order: 3;
+  width: 100%;
+}
+
 .unit-trigger:hover .tooltip {
   display: block;
 }
@@ -177,6 +182,11 @@ span .tooltip, button .tooltip {
 
 /* Features */
 
+#board [data-feature] {
+  text-align: center;
+  padding-top: 10px;
+}
+
 #board [data-feature=block] {
   border: thick inset #785460;
   background-color: #997876;
@@ -198,24 +208,30 @@ span .tooltip, button .tooltip {
 }
 
 [data-uistate='selected'] {
-  border-width: 6px;
+  border-width: 3px;
 }
 [data-uistate='selected'] .unit {
-  border-width: 6px;
+  border-width: 5px;
 }
 [data-uistate='moveoption'] {
   cursor: pointer;
   border-color: rgba(105, 145, 45, 1);
   border-style: inset;
+  box-shadow: inset 5px 5px 10px rgba(2,4,32,0.7);
 }
 [data-uistate='moveoption']:hover {
-  border-width: 6px;
+  border-width: 5px;
+  background-color: rgba(255,254,254,0.2)
 }
 
 .playername {
-  padding: 15px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
   text-align: center;
   font-weight: bold;
+  min-width: 30%;
+  order: 1;
 }
 
 .playername[data-ready='true'] {
@@ -227,8 +243,9 @@ span .tooltip, button .tooltip {
 }
 
 #readybutton {
-  padding: 15px;
+  padding: 10px;
   background-color: #EEF;
-  width: 30%;
+  min-width: 30%;
   border-radius: 10px;
+  order: 2
 }

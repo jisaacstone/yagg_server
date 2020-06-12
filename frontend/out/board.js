@@ -49,11 +49,14 @@ function unit_el(unit, el) {
         el.appendChild(subel);
     }
     if (unit.triggers) {
+        const triggerel = document.createElement('div');
+        triggerel.className = 'triggers';
+        el.appendChild(triggerel);
         if (unit.triggers.death) {
             const subel = document.createElement('div'), tt = document.createElement('span');
             subel.className = 'unit-trigger death-trigger';
             subel.innerHTML = SKULL;
-            el.append(subel);
+            triggerel.appendChild(subel);
             tt.className = 'tooltip';
             tt.innerHTML = `When this unit dies: ${unit.triggers.death.description}`;
             subel.appendChild(tt);
@@ -62,7 +65,7 @@ function unit_el(unit, el) {
             const subel = document.createElement('div'), tt = document.createElement('span');
             subel.className = 'unit-trigger move-trigger';
             subel.innerHTML = MOVE;
-            el.append(subel);
+            triggerel.appendChild(subel);
             tt.className = 'tooltip';
             tt.innerHTML = `When this unit moves: ${unit.triggers.move.description}`;
             subel.appendChild(tt);
@@ -74,7 +77,7 @@ function unit_el(unit, el) {
         abilbut.innerHTML = abilname;
         abilbut.onclick = function (e) {
             console.log({ gmeta });
-            if (el.parentNode.className === 'square') {
+            if (el.parentNode.className === 'boardsquare') {
                 e.preventDefault();
                 e.stopPropagation();
                 if (window.confirm(unit.ability.description)) {
@@ -102,10 +105,10 @@ function gamestatechange(newstate) {
 function displayerror(message) {
     alert(message);
 }
-function displayready() {
+function displayready(label = 'READY') {
     const readyButton = document.createElement('button');
     readyButton.id = 'readybutton';
-    readyButton.innerHTML = 'READY';
+    readyButton.innerHTML = label;
     readyButton.onclick = () => {
         gameaction('ready', {}, 'board').then(() => {
             readyButton.remove();
@@ -130,7 +133,7 @@ const eventHandlers = {
         boardhtml(board);
         gamestatechange(state);
         if (state === 'placement' || state === 'gameover') {
-            displayready();
+            displayready(state === 'placement' ? 'READY' : 'REMATCH');
         }
     },
     battle_started: function () {
@@ -224,7 +227,7 @@ const eventHandlers = {
     gameover: function (event) {
         gamestatechange('gameover');
         document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
-        displayready();
+        displayready('REMATCH');
     },
     turn: function (event) {
         if (event.player === gmeta.position) {
