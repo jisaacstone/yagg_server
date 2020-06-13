@@ -48,6 +48,7 @@ function unit_el(unit, el) {
         subel.innerHTML = unit[att];
         el.appendChild(subel);
     }
+    el.style.backgroundImage = `url(img/${unit.name}.png)`;
     if (unit.triggers) {
         const triggerel = document.createElement('div');
         triggerel.className = 'triggers';

@@ -82,6 +82,8 @@ body > div {
   border-radius: 10px;
   box-sizing: border-box;
   border: 2px inset #C89;
+  background-size: cover;
+  align-items: flex-end;
 }
 
 .unit.owned:hover {
@@ -129,11 +131,13 @@ body > div {
 }
 .unit-ability {
   margin-bottom: 5px;
-  background-color: rgba(180, 185, 187, 0.3);
+  padding: 0 3px;
+  background-color: rgba(170, 155, 157, 0.7);
   border-width: 1px;
   border-radius: 5px;
   border-color: #ABA;
   text-shadow: #CBB -1px -1px 0;
+  max-height: 1.4em;
   order: 7;
 }
 .unit-ability:hover {
