@@ -39,12 +39,7 @@ defmodule Yagg.Endpoint do
     movedata = Poison.decode!(body, as: struct(module_name))
     player_name = Map.get(movedata, :player, conn.query_params["player"])
 
-    case Table.board_action(table_id, player_name, movedata) do
-      :ok -> respond(conn, 204, "")
-      {:ok, resp} -> respond(conn, 200, resp)
-      {:err, err} -> respond(conn, 400, err)
-      other -> respond(conn, 501, other)
-    end
+    Table.board_action(table_id, player_name, movedata) |> to_response(conn)
   end
 
   post "/table/:table_id/a/:action" do
@@ -54,27 +49,15 @@ defmodule Yagg.Endpoint do
     actiondata = Poison.decode!(body, as: struct(module_name))
     player_name = Map.get(actiondata, :player, conn.query_params["player"])
 
-    case Table.table_action(table_id, player_name, actiondata) do
-      :ok -> respond(conn, 204, "")
-      {:ok, resp} -> respond(conn, 200, resp)
-      {:err, err} -> respond(conn, 400, err)
-      other -> respond(conn, 501, other)
-    end
+    Table.table_action(table_id, player_name, actiondata) |> to_response(conn)
   end
 
   get "/table/:table_id/state" do
-    case Table.get_state(table_id) do
-      {:ok, game} -> respond(conn, 200, game)
-      {:err, err} -> respond(conn, 400, err)
-      other -> respond(conn, 501, other)
-    end
+    Table.get_state(table_id) |> to_response(conn)
   end
 
   get "/board/:table_id/player_state/:player_name" do
-    case Table.get_player_state(table_id, player_name) do
-      {:err, err} -> respond(conn, 400, err)
-      {:ok, units} -> respond(conn, 200, units)
-    end
+    Table.get_player_state(table_id, player_name) |> to_response(conn)
   end
 
   get "/configurations" do
@@ -103,6 +86,7 @@ defmodule Yagg.Endpoint do
     send_resp(conn, 404, "oops")
   end
 
+  # TODO: get notification when EventSource disconnects
   defp sse_loop(conn, pid) do
     receive do
       %Event{} = event ->
@@ -113,6 +97,15 @@ defmodule Yagg.Endpoint do
       other ->
         IO.inspect(['OTHER MESSAGE', other])
         sse_loop(conn, pid)
+    end
+  end
+
+  defp to_response(result, conn) do
+    case result do
+      :ok -> respond(conn, 204, "")
+      {:ok, resp} -> respond(conn, 200, resp)
+      {:err, err} -> respond(conn, 400, %{error: err})
+      other -> respond(conn, 501, %{unexpected: other})
     end
   end
 

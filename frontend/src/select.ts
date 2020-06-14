@@ -1,7 +1,21 @@
 import { gameaction } from './request.js';
 import { gmeta } from './state.js';
+import { displayerror } from './err.js';
 
 const global = { selected: null };
+
+function action(actType, args) {
+  gameaction(actType, args, 'board')
+    .catch(({ request }) => {
+      if (request.status === 400) {
+        if (request.responseText.includes('occupied')) {
+          displayerror('space is already occupied');
+        } else if (request.responseText.includes('noselfattack')) {
+          displayerror('you cannot attack your own units');
+        }
+      }
+    });
+}
 
 export function select(thisEl, meta) {
   function select() {
@@ -13,16 +27,16 @@ export function select(thisEl, meta) {
       // something was perviously selected
       if (sel.element !== thisEl) {
         if (sel.meta.inhand) {
-          gameaction('place', {index: sel.meta.index, x: meta.x, y: meta.y}, 'board');
+          action('place', {index: sel.meta.index, x: meta.x, y: meta.y});
         } else {
           console.log({ gmeta });
           // clickd on a board square
           if (gmeta.boardstate === 'battle') {
-            gameaction('move', {from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y}, 'board');
+            action('move', {from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y});
           } else {
             // change placement
             const index = +sel.element.firstChild.dataset.index;
-            gameaction('place', {index: index, x: meta.x, y: meta.y}, 'board');
+            action('place', {index: index, x: meta.x, y: meta.y});
           }
         }
       }
@@ -55,7 +69,7 @@ export function select(thisEl, meta) {
         }
         for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
           const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-          if (nel && ! nel.firstChild) {
+          if (nel && (! nel.firstElementChild || ! nel.firstElementChild.className.includes(gmeta.position))) {
             nel.dataset.uistate = 'moveoption';
             options.push(nel);
           }

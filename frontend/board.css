@@ -8,14 +8,14 @@ body[data-gamestate=placement] {
 }
 
 body[data-gamestate=battle] {
-  background: repeating-linear-gradient(
-    -40deg,
+  background: repeating-radial-gradient(
+    circle at -10% 120%,
     #dCD,
     #dCE 10px,
     transparent 10px,
     transparent 20px
-  ), repeating-linear-gradient(
-    40deg,
+  ), repeating-radial-gradient(
+    circle at 110% 120%,
     rgba(175, 165, 160, 0.5),
     rgba(175, 165, 160, 0.5) 10px,
     #FED 10px,
@@ -114,6 +114,7 @@ body > div {
   border: 2px inset #C89;
   background-size: cover;
   align-items: flex-end;
+  font-size: 90%;
 }
 
 .unit.owned:hover {
@@ -235,6 +236,13 @@ span .tooltip, button .tooltip {
   background-color: rgba(169, 168, 166, 0.8);
   border: 2px solid rgba(89, 78, 86, 0.9);
   text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
+}
+
+.death {
+  width: 100%;
+  margin-top: 20px;
+  font-size: 200%;
+  text-align: center;
 }
 
 /* Features */

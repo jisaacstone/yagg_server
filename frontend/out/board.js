@@ -3,6 +3,7 @@ import { gameaction, request } from './request.js';
 import { select } from './select.js';
 import { hostname, getname, tableid, _name_ } from './urlvars.js';
 import { gmeta } from './state.js';
+import { displayerror } from './err.js';
 function boardhtml(el, width = 5, height = 5) {
     el.innerHTML = '';
     function makerow(y) {
@@ -103,9 +104,6 @@ function gamestatechange(newstate) {
     Array.prototype.forEach.call(document.getElementsByClassName('playername'), el => {
         el.dataset.ready = null;
     });
-}
-function displayerror(message) {
-    alert(message);
 }
 function displayready(label = 'READY') {
     const readyButton = document.createElement('button');
@@ -209,10 +207,11 @@ const eventHandlers = {
     },
     unit_died: function (event) {
         const square = document.getElementById(`c${event.x}-${event.y}`), unit = square.firstChild;
-        unit.innerHTML = SKULL;
+        unit.innerHTML = `<div class="death">${SKULL}</div>`;
+        unit.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
         setTimeout(function () {
-            square.removeChild(unit);
-        }, 750);
+            unit.remove();
+        }, 850);
     },
     unit_moved: function (event) {
         console.log({ E: 'unit_moved', event });
@@ -295,12 +294,14 @@ function game() {
                     eventHandlers.player_ready({ player: gamedata.board.ready });
                 }
                 Object.entries(gamedata.board.grid).forEach(([coor, feature]) => {
-                    const [x, y] = coor.split(',');
-                    if (feature.kind === 'unit') {
-                        eventHandlers.unit_placed({ x, y, player: feature.player });
-                    }
-                    else {
-                        eventHandlers.feature({ x, y, feature });
+                    if (feature) {
+                        const [x, y] = coor.split(',');
+                        if (feature.kind === 'unit') {
+                            eventHandlers.unit_placed({ x, y, player: feature.player });
+                        }
+                        else {
+                            eventHandlers.feature({ x, y, feature });
+                        }
                     }
                 });
                 eventHandlers.turn({ player: gamedata.turn });

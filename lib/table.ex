@@ -185,7 +185,6 @@ defmodule Yagg.Table do
     notify(game, events)
   end
   defp notify(%{subscribors: subs, players: players}, %Event{} = event) do
-    IO.inspect(subs: subs, play: players, e: event)
     Enum.each(
       subs,
       fn({player, pid}) ->
