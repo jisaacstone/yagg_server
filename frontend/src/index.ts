@@ -14,7 +14,19 @@ function fetchConfigs(sel_el: HTMLElement) {
   );
 }
 
-function displayTableData(tables, data) {
+function displayTableData(tablesEl, data) {
+  for (const tableId of data.ids) {
+    const el = document.createElement('div');
+    el.className = 'table';
+    el.innerHTML = tableId;
+    el.onclick = () => {
+      const name = (document.getElementById('name') as HTMLInputElement).value || _name_();
+      gameaction('join', { player: name }, 'table', tableId).then(() => {
+        window.location.href = `board.html?table=${tableId}&player=${name}`;
+      });
+    };
+    tablesEl.appendChild(el);
+  }
 }
 
 window.onload = function() {

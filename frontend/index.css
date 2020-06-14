@@ -23,4 +23,23 @@ body {
 }
 
 #tables {
+  padding: 1em;
+  margin: 1em;
+  border-radius: 10px;
+  border: 2px solid #556;
+  background-color: #789;
+}
+
+.table {
+  min-width: 8em;
+  border: 2px inset #94B;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #9BC;
+  text-align: center;
+  cursor: pointer;
+}
+
+.table:hover {
+  border-style: outset;
 }

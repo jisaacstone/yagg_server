@@ -56,7 +56,7 @@ defmodule Board.Configuration.Chain do
       Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
       Unit.new(position, :mosh, 3, 4, Ability.Push),
       Unit.new(position, :bezerker, 7, 2),
-      Unit.new(position, :commander, 3, 4, Ability.Manuver),
+      Unit.new(position, :dogatron, 3, 4, Ability.Secondwind),
       Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
       Unit.new(position, :colburninator, 1, 2, Ability.Colburn),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
