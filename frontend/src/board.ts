@@ -110,6 +110,7 @@ function unit_el(unit, el) {
 
 function gamestatechange(newstate) {
   document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
+  document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
   gmeta.boardstate = newstate;
   Array.prototype.forEach.call(
     document.getElementsByClassName('playername') as HTMLCollectionOf<HTMLInputElement>,
@@ -262,6 +263,7 @@ const eventHandlers = {
   },
 
   turn: function(event) {
+    gmeta.turn = event.player;
     if (event.player === gmeta.position) {
       (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'true';
       (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'false';

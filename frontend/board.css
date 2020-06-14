@@ -3,6 +3,36 @@ body {
   margin-bottom: 30px;
 }
 
+body[data-gamestate=placement] {
+  background: repeating-linear-gradient(40deg, #CCD, #CCD 10px, #eee 10px, #eee 20px, #BAB 20px, #B9B 30px);
+}
+
+body[data-gamestate=battle] {
+  background: repeating-linear-gradient(
+    -40deg,
+    #dCD,
+    #dCE 10px,
+    transparent 10px,
+    transparent 20px
+  ), repeating-linear-gradient(
+    40deg,
+    rgba(175, 165, 160, 0.5),
+    rgba(175, 165, 160, 0.5) 10px,
+    #FED 10px,
+    #fdc 20px
+  );
+}
+
+body[data-gamestate=gameover] {
+  background: repeating-radial-gradient(
+  circle at 50% 100%,
+  #FAB, #FAB 10px,
+  #DD8 10px, #DD8 20px,
+  #CFD 20px, #CFD 30px,
+  #9AD 30px, #9AD 40px
+  );
+}
+
 body > div {
   width: 100%;
   margin: auto;
@@ -129,6 +159,29 @@ body > div {
   background-color: rgba(245, 248, 246, 0.1);
   margin: 5px;
 }
+
+/* attack/defense tooltips */
+.unit-attack::after {
+  content: 'attack';
+}
+.unit-defense::after {
+  content: 'defense';
+}
+.unit-attack::after, .unit-defense::after {
+  visibility: hidden;
+  position: absolute;
+  color: #221;
+  font-weight: normal;
+  padding: 3px;
+  font-size: 12px;
+  background-color: rgba(169, 168, 166, 0.8);
+  border: 2px solid rgba(89, 78, 86, 0.9);
+  text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
+}
+.unit-attack:hover::after, .unit-defense:hover::after {
+  visibility: visible;
+}
+
 .unit-ability {
   margin-bottom: 5px;
   padding: 0 3px;

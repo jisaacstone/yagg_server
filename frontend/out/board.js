@@ -98,6 +98,7 @@ function unit_el(unit, el) {
 }
 function gamestatechange(newstate) {
     document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
+    document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
     gmeta.boardstate = newstate;
     Array.prototype.forEach.call(document.getElementsByClassName('playername'), el => {
         el.dataset.ready = null;
@@ -231,6 +232,7 @@ const eventHandlers = {
         displayready('REMATCH');
     },
     turn: function (event) {
+        gmeta.turn = event.player;
         if (event.player === gmeta.position) {
             document.querySelector('#player .playername').dataset.turn = 'true';
             document.querySelector('#opponent .playername').dataset.turn = 'false';

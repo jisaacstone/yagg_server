@@ -2,10 +2,10 @@ import { gameaction } from './request.js';
 import { gmeta } from './state.js';
 const global = { selected: null };
 export function select(thisEl, meta) {
-    function deselect() {
-    }
-    ;
     function select() {
+        if (gmeta.boardstate === 'gameover') {
+            return;
+        }
         const sel = global.selected;
         if (sel) {
             // something was perviously selected
@@ -47,6 +47,10 @@ export function select(thisEl, meta) {
                 const childEl = thisEl.firstChild;
                 if (!childEl || !childEl.className.includes(gmeta.position)) {
                     // Square with no owned unit
+                    return;
+                }
+                else if (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) {
+                    // Not your turn
                     return;
                 }
                 for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {

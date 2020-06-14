@@ -39,7 +39,11 @@ private state only a player knows
 
     curl -i 'localhost:8000/board/ID/player_state/PLAYER
 
-Very basic ui is at `localhost:8000/front/index.html`
+FRONTEND:
+
+ui is at `localhost:8000/fe/index.html`
+
+go directly to game at `localhost:8000/fe/board.html?table=TABLE_ID&player=PLAYER`
 
 EVENTS:
 
