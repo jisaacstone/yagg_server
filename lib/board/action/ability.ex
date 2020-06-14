@@ -206,7 +206,7 @@ defmodule Action.Ability.Manuver do
   use Action.Ability
 
   @impl Action.Ability
-  def resolve(board, opts) do
+  def resolve(%Board{} = board, opts) do
     case {opts[:from], opts[:to]} do
       {_,:nil} -> {:err, :misconfigured}
       {:nil,_} -> {:err, :misconfigured}
@@ -228,7 +228,7 @@ defmodule Action.Ability.Manuver do
   end
 
   defp move_units(board, _direction, _position, [], events), do: {board, events}
-  defp move_units(board, direction, position, [from | coords], events) do
+  defp move_units(%Board{} = board, direction, position, [from | coords], events) do
     case Board.move(board, position, from, Board.next(direction, from)) do
       {:ok, newboard, newevents} ->
         move_units(newboard, direction, position, coords, events ++ newevents)

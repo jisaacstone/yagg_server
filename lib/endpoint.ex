@@ -26,10 +26,14 @@ defmodule Yagg.Endpoint do
   end
 
   get "/table" do
-    ids = Table.list() |> Enum.map(
-      fn (pid) -> pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd end
+    tables = Table.list() |> Enum.map(
+      fn (pid) ->
+        id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
+        {:ok, table} = Table.get_state(pid)
+        %{id: id, players: table.players}
+      end
     )
-    respond(conn, 200, %{ids: ids})
+    respond(conn, 200, %{tables: tables})
   end
 
   post "/board/:table_id/a/:action" do

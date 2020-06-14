@@ -15,17 +15,40 @@ function fetchConfigs(sel_el: HTMLElement) {
 }
 
 function displayTableData(tablesEl, data) {
-  for (const tableId of data.ids) {
-    const el = document.createElement('div');
-    el.className = 'table';
-    el.innerHTML = tableId;
-    el.onclick = () => {
-      const name = (document.getElementById('name') as HTMLInputElement).value || _name_();
-      gameaction('join', { player: name }, 'table', tableId).then(() => {
-        window.location.href = `board.html?table=${tableId}&player=${name}`;
+  const currentName = (document.getElementById('name') as HTMLInputElement).value;
+
+  if (! data.tables || ! data.tables.length) {
+    tablesEl.innerHTML = '<p>No open tables right now';
+  }
+
+  for (const table of data.tables) {
+    if (currentName && table.players.some(({ name }) => name === currentName)) {
+      const el = document.createElement('div');
+      el.className = 'table';
+      el.innerHTML = `REJOIN ${table.id}`;
+      el.onclick = () => {
+        window.location.href = `board.html?table=${table.id}&player=${currentName}`;
+      };
+      tablesEl.appendChild(el);
+    } else if (table.players.length < 2) {
+      const el = document.createElement('div');
+      el.className = 'table';
+      el.innerHTML = table.id;
+      table.players.forEach(({ name }) => {
+        const nel = document.createElement('div');
+        nel.className = 'playername';
+        nel.innerHTML = name
+        el.appendChild(nel);
       });
-    };
-    tablesEl.appendChild(el);
+
+      el.onclick = () => {
+        const name = (document.getElementById('name') as HTMLInputElement).value || _name_();
+        gameaction('join', { player: name }, 'table', table.id).then(() => {
+          window.location.href = `board.html?table=${table.id}&player=${name}`;
+        });
+      };
+      tablesEl.appendChild(el);
+    }
   }
 }
 

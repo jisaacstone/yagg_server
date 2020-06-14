@@ -112,7 +112,7 @@ defmodule Yagg.Board do
     {:ok, %{grid: ongrid, hand: hand}}
   end
 
-  def move(board, position, from, to) do
+  def move(%Board{} = board, position, from, to) do
     case board.grid[from] do
       %Unit{position: ^position} = unit ->
         unless can_move?(from, to) do

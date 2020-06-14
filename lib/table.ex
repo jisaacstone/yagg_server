@@ -68,6 +68,9 @@ defmodule Yagg.Table do
 
   # API
 
+  def get_state(pid) when is_pid(pid) do
+    GenServer.call(pid, :get_state)
+  end
   def get_state(table_id) do
     {:ok, pid} = get_or_single__(table_id)
     GenServer.call(pid, :get_state)

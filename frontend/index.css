@@ -1,6 +1,7 @@
 body {
   margin-top: 1em;
   flex-wrap: wrap;
+  background: repeating-linear-gradient(90deg, #344, #344 2px, #556 2px, #556 12px, #9ab 12px, #9ab 22px, #789 22px, #789 32px, #344 32px, #344 34px, #94b 34px, #94b 50px);
 }
 
 #nameform {
@@ -49,4 +50,20 @@ body {
 
 .table:hover {
   border-style: outset;
+}
+
+.table::after {
+  content: 'join this game';
+  visibility: hidden;
+  position: absolute;
+  color: #221;
+  font-weight: normal;
+  padding: 3px;
+  font-size: 12px;
+  background-color: rgba(169, 168, 166, 0.8);
+  border: 2px solid rgba(89, 78, 86, 0.9);
+  text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
+}
+.table:hover::after {
+  visibility: visible;
 }
