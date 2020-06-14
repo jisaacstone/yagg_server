@@ -1,8 +1,10 @@
 body {
   margin-top: 1em;
+  flex-wrap: wrap;
 }
 
 #nameform {
+  min-width: 40%;
   max-width: 80%;
   max-height: 5em;
   border: 2px solid #556;
@@ -13,6 +15,7 @@ body {
 }
 
 #createdialog {
+  min-width: 40%;
   max-width: 80%;
   max-height: 5em;
   border: 2px solid #556;
@@ -23,6 +26,8 @@ body {
 }
 
 #tables {
+  width: 80%;
+  text-align: center;
   padding: 1em;
   margin: 1em;
   border-radius: 10px;
@@ -31,7 +36,9 @@ body {
 }
 
 .table {
-  min-width: 8em;
+  min-width: 6em;
+  max-width: 10em;
+  grow: 1;
   border: 2px inset #94B;
   border-radius: 5px;
   padding: 5px;
