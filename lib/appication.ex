@@ -7,8 +7,14 @@ defmodule Yagg.Application do
         scheme: :http,
         ip: {0, 0, 0, 0},
         plug: Yagg.Endpoint,
-        port: 8000,
-        protocol_options: [idle_timeout: :infinity]
+        protocol_options: [idle_timeout: :infinity],
+        options: [
+          port: 8000,
+          dispatch: [{:_,[
+            {"/ws/[...]", Yagg.Websocket, []},
+            {:_, Plug.Cowboy.Handler, {Yagg.Endpoint, []}}
+          ]}]
+        ]
       ),
       {DynamicSupervisor, name: Yagg.TableSupervisor, strategy: :one_for_one},
     ]

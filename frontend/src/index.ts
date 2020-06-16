@@ -34,6 +34,7 @@ function displayTableData(tablesEl, data) {
       const el = document.createElement('div');
       el.className = 'table';
       el.innerHTML = table.id;
+
       table.players.forEach(({ name }) => {
         const nel = document.createElement('div');
         nel.className = 'playername';

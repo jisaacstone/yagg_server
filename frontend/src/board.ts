@@ -278,14 +278,29 @@ function game() {
   function listen() {
     if (eventListener === null) {
       console.log('creating event listener');
-      createEventListener();
+      createWSEventListener();
     }
   }
 
-  function createEventListener() {
+  function createWSEventListener() {
     const host = hostname();
     const playername = getname();
-    eventListener = new EventSource(`http://${host}/sse/table/ID/events?player=${playername}`);
+    eventListener = new WebSocket(`ws://${host}/ws/${tableid()}/${playername}`);
+    eventListener.onmessage = (event) => {
+      console.log({ event });
+      const evt = JSON.parse(event.data);
+      if (eventHandlers[evt.event]) {
+        eventHandlers[evt.event](evt);
+      } else {
+        console.log({msg: `no event handler for ${evt.event}`, evt});
+      }
+    };
+  }
+
+  function createSSEventListener() {
+    const host = hostname();
+    const playername = getname();
+    eventListener = new EventSource(`http://${host}/sse/table/${tableid()}/events?player=${playername}`);
     eventListener.addEventListener('game_event', function(ssevent) {
       console.log({ ssevent });
       const evt = JSON.parse(ssevent.data);
