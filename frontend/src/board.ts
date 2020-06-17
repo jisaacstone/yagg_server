@@ -5,6 +5,7 @@ import { select } from './select.js';
 import { hostname, getname, tableid, _name_ } from './urlvars.js';
 import { gmeta } from './state.js';
 import { displayerror } from './err.js';
+import { listen } from './eventlistener.js';
 
 function boardhtml(el: HTMLElement, width=5, height=5) {
   el.innerHTML = '';
@@ -272,112 +273,65 @@ const eventHandlers = {
   }
 };
 
-function game() {
-  let eventListener = null;
-
-  function listen() {
-    if (eventListener === null) {
-      console.log('creating event listener');
-      createWSEventListener();
-    }
-  }
-
-  function createWSEventListener() {
-    const host = hostname();
-    const playername = getname();
-    eventListener = new WebSocket(`ws://${host}/ws/${tableid()}/${playername}`);
-    eventListener.onmessage = (event) => {
-      console.log({ event });
-      const evt = JSON.parse(event.data);
-      if (eventHandlers[evt.event]) {
-        eventHandlers[evt.event](evt);
-      } else {
-        console.log({msg: `no event handler for ${evt.event}`, evt});
+function gamestate() {
+  request(`table/${tableid()}/state`).then((gamedata) => {
+    setstate(gamedata);
+    request(`board/${tableid()}/player_state/${getname()}`).then((unitdata: any) => {
+      for (const ob of unitdata.grid) {
+        eventHandlers.new_unit(ob);
       }
-    };
-  }
-
-  function createSSEventListener() {
-    const host = hostname();
-    const playername = getname();
-    eventListener = new EventSource(`http://${host}/sse/table/${tableid()}/events?player=${playername}`);
-    eventListener.addEventListener('game_event', function(ssevent) {
-      console.log({ ssevent });
-      const evt = JSON.parse(ssevent.data);
-      if (eventHandlers[evt.event]) {
-        eventHandlers[evt.event](evt);
-      } else {
-        console.log({msg: `no event handler for ${evt.event}`, evt});
-      }
-    });
-  }
-
-  function gamestate() {
-    request(`table/${tableid()}/state`).then((gamedata) => {
-      setstate(gamedata);
-      request(`board/${tableid()}/player_state/${getname()}`).then((unitdata: any) => {
-        for (const ob of unitdata.grid) {
-          eventHandlers.new_unit(ob);
-        }
-        Array.prototype.forEach.call(
-          Object.entries(unitdata.hand),
-          ([index, card]: [string, any]) => {
-            eventHandlers.add_to_hand({index: +index, unit: card.unit});
-            if (card.assigned) {
-              eventHandlers.unit_assigned({index: +index, x: card.assigned.x, y: card.assigned.y});
-            }
+      Array.prototype.forEach.call(
+        Object.entries(unitdata.hand),
+        ([index, card]: [string, any]) => {
+          eventHandlers.add_to_hand({index: +index, unit: card.unit});
+          if (card.assigned) {
+            eventHandlers.unit_assigned({index: +index, x: card.assigned.x, y: card.assigned.y});
           }
-        );
+        }
+      );
+    });
+  });
+}
+
+function setstate(gamedata) {
+  let players = 0;
+  for (const player of gamedata.players) {
+    eventHandlers.player_joined(player);
+    players ++;
+  }
+  if (gamedata.board) {
+    eventHandlers.game_started({state: gamedata.board.state});
+    if (players >= 2) {
+      if (gamedata.board.ready) {
+        eventHandlers.player_ready({player: gamedata.board.ready});
+      }
+      Object.entries(gamedata.board.grid).forEach(([coor, feature]: [string, any]) => {
+        if (feature) {
+          const [x, y] = coor.split(',');
+          if (feature.kind === 'unit') {
+            eventHandlers.unit_placed({x, y, player: feature.player});
+          } else {
+            eventHandlers.feature({x, y, feature});
+          }
+        }
       });
-    });
-  }
-
-  function setstate(gamedata) {
-    let players = 0;
-    for (const player of gamedata.players) {
-      eventHandlers.player_joined(player);
-      players ++;
+      eventHandlers.turn({player: gamedata.turn});
     }
-    if (gamedata.board) {
-      eventHandlers.game_started({state: gamedata.board.state});
-      if (players >= 2) {
-        if (gamedata.board.ready) {
-          eventHandlers.player_ready({player: gamedata.board.ready});
-        }
-        Object.entries(gamedata.board.grid).forEach(([coor, feature]: [string, any]) => {
-          if (feature) {
-            const [x, y] = coor.split(',');
-            if (feature.kind === 'unit') {
-              eventHandlers.unit_placed({x, y, player: feature.player});
-            } else {
-              eventHandlers.feature({x, y, feature});
-            }
-          }
-        });
-        eventHandlers.turn({player: gamedata.turn});
-      }
-    } else {
-      waitingforplayers(document.getElementById('board'));
-    }
+  } else {
+    waitingforplayers(document.getElementById('board'));
   }
-
-  return {
-    gamestate,
-    listen,
-  };
 }
 
 window.onload = function() {
-  const G = game(),
-    name = getname() || _name_();
+  const name = getname() || _name_();
   gmeta.name = name;
   gameaction('join', { player: name }, 'table')
     .then(() => {
-      G.gamestate();
-      G.listen();
+      gamestate();
+      listen(eventHandlers);
     }).catch((err) => {
       console.log({ joinerror: err });
-      G.gamestate();
-      G.listen();
+      gamestate();
+      listen(eventHandlers);
     });
 };

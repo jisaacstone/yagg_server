@@ -122,11 +122,9 @@ defmodule Yagg.Board do
             :out_of_bounds -> {:err, :out_of_bounds}
             :water -> {:err, :illegal}
             :block -> 
-              {board, events} = push_block(board, from, to)
-              {:ok, board, events}
+              push_block(board, from, to)
             :nil -> 
-              {board, events} = do_move(board, from, to)
-              {:ok, board, events}
+              do_move(board, from, to)
             feature -> 
               do_battle(board, unit, feature, from, to)
           end
@@ -148,30 +146,6 @@ defmodule Yagg.Board do
       board,
       [Event.UnitDied.new(x: x, y: y) | events]
     }
-  end
-
-
-  @doc """
-  Returnts a list of {coords, feature} tuple for any features within distance of {x, y}
-  """
-  def features_around(board, {x, y}, distance \\ 1) do
-    # nested reduce gets all permutations
-    Enum.reduce(
-      x-distance..x+distance,
-      [],
-      fn(xa, features) ->
-        Enum.reduce(
-          y-distance..y+distance,
-          features,
-          fn(ya, features) ->
-            case board.grid[{xa, ya}] do
-              :nil -> features
-              feature -> [{{xa, ya}, feature} | features]
-            end
-          end
-        )
-      end
-    )
   end
 
   @doc """
@@ -210,8 +184,8 @@ defmodule Yagg.Board do
   Takes two points and retires the direction from the first to the second
   errors if the points are not on a line.
   """
-  def direction({x1, y}, {x2, y}) when x1 > x2, do: :east
-  def direction({x1, y}, {x2, y}) when x1 < x2, do: :west
+  def direction({x1, y}, {x2, y}) when x1 < x2, do: :east
+  def direction({x1, y}, {x2, y}) when x1 > x2, do: :west
   def direction({x, y1}, {x, y2}) when y1 > y2, do: :south
   def direction({x, y1}, {x, y2}) when y1 < y2, do: :north
   def direction(_, _), do: {:err, :not_on_line}
@@ -240,7 +214,7 @@ defmodule Yagg.Board do
     Enum.sort([abs(x - to_x), abs(y - to_y)]) == [0, 1]
   end
 
-  defp do_move(board, from, to, opts \\ []) do
+  defp do_move(%Board{} = board, from, to, opts \\ []) do
     {unit, grid} = Map.pop(board.grid, from)
     grid = Map.put_new(grid, to, unit)
     board = %{board | grid: grid}
@@ -260,19 +234,19 @@ defmodule Yagg.Board do
       unit.attack > opponent.defense ->
         {board, e1} = unit_death(board, opponent, to, opponent: {unit, from})
         {board, e2} = do_move(board, from, to)
-        {:ok, board, e1 ++ e2}
+        {board, e1 ++ e2}
       unit.attack == opponent.defense ->
         # not currently possible?
         {board, e1} = unit_death(board, unit, from)
         {board, e2} = unit_death(board, opponent, to)
-        {:ok, board, e1 ++ e2}
+        {board, e1 ++ e2}
       unit.attack < opponent.defense ->
         {board, events} = unit_death(board, unit, from, opponent: {opponent, to}, attacking: :true)
-        {:ok, board, events}
+        {board, events}
     end
   end
 
-  defp push_block(board, from, to) do
+  def push_block(board, from, to) do
     dir = direction(from, to)
     square = next(dir, to)
     case board.grid[square] do

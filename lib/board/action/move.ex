@@ -11,7 +11,7 @@ defmodule Action.Move do
     case Board.move(board, position, {move.from_x, move.from_y}, {move.to_x, move.to_y}) do
       {:err, _} = err ->
         err
-      {:ok, board, events} ->
+      {board, events} ->
         {board, events}
     end
   end

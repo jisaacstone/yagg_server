@@ -69,7 +69,8 @@ export function select(thisEl, meta) {
                 }
                 for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
                     const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-                    if (nel && (!nel.firstElementChild || !nel.firstElementChild.className.includes(gmeta.position))) {
+                    console.log({ nel, fc: nel && nel.firstElementChild });
+                    if (ismoveoption(nel)) {
                         nel.dataset.uistate = 'moveoption';
                         options.push(nel);
                     }
@@ -79,4 +80,16 @@ export function select(thisEl, meta) {
         }
     }
     return select;
+}
+function ismoveoption(el) {
+    if (!el) {
+        return false;
+    }
+    if (el.dataset.feature === 'water') {
+        return false;
+    }
+    if (el.firstElementChild && el.firstElementChild.className.includes(gmeta.position)) {
+        return false;
+    }
+    return true;
 }
