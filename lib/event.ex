@@ -73,6 +73,35 @@ defmodule Yagg.Event do
     end
   end
 
+  defmodule UnitChanged do
+    @moduledoc """
+    Unit on board has attribute changed
+    """
+    @spec new(
+      Player.position(),
+      [
+        x: 0..4,
+        y: 0..4,
+        unit: Unit.t
+      ]) :: Event.t
+    def new(position, params) do
+      Event.new(position, :unit_changed, params)
+    end
+  end
+
+  defmodule NewUnit do
+    @spec new(
+      Player.position(),
+      [
+        x: 0..4,
+        y: 0..4,
+        unit: Unit.t
+      ]) :: Event.t
+    def new(position, params) do
+      Event.new(position, :new_unit, params)
+    end
+  end
+
   defmodule Gameover do
     @spec new([winner: Player.position()]) :: Event.t
     def new(params) do
@@ -131,8 +160,8 @@ defmodule Yagg.Event do
 
   defmodule UnitMoved do
     @spec new([
-      from: Board.coord,
-      to: Board.coord
+      from: Board.Grid.coord,
+      to: Board.Grid.coord
     ]) :: Event.t
     def new(params) do
       Event.new(:global, :unit_moved, params)

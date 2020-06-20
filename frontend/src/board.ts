@@ -20,12 +20,22 @@ function boardhtml(el: HTMLElement, width=5, height=5) {
     row.className = className;
     el.appendChild(row);
 
-    for (let x=0; x < width; x++) {
+    function makesquare(x: number) {
       let square = document.createElement('div')
       square.className = 'boardsquare';
       square.id = `c${x}-${y}`;
       square.onclick = select(square, {x, y, ongrid: true});
       row.appendChild(square);
+    }
+
+    if (gmeta.position === 'north') {
+      for (let x=width - 1; x >= 0; x--) {
+        makesquare(x);
+      }
+    } else {
+      for (let x=0; x < width; x++) {
+        makesquare(x);
+      }
     }
   }
 
@@ -202,12 +212,16 @@ const eventHandlers = {
   },
 
   new_unit: function(event){
-    const unit = document.getElementById(`c${event.x}-${event.y}`).firstChild as HTMLElement;
+    const unit = document.getElementById(`c${event.x}-${event.y}`).firstElementChild as HTMLElement;
     if (!unit) {
       return console.log({err: 'unitnotfound', event, unit});
     }
     unit.innerHTML = '';
     unit_el(event.unit, unit);
+  },
+
+  unit_changed: function(event) {
+    eventHandlers.new_unit(event);  // for now
   },
 
   unit_placed: function(event) {

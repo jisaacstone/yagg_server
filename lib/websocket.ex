@@ -17,11 +17,10 @@ defmodule Yagg.Websocket do
   # Handle 'ping' messages from the browser - reply
   @impl :cowboy_websocket
   def websocket_handle({:text, "ping"}, state) do
-    IO.inspect('PING PONG')
     {:reply, :pong, state}
   end
+  # Seems unused?
   def websocket_handle({:ping, _}, state) do
-    IO.inspect('PING PONG :ping')
     {:reply, :pong, state}
   end
 

@@ -18,7 +18,7 @@ defmodule Yagg.Endpoint do
     config = if Map.has_key?(data, :configuration) do
       Configuration.all()[data.configuration]
     else
-      Configuration.Default
+      Configuration.Random
     end
     {:ok, pid} = Table.new(config)
     table_id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd

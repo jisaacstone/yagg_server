@@ -11,7 +11,7 @@ defmodule YaggTest.AI do
     fn
       ({coords, %Unit{position: ^position}}) ->
       # TODO: add unit ability actions
-      Enum.map(Board.surrounding(coords), fn ({x, y}) ->
+      Enum.map(Board.Grid.surrounding(coords), fn ({x, y}) ->
         %Board.Action.Move{from_x: x, from_y: y, to_x: x, to_y: y}
       end)
       ({_, _}) -> []

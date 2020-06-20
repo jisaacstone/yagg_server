@@ -5,21 +5,61 @@ alias Yagg.Board
 
 defmodule Yagg.Board.Configuration do
   @callback starting_units(Player.position()) :: [Unit.t, ...]
-  @callback terrain() :: [{Board.coord(), Board.terrain()}]
+  @callback terrain() :: [{Board.Grid.coord(), Board.Grid.terrain()}]
 
   def all() do
     %{
-      "alpha" => Board.Configuration.Default,
+      "random" => Board.Configuration.Random,
+      "alpha" => Board.Configuration.Alpha,
       "beta" => Board.Configuration.Chain,
     }
   end
 end
 
-defmodule Board.Configuration.Default do
+defmodule Board.Configuration.Random do
   @behaviour Board.Configuration
-  @doc """
-  Returns ten standard units in a random order
-  """
+  @impl Board.Configuration
+  def starting_units(position) do
+    units = Enum.shuffle([
+      Unit.new(position, :general, 5, 4, :nil, %{move: Ability.Manuver}),
+      Unit.new(position, :bezerker, 9, 2),
+      Unit.new(position, :dogatron, 7, 4),
+      Unit.new(position, :tim, 1, 8),
+      Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
+      Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
+      Unit.new(position, :mosh, 3, 0, Ability.Push),
+      Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
+      Unit.new(position, :rowburninator, 1, 2, Ability.Rowburn),
+      Unit.new(position, :tinker, 3, 2, Ability.Tink),
+      Unit.new(position, :electromouse, 3, 2, Ability.Upgrade),
+      Unit.new(position, :mediacreep, 5, 4, :nil, %{move: Ability.Duplicate}),
+      Unit.new(position, :sparky, 1, 0, Ability.Copyleft)
+    ]) |> Enum.take(7)
+    [Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}) | units]
+  end
+
+  @impl Board.Configuration
+  def terrain() do
+    gen_terrain(
+      %{{Enum.random(0..4), Enum.random(0..4)} => Enum.random([:water, :block])},
+      Enum.random(0..3)
+    )
+  end
+
+  def gen_terrain(terrain, 0) do
+    Map.to_list(terrain)
+  end
+  def gen_terrain(terrain, n) do
+    Map.put(
+      terrain,
+      {Enum.random([0,1,1,2,3,3,4]), Enum.random([0,1,1,2,2,2,2,3,3,4])},
+      Enum.random([:water, :block])
+    ) |> gen_terrain(n - 1)
+  end
+end
+
+defmodule Board.Configuration.Alpha do
+  @behaviour Board.Configuration
 
   @impl Board.Configuration
   def starting_units(position) do

@@ -35,7 +35,7 @@ defmodule Yagg.Table do
       |> Enum.map(fn ({_, pid, _, _}) -> pid end)
   end
 
-  def new(configuration \\ Board.Configuration.Default) do
+  def new(configuration \\ Board.Configuration.Random) do
     table = %Table{
       players: [],
       subscribors: [],
@@ -47,7 +47,7 @@ defmodule Yagg.Table do
   end
 
   # TO ENABLE default table
-  def single__(configuration \\ Board.Configuration.Default) do
+  def single__(configuration \\ Board.Configuration.Random) do
     case Supervisor.which_children(Yagg.TableSupervisor) do
       [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
       [] -> new(configuration)

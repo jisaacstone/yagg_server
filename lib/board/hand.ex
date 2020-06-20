@@ -4,7 +4,7 @@ alias Yagg.Event
 alias Yagg.Table.Player
 
 defmodule Yagg.Board.Hand do
-  @type t() :: %{non_neg_integer() => {Unit.t, :nil | Board.coord()}}
+  @type t() :: %{non_neg_integer() => {Unit.t, :nil | Board.Grid.coord()}}
 
   def add_unit(%Board{} = board, position, %Unit{} = unit) do
     {hand, events} = board.hands[position] |> add_unit(unit)

@@ -2,6 +2,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Table.Player
 alias Yagg.Board.Hand
+alias Yagg.Board.Grid
 alias Yagg.Board.Configuration
 
 defmodule Yagg.Board do
@@ -11,11 +12,9 @@ defmodule Yagg.Board do
   @enforce_keys [:grid, :hands, :state]
   defstruct @enforce_keys
 
-  @type coord() :: {0..5, 0..5}
-  @type terrain :: :water | Unit.t
-
+  @type direction :: :north | :south | :east | :west
   @type t :: %Board{
-    grid: %{coord() => terrain},
+    grid: Grid.t,
     hands: %{Player.position() => Hand.t},
     state: State.t,
   }
@@ -118,7 +117,7 @@ defmodule Yagg.Board do
         unless can_move?(from, to) do
           {:err, :illegal}
         else
-          case thing_at(board, to) do
+          case Grid.thing_at(board, to) do
             :out_of_bounds -> {:err, :out_of_bounds}
             :water -> {:err, :illegal}
             :block -> 
@@ -148,14 +147,7 @@ defmodule Yagg.Board do
     }
   end
 
-  @doc """
-  Returns what is at the coords, :nil if nothing is there, and :out_of_bounds if it is out of the grid
-  """
-  def thing_at(_, {x, y}) when x < 0 or y < 0, do: :out_of_bounds
-  def thing_at(_, {x, y}) when x >= 5 or y >= 5, do: :out_of_bounds
-  def thing_at(board, coords), do: board.grid[coords]
-
-  def setup(board), do: setup(board, Configuration.Default)
+  def setup(board), do: setup(board, Configuration.Random)
   def setup(board, configuration) do
     {board, events} = add_features(board, [], configuration.terrain())
     {board, events} = Enum.reduce(
@@ -170,35 +162,6 @@ defmodule Yagg.Board do
       board,
       [Event.GameStarted.new() | events]
     }
-  end
-
-  @doc """
-  direction to coord math
-  """
-  def next(:west, {x, y}), do: {x - 1, y}
-  def next(:east, {x, y}), do: {x + 1, y}
-  def next(:north, {x, y}), do: {x, y + 1}
-  def next(:south, {x, y}), do: {x, y - 1}
-
-  @doc """
-  Takes two points and retires the direction from the first to the second
-  errors if the points are not on a line.
-  """
-  def direction({x1, y}, {x2, y}) when x1 < x2, do: :east
-  def direction({x1, y}, {x2, y}) when x1 > x2, do: :west
-  def direction({x, y1}, {x, y2}) when y1 > y2, do: :south
-  def direction({x, y1}, {x, y2}) when y1 < y2, do: :north
-  def direction(_, _), do: {:err, :not_on_line}
-
-  @doc """
-  all adjacent squares (add, sub 1 for x, y)
-  returns {direction, coord} tuples
-  """
-  def surrounding(coords) do
-    Enum.map(
-      [:north, :south, :east, :west],
-      fn(dir) -> {dir, next(dir, coords)} end
-    )
   end
 
   ## Private
@@ -247,8 +210,8 @@ defmodule Yagg.Board do
   end
 
   def push_block(board, from, to) do
-    dir = direction(from, to)
-    square = next(dir, to)
+    dir = Grid.direction(from, to)
+    square = Grid.next(dir, to)
     case board.grid[square] do
       :nil -> 
         {board, events1} = do_move(board, to, square)

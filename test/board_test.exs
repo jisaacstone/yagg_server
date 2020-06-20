@@ -6,6 +6,6 @@ defmodule YaggTest.Board.Setup do
   test 'setup' do
     {board, _events} = Board.new() |> Board.setup()
     assert %{north: _, south: _} = board.hands
-    assert %{{1, 2} => :block} = board.grid
+    assert [{{_x, _y}, _}|_] = Map.to_list(board.grid)
   end
 end
