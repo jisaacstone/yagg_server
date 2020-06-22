@@ -12,6 +12,8 @@ function action(actType, args) {
           displayerror('space is already occupied');
         } else if (request.responseText.includes('noselfattack')) {
           displayerror('you cannot attack your own units');
+        } else if (request.responseText.includes('illegal')) {
+          displayerror('illegal move');
         }
       }
     });

@@ -32,7 +32,7 @@ defmodule Board.Configuration.Random do
       Unit.new(position, :rowburninator, 1, 2, Ability.Rowburn),
       Unit.Tinker.new(position),
       Unit.new(position, :electromouse, 3, 2, Ability.Upgrade),
-      Unit.new(position, :mediacreep, 5, 4, :nil, %{move: Ability.Duplicate}),
+      Unit.Mediacreep.new(position),
       Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
       Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
       Unit.Maycorn.new(position),

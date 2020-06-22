@@ -161,7 +161,7 @@ defmodule Yagg.Event do
   defmodule ThingMoved do
     @spec new([
       from: Board.Grid.coord,
-      to: Board.Grid.coord
+      to: Board.Grid.coord | :offscreen
     ]) :: Event.t
     def new(params) do
       Event.new(:global, :thing_moved, params)

@@ -48,10 +48,20 @@ function boardhtml(el, width = 5, height = 5) {
     }
 }
 function waitingforplayers(el) {
-    const waiting = document.createElement('div');
+    const waiting = document.createElement('div'), copy = document.createElement('button');
     waiting.className = 'waiting';
     waiting.innerHTML = 'waiting for opponent';
     el.appendChild(waiting);
+    copy.innerHTML = 'copy join link';
+    copy.className = 'linkcopy';
+    copy.onclick = () => {
+        const url = new URL(window.location.toString());
+        url.searchParams.delete('player');
+        navigator.clipboard.writeText(url.toString()).then(() => {
+            alert('copied!');
+        });
+    };
+    waiting.appendChild(copy);
 }
 function unit_el(unit, el) {
     for (const att of ['name', 'attack', 'defense']) {
@@ -308,8 +318,11 @@ function setstate(gamedata) {
         waitingforplayers(document.getElementById('board'));
     }
 }
+function namedialog() {
+    return prompt('enter your name', _name_());
+}
 window.onload = function () {
-    const name = getname() || _name_();
+    const name = getname() || namedialog();
     gmeta.name = name;
     gameaction('join', { player: name }, 'table')
         .then(() => {

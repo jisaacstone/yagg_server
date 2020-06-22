@@ -12,6 +12,9 @@ function action(actType, args) {
             else if (request.responseText.includes('noselfattack')) {
                 displayerror('you cannot attack your own units');
             }
+            else if (request.responseText.includes('illegal')) {
+                displayerror('illegal move');
+            }
         }
     });
 }

@@ -1,5 +1,5 @@
 import { request, post, gameaction } from './request.js';
-import { _name_ } from './urlvars.js';
+import { getname, _name_ } from './urlvars.js';
 function fetchConfigs(sel_el) {
     request('configurations').then((configs) => {
         for (const config of Object.keys(configs)) {
@@ -46,15 +46,17 @@ function displayTableData(tablesEl, data) {
     }
 }
 window.onload = function () {
-    console.log('ONLOAD!');
-    const tables = document.getElementById('tables'), ct = document.getElementById('createtable'), name_el = document.getElementById('name'), sel_el = document.getElementById('config');
+    const tables = document.getElementById('tables'), ct = document.getElementById('createtable'), name_el = document.getElementById('name'), sel_el = document.getElementById('config'), name = getname();
+    if (name) {
+        name_el.value = name;
+    }
     request('table').then(tabledata => {
         console.log({ tabledata });
         displayTableData(tables, tabledata);
     }).catch((e) => console.log({ e }));
     fetchConfigs(sel_el);
     ct.onclick = () => {
-        const conf = sel_el.value || 'alpha', name = name_el.value || _name_();
+        const conf = sel_el.value || 'random', name = name_el.value || _name_();
         post('table/new', { configuration: conf }).then(({ id }) => {
             gameaction('join', { player: name }, 'table', id).then(() => {
                 window.location.href = `board.html?table=${id}&player=${name}`;

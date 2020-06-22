@@ -1,6 +1,7 @@
 body {
   flex-direction: column;
   margin-bottom: 30px;
+  background: repeating-linear-gradient(90deg, #FFA, #FAF 10px, #AFF 10px, #FAF 20px, #AAF 20px, #AFF 30px);
 }
 
 body[data-gamestate=placement] {
@@ -36,6 +37,16 @@ body[data-gamestate=gameover] {
 body > div {
   width: 100%;
   margin: auto;
+}
+
+.waiting {
+  padding: 2vh;
+  background: repeating-linear-gradient(40deg, #CCD, #CCD 10px, #eee 10px, #eee 20px, #BAB 20px, #B9B 30px);
+}
+
+.linkcopy {
+  display: block;
+  margin-top: 2vh;
 }
 
 /* BOARD */

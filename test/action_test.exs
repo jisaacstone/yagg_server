@@ -16,6 +16,15 @@ defmodule YaggTest.Action.Place do
     assert newboard.hands[:north][0] == {unit, {4, 4}}
   end
 
+  test "place unit occupied" do
+    unit = Unit.new(:north, :test, 3, 3)
+    board = %{Board.new() | state: %Placement{}}
+    hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
+    board = %{board | hands: hands, grid: %{{4, 4} => :water}}
+    action = %Board.Action.Place{index: 0, x: 4, y: 4}
+    assert {:err, :occupied} = Board.Action.resolve(action, board, :north)
+  end
+
   test "place battle" do
     unit = Unit.new(:north, :test, 3, 3)
     board = %{Board.new() | state: :battle}
@@ -267,6 +276,20 @@ defmodule YaggTest.Action.Ability do
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
     assert Enum.find(events, fn(e) -> e.kind == :thing_moved end)
   end
+
+  test "creapattack" do
+    mediacreep = Unit.Mediacreep.new(:north)
+    spikeder = Unit.Spikeder.new(:south)
+    board = set_board([
+      {{2, 2}, mediacreep},
+      {{3, 2}, spikeder},
+    ])
+    action = %Board.Action.Move{from_x: 2, from_y: 2, to_x: 3, to_y: 2}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
+    assert newboard.grid[{3, 2}] == :nil
+    assert newboard.grid[{2, 2}] == mediacreep
+  end
+
   test "illegal square" do
     grid = %{
       {0, 1} => %Unit{ability: Board.Action.Ability.Upgrade, attack: 3, defense: 2, name: :electromouse, position: :south, state: %{}, triggers: %{}},

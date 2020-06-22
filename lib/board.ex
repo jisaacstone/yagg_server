@@ -48,14 +48,16 @@ defmodule Yagg.Board do
     }
   end
 
+  @spec assign(Board.t, Player.position, any, Grid.coord) :: {:ok, Board.t} | {:err, atom}
   def assign(board, position, hand_index, coords) do
-    if can_place?(position, coords) do
-      case hand_assign(board.hands[position], hand_index, coords) do
-        {:err, _} = err -> err
-        hand -> {:ok, %{board | hands: Map.put(board.hands, position, hand)}}
-      end
-    else
-      {:err, :illegal_square}
+    cond do
+      not(can_place?(position, coords)) -> {:err, :illegal_square}
+      board.grid[coords] != :nil -> {:err, :occupied}
+      :true ->
+        case hand_assign(board.hands[position], hand_index, coords) do
+          {:err, _} = err -> err
+          hand -> {:ok, %{board | hands: Map.put(board.hands, position, hand)}}
+        end
     end
   end
 
