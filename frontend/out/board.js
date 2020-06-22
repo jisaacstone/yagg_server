@@ -89,13 +89,12 @@ function unit_el(unit, el) {
         abilbut.className = 'unit-ability';
         abilbut.innerHTML = abilname;
         abilbut.onclick = function (e) {
-            console.log({ gmeta });
             if (el.parentNode.className === 'boardsquare') {
                 e.preventDefault();
                 e.stopPropagation();
                 if (window.confirm(unit.ability.description)) {
                     const square = el.parentNode, x = +square.id.charAt(1), y = +square.id.charAt(3);
-                    gameaction('ability', { name: abilname, x: x, y: y }, 'board');
+                    gameaction('ability', { x: x, y: y }, 'board');
                 }
             }
         };
@@ -215,9 +214,10 @@ const eventHandlers = {
         }
     },
     feature: function (event) {
-        const square = document.getElementById(`c${event.x}-${event.y}`);
-        square.innerHTML = event.feature;
-        square.dataset.feature = event.feature;
+        const square = document.getElementById(`c${event.x}-${event.y}`), feature = document.createElement('div');
+        feature.className = `feature ${event.feature}`;
+        feature.innerHTML = event.feature;
+        square.appendChild(feature);
     },
     unit_died: function (event) {
         const square = document.getElementById(`c${event.x}-${event.y}`), unit = square.firstChild;
@@ -227,17 +227,23 @@ const eventHandlers = {
             unit.remove();
         }, 850);
     },
-    unit_moved: function (event) {
-        console.log({ E: 'unit_moved', event });
-        const to = document.getElementById(`c${event.to.x}-${event.to.y}`), from = document.getElementById(`c${event.from.x}-${event.from.y}`), unit = from.firstChild;
-        while (to.firstChild) {
-            to.removeChild(to.firstChild);
+    thing_moved: function (event) {
+        const to = document.getElementById(`c${event.to.x}-${event.to.y}`), from = document.getElementById(`c${event.from.x}-${event.from.y}`), thing = from.firstChild;
+        console.log({ to, from, thing });
+        if (to) {
+            const child = to.firstChild;
+            //if (child && child.style) {
+            //  child.style.visibility = 'hidden';
+            //}
+            to.appendChild(thing);
         }
-        to.appendChild(unit);
-        if (from.dataset.feature) {
-            to.dataset.feature = from.dataset.feature;
-            from.dataset.feature = null;
+        else {
+            from.removeChild(thing);
         }
+        //const maybeHidden = from.firstChild as HTMLElement;
+        //if (maybeHidden && maybeHidden.style) {
+        //  maybeHidden.style.visibility = '';
+        //}
     },
     gameover: function (event) {
         gamestatechange('gameover');

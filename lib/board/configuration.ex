@@ -21,19 +21,23 @@ defmodule Board.Configuration.Random do
   @impl Board.Configuration
   def starting_units(position) do
     units = Enum.shuffle([
-      Unit.new(position, :general, 5, 4, :nil, %{move: Ability.Manuver}),
+      Unit.Tactician.new(position),
       Unit.new(position, :bezerker, 9, 2),
-      Unit.new(position, :dogatron, 7, 4),
+      Unit.new(position, :chopper, 7, 4),
       Unit.new(position, :tim, 1, 8),
       Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
-      Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
-      Unit.new(position, :mosh, 3, 0, Ability.Push),
+      Unit.Explody.new(position),
+      Unit.Pushie.new(position),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 1, 2, Ability.Rowburn),
-      Unit.new(position, :tinker, 3, 2, Ability.Tink),
+      Unit.Tinker.new(position),
       Unit.new(position, :electromouse, 3, 2, Ability.Upgrade),
       Unit.new(position, :mediacreep, 5, 4, :nil, %{move: Ability.Duplicate}),
-      Unit.new(position, :sparky, 1, 0, Ability.Copyleft)
+      Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
+      Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
+      Unit.Maycorn.new(position),
+      Unit.Spikeder.new(position),
+      Unit.Busybody.new(position),
     ]) |> Enum.take(7)
     [Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}) | units]
   end
@@ -65,11 +69,11 @@ defmodule Board.Configuration.Alpha do
   def starting_units(position) do
     Enum.shuffle([
       Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
-      Unit.new(position, :general, 5, 4, :nil, %{move: Ability.Manuver}),
+      Unit.Tactician.new(position),
       Unit.new(position, :bezerker, 7, 2),
       Unit.new(position, :fullarmorcoward, 1, 6, :nil, %{death: Ability.Secondwind}),
-      Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
-      Unit.new(position, :mosh, 3, 0, Ability.Push),
+      Unit.Explody.new(position),
+      Unit.Pushie.new(position),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
     ])

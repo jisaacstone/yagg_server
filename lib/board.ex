@@ -81,7 +81,7 @@ defmodule Yagg.Board do
     case grid[coords] do
       :nil ->
         unless can_place?(unit.position, coords) do
-          {:err, :illegal_square}
+          {:err, :illegal_placement}
         else
           {:ok, %{board | grid: Map.put_new(grid, coords, unit)}}
         end
@@ -137,6 +137,7 @@ defmodule Yagg.Board do
   @doc """
   Unit dies as {x, y}. Returns new board and events
   """
+  @spec unit_death(Board.t, Unit.t, Grid.coord, Keyword.t) :: {Board.t, [Event.t]}
   def unit_death(board, unit, {x, y}, meta \\ []) do
     board = %{board | grid: Map.delete(board.grid, {x, y})}
     opts = [{:unit, unit}, {:coords, {x, y}} | meta]
@@ -147,6 +148,7 @@ defmodule Yagg.Board do
     }
   end
 
+  @spec setup(Board.t) :: {Board.t, [Event.t]}
   def setup(board), do: setup(board, Configuration.Random)
   def setup(board, configuration) do
     {board, events} = add_features(board, [], configuration.terrain())
@@ -185,7 +187,7 @@ defmodule Yagg.Board do
     {board, events} = Unit.trigger_module(unit, :move).resolve(board, opts)
     {
       board,
-      [Event.UnitMoved.new(from: from, to: to) | events]
+      [Event.ThingMoved.new(from: from, to: to) | events]
     }
   end
 
@@ -196,7 +198,7 @@ defmodule Yagg.Board do
     cond do
       unit.attack > opponent.defense ->
         {board, e1} = unit_death(board, opponent, to, opponent: {unit, from})
-        {board, e2} = do_move(board, from, to)
+        {board, e2} = do_move(board, from, to, action: :battle)
         {board, e1 ++ e2}
       unit.attack == opponent.defense ->
         # not currently possible?
@@ -215,7 +217,7 @@ defmodule Yagg.Board do
     case board.grid[square] do
       :nil -> 
         {board, events1} = do_move(board, to, square)
-        {board, events2} = do_move(board, from, to)
+        {board, events2} = do_move(board, from, to, action: :push)
         {board, events1 ++ events2}
       _ ->
         {:err, :occupied}

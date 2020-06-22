@@ -13,17 +13,15 @@ defmodule Action.Ability do
   @callback resolve(Yagg.Board.t, keyword()) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
   @callback description() :: String.t
 
-  @enforce_keys [:name, :x, :y]
+  @enforce_keys [:x, :y]
   defstruct @enforce_keys
-  alias __MODULE__
 
   @impl Action
-  def resolve(data, %Board{state: :battle} = board, _position) do
-    module = Module.safe_concat(Ability, String.capitalize(data.name))
+  def resolve(data, %Board{state: :battle} = board, position) do
     coords = {data.x, data.y}
-    case ability_at(board, module, coords) do
+    case ability_at(board, coords, position) do
       {:err, _} = err -> err
-      unit -> module.resolve(board, unit: unit, coords: coords)
+      {:ok, unit} -> unit.ability.resolve(board, unit: unit, coords: coords)
     end
   end
 
@@ -46,11 +44,12 @@ defmodule Action.Ability do
     end
   end
 
-  defp ability_at(board, module, coords) do
+  defp ability_at(board, coords, position) do
     case board.grid[coords] do
-      %Unit{ability: ^module} = unit -> unit
-      %Unit{} -> {:err, :unable}
-      _ -> {:err, :empty}
+      %Unit{ability: :nil} -> {:err, :noable}
+      %Unit{position: ^position} = unit -> {:ok, unit}
+      %Unit{} -> {:err, :unowned}
+      _ -> {:err, :nounit}
     end
   end
 end
@@ -61,29 +60,6 @@ defmodule Action.Ability.NOOP do
 
   def resolve(board, _) do
     {board, []}
-  end
-end
-
-defmodule Action.Ability.Selfdestruct do
-  @moduledoc "Destroy everything within 1 square radius"
-  use Action.Ability
-
-  def resolve(board, opts) do
-    Enum.reduce(
-      [opts[:coords] | Grid.surrounding(opts[:coords])],
-      {board, []},
-      fn({_, coord}, b_e) ->
-        killunit({coord, board.grid[coord]}, b_e)
-      end
-    )
-  end
-
-  defp killunit({coords, %Unit{} = unit}, {board, events}) do
-    {board, newevents} = Board.unit_death(board, unit, coords)
-    {board, newevents ++ events}
-  end
-  defp killunit(_, state) do
-    state
   end
 end
 
@@ -174,16 +150,43 @@ defmodule Action.Ability.Copyleft do
   @impl Action.Ability
   def resolve(board, opts) do
     pos = opts[:unit].position
-    coord = case pos do
-      :north -> Grid.next(:east, opts[:coords])
-      :south -> Grid.next(:west, opts[:coords])
-    end
+    coord = Grid.cardinal(pos, :left) |> Grid.next(opts[:coords])
     IO.inspect(opts: opts, coord: coord)
     case board.grid[coord] do
       %Unit{} = unit ->
         copy = %{unit | position: pos}
         Hand.add_unit(board, pos, copy)
       _ -> {board, []}
+    end
+  end
+end
+
+defmodule Action.Ability.Duplicate do
+  @moduledoc """
+  leave behind an inferior copy
+  """
+  use Action.Ability
+
+  @impl Action.Ability
+  def resolve(%Board{} = board, opts) do
+    unit = opts[:unit]
+    {x, y} = opts[:from]
+    copy = %{
+      opts[:unit] |
+      attack: unit.attack - 2,
+      defense: unit.defense - 2
+    }
+    if copy.attack < 0 or copy.defense < 0 do
+      { board, [] }
+    else 
+      grid = Map.put(board.grid, opts[:from], copy)
+      {
+        %{board | grid: grid},
+        [
+          Event.UnitPlaced.new(player: unit.position, x: x, y: y),
+          Event.NewUnit.new(unit.position, x: x, y: y, unit: copy)
+        ]
+      }
     end
   end
 end
@@ -233,72 +236,6 @@ defmodule Action.Ability.Push do
   end
 end
 
-defmodule Action.Ability.Duplicate do
-  @moduledoc """
-  leave behind an inferior copy
-  """
-  use Action.Ability
-
-  @impl Action.Ability
-  def resolve(%Board{} = board, opts) do
-    unit = opts[:unit]
-    {x, y} = opts[:from]
-    IO.inspect(duplicate: opts)
-    copy = %{
-      opts[:unit] |
-      attack: unit.attack - 2,
-      defense: unit.defense - 2
-    }
-    if copy.attack < 0 or copy.defense < 0 do
-      { board, [] }
-    else 
-      board = Board.place!(board, copy, opts[:from])
-      { board, [
-        Event.UnitPlaced.new(player: unit.position, x: x, y: y),
-        Event.NewUnit.new(unit.position, x: x, y: y, unit: copy)
-      ]}
-    end
-  end
-end
-
-defmodule Action.Ability.Manuver do
-  @moduledoc """
-  all adjacent friendly units move in the same direction,
-  north, south, east, west
-  """
-  use Action.Ability
-
-  @impl Action.Ability
-  def resolve(%Board{} = board, opts) do
-    case {opts[:from], opts[:to]} do
-      {_,:nil} -> {:err, :misconfigured}
-      {:nil,_} -> {:err, :misconfigured}
-      {from, to} ->
-        direction = Grid.direction(from, to)
-        coords =
-          Grid.surrounding(from)
-          |> Enum.into(%{})
-          |> order(direction)
-        move_units(board, direction, opts[:unit].position, coords, [])
-    end
-  end
-
-  defp order(coord_map, direction) do
-    {_first, coord_map} = Map.pop(coord_map, direction)
-    Map.values(coord_map)
-  end
-
-  defp move_units(board, _direction, _position, [], events), do: {board, events}
-  defp move_units(%Board{} = board, direction, position, [from | coords], events) do
-    case Board.move(board, position, from, Grid.next(direction, from)) do
-      {%Board{} = newboard, newevents} ->
-        move_units(newboard, direction, position, coords, events ++ newevents)
-      _ -> 
-        move_units(board, direction, position, coords, events)
-    end
-  end
-end
-
 defmodule Action.Ability.Upgrade do
   @moduledoc """
   Return to your hand and gain +2 attack and +2 defense
@@ -315,56 +252,3 @@ defmodule Action.Ability.Upgrade do
   end
 end
 
-defmodule Action.Ability.Tink do
-  @moduledoc """
-  Give units to the right and left +2 attack
-  """
-
-  use Action.Ability
-  @impl Action.Ability
-  def resolve(%Board{} = board, opts) do
-    {board, events } = Enum.reduce(
-      [:east, :west],
-      {board, []},
-      fn(direction, {board, events}) ->
-        Grid.update(
-          board,
-          Grid.next(direction, opts[:coords]),
-          fn(unit) -> %{unit | attack: unit.attack + 2} end,
-          events)
-      end
-    )
-    Grid.update(
-      board,
-      opts[:coords],
-      fn(unit) -> %{unit | ability: Action.Ability.Tonk} end,
-      events)
-  end
-end
-
-defmodule Action.Ability.Tonk do
-  @moduledoc """
-  Give units to the front and back +2 attack
-  """
-
-  use Action.Ability
-  @impl Action.Ability
-  def resolve(%Board{} = board, opts) do
-    {board, events} = Enum.reduce(
-      [:north, :south],
-      {board, []},
-      fn(direction, {board, events}) ->
-        Grid.update(
-          board,
-          Grid.next(direction, opts[:coords]),
-          fn(unit) -> %{unit | attack: unit.attack + 2} end,
-          events)
-      end
-    )
-    Grid.update(
-      board,
-      opts[:coords],
-      fn(unit) -> %{unit | ability: Action.Ability.Tink} end,
-      events)
-  end
-end

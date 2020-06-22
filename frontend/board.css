@@ -69,6 +69,7 @@ body > div {
   border: 2px inset #4B9;
   box-sizing: border-box;
   background-color: rgba(255,254,254,0.6);
+  display: flex;
 }
 
 .boardrow.northrow {
@@ -260,20 +261,21 @@ span .tooltip, button .tooltip {
 
 /* Features */
 
-#board [data-feature] {
+.feature {
   text-align: center;
   padding-top: 10px;
+  flex-grow: 1;
 }
 
-#board [data-feature=block] {
+.feature.block {
   border: thick inset #785460;
   background-color: #997876;
 }
-#board [data-feature=block][data-uistate=moveoption] {
+[data-uistate=moveoption] .feature.block {
   border-color: rgba(105, 145, 45, 1);
 }
 
-#board [data-feature=water] {
+.feature.water {
   border: thick double #32a1ce;
   background-color: #ABC;
 }

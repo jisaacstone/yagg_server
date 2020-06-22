@@ -63,7 +63,7 @@ defmodule YaggTest.Action.Move do
     action = %Board.Action.Move{from_x: 2, from_y: 4, to_x: 2, to_y: 3}
     assert {newboard, events} = Board.Action.resolve(action, board, :north)
     assert newboard.grid[{2, 3}] == unit
-    assert Enum.find(events, fn(e) -> e.kind == :unit_moved end)
+    assert Enum.find(events, fn(e) -> e.kind == :thing_moved end)
   end
 
   test "attack" do
@@ -151,6 +151,9 @@ end
 defmodule YaggTest.Action.Ability do
   use ExUnit.Case
 
+  defp set_board(features) do
+    Board.new() |> Map.put(:state, :battle) |> set_board(features)
+  end
   defp set_board(board, []), do: board
   defp set_board(board, [{coord, feature} | features]) do
     grid = Map.put(board.grid, coord, feature)
@@ -158,8 +161,9 @@ defmodule YaggTest.Action.Ability do
   end
 
   test "selfdestruct" do
-    unit = Unit.new(:north, :test, 3, 3, Ability.Selfdestruct)
+    unit = Unit.Explody.new(:north)
     unit2 = Unit.new(:north, :test2, 3, 3)
+    unit3 = Unit.new(:south, :test3, 7, 3)
     board =
       Board.new()
       |> Map.put(:state, :battle)
@@ -167,28 +171,10 @@ defmodule YaggTest.Action.Ability do
         [
           {{4, 4}, unit},
           {{4, 3}, unit2},
-          {{3, 3}, unit2}
+          {{3, 4}, unit3}
         ])
-    action = %Board.Action.Ability{name: "selfdestruct", x: 4, y: 4}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{3, 3}] == unit2
-    assert newboard.grid[{4, 3}] == :nil
-    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-  end
-
-  test "selfdestruct death" do
-    unit = Unit.new(:south, :test, 3, 3, :nil, %{death: Ability.Selfdestruct})
-    unit2 = Unit.new(:north, :test2, 5, 4)
-    board =
-      Board.new()
-      |> Map.put(:state, :battle)
-      |> set_board(
-        [
-          {{4, 4}, unit},
-          {{4, 3}, unit2}
-        ])
-    action = %Board.Action.Move{from_x: 4, from_y: 3, to_x: 4, to_y: 4}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
+    action = %Board.Action.Move{from_x: 3, from_y: 4, to_x: 4, to_y: 4}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{4, 4}] == :nil
     assert newboard.grid[{4, 3}] == :nil
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
@@ -212,7 +198,7 @@ defmodule YaggTest.Action.Ability do
   end
 
   test "manuver" do
-    unitM = Unit.new(:south, :manu, 1, 0, :nil, %{move: Ability.Manuver})
+    unitM = Unit.Tactician.new(:south)
     unitF = Unit.new(:south, :unit, 3, 2)
     unitE = Unit.new(:north, :enemy, 5, 4)
     board =
@@ -233,8 +219,8 @@ defmodule YaggTest.Action.Ability do
   end
 
   test "push manuver" do
-    unitM = Unit.new(:south, :manu, 1, 0, :nil, %{move: Ability.Manuver})
-    unitP = Unit.new(:south, :push, 3, 2, Ability.Push)
+    unitM = Unit.Tactician.new(:south)
+    unitP = Unit.Pushie.new(:south)
     board =
       Board.new()
       |> Map.put(:state, :battle)
@@ -244,11 +230,57 @@ defmodule YaggTest.Action.Ability do
           {{1, 3}, unitM},
           {{2, 2}, :block},
         ])
-    action = %Board.Action.Ability{name: "push", x: 2, y: 3}
+    action = %Board.Action.Ability{x: 2, y: 3}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{2, 3}] == :nil
     assert newboard.grid[{1, 3}] == unitP
     assert newboard.grid[{0, 3}] == unitM
     assert newboard.grid[{2, 1}] == :block
+  end
+
+  test "spikeder slide" do
+    spikeder = Unit.Spikeder.new(:south)
+    enemy = Unit.Pushie.new(:north)
+    board = set_board(
+        [
+          {{3, 0}, spikeder},
+          {{3, 4}, enemy}
+        ])
+    action = %Board.Action.Move{from_x: 3, from_y: 0, to_x: 3, to_y: 1}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
+    assert newboard.grid[{3, 0}] == :nil
+    assert newboard.grid[{3, 4}] == spikeder
+  end
+
+  test "busybody" do
+    busybody = Unit.Busybody.new(:south)
+    other = Unit.Pushie.new(:south)
+    board = set_board([
+      {{0, 2}, busybody},
+      {{1, 2}, :water},
+      {{0, 1}, other},
+    ])
+    action = %Board.Action.Ability{x: 0, y: 2}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert newboard.grid[{0, 2}] == busybody
+    assert newboard.grid[{0, 1}] == :water
+    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
+    assert Enum.find(events, fn(e) -> e.kind == :thing_moved end)
+  end
+  test "illegal square" do
+    grid = %{
+      {0, 1} => %Unit{ability: Board.Action.Ability.Upgrade, attack: 3, defense: 2, name: :electromouse, position: :south, state: %{}, triggers: %{}},
+      {0, 2} => %Unit{ability: nil, attack: 5, defense: 4, name: :mediacreep, position: :north, state: %{}, triggers: %{move: Board.Action.Ability.Duplicate}},
+      {1, 0} => :water,
+      {1, 1} => %Unit{ability: Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :south, state: %{}, triggers: %{}},
+      {1, 2} => %Unit{ability: nil, attack: 1, defense: 8, name: :tim, position: :south, state: %{}, triggers: %{}},
+      {3, 0} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, state: %{}, triggers: %{death: Board.Action.Ability.Concede}},
+      {3, 3} => %Unit{ability: nil, attack: 9, defense: 2, name: :bezerker, position: :north, state: %{}, triggers: %{}},
+      {3, 4} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, state: %{}, triggers: %{death: Board.Action.Ability.Concede}},
+      {4, 3} => :water
+    }
+    action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 0, to_y: 3}
+    board = %Board{grid: grid, state: :battle, hands: []}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
   end
 end

@@ -85,11 +85,13 @@ function ismoveoption(el) {
     if (!el) {
         return false;
     }
-    if (el.dataset.feature === 'water') {
-        return false;
-    }
-    if (el.firstElementChild && el.firstElementChild.className.includes(gmeta.position)) {
-        return false;
+    if (el.firstElementChild) {
+        if (el.firstElementChild.className.includes(gmeta.position)) {
+            return false;
+        }
+        if (el.firstElementChild.className.includes('water')) {
+            return false;
+        }
     }
     return true;
 }

@@ -1,10 +1,11 @@
 alias Yagg.Board
 alias Yagg.Unit
 alias Yagg.Event
+alias Yagg.Table.Player
 
 defmodule Yagg.Board.Grid do
   @type coord() :: {0..5, 0..5}
-  @type terrain :: :water | Unit.t
+  @type terrain :: :water | :block | Unit.t
   @type t :: %{coord => terrain}
 
   @doc """
@@ -47,6 +48,21 @@ defmodule Yagg.Board.Grid do
     )
   end
 
+  @doc """
+  transfer directional (:left, :right) into cardinal (:east, :west)
+  """
+  @spec cardinal(Player.position, :left | :right | :front | :back) :: Board.direction
+  def cardinal(:north, :left), do: :east
+  def cardinal(:south, :left), do: :west
+  def cardinal(:north, :right), do: :west
+  def cardinal(:south, :right), do: :east
+  def cardinal(:north, :front), do: :south
+  def cardinal(:south, :front), do: :north
+  def cardinal(position, :back), do: position
+
+  @doc """
+  in-place update of unit at coord
+  """
   def update(%Board{} = board, {x, y} = coord, updater, events \\ []) do
     case board.grid[coord] do
       %Unit{} = unit ->

@@ -158,13 +158,13 @@ defmodule Yagg.Event do
     end
   end
 
-  defmodule UnitMoved do
+  defmodule ThingMoved do
     @spec new([
       from: Board.Grid.coord,
       to: Board.Grid.coord
     ]) :: Event.t
     def new(params) do
-      Event.new(:global, :unit_moved, params)
+      Event.new(:global, :thing_moved, params)
     end
   end
 
