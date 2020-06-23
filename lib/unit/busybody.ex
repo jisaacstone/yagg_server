@@ -25,7 +25,7 @@ defmodule Unit.Busybody do
     use Ability
     @impl Ability
     def resolve(board, opts) do
-      {board, things} = IO.inspect(gather(board, opts[:coords], [:north, :east, :south, :west, :north], []))
+      {board, things} = gather(board, opts[:coords], [:north, :east, :south, :west, :north], [])
       place(board, things, [])
     end
 
@@ -54,8 +54,8 @@ defmodule Unit.Busybody do
       end
     end
 
-    defp offscreend(board, %Unit{} = unit, coord) do
-      Board.unit_death(board, unit, coord)
+    defp offscreend(board, %Unit{}, coord) do
+      Board.unit_death(board, coord)
     end
     defp offscreend(board, _feature, coord) do
       event = Event.ThingMoved.new(from: coord, to: :offscreen)

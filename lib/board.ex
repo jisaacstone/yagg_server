@@ -40,6 +40,7 @@ defmodule Yagg.Board do
     defp encode_feature(other), do: other
   end
 
+  @spec new() :: t
   def new() do
     %Board{
       grid: %{},
@@ -73,12 +74,15 @@ defmodule Yagg.Board do
     end
   end
 
+  @spec place!(t, Unit.t, Grid.coord) :: t
   def place!(%Board{} = board, %Unit{} = unit, coords) do
     case place(board, unit, coords) do
       {:ok, board} -> board
       err -> throw(err)
     end
   end
+
+  @spec place(t, Unit.t, Grid.coord) :: {:ok, t} | {:err, atom}
   def place(%Board{grid: grid} = board, %Unit{} = unit, coords) do
     case grid[coords] do
       :nil ->
@@ -96,6 +100,7 @@ defmodule Yagg.Board do
   defp can_place?(:south, {_, y}) when y in 0..1, do: :true
   defp can_place?(:south, _), do: :false
 
+  @spec units(t, Player.position) :: {:ok, %{grid: list, hand: list}}
   def units(:nil, _), do: {:ok, %{grid: [], hand: []}}
   def units(board, position) do
     ongrid = Enum.reduce(
@@ -113,6 +118,7 @@ defmodule Yagg.Board do
     {:ok, %{grid: ongrid, hand: hand}}
   end
 
+  @spec move(t, Player.position, Grid.coord, Grid.coord) :: {t, [Event.t]} | {:err, atom}
   def move(%Board{} = board, position, from, to) do
     case board.grid[from] do
       %Unit{position: ^position} = unit ->
@@ -139,9 +145,10 @@ defmodule Yagg.Board do
   @doc """
   Unit dies as {x, y}. Returns new board and events
   """
-  @spec unit_death(Board.t, Unit.t, Grid.coord, Keyword.t) :: {Board.t, [Event.t]}
-  def unit_death(board, unit, {x, y}, meta \\ []) do
-    board = %{board | grid: Map.delete(board.grid, {x, y})}
+  @spec unit_death(Board.t, Grid.coord, Keyword.t) :: {Board.t, [Event.t]}
+  def unit_death(board, {x, y}, meta \\ []) do
+    {unit, grid} = Map.pop(board.grid, {x, y})
+    board = %{board | grid: grid}
     opts = [{:unit, unit}, {:coords, {x, y}} | meta]
     {board, events} = Unit.trigger_module(unit, :death).resolve(board, opts)
     {
@@ -166,6 +173,20 @@ defmodule Yagg.Board do
       board,
       [Event.GameStarted.new() | events]
     }
+  end
+
+  @spec push_block(t, Grid.coord, Grid.coord) :: {t, [Event.t]} | {:err, atom}
+  def push_block(board, from, to) do
+    dir = Grid.direction(from, to)
+    square = Grid.next(dir, to)
+    case board.grid[square] do
+      :nil -> 
+        {board, events1} = do_move(board, to, square)
+        {board, events2} = do_move(board, from, to, action: :push)
+        {board, events1 ++ events2}
+      _ ->
+        {:err, :occupied}
+    end
   end
 
   ## Private
@@ -199,30 +220,17 @@ defmodule Yagg.Board do
   defp do_battle(board, unit, opponent, from, to) do
     cond do
       unit.attack > opponent.defense ->
-        {board, e1} = unit_death(board, opponent, to, opponent: {unit, from})
+        {board, e1} = unit_death(board, to, opponent: {unit, from})
         {board, e2} = do_move(board, from, to, action: :battle)
         {board, e1 ++ e2}
       unit.attack == opponent.defense ->
         # not currently possible?
-        {board, e1} = unit_death(board, unit, from)
-        {board, e2} = unit_death(board, opponent, to)
+        {board, e1} = unit_death(board, from)
+        {board, e2} = unit_death(board, to)
         {board, e1 ++ e2}
       unit.attack < opponent.defense ->
-        {board, events} = unit_death(board, unit, from, opponent: {opponent, to}, attacking: :true)
+        {board, events} = unit_death(board, from, opponent: {opponent, to}, attacking: :true)
         {board, events}
-    end
-  end
-
-  def push_block(board, from, to) do
-    dir = Grid.direction(from, to)
-    square = Grid.next(dir, to)
-    case board.grid[square] do
-      :nil -> 
-        {board, events1} = do_move(board, to, square)
-        {board, events2} = do_move(board, from, to, action: :push)
-        {board, events1 ++ events2}
-      _ ->
-        {:err, :occupied}
     end
   end
 end

@@ -88,8 +88,8 @@ defmodule Action.Ability.Rowburn do
     )
   end
 
-  defp burn_unit({{x, y}, %Unit{} = unit}, {board, events}, y) do
-    {board, newevents} = Board.unit_death(board, unit, {x, y})
+  defp burn_unit({{x, y}, %Unit{}}, {board, events}, y) do
+    {board, newevents} = Board.unit_death(board, {x, y})
     {board, newevents ++ events}
   end
   defp burn_unit(_, acc, _) do
@@ -110,8 +110,8 @@ defmodule Action.Ability.Colburn do
     )
   end
 
-  defp burn_unit({{x, y}, %Unit{} = unit}, {board, events}, x) do
-    {board, newevents} = Board.unit_death(board, unit, {x, y})
+  defp burn_unit({{x, y}, %Unit{}}, {board, events}, x) do
+    {board, newevents} = Board.unit_death(board, {x, y})
     {board, newevents ++ events}
   end
   defp burn_unit(_, acc, _) do
@@ -126,7 +126,7 @@ defmodule Action.Ability.Poisonblade do
   def resolve(board, opts) do
     case opts[:opponent] do
       :nil -> {board, []}
-      {unit, coords} -> Board.unit_death(board, unit, coords)
+      {%Unit{}, coords} -> Board.unit_death(board, coords)
     end
   end
 end
@@ -151,7 +151,6 @@ defmodule Action.Ability.Copyleft do
   def resolve(board, opts) do
     pos = opts[:unit].position
     coord = Grid.cardinal(pos, :left) |> Grid.next(opts[:coords])
-    IO.inspect(opts: opts, coord: coord)
     case board.grid[coord] do
       %Unit{} = unit ->
         copy = %{unit | position: pos}
@@ -191,7 +190,7 @@ defmodule Action.Ability.Push do
   defp push_unit({board, events}, direction, coord, unit) do
     case Board.move(board, unit.position, coord, Grid.next(direction, coord)) do
       {:err, :out_of_bounds} ->
-        {newboard, newevents} = Board.unit_death(board, unit, coord)
+        {newboard, newevents} = Board.unit_death(board, coord)
         {newboard, events ++ newevents}
       {:err, _} -> {board, events}
       {newboard, newevents} -> {newboard, events ++ newevents}
@@ -215,7 +214,10 @@ defmodule Action.Ability.Upgrade do
   @impl Action.Ability
   def resolve(%Board{} = board, opts) do
     unit = opts[:unit]
-    {board, e1} = Board.unit_death(board, unit, opts[:coords])
+    {board, e1} = case board.grid[opts[:coords]] do
+      :nil -> {board, []}
+      ^unit -> Board.unit_death(board, opts[:coords])
+    end
     newunit = %{opts[:unit] | attack: unit.attack + 2, defense: unit.defense + 2}
     {board, e2} = Hand.add_unit(board, unit.position, newunit)
     {board, e1 ++ e2}

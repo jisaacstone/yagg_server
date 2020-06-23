@@ -277,33 +277,34 @@ defmodule YaggTest.Action.Ability do
     assert Enum.find(events, fn(e) -> e.kind == :thing_moved end)
   end
 
-  test "creapattack" do
-    mediacreep = Unit.Mediacreep.new(:north)
-    spikeder = Unit.Spikeder.new(:south)
-    board = set_board([
-      {{2, 2}, mediacreep},
-      {{3, 2}, spikeder},
-    ])
-    action = %Board.Action.Move{from_x: 2, from_y: 2, to_x: 3, to_y: 2}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{3, 2}] == :nil
-    assert newboard.grid[{2, 2}] == mediacreep
-  end
-
   test "illegal square" do
     grid = %{
-      {0, 1} => %Unit{ability: Board.Action.Ability.Upgrade, attack: 3, defense: 2, name: :electromouse, position: :south, state: %{}, triggers: %{}},
-      {0, 2} => %Unit{ability: nil, attack: 5, defense: 4, name: :mediacreep, position: :north, state: %{}, triggers: %{move: Board.Action.Ability.Duplicate}},
+      {0, 1} => %Unit{ability: Board.Action.Ability.Upgrade, attack: 3, defense: 2, name: :electromouse, position: :south, triggers: %{}},
+      {0, 2} => %Unit{ability: nil, attack: 5, defense: 4, name: :mediacreep, position: :north, triggers: %{move: Unit.Mediacreep.Duplicate}},
       {1, 0} => :water,
-      {1, 1} => %Unit{ability: Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :south, state: %{}, triggers: %{}},
-      {1, 2} => %Unit{ability: nil, attack: 1, defense: 8, name: :tim, position: :south, state: %{}, triggers: %{}},
-      {3, 0} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, state: %{}, triggers: %{death: Board.Action.Ability.Concede}},
-      {3, 3} => %Unit{ability: nil, attack: 9, defense: 2, name: :bezerker, position: :north, state: %{}, triggers: %{}},
-      {3, 4} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, state: %{}, triggers: %{death: Board.Action.Ability.Concede}},
+      {1, 1} => %Unit{ability: Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :south, triggers: %{}},
+      {1, 2} => %Unit{ability: nil, attack: 1, defense: 8, name: :tim, position: :south, triggers: %{}},
+      {3, 0} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, triggers: %{death: Board.Action.Ability.Concede}},
+      {3, 3} => %Unit{ability: nil, attack: 9, defense: 2, name: :bezerker, position: :north, triggers: %{}},
+      {3, 4} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, triggers: %{death: Board.Action.Ability.Concede}},
       {4, 3} => :water
     }
     action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 0, to_y: 3}
     board = %Board{grid: grid, state: :battle, hands: []}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
+  end
+
+  test "timeout" do
+    grid = %{
+      {0, 2} => %Unit{ability: nil, attack: 1, defense: 0, name: :dogatron, position: :south, triggers: %{death: Board.Action.Ability.Upgrade}},
+      {1, 2} => Unit.Explody.new(:north),
+      {1, 3} => %Unit{ability: Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :north, triggers: %{}},
+      {2, 0} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, triggers: %{death: Board.Action.Ability.Concede}},
+      {4, 4} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, triggers: %{death: Board.Action.Ability.Concede}},
+      {4, 3} => :water
+    }
+    action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 1, to_y: 2}
+    board = %Board{grid: grid, state: :battle, hands: %{north: %{}, south: %{}}}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
   end
 end

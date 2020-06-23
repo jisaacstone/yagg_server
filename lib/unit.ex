@@ -4,7 +4,7 @@ alias Yagg.Table.Player
 defmodule Yagg.Unit do
   alias __MODULE__
   @enforce_keys [:attack, :defense, :name, :position]
-  defstruct [:ability, :triggers, :state | @enforce_keys]
+  defstruct [:ability, :triggers | @enforce_keys]
 
   @callback new(Player.position) :: t
 
@@ -15,7 +15,6 @@ defmodule Yagg.Unit do
     :position => Player.position(),
     :ability => :nil | module(),
     :triggers => map(),
-    :state => any()
   }
 
   defimpl Poison.Encoder, for: Unit do
@@ -31,9 +30,9 @@ defmodule Yagg.Unit do
     end
   end
 
-  @spec new(Player.position, atom, non_neg_integer, non_neg_integer, :nil | module(), %{atom => module()}, any) :: t 
-  def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}, state \\ %{}) do
-    %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers, state: state}
+  @spec new(Player.position, atom, non_neg_integer, non_neg_integer, :nil | module(), %{atom => module()}) :: t 
+  def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}) do
+    %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers}
   end
   @spec override(Player.position, module, keyword()) :: t
   def override(position, module, overrides) when is_atom(module) and is_list(overrides) do

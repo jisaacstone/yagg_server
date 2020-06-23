@@ -31,8 +31,8 @@ defmodule Unit.Explody do
       )
     end
 
-    defp killunit({coords, %Unit{} = unit}, {board, events}) do
-      {board, newevents} = Board.unit_death(board, unit, coords)
+    defp killunit({coords, %Unit{}}, {board, events}) do
+      {board, newevents} = Board.unit_death(board, coords)
       {board, newevents ++ events}
     end
     defp killunit(_, state) do
