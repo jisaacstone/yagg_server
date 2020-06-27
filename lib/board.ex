@@ -62,18 +62,6 @@ defmodule Yagg.Board do
     end
   end
 
-  defp hand_assign(hand, index, coords) do
-    case hand[index] do
-      :nil -> {:err, :invalid_index}
-      {unit, _} ->
-        if Enum.any?(hand, fn({_, {_, ^coords}}) -> :true; (_) -> :false end) do
-          {:err, :occupied}
-        else 
-          %{hand | index => {unit, coords}}
-        end
-    end
-  end
-
   @spec place!(t, Unit.t, Grid.coord) :: t
   def place!(%Board{} = board, %Unit{} = unit, coords) do
     case place(board, unit, coords) do
@@ -94,11 +82,6 @@ defmodule Yagg.Board do
       _something -> {:err, :occupied}
     end
   end
-
-  defp can_place?(:north, {_, y}) when y in 3..4, do: :true
-  defp can_place?(:north, _), do: :false
-  defp can_place?(:south, {_, y}) when y in 0..1, do: :true
-  defp can_place?(:south, _), do: :false
 
   @spec units(t, Player.position) :: {:ok, %{grid: list, hand: list}}
   def units(:nil, _), do: {:ok, %{grid: [], hand: []}}
@@ -233,4 +216,21 @@ defmodule Yagg.Board do
         {board, events}
     end
   end
+
+  defp hand_assign(hand, index, coords) do
+    case hand[index] do
+      :nil -> {:err, :invalid_index}
+      {unit, _} ->
+        if Enum.any?(hand, fn({_, {_, ^coords}}) -> :true; (_) -> :false end) do
+          {:err, :occupied}
+        else 
+          %{hand | index => {unit, coords}}
+        end
+    end
+  end
+
+  defp can_place?(:north, {_, y}) when y in 3..4, do: :true
+  defp can_place?(:north, _), do: :false
+  defp can_place?(:south, {_, y}) when y in 0..1, do: :true
+  defp can_place?(:south, _), do: :false
 end

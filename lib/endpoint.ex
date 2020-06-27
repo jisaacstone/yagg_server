@@ -109,7 +109,7 @@ defmodule Yagg.Endpoint do
       :ok -> respond(conn, 204, "")
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, %{error: err})
-      other -> respond(conn, 501, %{unexpected: other})
+      # other -> respond(conn, 501, %{unexpected: other})
     end
   end
 

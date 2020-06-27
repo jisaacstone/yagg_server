@@ -10,6 +10,7 @@ defmodule Yagg.Table do
   @derive {Poison.Encoder, only: [:players, :board, :turn, :configuration]}
   defstruct [:subscribors | @enforce_keys]
 
+  @type id :: String.t
   @type t() :: %Table{
     players: [Player.t],
     board: :nil | Board.t,
@@ -30,11 +31,13 @@ defmodule Yagg.Table do
     end
   end
 
+  @spec list() :: [pid]
   def list() do
     Supervisor.which_children(Yagg.TableSupervisor)
       |> Enum.map(fn ({_, pid, _, _}) -> pid end)
   end
 
+  @spec new(module) :: {:ok, pid}
   def new(configuration \\ Board.Configuration.Random) do
     table = %Table{
       players: [],
@@ -68,6 +71,7 @@ defmodule Yagg.Table do
 
   # API
 
+  @spec get_state(pid | id) :: {:ok, t}
   def get_state(pid) when is_pid(pid) do
     GenServer.call(pid, :get_state)
   end
@@ -76,6 +80,7 @@ defmodule Yagg.Table do
     GenServer.call(pid, :get_state)
   end
 
+  @spec get_player_state(id, String.t) :: {:ok, %{grid: list, hand: list}} | {:err, atom}
   def get_player_state(table_id, player_name) do
     {:ok, pid} = get_or_single__(table_id)
     case GenServer.call(pid, :get_state) do
@@ -88,6 +93,7 @@ defmodule Yagg.Table do
     end
   end
 
+  @spec subscribe(id, String.t) :: {:ok, pid}
   def subscribe(table_id, player) do
     {:ok, pid} = get_or_single__(table_id)
     Process.monitor(pid)
@@ -95,11 +101,13 @@ defmodule Yagg.Table do
     {:ok, pid}
   end
 
+  @spec table_action(id, String.t, struct) :: :ok | {:err, atom}
   def table_action(table_id, player_name, action) do
     {:ok, pid} = get_or_single__(table_id)
     GenServer.call(pid, {:table_action, player_name, action})
   end
 
+  @spec board_action(id, String.t, struct) :: :ok | {:err, atom}
   def board_action(table_id, player_name, action) do
     {:ok, pid} = get_or_single__(table_id)
     GenServer.call(pid, {:board_action, player_name, action})
