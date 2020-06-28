@@ -5,7 +5,8 @@ alias Yagg.Board
 
 defmodule Yagg.Board.Configuration do
   @callback starting_units(Player.position()) :: [Unit.t, ...]
-  @callback terrain() :: [{Board.Grid.coord(), Board.Grid.terrain()}]
+  @callback terrain(Board.t) :: [{Board.Grid.coord(), Board.Grid.terrain()}]
+  @callback dimensions() :: {0..8, 0..8}
 
   def all() do
     %{
@@ -38,27 +39,33 @@ defmodule Board.Configuration.Random do
       Unit.Maycorn.new(position),
       Unit.Spikeder.new(position),
       Unit.Busybody.new(position),
-    ]) |> Enum.take(7)
+    ]) |> Enum.take(Enum.random(6..9))
     [Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}) | units]
   end
 
   @impl Board.Configuration
-  def terrain() do
+  def dimensions do
+    {Enum.random(4..8), Enum.random(4..8)}
+  end
+
+  @impl Board.Configuration
+  def terrain(%{dimensions: dim}) do
     gen_terrain(
-      %{{Enum.random(0..4), Enum.random(0..4)} => Enum.random([:water, :block])},
-      Enum.random(0..3)
+      %{},
+      dim,
+      Enum.random(0..elem(dim, 0)) + 1
     )
   end
 
-  def gen_terrain(terrain, 0) do
+  def gen_terrain(terrain, _, 0) do
     Map.to_list(terrain)
   end
-  def gen_terrain(terrain, n) do
+  def gen_terrain(terrain, {width, height}, n) do
     Map.put(
       terrain,
-      {Enum.random([0,1,1,2,3,3,4]), Enum.random([0,1,1,2,2,2,2,3,3,4])},
+      {Enum.random(0..(width-1)), Enum.random(0..(height-1))},
       Enum.random([:water, :block])
-    ) |> gen_terrain(n - 1)
+    ) |> gen_terrain({width, height}, n - 1)
   end
 end
 
@@ -80,12 +87,15 @@ defmodule Board.Configuration.Alpha do
   end
 
   @impl Board.Configuration
-  def terrain() do
+  def terrain(_) do
     [
       {{1, 2}, :block},
       {{4, 2}, :water},
     ]
   end
+
+  @impl Board.Configuration
+  def dimensions(), do: {5, 5}
 end
 
 defmodule Board.Configuration.Chain do
@@ -101,7 +111,8 @@ defmodule Board.Configuration.Chain do
       Unit.new(position, :mosh, 3, 4, Ability.Push),
       Unit.new(position, :bezerker, 7, 2),
       Unit.new(position, :dogatron, 3, 4, Ability.Secondwind),
-      Unit.new(position, :explody, 3, 2, :nil, %{death: Ability.Selfdestruct}),
+      Unit.Explody.new(position),
+      Unit.Tactician.new(position),
       Unit.new(position, :colburninator, 1, 2, Ability.Colburn),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
@@ -109,13 +120,17 @@ defmodule Board.Configuration.Chain do
   end
 
   @impl Board.Configuration
-  def terrain() do
+  def terrain(_) do
     [
       {{0, 0}, :water},
-      {{4, 4}, :water},
-      {{0, 4}, :water},
-      {{4, 0}, :water},
+      {{6, 6}, :water},
+      {{0, 6}, :water},
+      {{6, 0}, :water},
       {{2, 2}, :block},
+      {{4, 4}, :block},
     ]
   end
+
+  @impl Board.Configuration
+  def dimensions, do: {7, 7}
 end

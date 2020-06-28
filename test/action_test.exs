@@ -2,13 +2,14 @@ alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.Action.Ability
 alias Yagg.Board.State.Placement
+import Helper.Board
 
 defmodule YaggTest.Action.Place do
   use ExUnit.Case
 
   test "place unit" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = %{Board.new() | state: %Placement{}}
+    board = %{new_board() | state: %Placement{}}
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -18,7 +19,7 @@ defmodule YaggTest.Action.Place do
 
   test "place unit occupied" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = %{Board.new() | state: %Placement{}}
+    board = new_board()
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands, grid: %{{4, 4} => :water}}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -27,7 +28,7 @@ defmodule YaggTest.Action.Place do
 
   test "place battle" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = %{Board.new() | state: :battle}
+    board = %{new_board() | state: :battle}
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -38,7 +39,7 @@ defmodule YaggTest.Action.Place do
 
   test "already_assigned" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = %{Board.new() | state: %Placement{}}
+    board = new_board()
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -49,7 +50,7 @@ defmodule YaggTest.Action.Place do
   test "occupied" do
     unit1 = Unit.new(:north, :test1, 3, 3)
     unit2 = Unit.new(:north, :test2, 3, 3)
-    board = %{Board.new() | state: %Placement{}}
+    board = new_board()
     hands = Map.put(board.hands, :north, %{0 => {unit1, :nil}, 1 => {unit2, :nil}})
     board = %{board | hands: hands}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -65,7 +66,7 @@ defmodule YaggTest.Action.Move do
   test "move unit" do
     unit = Unit.new(:north, :test, 3, 3)
     board =
-      Board.new() |>
+      new_board() |>
       Map.put(:state, :battle) |>
       Board.place(unit, {2, 4}) |> elem(1)
 
@@ -79,7 +80,7 @@ defmodule YaggTest.Action.Move do
     attacker = Unit.new(:north, :test, 3, 3)
     defender = Unit.new(:south, :t2, 1, 1)
     board =
-      Board.new()
+      new_board()
       |> Map.put(:state, :battle)
       |> Board.place(attacker, {4, 4}) |> elem(1)
       |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, defender)} end.()
@@ -93,7 +94,7 @@ defmodule YaggTest.Action.Move do
     attacker = Unit.new(:north, :test, 3, 3)
     defender = Unit.new(:south, :monarch, 1, 1, :nil, %{death: Ability.Concede})
     board =
-      Board.new()
+      new_board()
       |> Map.put(:state, :battle)
       |> Board.place(attacker, {4, 4}) |> elem(1)
       |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, defender)} end.()
@@ -109,7 +110,7 @@ defmodule YaggTest.Action.Move do
     unit = Unit.new(:north, :test, 3, 3)
     unit2 = Unit.new(:north, :test2, 3, 3)
     board =
-      Board.new()
+      new_board()
       |> Map.put(:state, :battle)
       |> Board.place(unit, {4, 4}) |> elem(1)
       |> Board.place(unit2, {4, 3}) |> elem(1)
@@ -120,7 +121,7 @@ defmodule YaggTest.Action.Move do
   test "push block" do
     unit = Unit.new(:north, :test, 3, 3)
     board =
-      Board.new()
+      new_board()
       |> Map.put(:state, :battle)
       |> Board.place(unit, {2, 3}) |> elem(1)
       |> fn (b) -> %{b | grid: Map.put(b.grid, {2, 2}, :block)} end.()
@@ -136,7 +137,7 @@ defmodule YaggTest.Action.Ready do
 
   test "ready" do
     unit = Unit.new(:north, :monarch, 3, 3)
-    board = %{Board.new() | state: %Placement{}}
+    board = new_board()
     hands = Map.put(board.hands, :north, %{0 => {unit, {4, 4}}})
     board = %{board | hands: hands}
     action = %Board.Action.Ready{}
@@ -147,7 +148,7 @@ defmodule YaggTest.Action.Ready do
 
   test "gamestart" do
     unit = Unit.new(:north, :monarch, 3, 3)
-    board = %{Board.new() | state: %Placement{ready: :south}}
+    board = %{new_board() | state: %Placement{ready: :south}}
     hands = Map.put(board.hands, :north, %{0 => {unit, {4, 4}}})
     board = %{board | hands: hands}
     action = %Board.Action.Ready{}
@@ -160,23 +161,11 @@ end
 defmodule YaggTest.Action.Ability do
   use ExUnit.Case
 
-  defp set_board(features) do
-    Board.new() |> Map.put(:state, :battle) |> set_board(features)
-  end
-  defp set_board(board, []), do: board
-  defp set_board(board, [{coord, feature} | features]) do
-    grid = Map.put(board.grid, coord, feature)
-    set_board(%{board | grid: grid}, features)
-  end
-
   test "selfdestruct" do
     unit = Unit.Explody.new(:north)
     unit2 = Unit.new(:north, :test2, 3, 3)
     unit3 = Unit.new(:south, :test3, 7, 3)
-    board =
-      Board.new()
-      |> Map.put(:state, :battle)
-      |> set_board(
+    board = set_board(
         [
           {{4, 4}, unit},
           {{4, 3}, unit2},
@@ -192,10 +181,7 @@ defmodule YaggTest.Action.Ability do
   test "secondwind" do
     unit = Unit.new(:south, :test, 3, 0, :nil, %{death: Ability.Secondwind})
     unit2 = Unit.new(:north, :test2, 5, 4)
-    board =
-      Board.new()
-      |> Map.put(:state, :battle)
-      |> set_board(
+    board = set_board(
         [
           {{4, 4}, unit2},
           {{4, 3}, unit}
@@ -210,10 +196,7 @@ defmodule YaggTest.Action.Ability do
     unitM = Unit.Tactician.new(:south)
     unitF = Unit.new(:south, :unit, 3, 2)
     unitE = Unit.new(:north, :enemy, 5, 4)
-    board =
-      Board.new()
-      |> Map.put(:state, :battle)
-      |> set_board(
+    board = set_board(
         [
           {{2, 2}, unitM},
           {{3, 2}, unitF},
@@ -230,10 +213,7 @@ defmodule YaggTest.Action.Ability do
   test "push manuver" do
     unitM = Unit.Tactician.new(:south)
     unitP = Unit.Pushie.new(:south)
-    board =
-      Board.new()
-      |> Map.put(:state, :battle)
-      |> set_board(
+    board = set_board(
         [
           {{2, 3}, unitP},
           {{1, 3}, unitM},
@@ -290,7 +270,7 @@ defmodule YaggTest.Action.Ability do
       {4, 3} => :water
     }
     action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 0, to_y: 3}
-    board = %Board{grid: grid, state: :battle, hands: []}
+    board = %Board{grid: grid, state: :battle, hands: [], dimensions: {5, 5}, configuration: Board.Configuration.Alpha}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
   end
 
@@ -304,7 +284,20 @@ defmodule YaggTest.Action.Ability do
       {4, 3} => :water
     }
     action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 1, to_y: 2}
-    board = %Board{grid: grid, state: :battle, hands: %{north: %{}, south: %{}}}
+    board = %Board{grid: grid, state: :battle, hands: %{north: %{}, south: %{}}, dimensions: {5, 5}, configuration: Board.Configuration.Alpha}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
   end
+
+  test "spark" do
+    sparkle = %{Unit.Maycorn.new(:south) | ability: Unit.Maycorn.Spark.Front}
+    tink = Unit.Tinker.new(:north)
+    board = set_board([
+      {{4, 2}, sparkle},
+      {{4, 4}, tink}
+    ])
+    action = %Board.Action.Ability{x: 4, y: 2}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
+    assert newboard.grid[{4, 4}] == :nil
+  end
+
 end

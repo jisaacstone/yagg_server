@@ -8,11 +8,15 @@ defmodule YaggServer.MixProject do
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      elixirc_paths: compiler_paths(Mix.env()),
       dialyzer: [
         flags: [:unmatched_returns, :error_handling, :race_conditions, :unknown],
       ],
     ]
   end
+
+  def compiler_paths(:test), do: IO.inspect(["test/helpers"] ++ compiler_paths(:prod))
+  def compiler_paths(_), do: ["lib"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do

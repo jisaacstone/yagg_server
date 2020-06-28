@@ -9,7 +9,7 @@ defmodule Yagg.Board do
   alias __MODULE__
   alias Board.State
 
-  @enforce_keys [:grid, :hands, :state]
+  @enforce_keys [:grid, :hands, :state, :dimensions, :configuration]
   defstruct @enforce_keys
 
   @type direction :: :north | :south | :east | :west
@@ -17,6 +17,8 @@ defmodule Yagg.Board do
     grid: Grid.t,
     hands: %{Player.position() => Hand.t},
     state: State.t,
+    dimensions: {0..8, 0..8},
+    configuration: module,
   }
 
   defimpl Poison.Encoder, for: Board do
@@ -24,35 +26,25 @@ defmodule Yagg.Board do
       encodeable = grid
         |> Map.to_list()
         |> Map.new(fn({{x, y}, f}) -> {"#{x},#{y}", encode_feature(f)} end)
-      map = case board.state do
+      case board.state do
         %{ready: ready} ->
             %{ready: ready, state: board.state.__struct__ |> Module.split() |> Enum.reverse() |> hd()}
         state when is_atom(state) ->
           %{state: state}
       end
-      Poison.Encoder.Map.encode(
-        Map.put_new(map, :grid, encodeable),
-        options
-      )
+        |> Map.put_new(:grid, encodeable)
+        |> Map.put_new(:dimensions, board.dimensions)
+        |> Poison.Encoder.Map.encode(options)
     end
 
     defp encode_feature(%Unit{position: pos}), do: %{kind: :unit, player: pos}
     defp encode_feature(other), do: other
   end
 
-  @spec new() :: t
-  def new() do
-    %Board{
-      grid: %{},
-      hands: %{north: %{}, south: %{}},
-      state: %State.Placement{},
-    }
-  end
-
   @spec assign(Board.t, Player.position, any, Grid.coord) :: {:ok, Board.t} | {:err, atom}
   def assign(board, position, hand_index, coords) do
     cond do
-      not(can_place?(position, coords)) -> {:err, :illegal_square}
+      not(can_place?(board, position, coords)) -> {:err, :illegal_square}
       board.grid[coords] != :nil -> {:err, :occupied}
       :true ->
         case hand_assign(board.hands[position], hand_index, coords) do
@@ -74,7 +66,7 @@ defmodule Yagg.Board do
   def place(%Board{grid: grid} = board, %Unit{} = unit, coords) do
     case grid[coords] do
       :nil ->
-        unless can_place?(unit.position, coords) do
+        unless can_place?(board, unit.position, coords) do
           {:err, :illegal_placement}
         else
           {:ok, %{board | grid: Map.put_new(grid, coords, unit)}}
@@ -140,10 +132,17 @@ defmodule Yagg.Board do
     }
   end
 
-  @spec setup(Board.t) :: {Board.t, [Event.t]}
-  def setup(board), do: setup(board, Configuration.Random)
-  def setup(board, configuration) do
-    {board, events} = add_features(board, [], configuration.terrain())
+  @spec setup(module) :: {Board.t, [Event.t]}
+  def setup(), do: setup(Configuration.Random)
+  def setup(configuration) do
+    board = %Board{
+      state: %State.Placement{},
+      dimensions: configuration.dimensions(),
+      hands: %{north: %{}, south: %{}},
+      grid: %{},
+      configuration: configuration,
+    }
+    {board, events} = add_features(board, [], configuration.terrain(board))
     {board, events} = Enum.reduce(
       [:north, :south],
       {board, events},
@@ -229,8 +228,8 @@ defmodule Yagg.Board do
     end
   end
 
-  defp can_place?(:north, {_, y}) when y in 3..4, do: :true
-  defp can_place?(:north, _), do: :false
-  defp can_place?(:south, {_, y}) when y in 0..1, do: :true
-  defp can_place?(:south, _), do: :false
+  defp can_place?(%{dimensions: {_, h}}, :north, {_, y}) when y in h-2..h, do: :true
+  defp can_place?(_, :north, _), do: :false
+  defp can_place?(_, :south, {_, y}) when y in 0..1, do: :true
+  defp can_place?(_, :south, _), do: :false
 end

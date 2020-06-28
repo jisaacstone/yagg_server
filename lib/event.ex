@@ -49,8 +49,8 @@ defmodule Yagg.Event do
       Player.position(),
       [ 
         index: term,
-        x: 0..4,
-        y: 0..4 
+        x: 0..8,
+        y: 0..8 
       ]) :: Event.t
  
     def new(position, params) do
@@ -65,8 +65,8 @@ defmodule Yagg.Event do
 
     @spec new([
         player: Player.position(),
-        x: 0..4,
-        y: 0..4
+        x: 0..8,
+        y: 0..8
       ]) :: Event.t
     def new(params) do
       Event.new(:global, :unit_placed, params)
@@ -80,8 +80,8 @@ defmodule Yagg.Event do
     @spec new(
       Player.position(),
       [
-        x: 0..4,
-        y: 0..4,
+        x: 0..8,
+        y: 0..8,
         unit: Unit.t
       ]) :: Event.t
     def new(position, params) do
@@ -93,8 +93,8 @@ defmodule Yagg.Event do
     @spec new(
       Player.position(),
       [
-        x: 0..4,
-        y: 0..4,
+        x: 0..8,
+        y: 0..8,
         unit: Unit.t
       ]) :: Event.t
     def new(position, params) do
@@ -141,7 +141,7 @@ defmodule Yagg.Event do
   end
 
   defmodule UnitDied do
-    @spec new([x: 0..4, y: 0..4]) :: Event.t
+    @spec new([x: 0..8, y: 0..8]) :: Event.t
     def new(params) do
       Event.new(:global, :unit_died, params)
     end
@@ -149,8 +149,8 @@ defmodule Yagg.Event do
 
   defmodule Feature do
     @spec new([
-      x: 0..4,
-      y: 0..4,
+      x: 0..8,
+      y: 0..8,
       feture: term()
     ]) :: Event.t
     def new(params) do

@@ -31,7 +31,7 @@ defmodule Unit.Maycorn do
 
   defp sparkle(board, attack, direction, coord) do
     case Grid.thing_at(board, coord) do
-      %Unit{attack: a} when a < attack ->
+      %Unit{defense: a} when a < attack ->
         Board.unit_death(board, coord)
       atom when atom == :nil or atom == :water ->
         sparkle(board, attack, direction, Grid.next(direction, coord))

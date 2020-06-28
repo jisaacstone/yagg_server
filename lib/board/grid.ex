@@ -13,7 +13,7 @@ defmodule Yagg.Board.Grid do
   """
   @spec thing_at(Board.t, coord) :: :nil | :out_of_bounds | terrain
   def thing_at(_, {x, y}) when x < 0 or y < 0, do: :out_of_bounds
-  def thing_at(_, {x, y}) when x >= 5 or y >= 5, do: :out_of_bounds
+  def thing_at(%{dimensions: {w, h}}, {x, y}) when x >= w or y >= h, do: :out_of_bounds
   def thing_at(board, coords), do: board.grid[coords]
 
   @doc """

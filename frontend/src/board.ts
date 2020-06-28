@@ -171,7 +171,7 @@ const eventHandlers = {
   game_started: function(event) {
     const board = document.getElementById('board'),
       state = (event.state || 'placement').toLowerCase();
-    boardhtml(board);
+    boardhtml(board, event.dimensions.x, event.dimensions.y);
     gamestatechange(state);
     if (state === 'placement' || state === 'gameover') {
       displayready(state === 'placement' ? 'READY' : 'REMATCH');
@@ -333,7 +333,7 @@ function setstate(gamedata) {
     players ++;
   }
   if (gamedata.board) {
-    eventHandlers.game_started({state: gamedata.board.state});
+    eventHandlers.game_started(gamedata.board);
     if (players >= 2) {
       if (gamedata.board.ready) {
         eventHandlers.player_ready({player: gamedata.board.ready});

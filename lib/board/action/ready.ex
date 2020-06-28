@@ -27,8 +27,8 @@ defmodule Action.Ready do
   def resolve(_, %Board{state: %Gameover{ready: :nil}} = board, position) do
       {%{board | state: %Gameover{ready: position}}, [Event.PlayerReady.new(player: position)]}
   end
-  def resolve(_act, %Board{state: %Gameover{ready: _opponent}}, _position) do
-    Board.new() |> Board.setup()
+  def resolve(_act, %Board{state: %Gameover{ready: _opponent}, configuration: conf}, _position) do
+    Board.setup(conf)
   end
   def resolve(_, _, _) do
     {:err, :badstate}

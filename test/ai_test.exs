@@ -20,7 +20,7 @@ defmodule YaggTest.AI do
 
   test "possible moves" do
     board =
-      Board.new() |>
+      Helper.Board.new_board() |>
       Map.put(:state, :battle) |>
       Board.place!(Unit.new(:north, :test, 3, 3), {2, 4}) |>
       Board.place!(Unit.new(:south, :test, 3, 3), {1, 1})

@@ -51,7 +51,7 @@ export function select(thisEl, meta) {
         }
         else {
             const options = [];
-            if (meta.inhand) {
+            if (meta.inhand || gmeta.boardstate === 'placement') {
                 thisEl.dataset.uistate = 'selected';
                 Array.prototype.forEach.call(document.querySelectorAll(`.${meta.player}row .boardsquare`), el => {
                     if (!el.firstChild) {

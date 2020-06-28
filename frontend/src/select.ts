@@ -49,7 +49,7 @@ export function select(thisEl, meta) {
       global.selected = null;
     } else {
       const options = [];
-      if (meta.inhand) {
+      if (meta.inhand || gmeta.boardstate === 'placement') {
         thisEl.dataset.uistate = 'selected';
         Array.prototype.forEach.call(
           document.querySelectorAll(`.${meta.player}row .boardsquare`),

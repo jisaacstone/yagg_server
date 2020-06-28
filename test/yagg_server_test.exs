@@ -66,7 +66,9 @@ defmodule YaggTest.Endpoint do
     %{id: table_id} = call_200("/table/new", %{})
     call_204("/table/#{table_id}/a/join", %{player: "p1"})
     call_204("/table/#{table_id}/a/join", %{player: "p2"})
-    call_204("/board/#{table_id}/a/place?player=p1", %{index: 1, x: 4, y: 4})
+    table = get_200("/table/#{table_id}/state")
+    south = Enum.find(table.players, fn(p) -> p.position == "south" end)
+    call_204("/board/#{table_id}/a/place?player=#{south.name}", %{index: 1, x: 0, y: 0})
   end
 
   test "new with config" do
