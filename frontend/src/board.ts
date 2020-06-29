@@ -171,6 +171,12 @@ const eventHandlers = {
   game_started: function(event) {
     const board = document.getElementById('board'),
       state = (event.state || 'placement').toLowerCase();
+    if (! event.dimensions) {
+      console.log({event, foob: "gog"});
+      return request(`table/${tableid()}/state`).then((gamedata) => {
+        setstate(gamedata);
+      });
+    }
     boardhtml(board, event.dimensions.x, event.dimensions.y);
     gamestatechange(state);
     if (state === 'placement' || state === 'gameover') {
@@ -182,14 +188,17 @@ const eventHandlers = {
   },
   player_joined: function(event) {
     console.log({e: 'player_joined', event});
-    const nameEl = document.createElement('div');
+    const nameEl = document.createElement('div'),
+      whois = event.name === getname() ? 'player' : 'opponent',
+      container = document.getElementById(whois);
+    if (container.firstElementChild) {
+      return;
+    }
     nameEl.className = 'playername';
     nameEl.innerHTML = event.name;
-    if (event.name === getname()) {
+    container.appendChild(nameEl);
+    if (whois === 'player') {
       gmeta.position = event.position;
-      document.getElementById('player').appendChild(nameEl);
-    } else {
-      document.getElementById('opponent').appendChild(nameEl);
     }
   },
   player_left: function(event) {
@@ -272,20 +281,12 @@ const eventHandlers = {
     const to = document.getElementById(`c${event.to.x}-${event.to.y}`),
       from = document.getElementById(`c${event.from.x}-${event.from.y}`),
       thing = from.firstChild;
-    console.log({ to, from, thing });
     if (to) {
       const child = to.firstChild as HTMLElement;
-      //if (child && child.style) {
-      //  child.style.visibility = 'hidden';
-      //}
       to.appendChild(thing);
     } else {
       from.removeChild(thing);
     }
-    //const maybeHidden = from.firstChild as HTMLElement;
-    //if (maybeHidden && maybeHidden.style) {
-    //  maybeHidden.style.visibility = '';
-    //}
   },
 
   gameover: function(event) {
@@ -306,7 +307,7 @@ const eventHandlers = {
   }
 };
 
-function gamestate() {
+function fetchgamestate() {
   request(`table/${tableid()}/state`).then((gamedata) => {
     setstate(gamedata);
     request(`board/${tableid()}/player_state/${getname()}`).then((unitdata: any) => {
@@ -364,11 +365,11 @@ window.onload = function() {
   gmeta.name = name;
   gameaction('join', { player: name }, 'table')
     .then(() => {
-      gamestate();
+      fetchgamestate();
       listen(eventHandlers);
     }).catch((err) => {
       console.log({ joinerror: err });
-      gamestate();
+      fetchgamestate();
       listen(eventHandlers);
     });
 };

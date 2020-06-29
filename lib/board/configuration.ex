@@ -6,7 +6,7 @@ alias Yagg.Board
 defmodule Yagg.Board.Configuration do
   @callback starting_units(Player.position()) :: [Unit.t, ...]
   @callback terrain(Board.t) :: [{Board.Grid.coord(), Board.Grid.terrain()}]
-  @callback dimensions() :: {0..8, 0..8}
+  @callback dimensions() :: {4..8, 4..8}
 
   def all() do
     %{
@@ -39,13 +39,14 @@ defmodule Board.Configuration.Random do
       Unit.Maycorn.new(position),
       Unit.Spikeder.new(position),
       Unit.Busybody.new(position),
-    ]) |> Enum.take(Enum.random(6..9))
+    ]) |> Enum.take(10)
     [Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}) | units]
   end
 
   @impl Board.Configuration
   def dimensions do
-    {Enum.random(4..8), Enum.random(4..8)}
+    size = Enum.random(4..7)
+    {size, size}
   end
 
   @impl Board.Configuration

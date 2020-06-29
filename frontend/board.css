@@ -1,6 +1,5 @@
 body {
   flex-direction: column;
-  margin-bottom: 30px;
   background: repeating-linear-gradient(90deg, #FFA, #FAF 10px, #AFF 10px, #FAF 20px, #AAF 20px, #AFF 30px);
 }
 
@@ -96,8 +95,8 @@ body > div {
 
 #hand {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  width: 100%;
   margin-top: 1vh;
 }
 
