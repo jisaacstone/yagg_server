@@ -69,68 +69,7 @@ function waitingforplayers(el: HTMLElement) {
   waiting.appendChild(copy);
 }
 
-function unit_el(unit, el) {
-  for (const att of ['name', 'attack', 'defense']) {
-    const subel = document.createElement('span');
-    subel.className = `unit-${att}`;
-    subel.innerHTML = unit[att];
-    el.appendChild(subel);
-  }
-  el.style.backgroundImage = `url(img/${unit.name}.png)`;
-  if (unit.triggers) {
-    const triggerel = document.createElement('div');
-    triggerel.className = 'triggers';
-    el.appendChild(triggerel);
-    if (unit.triggers.death) {
-      const subel = document.createElement('div'),
-        tt = document.createElement('span');
-      subel.className = 'unit-trigger death-trigger';
-      subel.innerHTML = SKULL;
-      triggerel.appendChild(subel);
-      tt.className = 'tooltip';
-      tt.innerHTML = `When this unit dies: ${unit.triggers.death.description}`;
-      subel.appendChild(tt);
-    }
-    if (unit.triggers.move) {
-      const subel = document.createElement('div'),
-        tt = document.createElement('span');
-      subel.className = 'unit-trigger move-trigger';
-      subel.innerHTML = MOVE;
-      triggerel.appendChild(subel);
-      tt.className = 'tooltip';
-      tt.innerHTML = `When this unit moves: ${unit.triggers.move.description}`;
-      subel.appendChild(tt);
-    }
-  }
-  if (unit.ability) {
-    const abilbut = document.createElement('button'),
-      tt = document.createElement('span'),
-      abilname = unit.ability.name;
-    abilbut.className = 'unit-ability';
-    abilbut.innerHTML = abilname;
-    abilbut.onclick = function(e) {
-      if (el.parentNode.className === 'boardsquare') {
-        e.preventDefault();
-        e.stopPropagation();
-        if (window.confirm(unit.ability.description)) {
-          const square = el.parentNode,
-            x = +square.id.charAt(1),
-            y = +square.id.charAt(3);
-          gameaction('ability', {x: x, y: y}, 'board');
-        }
-      }
-    };
-    el.appendChild(abilbut);
-    tt.className = 'tooltip';
-    tt.innerHTML = unit.ability.description;
-    abilbut.appendChild(tt);
-  }
-  if (unit.name === 'monarch') {
-    el.className = `monarch ${el.className}`;
-  }
-}
-
-function gamestatechange(newstate) {
+function gamestatechange(newstate: string): void {
   document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
   document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
   gmeta.boardstate = newstate;
@@ -219,7 +158,7 @@ const eventHandlers = {
     }
     unit.className = className;
     unit.dataset.index = event.index;
-    unit_el(event.unit, unit);
+    render_unit(event.unit, unit);
     card.appendChild(unit);
     unitsbyindex[event.index] = unit;
   },
@@ -236,7 +175,7 @@ const eventHandlers = {
       return console.log({err: 'unitnotfound', event, unit});
     }
     unit.innerHTML = '';
-    unit_el(event.unit, unit);
+    render_unit(event.unit, unit);
   },
 
   unit_changed: function(event) {
@@ -356,12 +295,18 @@ function setstate(gamedata) {
   }
 }
 
-function namedialog() {
-  return prompt('enter your name', _name_());
+function namedialog(): string {
+  const gn = getname();
+  if (gn) {
+    return gn;
+  }
+  const name = prompt('enter your name', _name_());
+  history.pushState({ name }, '', `${window.location}&player=${name}`);
+  return name;
 }
 
 window.onload = function() {
-  const name = getname() || namedialog();
+  const name = namedialog();
   gmeta.name = name;
   gameaction('join', { player: name }, 'table')
     .then(() => {

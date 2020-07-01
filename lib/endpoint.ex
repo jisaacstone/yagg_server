@@ -12,6 +12,12 @@ defmodule Yagg.Endpoint do
   plug :match
   plug :dispatch
 
+  get("/fe") do
+    conn
+      |> Conn.put_resp_header("location", "/fe/index.html")
+      |> send_resp(302, "")
+  end
+
   post "/table/new" do
     {:ok, body, conn} = Conn.read_body(conn)
     data = Poison.Parser.parse!(body, %{keys: :atoms!})
