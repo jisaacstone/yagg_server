@@ -40,7 +40,7 @@ defmodule Board.Configuration.Random do
       Unit.Spikeder.new(position),
       Unit.Busybody.new(position),
     ]) |> Enum.take(10)
-    [Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}) | units]
+    [Unit.Monarch.new(position) | units]
   end
 
   @impl Board.Configuration
@@ -76,7 +76,7 @@ defmodule Board.Configuration.Alpha do
   @impl Board.Configuration
   def starting_units(position) do
     Enum.shuffle([
-      Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
+      Unit.Monarch.new(position),
       Unit.Tactician.new(position),
       Unit.new(position, :bezerker, 7, 2),
       Unit.new(position, :fullarmorcoward, 1, 6, :nil, %{death: Ability.Secondwind}),
@@ -108,7 +108,7 @@ defmodule Board.Configuration.Chain do
   @impl Board.Configuration
   def starting_units(position) do
     Enum.shuffle([
-      Unit.new(position, :monarch, 1, 0, Ability.Concede, %{death: Ability.Concede}),
+      Unit.Monarch.new(position),
       Unit.new(position, :mosh, 3, 4, Ability.Push),
       Unit.new(position, :bezerker, 7, 2),
       Unit.new(position, :dogatron, 3, 4, Ability.Secondwind),
