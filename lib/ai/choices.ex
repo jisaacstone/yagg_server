@@ -4,7 +4,7 @@ alias Yagg.Table.Player
 alias Yagg.Board.Action
 alias Yagg.Board.Grid
 
-defmodule Yagg.AI do
+defmodule Yagg.AI.Choices do
   @spec move(Board.t, Player.position) :: struct
   def move(board, position) do
     chs = choices(board, position)

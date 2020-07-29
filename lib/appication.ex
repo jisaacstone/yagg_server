@@ -17,6 +17,7 @@ defmodule Yagg.Application do
         ]
       ),
       {DynamicSupervisor, name: Yagg.TableSupervisor, strategy: :one_for_one},
+      {DynamicSupervisor, name: Yagg.AISupervisor, strategy: :one_for_one},
     ]
 
     opts = [strategy: :one_for_one, name: Yagg.Supervisor]

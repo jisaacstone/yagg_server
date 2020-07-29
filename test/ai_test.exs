@@ -1,6 +1,6 @@
 alias Yagg.Unit
 alias Yagg.Board
-alias Yagg.AI
+alias Yagg.AI.Choices
 alias Yagg.Board.Action
 require Helper.Board
 #alias Yagg.Board.State.Placement
@@ -38,7 +38,7 @@ defmodule YaggTest.AI do
       [],
       {4, 4}
     )
-    choices = AI.choices(board, :north)
+    choices = Choices.choices(board, :north)
     assert Enum.member?(choices.place, %Action.Place{index: 0, x: 3, y: 3})
     assert not(Enum.member?(choices.place, %Action.Place{index: 0, x: 0, y: 0}))
     assert choices.move == []
@@ -50,7 +50,7 @@ defmodule YaggTest.AI do
       HB.new_board([], [], {4, 4})
       |> Map.put(:state, :battle)
       |> Board.place!(Unit.Monarch.new(:north), {3, 3})
-    choices = AI.choices(board, :north)
+    choices = Choices.choices(board, :north)
     assert Enum.member?(choices.move, %Action.Move{from_x: 3, from_y: 3, to_x: 3, to_y: 2})
     assert choices.place == []
     assert choices.ability == []
@@ -61,7 +61,7 @@ defmodule YaggTest.AI do
       HB.new_board([], [], {4, 4})
       |> Map.put(:state, :battle)
       |> Board.place!(Unit.Pushie.new(:north), {3, 3})
-    choices = AI.choices(board, :north)
+    choices = Choices.choices(board, :north)
     assert Enum.member?(choices.ability, %Action.Ability{x: 3, y: 3})
     assert choices.place == []
   end

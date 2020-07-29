@@ -6,12 +6,13 @@ defmodule Yagg.Table do
   use GenServer
   alias __MODULE__
 
-  @enforce_keys [:players, :board, :turn, :configuration]
+  @enforce_keys [:id, :players, :board, :turn, :configuration]
   @derive {Poison.Encoder, only: [:players, :board, :turn, :configuration]}
   defstruct [:subscribors | @enforce_keys]
 
   @type id :: String.t
   @type t() :: %Table{
+    id: id,
     players: [Player.t],
     board: :nil | Board.t,
     turn: :nil | Player.position(),
@@ -39,7 +40,9 @@ defmodule Yagg.Table do
 
   @spec new(module) :: {:ok, pid}
   def new(configuration \\ Board.Configuration.Random) do
+    id = self() |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
     table = %Table{
+      id: id,
       players: [],
       subscribors: [],
       board: :nil,
@@ -108,6 +111,9 @@ defmodule Yagg.Table do
   end
 
   @spec board_action(id, String.t, struct) :: :ok | {:err, atom}
+  def board_action(pid, player_name, action) when is_pid(pid) do
+    GenServer.call(pid, {:board_action, player_name, action})
+  end
   def board_action(table_id, player_name, action) do
     {:ok, pid} = get_or_single__(table_id)
     GenServer.call(pid, {:board_action, player_name, action})

@@ -81,4 +81,21 @@ defmodule YaggTest.Endpoint do
     assert table.board.grid[:"2,2"] == "block"
   end
 
+  test "with ai" do
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "beta"})
+    call_204("/table/#{table_id}/a/join", %{player: "p1"})
+    table = get_200("/table/#{table_id}/state")
+    assert [%{name: "p1"}] = table.players
+    call_204("/table/#{table_id}/a/ai", %{name: "random"})
+    table = get_200("/table/#{table_id}/state")
+    assert [_, _] = table.players
+    stop_ai_servers()
+  end
+
+  defp stop_ai_servers() do
+    Enum.map(
+      Supervisor.which_children(Yagg.AISupervisor),
+      fn ({id, _, _, _}) -> Supervisor.terminate_child(Yagg.AISupervisor, id) end
+    )
+  end
 end
