@@ -8,6 +8,7 @@ defmodule Yagg.AI.Server do
   use GenServer
 
   def init({table_id, robot}) do
+    IO.inspect(aiinit: robot)
     GenServer.cast(self(), :subscribe_table)
     {:ok, %{robot: robot, table_id: table_id}}
   end
@@ -17,27 +18,49 @@ defmodule Yagg.AI.Server do
   end
 
   def handle_cast(:subscribe_table, %{robot: robot, table_id: table_id} = state) do
+    IO.inspect([st: robot])
     {:ok, pid} = Table.subscribe(table_id, robot.name)
     send(self(), :check_game_started)
+    IO.inspect(:cgs_called)
     {:noreply, Map.put(state, :pid, pid)}
   end
 
   def handle_info(:check_game_started, state) do
+    IO.inspect([:cgs, self(), state])
     {:ok, table} = Table.get_state(state.pid)
+    position = state.robot.position
     case table.board do
-      %Board{state: %Board.State.Placement{}} -> do_initial_placement(state, table.board)
-      _ -> Process.send_after(self(), :check_game_started, 100)
+      %{turn: ^position} = board ->
+        take_your_turn(board, state)
+      %Board{state: %Board.State.Placement{ready: ^position}} ->
+        :do_nothing
+      %Board{state: %Board.State.Placement{}} ->
+        do_initial_placement(state, table.board)
+      :nil ->
+        Process.send_after(self(), :check_game_started, 100)
+      _ -> :do_nothing
     end
     {:noreply, state}
   end
 
+  def handle_info(%{kind: :turn, data: %{player: pos}}, %{robot: %{position: pos}} = state) do
+    {:ok, table} = Table.get_state(state.pid)
+    take_your_turn(table.board, state)
+    {:noreply, state}
+  end
   def handle_info(%Event{} = event, state) do
-    IO.inspect(event)
+    IO.inspect(event: event)
     {:noreply, state}
   end
   def handle_info(other, state) do
     IO.inspect(%{unexpected: other})
     {:noreply, state}
+  end
+
+  defp take_your_turn(board, state) do
+    action = Choices.move(board, state.robot.position)
+    IO.inspect([action: action])
+    :ok = Table.board_action(state.pid, state.robot.name, action)
   end
 
   defp do_initial_placement(%{pid: table_pid, robot: robot}, board) do
@@ -48,14 +71,16 @@ defmodule Yagg.AI.Server do
     occupied = [{place_monarch.x, place_monarch.y} | Map.keys(board.grid)]
     choices = drop_dupes(choices, MapSet.new([monarch_idx]), MapSet.new(occupied))
     # place on average just above half the units?
-    actions =  choices ++ [%Ready{}]
+    actions =  [place_monarch | choices]
     IO.inspect(actions)
 
     Enum.each(
       actions,
       fn(action) -> :ok = Table.board_action(table_pid, robot.name, IO.inspect(action)) end
     )
-    :ok
+    {:ok, table} = Table.get_state(table_pid)
+    IO.inspect(hand: table.board.hands[robot.position])
+    :ok = Table.board_action(table_pid, robot.name, IO.inspect(%Ready{}))
   end
 
   defp cpm(%{index: i, x: x, y: y}, i, grid) do

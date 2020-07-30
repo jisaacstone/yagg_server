@@ -9,7 +9,8 @@ defmodule Action.Ready do
   defstruct []
 
   @impl Action
-  def resolve(_, %Board{state: %{ready: position}}, position) do
+  def resolve(_, %Board{state: %{ready: position}} = bord, position) do
+    IO.inspect(bord: bord, pos: position)
     {:err, :already_ready}
   end
   def resolve(_act, %Board{state: %Placement{ready: :nil}} = board, position) do

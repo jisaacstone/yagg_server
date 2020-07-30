@@ -51,7 +51,7 @@ defmodule Yagg.AI.Choices do
   defp open_squares(grid, width, height, position) do
     ys = y_rows(height, position)
     Enum.reduce(
-      0..width,
+      0..(width - 1),
       [],
       fn(x, options) ->
         Enum.reduce(
