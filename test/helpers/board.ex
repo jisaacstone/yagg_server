@@ -17,7 +17,7 @@ defmodule Helper.Board do
     new_board(config)
   end
   def new_board(config \\ Configuration.Alpha) do
-    {board, _} = Yagg.Board.setup(config)
+    {board, _} = Yagg.Board.setup(Yagg.Board.new(config))
     board
   end
 

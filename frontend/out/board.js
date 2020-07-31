@@ -6,7 +6,9 @@ import { getname, tableid, _name_ } from './urlvars.js';
 import { gmeta } from './state.js';
 import { displayerror } from './err.js';
 import { listen } from './eventlistener.js';
+import * as overlay from './overlay.js';
 function boardhtml(el, width = 5, height = 5) {
+    console.log('b2h');
     el.innerHTML = '';
     function makerow(y) {
         let row = document.createElement('div'), className = 'boardrow';
@@ -48,11 +50,11 @@ function boardhtml(el, width = 5, height = 5) {
         }
     }
 }
-function waitingforplayers(el) {
-    const waiting = document.createElement('div'), copy = document.createElement('button');
-    waiting.className = 'waiting';
+function waitingforplayers() {
+    const waiting = document.createElement('div'), copy = document.createElement('button'), comp = document.createElement('button'), over = overlay.create();
+    over.className = over.className + ' waiting';
     waiting.innerHTML = 'waiting for opponent';
-    el.appendChild(waiting);
+    over.appendChild(waiting);
     copy.innerHTML = 'copy join link';
     copy.className = 'linkcopy';
     copy.onclick = () => {
@@ -62,7 +64,15 @@ function waitingforplayers(el) {
             alert('copied!');
         });
     };
-    waiting.appendChild(copy);
+    over.appendChild(copy);
+    comp.innerHTML = 'play the computer';
+    comp.className = 'aibutton';
+    comp.onclick = function () {
+        gameaction('ai', {}, 'table').then(() => {
+            overlay.clear();
+        });
+    };
+    over.appendChild(comp);
 }
 function gamestatechange(newstate) {
     document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
@@ -96,14 +106,11 @@ function hideready() {
 const unitsbyindex = {};
 const eventHandlers = {
     game_started: function (event) {
-        const board = document.getElementById('board'), state = (event.state || 'placement').toLowerCase();
-        if (!event.dimensions) {
-            console.log({ event, foob: "gog" });
-            return request(`table/${tableid()}/state`).then((gamedata) => {
-                setstate(gamedata);
-            });
+        const board = document.getElementById('board'), state = event.state.toLowerCase() || 'placement';
+        console.log({ gs: event });
+        if (event.dimensions) {
+            boardhtml(board, event.dimensions.x, event.dimensions.y);
         }
-        boardhtml(board, event.dimensions.x, event.dimensions.y);
         gamestatechange(state);
         if (state === 'placement' || state === 'gameover') {
             displayready(state === 'placement' ? 'READY' : 'REMATCH');
@@ -177,6 +184,7 @@ const eventHandlers = {
         }
     },
     feature: function (event) {
+        console.log({ feature: event });
         const square = document.getElementById(`c${event.x}-${event.y}`), feature = document.createElement('div');
         feature.className = `feature ${event.feature}`;
         feature.innerHTML = event.feature;
@@ -259,8 +267,8 @@ function setstate(gamedata) {
             eventHandlers.turn({ player: gamedata.turn });
         }
     }
-    else {
-        waitingforplayers(document.getElementById('board'));
+    if (!gamedata.board || gamedata.board.state === 'open') {
+        waitingforplayers();
     }
 }
 function namedialog() {

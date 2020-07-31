@@ -6,5 +6,5 @@ defmodule Yagg.Board.State do
     defstruct [:ready]
   end
 
-  @type t :: %Placement{} | %Gameover{} | :battle
+  @type t :: %Placement{} | %Gameover{} | :battle | :open
 end

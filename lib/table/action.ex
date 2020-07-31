@@ -9,7 +9,7 @@ defmodule Yagg.Table.Action do
   end
 
   def initial_setup(table) do
-    {board, events} = Board.setup(table.configuration)
+    {board, events} = Board.setup(table.board)
     {%{table | board: board}, events}
   end
 end

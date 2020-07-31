@@ -28,15 +28,16 @@ defmodule Yagg.AI.Server do
   def handle_info(:check_game_started, state) do
     IO.inspect([:cgs, self(), state])
     {:ok, table} = Table.get_state(state.pid)
+    IO.inspect(players: table.players, bn: Table.Player.by_name(table, state.robot.name))
     position = state.robot.position
-    case table.board do
-      %{turn: ^position} = board ->
+    _ = case table do
+      %{turn: ^position, board: board} ->
         take_your_turn(board, state)
-      %Board{state: %Board.State.Placement{ready: ^position}} ->
+      %{board: %Board{state: %Board.State.Placement{ready: ^position}}} ->
         :do_nothing
-      %Board{state: %Board.State.Placement{}} ->
+      %{board: %Board{state: %Board.State.Placement{}}} ->
         do_initial_placement(state, table.board)
-      :nil ->
+      %{board: %{state: :open}} ->
         Process.send_after(self(), :check_game_started, 100)
       _ -> :do_nothing
     end

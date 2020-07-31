@@ -10,7 +10,7 @@ defmodule Yagg.Table.Action.Join do
   def resolve(%{player: ""}, _table, _) do
     {:err, :noname}
   end
-  def resolve(%{player: player_name}, %{board: :nil} = table, :notfound) do
+  def resolve(%{player: player_name}, %{board: %{state: :open}} = table, :notfound) do
     case table.players do
       [] -> {
           %{table | players: [Player.new(player_name, :north)]},

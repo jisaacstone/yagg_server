@@ -132,16 +132,20 @@ defmodule Yagg.Board do
     }
   end
 
-  @spec setup(module) :: {Board.t, [Event.t]}
-  def setup(), do: setup(Configuration.Random)
-  def setup(configuration) do
-    board = %Board{
-      state: %State.Placement{},
+  @spec new(module) :: Board.t
+  def new(), do: new(Configuration.Random)
+  def new(configuration) do
+    %Board{
+      state: :open,
       dimensions: configuration.dimensions(),
       hands: %{north: %{}, south: %{}},
       grid: %{},
       configuration: configuration,
     }
+  end
+
+  @spec setup(Board.t) :: {Board.t, [Event.t]}
+  def setup(%{configuration: configuration} = board) do
     {board, events} = add_features(board, [], configuration.terrain(board))
     {board, events} = Enum.reduce(
       [:north, :south],
@@ -152,7 +156,7 @@ defmodule Yagg.Board do
       end
     )
     {
-      board,
+      %{board | state: %State.Placement{}},
       [Event.GameStarted.new() | events]
     }
   end
