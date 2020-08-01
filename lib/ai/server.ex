@@ -18,7 +18,6 @@ defmodule Yagg.AI.Server do
   end
 
   def handle_cast(:subscribe_table, %{robot: robot, table_id: table_id} = state) do
-    IO.inspect([st: robot])
     {:ok, pid} = Table.subscribe(table_id, robot.name)
     send(self(), :check_game_started)
     IO.inspect(:cgs_called)
@@ -28,16 +27,15 @@ defmodule Yagg.AI.Server do
   def handle_info(:check_game_started, state) do
     IO.inspect([:cgs, self(), state])
     {:ok, table} = Table.get_state(state.pid)
-    IO.inspect(players: table.players, bn: Table.Player.by_name(table, state.robot.name))
     position = state.robot.position
-    _ = case table do
-      %{turn: ^position, board: board} ->
+    case table.board do
+      %{turn: ^position} = board ->
         take_your_turn(board, state)
-      %{board: %Board{state: %Board.State.Placement{ready: ^position}}} ->
+      %Board{state: %Board.State.Placement{ready: ^position}} ->
         :do_nothing
-      %{board: %Board{state: %Board.State.Placement{}}} ->
-        do_initial_placement(state, table.board)
-      %{board: %{state: :open}} ->
+      %Board{state: %Board.State.Placement{}} ->
+        do_initial_placement(table.board, state)
+      :nil ->
         Process.send_after(self(), :check_game_started, 100)
       _ -> :do_nothing
     end
@@ -49,8 +47,18 @@ defmodule Yagg.AI.Server do
     take_your_turn(table.board, state)
     {:noreply, state}
   end
+  def handle_info(%{kind: :gameover}, state) do
+    :ok = Table.board_action(state.pid, state.robot.name, IO.inspect(%Ready{}))
+    {:noreply, state}
+  end
+  def handle_info(%{kind: :game_started}, state) do
+    {:ok, %{board: %{state: %Board.State.Placement{}}} = table} = Table.get_state(state.pid)
+    do_initial_placement(table.board, state)
+    {:noreply, state}
+  end
+
   def handle_info(%Event{} = event, state) do
-    IO.inspect(event: event)
+    IO.inspect(unhandled_event: event)
     {:noreply, state}
   end
   def handle_info(other, state) do
@@ -64,7 +72,7 @@ defmodule Yagg.AI.Server do
     :ok = Table.board_action(state.pid, state.robot.name, action)
   end
 
-  defp do_initial_placement(%{pid: table_pid, robot: robot}, board) do
+  defp do_initial_placement(board, %{pid: table_pid, robot: robot}) do
     %{place: place_choices} = Choices.choices(board, robot.position)
     {monarch_idx, _} = Enum.find(board.hands[robot.position], fn({_, {u, _}}) -> u.name == :monarch end)
     choices = Enum.shuffle(place_choices)

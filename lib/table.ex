@@ -147,7 +147,6 @@ defmodule Yagg.Table do
   end
 
   def handle_call({:board_action, player_name, action}, _from, game) do
-    IO.inspect(name: player_name)
     player = Player.by_name(game, player_name)
     # try do
       cond do

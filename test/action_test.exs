@@ -300,4 +300,16 @@ defmodule YaggTest.Action.Ability do
     assert newboard.grid[{4, 4}] == :nil
   end
 
+  test "spindeath monarch" do
+    board = set_board([
+      {{2, 6}, Unit.Busybody.new(:north)},
+      {{3, 6}, Unit.Monarch.new(:north)},
+    ])
+    action = %Board.Action.Ability{x: 2, y: 6}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
+    assert newboard.grid[{3, 6}] == :nil
+    assert Enum.any?(events, fn(e) -> e.kind == :unit_died end)
+    assert Enum.any?(events, fn(e) -> e.kind == :gameover end)
+  end
+
 end

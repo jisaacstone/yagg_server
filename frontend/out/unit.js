@@ -34,10 +34,11 @@ function unit_el(unit, el) {
         }
     }
     if (unit.ability) {
-        const abilbut = document.createElement('button'), tt = document.createElement('span'), abilname = unit.ability.name, square = el.parentNode;
+        const abilbut = document.createElement('button'), tt = document.createElement('span'), abilname = unit.ability.name;
         abilbut.className = 'unit-ability';
         abilbut.innerHTML = abilname;
         abilbut.onclick = function (e) {
+            const square = el.parentNode;
             if (gmeta.boardstate !== 'battle' ||
                 gmeta.position !== gmeta.turn ||
                 !square.className.includes('boardsquare')) {

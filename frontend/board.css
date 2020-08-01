@@ -40,7 +40,7 @@ body > div {
 
 .waiting {
   padding: 2vh;
-  background: repeating-linear-gradient(40deg, #CCD, #CCD 10px, #eee 10px, #eee 20px, #BAB 20px, #B9B 30px);
+  background: repeating-linear-gradient(40deg, #CFCFD0, #CFCFD0 10px, #e0e0e1 10px, #e0e1e0 20px, #BFAFBE 20px, #BFAEBF 30px);
 }
 
 .linkcopy {
@@ -379,4 +379,5 @@ span .tooltip, button .tooltip {
   border-radius: 5vh;
   border: 5px inset steelblue;
   box-shadow: 1vh 2vh 1vh rgba(0,0,5,0.4);
+  box-sizing: border-box;
 }

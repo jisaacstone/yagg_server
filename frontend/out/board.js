@@ -106,7 +106,7 @@ function hideready() {
 const unitsbyindex = {};
 const eventHandlers = {
     game_started: function (event) {
-        const board = document.getElementById('board'), state = event.state.toLowerCase() || 'placement';
+        const board = document.getElementById('board'), state = (event.state || 'placement').toLowerCase();
         console.log({ gs: event });
         if (event.dimensions) {
             boardhtml(board, event.dimensions.x, event.dimensions.y);

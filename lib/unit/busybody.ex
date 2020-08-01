@@ -54,8 +54,8 @@ defmodule Unit.Busybody do
       end
     end
 
-    defp offscreend(board, %Unit{}, coord) do
-      Board.unit_death(board, coord)
+    defp offscreend(board, %Unit{} = unit, coord) do
+      Board.unit_death(board, coord, unit: unit)
     end
     defp offscreend(board, _feature, coord) do
       event = Event.ThingMoved.new(from: coord, to: :offscreen)

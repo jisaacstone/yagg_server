@@ -55,11 +55,11 @@ function unit_el(unit: Unit, el: HTMLElement) {
   if (unit.ability) {
     const abilbut = document.createElement('button'),
       tt = document.createElement('span'),
-      abilname = unit.ability.name,
-      square = el.parentNode as HTMLElement;
+      abilname = unit.ability.name;
     abilbut.className = 'unit-ability';
     abilbut.innerHTML = abilname;
     abilbut.onclick = function(e) {
+      const square = el.parentNode as HTMLElement;
       if (
         gmeta.boardstate !== 'battle' ||
         gmeta.position !== gmeta.turn ||

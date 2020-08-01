@@ -124,8 +124,8 @@ defmodule Yagg.Board do
   def unit_death(board, {x, y}, meta \\ []) do
     {unit, grid} = Map.pop(board.grid, {x, y})
     board = %{board | grid: grid}
-    opts = [{:unit, unit}, {:coords, {x, y}} | meta]
-    {board, events} = Unit.trigger_module(unit, :death).resolve(board, opts)
+    opts = meta ++ [{:unit, unit}, {:coords, {x, y}}]
+    {board, events} = Unit.trigger_module(opts[:unit], :death).resolve(board, opts)
     {
       board,
       [Event.UnitDied.new(x: x, y: y) | events]
@@ -144,9 +144,13 @@ defmodule Yagg.Board do
     }
   end
 
+  @doc """
+  Sets up the board for play.
+  Overwrites the keys state, hands, grid
+  """
   @spec setup(Board.t) :: {Board.t, [Event.t]}
   def setup(%{configuration: configuration} = board) do
-    {board, events} = add_features(board, [], configuration.terrain(board))
+    {board, events} = add_features(%{board | grid: %{}}, [], configuration.terrain(board))
     {board, events} = Enum.reduce(
       [:north, :south],
       {board, events},
