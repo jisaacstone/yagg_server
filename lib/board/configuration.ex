@@ -27,6 +27,7 @@ defmodule Board.Configuration.Random do
       Unit.new(position, :chopper, 7, 4),
       Unit.new(position, :tim, 1, 8),
       Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
+      Unit.Sackboom.new(position),
       Unit.Explody.new(position),
       Unit.Pushie.new(position),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
@@ -114,7 +115,7 @@ defmodule Board.Configuration.Chain do
       Unit.new(position, :dogatron, 3, 4, Ability.Secondwind),
       Unit.Explody.new(position),
       Unit.Tactician.new(position),
-      Unit.new(position, :colburninator, 1, 2, Ability.Colburn),
+      Unit.Sackboom.new(position),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
     ])

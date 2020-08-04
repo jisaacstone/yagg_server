@@ -35,11 +35,11 @@ defmodule Yagg.Unit do
     %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers}
   end
 
-  @spec trigger_module(Unit.t, atom) :: {module, Keyword.t}
+  @spec trigger_module(Unit.t, atom) :: module
   def trigger_module(%Unit{triggers: %{}} = unit, trigger) do
     unit.triggers[trigger] || Ability.NOOP
   end
   def trigger_module(_, _) do
-    {Ability.NOOP, []}
+    Ability.NOOP
   end
 end
