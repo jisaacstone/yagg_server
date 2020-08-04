@@ -13,7 +13,7 @@ defmodule Yagg.Unit do
     :defense => 0 | 2 | 4 | 6 | 8,
     :name => atom(),
     :position => Player.position(),
-    :ability => :nil | module(),
+    :ability => :nil | module() | {module(), Keyword.t},
     :triggers => map(),
   }
 
@@ -34,24 +34,12 @@ defmodule Yagg.Unit do
   def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}) do
     %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers}
   end
-  @spec override(Player.position, module, keyword()) :: t
-  def override(position, module, overrides) when is_atom(module) and is_list(overrides) do
-    unit = module.new(position)
-    Enum.reduce(
-      overrides,
-      unit,
-      fn({k, v}, u) -> %{u | k => v} end
-    )
-  end
 
-  def trigger_module(%Unit{} = unit, trigger) do
-    if unit.triggers && unit.triggers[trigger] do
-      unit.triggers[trigger]
-    else
-      Ability.NOOP
-    end
+  @spec trigger_module(Unit.t, atom) :: {module, Keyword.t}
+  def trigger_module(%Unit{triggers: %{}} = unit, trigger) do
+    unit.triggers[trigger] || Ability.NOOP
   end
   def trigger_module(_, _) do
-    Ability.NOOP
+    {Ability.NOOP, []}
   end
 end

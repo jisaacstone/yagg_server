@@ -28,15 +28,15 @@ defmodule Yagg.AI.Server do
     IO.inspect([:cgs, self(), state])
     {:ok, table} = Table.get_state(state.pid)
     position = state.robot.position
-    case table.board do
-      %{turn: ^position} = board ->
-        take_your_turn(board, state)
-      %Board{state: %Board.State.Placement{ready: ^position}} ->
+    _ = case table do
+      %{board: %{state: :open}} ->
+        Process.send_after(self(), :check_game_started, 500)
+      %{board: %{state: %Board.State.Placement{ready: ^position}}} ->
         :do_nothing
-      %Board{state: %Board.State.Placement{}} ->
+      %{board: %{state: %Board.State.Placement{}}} ->
         do_initial_placement(table.board, state)
-      :nil ->
-        Process.send_after(self(), :check_game_started, 100)
+      %{board: board, turn: ^position} ->
+        take_your_turn(board, state)
       _ -> :do_nothing
     end
     {:noreply, state}
@@ -68,14 +68,15 @@ defmodule Yagg.AI.Server do
 
   defp take_your_turn(board, state) do
     action = Choices.move(board, state.robot.position)
-    IO.inspect([action: action])
-    :ok = Table.board_action(state.pid, state.robot.name, action)
+    {:ok, _} = :timer.apply_after(500, Table, :board_action, [state.pid, state.robot.name, action])
+    :ok
   end
 
   defp do_initial_placement(board, %{pid: table_pid, robot: robot}) do
     %{place: place_choices} = Choices.choices(board, robot.position)
     {monarch_idx, _} = Enum.find(board.hands[robot.position], fn({_, {u, _}}) -> u.name == :monarch end)
     choices = Enum.shuffle(place_choices)
+    # place monarch first to ensure there will be space
     place_monarch = Enum.find(choices, &cpm(&1, monarch_idx, board.grid))
     occupied = [{place_monarch.x, place_monarch.y} | Map.keys(board.grid)]
     choices = drop_dupes(choices, MapSet.new([monarch_idx]), MapSet.new(occupied))

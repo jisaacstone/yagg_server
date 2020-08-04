@@ -45,6 +45,16 @@ defmodule YaggTest.AI do
     assert choices.ability == []
   end
   
+  test "placement occupied" do
+    board = HB.new_board(
+      [Unit.Monarch.new(:nil)],
+      [{{3, 3}, :water}],
+      {4, 4}
+    )
+    choices = Choices.choices(board, :north)
+    assert not(Enum.member?(choices.place, %Action.Place{index: 0, x: 3, y: 3}))
+  end
+
   test "move" do
     board = 
       HB.new_board([], [], {4, 4})
