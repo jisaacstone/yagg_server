@@ -6,7 +6,12 @@ alias Yagg.Table.Player
 defmodule Yagg.Board.Grid do
   @type coord() :: {0..5, 0..5}
   @type terrain :: :water | :block | Unit.t
+  @type relative :: :left | :right | :front | :back
   @type t :: %{coord => terrain}
+
+  defguard is_relative(dir) when dir == :left or dir == :right or dir == :front or dir == :back
+  defguard is_cardinal(dir) when dir == :nort or dir == :south or dir == :east or dir == :west
+  defguard is_coord(c) when is_tuple(c) and is_integer(elem(c, 0)) and is_integer(elem(c, 1))
 
   @doc """
   Returns what is at the coords, :nil if nothing is there, and :out_of_bounds if it is out of the grid
@@ -15,6 +20,17 @@ defmodule Yagg.Board.Grid do
   def thing_at(_, {x, y}) when x < 0 or y < 0, do: :out_of_bounds
   def thing_at(%{dimensions: {w, h}}, {x, y}) when x >= w or y >= h, do: :out_of_bounds
   def thing_at(board, coords), do: board.grid[coords]
+
+  @spec thing_in_direction(Board.t, coord, {Player.position, relative} | Board.direction | {coord, coord}) :: :nil | :out_of_bounds | terrain
+  def thing_in_direction(board, coord, {position, direction}) when is_relative(direction) do
+    thing_in_direction(board, coord, cardinal(position, direction))
+  end
+  def thing_in_direction(board, coord, direction) when is_cardinal(direction) do
+    thing_at(board, next(direction, coord))
+  end
+  def thing_in_direction(board, coord, {from, to}) when is_coord(from) and is_coord(to) do
+    thing_in_direction(board, coord, direction(from, to))
+  end
 
   @doc """
   direction to coord math
@@ -51,7 +67,7 @@ defmodule Yagg.Board.Grid do
   @doc """
   transfer directional (:left, :right) into cardinal (:east, :west)
   """
-  @spec cardinal(Player.position, :left | :right | :front | :back) :: Board.direction
+  @spec cardinal(Player.position, relative) :: Board.direction
   def cardinal(:north, :left), do: :east
   def cardinal(:south, :left), do: :west
   def cardinal(:north, :right), do: :west

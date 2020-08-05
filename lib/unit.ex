@@ -1,5 +1,6 @@
 alias Yagg.Board.Action.Ability
 alias Yagg.Table.Player
+alias Yagg.Board
 
 defmodule Yagg.Unit do
   alias __MODULE__
@@ -8,13 +9,16 @@ defmodule Yagg.Unit do
 
   @callback new(Player.position) :: t
 
+  @type trigger :: :death | :move | :attack
+  @type triggers :: %{optional(trigger) => module()}
+
   @type t :: %Unit{
     :attack => 1 | 3 | 5 | 7 | 9,
     :defense => 0 | 2 | 4 | 6 | 8,
     :name => atom(),
     :position => Player.position(),
     :ability => :nil | module() | {module(), Keyword.t},
-    :triggers => map(),
+    :triggers => triggers,
   }
 
   defimpl Poison.Encoder, for: Unit do
@@ -35,6 +39,19 @@ defmodule Yagg.Unit do
     %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers}
   end
 
+  def after_death(board, unit, coords, opts \\ []) do
+    trigger_module(unit, :death).resolve(board, [{:coords, coords}, {:unit, unit} | opts])
+  end
+  def after_move(board, unit, from, to, opts \\ []) do
+    trigger_module(unit, :move).resolve(board, [{:from, from}, {:to, to}, {:unit, unit} | opts])
+  end
+  def attack(board, unit, opponent, from, to, opts \\ []) do
+    case trigger_module(unit, :attack) do
+      Ability.NOOP -> Board.do_battle(board, unit, opponent, from, to)
+      module -> module.resolve(board, [{:from, from}, {:to, to}, {:opponent, opponent}, {:unit, unit} | opts])
+    end
+  end
+
   @spec trigger_module(Unit.t, atom) :: module
   def trigger_module(%Unit{triggers: %{}} = unit, trigger) do
     unit.triggers[trigger] || Ability.NOOP
@@ -42,4 +59,5 @@ defmodule Yagg.Unit do
   def trigger_module(_, _) do
     Ability.NOOP
   end
+
 end

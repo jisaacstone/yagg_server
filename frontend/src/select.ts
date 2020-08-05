@@ -25,7 +25,7 @@ export function select(thisEl, meta) {
       return;
     }
     const sel = global.selected;
-    if (sel) {
+    if (sel && sel.element && sel.element.firstChild) {
       // something was perviously selected
       if (sel.element !== thisEl) {
         if (sel.meta.inhand) {

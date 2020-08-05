@@ -312,4 +312,16 @@ defmodule YaggTest.Action.Ability do
     assert Enum.any?(events, fn(e) -> e.kind == :gameover end)
   end
 
+  test "catmover jump" do
+    board = set_board([
+      {{1, 2}, Unit.Catmover.new(:south)},
+      {{2, 2}, Unit.Tinker.new(:north)}
+    ])
+    action = %Board.Action.Move{from_x: 1, from_y: 2, to_x: 2, to_y: 2}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert newboard.grid[{2, 2}] == :nil
+    assert %Unit{name: :catmover} = newboard.grid[{3, 2}]
+    assert event = Enum.find(events, fn(e) -> e.kind == :thing_moved end)
+    assert %{from: {1, 2}, to: {3, 2}} = event.data
+  end
 end

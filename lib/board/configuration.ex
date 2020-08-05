@@ -110,7 +110,7 @@ defmodule Board.Configuration.Chain do
   def starting_units(position) do
     Enum.shuffle([
       Unit.Monarch.new(position),
-      Unit.new(position, :mosh, 3, 4, Ability.Push),
+      Unit.Catmover.new(position),
       Unit.new(position, :bezerker, 7, 2),
       Unit.new(position, :dogatron, 3, 4, Ability.Secondwind),
       Unit.Explody.new(position),

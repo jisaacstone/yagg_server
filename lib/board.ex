@@ -107,8 +107,8 @@ defmodule Yagg.Board do
               push_block(board, from, to)
             :nil -> 
               do_move(board, from, to)
-            feature -> 
-              do_battle(board, unit, feature, from, to)
+            %Unit{} = opponent -> 
+              Unit.attack(board, unit, opponent, from, to)
           end
         end
       {%Unit{}, _coords} -> {:err, :nocontrol}
@@ -124,8 +124,8 @@ defmodule Yagg.Board do
   def unit_death(board, {x, y}, meta \\ []) do
     {unit, grid} = Map.pop(board.grid, {x, y})
     board = %{board | grid: grid}
-    opts = meta ++ [{:unit, unit}, {:coords, {x, y}}]
-    {board, events} = Unit.trigger_module(opts[:unit], :death).resolve(board, opts)
+    opts = meta ++ [{:unit, unit}]
+    {board, events} = Unit.after_death(board, opts[:unit], {x, y}, opts)
     {
       board,
       [Event.UnitDied.new(x: x, y: y) | events]
@@ -179,6 +179,27 @@ defmodule Yagg.Board do
     end
   end
 
+  @spec do_battle(t, Unit.t, Unit.t, Grid.coord, Grid.coord) :: {t, [Event.t]} | {:err, atom}
+  def do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _) do
+    {:err, :noselfattack}
+  end
+  def do_battle(board, unit, opponent, from, to) do
+    cond do
+      unit.attack > opponent.defense ->
+        {board, e1} = unit_death(board, to, opponent: {unit, from})
+        {board, e2} = do_move(board, from, to, action: :battle)
+        {board, e1 ++ e2}
+      unit.attack == opponent.defense ->
+        # not currently possible?
+        {board, e1} = unit_death(board, from)
+        {board, e2} = unit_death(board, to)
+        {board, e1 ++ e2}
+      unit.attack < opponent.defense ->
+        {board, events} = unit_death(board, from, opponent: {opponent, to}, attacking: :true)
+        {board, events}
+    end
+  end
+
   ## Private
   
   defp add_features(board, events, []), do: {board, events}
@@ -196,32 +217,11 @@ defmodule Yagg.Board do
     {unit, grid} = Map.pop(board.grid, from)
     grid = Map.put_new(grid, to, unit)
     board = %{board | grid: grid}
-    opts = [{:from, from}, {:to, to}, {:unit, unit} | opts]
-    {board, events} = Unit.trigger_module(unit, :move).resolve(board, opts)
+    {board, events} = Unit.after_move(board, unit, from, to, opts)
     {
       board,
       [Event.ThingMoved.new(from: from, to: to) | events]
     }
-  end
-
-  defp do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _) do
-    {:err, :noselfattack}
-  end
-  defp do_battle(board, unit, opponent, from, to) do
-    cond do
-      unit.attack > opponent.defense ->
-        {board, e1} = unit_death(board, to, opponent: {unit, from})
-        {board, e2} = do_move(board, from, to, action: :battle)
-        {board, e1 ++ e2}
-      unit.attack == opponent.defense ->
-        # not currently possible?
-        {board, e1} = unit_death(board, from)
-        {board, e2} = unit_death(board, to)
-        {board, e1 ++ e2}
-      unit.attack < opponent.defense ->
-        {board, events} = unit_death(board, from, opponent: {opponent, to}, attacking: :true)
-        {board, events}
-    end
   end
 
   defp hand_assign(hand, index, coords) do
