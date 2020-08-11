@@ -6,7 +6,6 @@ defmodule Yagg.Endpoint do
   use Plug.Router
 
   plug(CORSPlug)
-  plug(Plug.Static, at: "/front", from: "./static")
   plug(Plug.Static, at: "/fe", from: "./frontend")
 
   plug :match

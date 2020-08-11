@@ -1,5 +1,11 @@
 # YaggServer
 
+to start the server
+
+    mix run --no-halt
+
+# API
+
 Curl commands:
 
 Table
