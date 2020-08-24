@@ -24,5 +24,6 @@ yagg_server-*.tar
 
 *.sw?
 *.bak
+*.dump
 
 *.DS_Store

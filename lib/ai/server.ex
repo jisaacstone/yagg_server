@@ -25,20 +25,25 @@ defmodule Yagg.AI.Server do
   end
 
   def handle_info(:check_game_started, state) do
-    IO.inspect([:cgs, self(), state])
     {:ok, table} = Table.get_state(state.pid)
     position = state.robot.position
+    IO.inspect([:cgs, self(), state, table.board.state, table.turn, position])
     _ = case table do
       %{board: %{state: :open}} ->
+        IO.inspect("1")
         Process.send_after(self(), :check_game_started, 500)
       %{board: %{state: %Board.State.Placement{ready: ^position}}} ->
+        IO.inspect("2")
         :do_nothing
       %{board: %{state: %Board.State.Placement{}}} ->
+        IO.inspect("3")
         do_initial_placement(table.board, state)
       %{board: board, turn: ^position} ->
+        IO.inspect("4")
         take_your_turn(board, state)
       _ -> :do_nothing
     end
+    IO.inspect(:cgs_done)
     {:noreply, state}
   end
 
@@ -57,8 +62,8 @@ defmodule Yagg.AI.Server do
     {:noreply, state}
   end
 
-  def handle_info(%Event{} = event, state) do
-    IO.inspect(unhandled_event: event)
+  def handle_info(%Event{}, state) do
+    # IO.inspect(unhandled_event: event)
     {:noreply, state}
   end
   def handle_info(other, state) do

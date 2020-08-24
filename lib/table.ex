@@ -40,9 +40,8 @@ defmodule Yagg.Table do
 
   @spec new(module) :: {:ok, pid}
   def new(configuration \\ Board.Configuration.Random) do
-    id = self() |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
     table = %Table{
-      id: id,
+      id: :nil,
       players: [],
       subscribors: [],
       board: Board.new(configuration),
@@ -63,7 +62,9 @@ defmodule Yagg.Table do
   def get_or_single__(table_id) do
     try do
       case get(table_id) do
-        {:err, _} -> single__()
+        {:err, _} -> 
+          IO.inspect('__single')
+          single__()
         {:ok, pid} -> {:ok, pid}
       end
     rescue
@@ -99,6 +100,7 @@ defmodule Yagg.Table do
   @spec subscribe(id, String.t) :: {:ok, pid}
   def subscribe(table_id, player) do
     {:ok, pid} = get_or_single__(table_id)
+    IO.inspect(table: table_id, pid: pid)
     Process.monitor(pid)
     GenServer.call(pid, {:subscribe, player})
     {:ok, pid}
@@ -122,7 +124,8 @@ defmodule Yagg.Table do
   # Callbacks
 
   def init(%Table{} = table) do
-    {:ok, table}
+    id = self() |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
+    {:ok, %{table | id: id}}
   end
 
   def handle_call(:get_state, _from, game) do
