@@ -2,6 +2,8 @@ defmodule Yagg.Application do
   use Application
 
   def start(_type, _args) do
+    port = System.get_env("PORT", "8000") |> String.to_integer()
+    IO.inspect(port: port)
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
@@ -9,7 +11,7 @@ defmodule Yagg.Application do
         plug: Yagg.Endpoint,
         protocol_options: [idle_timeout: :infinity],
         options: [
-          port: 8000,
+          port: port,
           dispatch: [{:_,[
             {"/ws/[...]", Yagg.Websocket, []},
             {:_, Plug.Cowboy.Handler, {Yagg.Endpoint, []}}

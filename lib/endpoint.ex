@@ -16,6 +16,11 @@ defmodule Yagg.Endpoint do
       |> Conn.put_resp_header("location", "/fe/index.html")
       |> send_resp(302, "")
   end
+  get("/") do
+    conn
+      |> Conn.put_resp_header("location", "/fe/index.html")
+      |> send_resp(302, "")
+  end
 
   post "/table/new" do
     {:ok, body, conn} = Conn.read_body(conn)
