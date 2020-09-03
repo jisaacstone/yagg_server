@@ -1,7 +1,6 @@
 alias Yagg.Board
 alias Yagg.Unit
 alias Yagg.Event
-alias Yagg.Table.Player
 
 defmodule Yagg.Board.Hand do
   @type t() :: %{non_neg_integer() => {Unit.t, :nil | Board.Grid.coord()}}
@@ -17,17 +16,11 @@ defmodule Yagg.Board.Hand do
     end
     add_unit_at(hand, index, unit)
   end
-  defp add_unit_at(hand, index, %Unit{} = unit, notifications \\ []) do
-    {
-      Map.put_new(hand, index, {unit, :nil}),
-      [Event.AddToHand.new(unit.position, unit: unit, index: index) | notifications]
-    }
-  end
 
-  @spec new(Player.position(), [Event.t], module()) :: {t(), [Event.t]}
-  def new(position, notifications, configuration) do
+  @spec new([Unit.t], [Event.t]) :: {t(), [Event.t]}
+  def new(units, notifications) do
     {_, hand, notif} = Enum.reduce(
-      configuration.starting_units(position),
+      units,
       {0, %{}, notifications},
       fn (unit, {i, h, n}) ->
         {h2, n2} = add_unit_at(h, i, unit, n)
@@ -35,5 +28,12 @@ defmodule Yagg.Board.Hand do
       end
     )
     {hand, notif}
+  end
+
+  defp add_unit_at(hand, index, %Unit{} = unit, notifications \\ []) do
+    {
+      Map.put_new(hand, index, {unit, :nil}),
+      [Event.AddToHand.new(unit.position, unit: unit, index: index) | notifications]
+    }
   end
 end

@@ -149,13 +149,18 @@ defmodule Yagg.Board do
   Overwrites the keys state, hands, grid
   """
   @spec setup(Board.t) :: {Board.t, [Event.t]}
+  @spec setup(Board.t, %{north: [Unit.t], south: [Unit.t]}) :: {Board.t, [Event.t]}
   def setup(%{configuration: configuration} = board) do
+    units = %{north: configuration.starting_units(:north), south: configuration.starting_units(:south)}
+    setup(board, units)
+  end
+  def setup(%{configuration: configuration} = board, starting_units) do
     {board, events} = add_features(%{board | grid: %{}}, [], configuration.terrain(board))
     {board, events} = Enum.reduce(
       [:north, :south],
       {board, events},
       fn(player, {board, notifications}) ->
-        {hand, notif} = Hand.new(player, notifications, configuration)
+        {hand, notif} = Hand.new(starting_units[player], notifications)
         {%{board | hands: Map.put(board.hands, player, hand)}, notif}
       end
     )

@@ -1,4 +1,4 @@
-alias Yagg.{Event, Board}
+alias Yagg.{Event, Board, Jobfair}
 alias Yagg.Table.Player
 alias Yagg.Board.State
 
@@ -14,7 +14,7 @@ defmodule Yagg.Table do
   @type t() :: %Table{
     id: id,
     players: [Player.t],
-    board: :nil | Board.t,
+    board: :nil | Board.t | Jobfair.t,
     turn: :nil | Player.position(),
     configuration: module(),
   }
