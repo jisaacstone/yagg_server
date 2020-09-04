@@ -1,6 +1,7 @@
 alias Yagg.{Event, Board, Jobfair}
 alias Yagg.Table.Player
 alias Yagg.Board.State
+alias Yagg.Board.Configuration
 
 defmodule Yagg.Table do
   use GenServer
@@ -25,7 +26,7 @@ defmodule Yagg.Table do
 
   def get(table_id) do
     # will be a lookup by id eventually
-    pid = "<0.#{table_id}.0>" |> to_charlist() |> :erlang.list_to_pid
+    pid = id_to_pid(table_id)
     case Process.alive?(pid) do
       :true -> {:ok, pid}
       :false -> {:err, :process_ended}
@@ -44,7 +45,7 @@ defmodule Yagg.Table do
       id: :nil,
       players: [],
       subscribors: [],
-      board: Board.new(configuration),
+      board: Configuration.initial_board(configuration),
       turn: :nil,
       configuration: configuration,
     }
@@ -121,10 +122,18 @@ defmodule Yagg.Table do
     GenServer.call(pid, {:board_action, player_name, action})
   end
 
+  def pid_to_id(pid) do
+    pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
+  end
+
+  def id_to_pid(id) do
+    "<0.#{id}.0>" |> to_charlist() |> :erlang.list_to_pid
+  end
+
   # Callbacks
 
   def init(%Table{} = table) do
-    id = self() |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
+    id = self() |> pid_to_id()
     {:ok, %{table | id: id}}
   end
 
@@ -137,16 +146,16 @@ defmodule Yagg.Table do
 
   def handle_call({:table_action, player_name, action}, _from, game) do
     player = Player.by_name(game, player_name)
-    try do
+    # try do
       case Yagg.Table.Action.resolve(action, game, player) do
         {:err, _} = err -> {:reply, err, game}
         {game, events} ->
           notify(game, events)
           {:reply, :ok, game}
       end
-    rescue
-      FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
-    end
+    # rescue
+    #   FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
+    # end
   end
 
   def handle_call({:board_action, player_name, action}, _from, game) do

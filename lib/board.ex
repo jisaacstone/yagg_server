@@ -137,7 +137,7 @@ defmodule Yagg.Board do
   def new(configuration) do
     %Board{
       state: :open,
-      dimensions: configuration.dimensions(),
+      dimensions: Configuration.dimensions(configuration),
       hands: %{north: %{}, south: %{}},
       grid: %{},
       configuration: configuration,

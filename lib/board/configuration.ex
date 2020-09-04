@@ -2,11 +2,21 @@ alias Yagg.Table.Player
 alias Yagg.Unit
 alias Yagg.Board.Action.Ability
 alias Yagg.Board
+alias Yagg.Jobfair
 
 defmodule Yagg.Board.Configuration do
   @callback starting_units(Player.position()) :: [Unit.t, ...]
   @callback terrain(Board.t) :: [{Board.Grid.coord(), Board.Grid.terrain()}]
-  @callback dimensions() :: {4..8, 4..8}
+  @callback meta() :: %{dimensions: {4..8, 4..8}}
+
+  def dimensions(configuration) do
+    configuration.meta().dimensions
+  end
+
+  def initial_board(configuration) do
+    mod = Map.get(configuration.meta(), :initial_module, Board)
+    mod.new(configuration)
+  end
 
   def all() do
     %{
@@ -45,9 +55,11 @@ defmodule Board.Configuration.Random do
   end
 
   @impl Board.Configuration
-  def dimensions do
+  def meta do
     size = Enum.random(4..7)
-    {size, size}
+    %{
+      dimensions: {size, size},
+    }
   end
 
   @impl Board.Configuration
@@ -76,7 +88,7 @@ defmodule Board.Configuration.Alpha do
 
   @impl Board.Configuration
   def starting_units(position) do
-    Enum.shuffle([
+    [
       Unit.Monarch.new(position),
       Unit.Tactician.new(position),
       Unit.new(position, :bezerker, 7, 2),
@@ -85,7 +97,7 @@ defmodule Board.Configuration.Alpha do
       Unit.Pushie.new(position),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
-    ])
+    ]
   end
 
   @impl Board.Configuration
@@ -97,7 +109,13 @@ defmodule Board.Configuration.Alpha do
   end
 
   @impl Board.Configuration
-  def dimensions(), do: {5, 5}
+  def meta() do
+    %{
+      dimensions: {5, 5},
+      initial_module: Jobfair
+    }
+  end
+
 end
 
 defmodule Board.Configuration.Chain do
@@ -134,5 +152,9 @@ defmodule Board.Configuration.Chain do
   end
 
   @impl Board.Configuration
-  def dimensions, do: {7, 7}
+  def meta do
+    %{
+      dimensions: {7, 7}
+    }
+  end
 end

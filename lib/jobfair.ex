@@ -52,7 +52,7 @@ defmodule Yagg.Jobfair do
     if MapSet.size(MapSet.new(indices)) < length(indices) do
       {:err, :duplicates}
     else
-      fair = %{jobfair[position] | chosen: indices, ready: :true}
+      fair = %{Map.get(jobfair, position) | chosen: indices, ready: :true}
       {:ok, Map.put(jobfair, position, fair)}
     end
   end

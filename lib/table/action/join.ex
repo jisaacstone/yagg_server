@@ -1,6 +1,7 @@
 alias Yagg.Table.Player
 alias Yagg.Table.Action
 alias Yagg.Event
+alias Yagg.Jobfair
 
 defmodule Yagg.Table.Action.Join do
   defstruct [:player]
@@ -23,6 +24,24 @@ defmodule Yagg.Table.Action.Join do
         {
           table,
           [Event.PlayerJoined.new(name: player_name, position: p2.position) | events]
+        }
+      [_p1, _p2] -> {:err, :table_full}
+    end
+  end
+  def resolve(%{player: player_name}, %{board: %Jobfair{}} = table, :notfound) do
+    case table.players do
+      [] -> {
+          %{table | players: [Player.new(player_name, :north)]},
+          [Event.PlayerJoined.new(name: player_name, position: :north)]
+        }
+      [p1] -> 
+        p2 = Player.new(player_name, Player.opposite(p1.position))
+        {
+          %{table | players: [p1, p2]},
+          [
+            Event.PlayerJoined.new(name: player_name, position: p2.position),
+            Event.GameStarted.new()
+          ]
         }
       [_p1, _p2] -> {:err, :table_full}
     end
