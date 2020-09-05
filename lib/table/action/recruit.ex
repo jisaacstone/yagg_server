@@ -27,8 +27,8 @@ defmodule Yagg.Table.Action.Recruit do
 
   defp initial_setup(table) do
     units = %{
-      north: table.board.north.chosen,
-      south: table.board.south.chosen
+      north: Jobfair.chosen(table.board, :north),
+      south: Jobfair.chosen(table.board, :south)
     }
     {board, events} = Board.new(table.configuration) |> Board.setup(units)
     {%{table | board: board}, events}

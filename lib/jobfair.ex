@@ -57,6 +57,11 @@ defmodule Yagg.Jobfair do
     end
   end
 
+  def chosen(jobfair, position) do
+    fair = Map.get(jobfair, position)
+    Enum.map(fair.chosen, fn(i) -> fair.choices[i] end)
+  end
+
   def everybody_ready?(%{north: %{ready: :true}, south: %{ready: :true}}), do: :true
   def everybody_ready?(_), do: :false
 end
