@@ -140,6 +140,18 @@ defmodule Yagg.Event do
     end
   end
 
+  defmodule Candidate do
+    @spec new(
+      Player.position(),
+      [
+        index: term(),
+        unit: Unit.t
+      ]) :: Event.t
+    def new(position, params) do
+      Event.new(position, :candidate, params)
+    end
+  end
+
   defmodule UnitDied do
     @spec new([x: 0..8, y: 0..8]) :: Event.t
     def new(params) do

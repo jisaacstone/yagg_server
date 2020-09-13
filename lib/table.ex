@@ -90,9 +90,10 @@ defmodule Yagg.Table do
     {:ok, pid} = get_or_single__(table_id)
     case GenServer.call(pid, :get_state) do
       {:err, _} = err -> err
-      {:ok, game} ->
-        case Player.by_name(game, player_name) do
-          %Player{position: position} -> Board.units(game.board, position)
+      {:ok, table} ->
+        case Player.by_name(table, player_name) do
+          %Player{position: position} -> 
+            table.board.__struct__.units(table.board, position)
           _ -> {:err, :unknown_player}
         end
     end

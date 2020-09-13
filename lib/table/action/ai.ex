@@ -14,11 +14,10 @@ defmodule Action.Ai do
   defp check_players([_, _], _), do: {:err, :toomany}
   defp check_players([p1], table) do
     robot = Player.new("randombot", Player.opposite(p1.position))
-    {:ok, pid} = DynamicSupervisor.start_child(Yagg.AISupervisor, {AI.Server, [{table.id, robot}]})
-    IO.inspect(started: robot, pid: pid, table: table.id)
-    {table, events} = Action.initial_setup(%{table | players: [p1, robot]})
+    {:ok, _pid} = DynamicSupervisor.start_child(Yagg.AISupervisor, {AI.Server, [{table.id, robot}]})
+    {board, events} = table.board.__struct__.setup(table.board)
     {
-      %{table | players: [p1, robot]},
+      %{table | players: [p1, robot], board: board},
       [Event.PlayerJoined.new(robot: robot.name, position: robot.position) | events]
     }
   end

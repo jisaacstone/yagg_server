@@ -86,17 +86,23 @@ end
 defmodule Board.Configuration.Alpha do
   @behaviour Board.Configuration
 
+  # busybody.ex	explody.ex	maycorn.ex	mediacreep.ex	monarch.ex	pushie.ex	sackboom.ex	spikeder.ex	tactician.ex	tinker.ex
   @impl Board.Configuration
   def starting_units(position) do
     [
       Unit.Monarch.new(position),
       Unit.Tactician.new(position),
-      Unit.new(position, :bezerker, 7, 2),
-      Unit.new(position, :fullarmorcoward, 1, 6, :nil, %{death: Ability.Secondwind}),
+      Unit.Busybody.new(position),
       Unit.Explody.new(position),
       Unit.Pushie.new(position),
+      Unit.Mediacreep.new(position),
+      Unit.Sackboom.new(position),
+      Unit.Spikeder.new(position),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
+      Unit.new(position, :electromouse, 3, 2, Ability.Upgrade),
+      Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
+      Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
     ]
   end
 
@@ -112,7 +118,8 @@ defmodule Board.Configuration.Alpha do
   def meta() do
     %{
       dimensions: {5, 5},
-      initial_module: Jobfair
+      initial_module: Jobfair,
+      max: 8
     }
   end
 

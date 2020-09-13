@@ -1,6 +1,7 @@
 alias Yagg.Table.Player
 alias Yagg.Table.Action
 alias Yagg.Event
+alias Yagg.Board
 alias Yagg.Jobfair
 
 defmodule Yagg.Table.Action.Join do
@@ -20,9 +21,9 @@ defmodule Yagg.Table.Action.Join do
       [p1] -> 
         p2 = Player.new(player_name, Player.opposite(p1.position))
         # start game implicitly when two players join
-        {table, events} = Action.initial_setup(%{table | players: [p1, p2]})
+        {board, events} = Board.setup(table.board)
         {
-          table,
+          %{table | players: [p1, p2], board: board},
           [Event.PlayerJoined.new(name: player_name, position: p2.position) | events]
         }
       [_p1, _p2] -> {:err, :table_full}
@@ -36,11 +37,13 @@ defmodule Yagg.Table.Action.Join do
         }
       [p1] -> 
         p2 = Player.new(player_name, Player.opposite(p1.position))
+        {jf, events} = Jobfair.setup(table.board)
         {
-          %{table | players: [p1, p2]},
+          %{table | players: [p1, p2], board: jf},
           [
             Event.PlayerJoined.new(name: player_name, position: p2.position),
             Event.GameStarted.new()
+            | events
           ]
         }
       [_p1, _p2] -> {:err, :table_full}

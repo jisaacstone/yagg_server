@@ -362,6 +362,18 @@ span .tooltip, button .tooltip {
   margin: 3%;
 }
 
+/* jobfair */
+
+#jobfair {
+  display: grid;
+  grid-template-columns: 20vh 20vh 20vh 20vh;
+}
+
+.candidate {
+  display: grid;
+  height: 20vh;
+}
+
 /* overlay */
 
 .overlaycontainer {

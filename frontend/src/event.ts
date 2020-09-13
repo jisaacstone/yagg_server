@@ -2,9 +2,9 @@ import { getname } from './urlvars.js';
 import { gameaction } from './request.js';
 import { gmeta } from './state.js';
 import { select } from './select.js';
-import { render_unit } from './unit.js';
+import * as Unit from './unit.js';
 import { SKULL } from './constants.js';
-import { boardhtml } from './render.js';
+import * as Board from './board.js';
 import * as readyButton from './ready.js';
 
 const unitsbyindex = {};
@@ -25,7 +25,7 @@ export function game_started(event) {
   const board = document.getElementById('board'),
     state = (event.state || 'placement').toLowerCase();
   if (event.dimensions) {
-    boardhtml(board, event.dimensions.x, event.dimensions.y);
+    Board.render(board, event.dimensions.x, event.dimensions.y);
   }
   gamestatechange(state);
   if (state === 'placement' || state === 'gameover') {
@@ -71,7 +71,7 @@ export function add_to_hand(event) {
   }
   unit.className = className;
   unit.dataset.index = event.index;
-  render_unit(event.unit, unit);
+  Unit.render_into(event.unit, unit);
   card.appendChild(unit);
   unitsbyindex[event.index] = unit;
 }
@@ -88,7 +88,7 @@ export function new_unit(event) {
     return console.log({err: 'unitnotfound', event, unit});
   }
   unit.innerHTML = '';
-  render_unit(event.unit, unit);
+  Unit.render_into(event.unit, unit);
 }
 
 export function unit_changed(event) {
@@ -172,3 +172,11 @@ export function turn(event) {
   }
 }
 
+export function candidate(event) {
+  const jf = document.getElementById('jobfair'),
+    cdd = document.createElement('div'),
+    unitEl = Unit.render(event.unit, event.index);
+  cdd.className = 'candidate';
+  cdd.appendChild(unitEl);
+  jf.appendChild(cdd);
+}

@@ -1,4 +1,5 @@
 alias Yagg.Unit
+alias Yagg.Event
 
 defmodule Yagg.Jobfair do
   alias __MODULE__
@@ -36,6 +37,16 @@ defmodule Yagg.Jobfair do
     }
   end
 
+  def setup(jobfair) do
+    e1 = Enum.map(jobfair.north.choices, &to_event(&1, :north))
+    e2 = Enum.map(jobfair.south.choices, &to_event(&1, :south))
+    {jobfair, e1 ++ e2}
+  end
+
+  defp to_event({index, unit}, position) do
+    Event.Candidate.new(position, index: index, unit: unit)
+  end
+
   defp to_choicemap(units), do: to_choicemap(units, %{}, 0)
   defp to_choicemap([unit | units], map, key) do
     to_choicemap(units, Map.put_new(map, key, unit), key + 1)
@@ -64,4 +75,9 @@ defmodule Yagg.Jobfair do
 
   def everybody_ready?(%{north: %{ready: :true}, south: %{ready: :true}}), do: :true
   def everybody_ready?(_), do: :false
+
+  def units(jobfair, position) do
+    fair = Map.get(jobfair, position)
+    {:ok, fair}
+  end
 end

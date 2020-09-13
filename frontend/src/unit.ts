@@ -8,10 +8,11 @@ interface Ability {
   description: string;
 }
 
-interface Unit {
+export interface Unit {
   name: string;
   attack: number;
   defense: number;
+  player: null | string;
   ability: null | Ability;
   triggers: null | {
     move?: Ability;
@@ -89,6 +90,18 @@ function unit_el(unit: Unit, el: HTMLElement) {
   }
 }
 
-export function render_unit(unit: Unit, el: HTMLElement): void {
+export function render_into(unit: Unit, el: HTMLElement): void {
   return unit_el(unit, el);
+}
+
+export function render(unit: Unit, index): HTMLElement {
+  const unitEl = document.createElement('span');
+  let className = `unit ${unit.player}`;
+  if (unit.player === gmeta.position) {
+    className += ' owned';
+  }
+  unitEl.className = className;
+  unitEl.dataset.index = index;
+  render_into(unit, unitEl);
+  return unitEl
 }

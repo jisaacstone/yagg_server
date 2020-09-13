@@ -7,7 +7,7 @@ defmodule Helper.Board do
         Enum.map(unquote(Macro.escape(starting_u)), fn(unit) -> %{unit | position: position} end)
       end
       def terrain(_), do: unquote(Macro.escape(terr))
-      def dimensions(), do: unquote(Macro.escape(dimen))
+      def meta(), do: %{dimensions: unquote(Macro.escape(dimen))}
     end
     Module.create(TestConfig, contents, Macro.Env.location(__ENV__))
     TestConfig

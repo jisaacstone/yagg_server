@@ -64,6 +64,17 @@ function unit_el(unit, el) {
         el.className = `monarch ${el.className}`;
     }
 }
-export function render_unit(unit, el) {
+export function render_into(unit, el) {
     return unit_el(unit, el);
+}
+export function render(unit, index) {
+    const unitEl = document.createElement('span');
+    let className = `unit ${unit.player}`;
+    if (unit.player === gmeta.position) {
+        className += ' owned';
+    }
+    unitEl.className = className;
+    unitEl.dataset.index = index;
+    render_into(unit, unitEl);
+    return unitEl;
 }
