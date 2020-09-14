@@ -1,7 +1,7 @@
 import { getname } from './urlvars.js';
 import { gameaction } from './request.js';
 import { gmeta } from './state.js';
-import { select } from './select.js';
+import * as Select from './select.js';
 import * as Unit from './unit.js';
 import { SKULL } from './constants.js';
 import * as Board from './board.js';
@@ -24,12 +24,15 @@ function gamestatechange(newstate: string): void {
 export function game_started(event) {
   const board = document.getElementById('board'),
     state = (event.state || 'placement').toLowerCase();
-  if (event.dimensions) {
-    Board.render(board, event.dimensions.x, event.dimensions.y);
-  }
-  gamestatechange(state);
-  if (state === 'placement' || state === 'gameover') {
-    readyButton.display(state === 'placement' ? 'READY' : 'REMATCH');
+  if (gmeta.phase === 'jobfair') {
+  } else {
+    if (event.dimensions) {
+      Board.render(board, event.dimensions.x, event.dimensions.y);
+    }
+    gamestatechange(state);
+    if (state === 'placement' || state === 'gameover') {
+      readyButton.display(state === 'placement' ? 'READY' : 'REMATCH');
+    }
   }
 }
 
@@ -64,7 +67,7 @@ export function add_to_hand(event) {
   let className = `unit ${event.unit.player}`;
   card.dataset.index = event.index;
   card.className = 'card';
-  card.onclick = select(card, {index: event.index, inhand: true, player: event.unit.player});
+  Select.bind_hand(card, event.index, event.unit.player);
   hand.appendChild(card);
   if (event.unit.player === gmeta.position) {
     className += ' owned';
@@ -174,9 +177,15 @@ export function turn(event) {
 
 export function candidate(event) {
   const jf = document.getElementById('jobfair'),
+    existing = document.getElementById(`candidate-${event.index}`),
     cdd = document.createElement('div'),
     unitEl = Unit.render(event.unit, event.index);
+  if (existing) {
+    return;
+  }
   cdd.className = 'candidate';
+  cdd.id = `candidate-${event.index}`;
   cdd.appendChild(unitEl);
+  Select.bind_candidate(cdd, event.index);
   jf.appendChild(cdd);
 }

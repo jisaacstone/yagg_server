@@ -374,6 +374,14 @@ span .tooltip, button .tooltip {
   height: 20vh;
 }
 
+.candidate .unit {
+  background-color: rgba(100, 112, 90, 0.8);
+}
+
+.candidate[data-uistate='selected'] .unit {
+  background-color: rgba(110, 232, 120, 0.9);
+}
+
 /* overlay */
 
 .overlaycontainer {

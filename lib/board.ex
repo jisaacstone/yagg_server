@@ -166,7 +166,7 @@ defmodule Yagg.Board do
     )
     {
       %{board | state: %State.Placement{}},
-      [Event.GameStarted.new() | events]
+      [Event.GameStarted.new(dimensions: board.dimensions) | events]
     }
   end
 

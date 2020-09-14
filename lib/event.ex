@@ -117,8 +117,8 @@ defmodule Yagg.Event do
   end
 
   defmodule GameStarted do
-    def new() do
-      Event.new(:global, :game_started)
+    def new(params \\ []) do
+      Event.new(:global, :game_started, params)
     end
   end
 

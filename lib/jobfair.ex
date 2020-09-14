@@ -20,10 +20,10 @@ defmodule Yagg.Jobfair do
     south: fair()
   }
 
-  def new(configuration, max \\ 20, min \\ 0) do
+  def new(configuration) do
     %Jobfair{
-      max: max,
-      min: min,
+      max: configuration.meta().max,
+      min: configuration.meta().min,
       north: %{
         choices: configuration.starting_units(:north) |> to_choicemap(),
         chosen: [],
@@ -48,10 +48,11 @@ defmodule Yagg.Jobfair do
   end
 
   defp to_choicemap(units), do: to_choicemap(units, %{}, 0)
+  defp to_choicemap([%{name: :monarch} | units], map, key), do: to_choicemap(units, map, key)
+  defp to_choicemap([], map, _), do: map
   defp to_choicemap([unit | units], map, key) do
     to_choicemap(units, Map.put_new(map, key, unit), key + 1)
   end
-  defp to_choicemap([], map, _), do: map
 
   def choose(%{max: max}, _, indices) when length(indices) > max do
     {:err, :too_many}

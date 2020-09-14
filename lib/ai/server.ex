@@ -1,8 +1,10 @@
 alias Yagg.Table
 alias Yagg.Event
 alias Yagg.Board
+alias Yagg.Jobfair
 alias Yagg.AI.Choices
 alias Yagg.Board.Action.Ready
+alias Yagg.Table.Action
 
 defmodule Yagg.AI.Server do
   use GenServer
@@ -34,6 +36,8 @@ defmodule Yagg.AI.Server do
         :do_nothing
       %{board: %{state: %Board.State.Placement{}}} ->
         do_initial_placement(table.board, state)
+      %{board: %Jobfair{} = jf} ->
+        recruit(Map.get(jf, state.robot.position), jf.max, state)
       %{board: board, turn: ^position} ->
         take_your_turn(board, state)
       _ -> :do_nothing
@@ -82,14 +86,11 @@ defmodule Yagg.AI.Server do
     choices = drop_dupes(choices, MapSet.new([monarch_idx]), MapSet.new(occupied))
     # place on average just above half the units?
     actions =  [place_monarch | choices]
-    IO.inspect(actions)
 
     Enum.each(
       actions,
       fn(action) -> :ok = Table.board_action(table_pid, robot.name, IO.inspect(action)) end
     )
-    {:ok, table} = Table.get_state(table_pid)
-    IO.inspect(hand: table.board.hands[robot.position])
     :ok = Table.board_action(table_pid, robot.name, IO.inspect(%Ready{}))
   end
 
@@ -110,4 +111,9 @@ defmodule Yagg.AI.Server do
     end
   end
 
+  defp recruit(fair, max, %{pid: table_pid, robot: robot}) do
+    indices = Map.keys(fair.choices) |> Enum.shuffle |> Enum.take(max)
+    action = %Action.Recruit{units: indices}
+    :ok = Table.table_action(table_pid, robot.name, action)
+  end
 end

@@ -3,4 +3,5 @@ export const gmeta = {
   name: null,
   boardstate: null,
   turn: null,
+  phase: null,
 };

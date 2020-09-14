@@ -1,6 +1,7 @@
 import { gameaction } from './request.js';
 import { gmeta } from './state.js';
 import { displayerror } from './err.js';
+import * as Jobfair from './jobfair.js';
 
 const global = { selected: null };
 
@@ -17,6 +18,21 @@ function action(actType, args) {
         }
       }
     });
+}
+
+function ismoveoption(el: HTMLElement) {
+  if (!el) {
+    return false;
+  }
+  if (el.firstElementChild) {
+    if (el.firstElementChild.className.includes(gmeta.position)) {
+      return false;
+    } 
+    if (el.firstElementChild.className.includes('water')) {
+      return false;
+    } 
+  }
+  return true;
 }
 
 export function select(thisEl, meta) {
@@ -85,17 +101,20 @@ export function select(thisEl, meta) {
   return select;
 }
 
-function ismoveoption(el: HTMLElement) {
-  if (!el) {
-    return false;
-  }
-  if (el.firstElementChild) {
-    if (el.firstElementChild.className.includes(gmeta.position)) {
-      return false;
-    } 
-    if (el.firstElementChild.className.includes('water')) {
-      return false;
-    } 
-  }
-  return true;
+export function bind_hand(card: HTMLElement, index: number, player: string) {
+  card.onclick = select(card, { inhand: true, index, player });
+}
+
+export function bind_candidate(candidate: HTMLElement, index: number) {
+  candidate.onclick = () => {
+    if (candidate.dataset.uistate === 'selected') {
+      if (Jobfair.deselect(index)) {
+        candidate.dataset.uistate = '';
+      }
+    } else {
+      if (Jobfair.select(index)) {
+        candidate.dataset.uistate = 'selected';
+      }
+    }
+  };
 }

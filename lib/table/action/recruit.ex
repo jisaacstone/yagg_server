@@ -2,6 +2,7 @@ alias Yagg.Jobfair
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Table
+alias Yagg.Unit
 
 defmodule Yagg.Table.Action.Recruit do
   @enforce_keys [:units]
@@ -27,8 +28,8 @@ defmodule Yagg.Table.Action.Recruit do
 
   defp initial_setup(table) do
     units = %{
-      north: Jobfair.chosen(table.board, :north),
-      south: Jobfair.chosen(table.board, :south)
+      north: [Unit.Monarch.new(:north) | Jobfair.chosen(table.board, :north)],
+      south: [Unit.Monarch.new(:south) | Jobfair.chosen(table.board, :south)]
     }
     {board, events} = Board.new(table.configuration) |> Board.setup(units)
     {%{table | board: board}, events}

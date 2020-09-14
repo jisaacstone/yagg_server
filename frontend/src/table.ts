@@ -7,7 +7,10 @@ import * as Event from './event.js';
 import * as Jobfair from './jobfair.js';
 import * as Board from './board.js';
 
-function render_board(board) {
+function render_board(board, players: number) {
+  if (players !== 2) {
+    return;
+  }
   Event.game_started(board);
   if (board.ready) {
     Event.player_ready({player: board.ready});
@@ -25,16 +28,14 @@ function render_board(board) {
 }
 
 function render_jobfair(jobfair) {
-  Jobfair.render(jobfair.min, jobfair.max, jobfair[gmeta.position].choices);
+  Jobfair.render(jobfair.min, jobfair.max);
 }
 
-function render_(boardstate, phase) {
+function render_(boardstate, phase, players) {
   if (phase === 'jobfair') {
-    console.log('rjf');
     render_jobfair(boardstate);
   } else if (phase === 'board') {
-    console.log('rb');
-    render_board(boardstate)
+    render_board(boardstate, players)
   }
 }
 
@@ -82,14 +83,15 @@ function waitingforplayers() {
 function fetchgamestate() {
   request(`table/${tableid()}/state`).then((gamedata: any) => {
     const phase = gamephase(gamedata.board);
-    setstate(gamedata, phase);
-    request(`board/${tableid()}/player_state/${getname()}`).then((unitdata: any) => {
-      if (phase === 'jobfair') {
-        Jobfair.unitdata(unitdata);
-      } else if (phase === 'board') {
-        Board.unitdata(unitdata);
-      }
-    });
+    if (setstate(gamedata, phase)) {
+      request(`board/${tableid()}/player_state/${getname()}`).then((unitdata: any) => {
+        if (phase === 'jobfair') {
+          Jobfair.unitdata(unitdata);
+        } else if (phase === 'board') {
+          Board.unitdata(unitdata);
+        }
+      });
+    }
   });
 }
 
@@ -124,13 +126,12 @@ function setstate(gamedata, phase) {
     Event.player_joined(player);
     players ++;
   }
+  render_(gamedata.board, phase, players);
   if (!gamedata.board || players == 1) {
     waitingforplayers();
-  } else {
-    render_(gamedata.board, phase);
   }
   if (gamedata.turn) {
     Event.turn({player: gamedata.turn});
   }
+  return players === 2;  // continue and fetch player hands
 }
-

@@ -108,19 +108,22 @@ defmodule Yagg.Table do
     {:ok, pid}
   end
 
-  @spec table_action(id, String.t, struct) :: :ok | {:err, atom}
-  def table_action(table_id, player_name, action) do
-    {:ok, pid} = get_or_single__(table_id)
+  @spec table_action(id | pid, String.t, struct) :: :ok | {:err, atom}
+  def table_action(pid, player_name, action) when is_pid(pid) do
     GenServer.call(pid, {:table_action, player_name, action})
   end
+  def table_action(table_id, player_name, action) do
+    {:ok, pid} = get_or_single__(table_id)
+    table_action(pid, player_name, action)
+  end
 
-  @spec board_action(id, String.t, struct) :: :ok | {:err, atom}
+  @spec board_action(id | pid, String.t, struct) :: :ok | {:err, atom}
   def board_action(pid, player_name, action) when is_pid(pid) do
     GenServer.call(pid, {:board_action, player_name, action})
   end
   def board_action(table_id, player_name, action) do
     {:ok, pid} = get_or_single__(table_id)
-    GenServer.call(pid, {:board_action, player_name, action})
+    board_action(pid, player_name, action)
   end
 
   def pid_to_id(pid) do
@@ -164,7 +167,8 @@ defmodule Yagg.Table do
     # try do
       cond do
         player == :notfound -> {:reply, {:err, :player_invalid}, game}
-        game.board && game.board.state == :battle and game.turn != player.position -> {:reply, {:err, :notyourturn}, game}
+        game.board && Map.get(game.board, :state) == :battle and game.turn != player.position ->
+          {:reply, {:err, :notyourturn}, game}
         :true ->
           case Board.Action.resolve(action, game.board, player.position) do
             {:err, _} = err -> {:reply, err, game}
