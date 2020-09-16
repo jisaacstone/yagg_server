@@ -52,28 +52,6 @@ defmodule Yagg.Table do
     DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})
   end
 
-  # TO ENABLE default table
-  def single__(configuration \\ Board.Configuration.Random) do
-    case Supervisor.which_children(Yagg.TableSupervisor) do
-      [{_id, pid, :worker, _modules} | _] -> {:ok, pid}
-      [] -> new(configuration)
-    end
-  end
-
-  def get_or_single__(table_id) do
-    try do
-      case get(table_id) do
-        {:err, _} -> 
-          IO.inspect('__single')
-          single__()
-        {:ok, pid} -> {:ok, pid}
-      end
-    rescue
-      ArgumentError -> single__()
-    end
-  end
-  # END TO ENABLE
-
   # API
 
   @spec get_state(pid | id) :: {:ok, t}
@@ -81,13 +59,13 @@ defmodule Yagg.Table do
     GenServer.call(pid, :get_state)
   end
   def get_state(table_id) do
-    {:ok, pid} = get_or_single__(table_id)
+    {:ok, pid} = get(table_id)
     GenServer.call(pid, :get_state)
   end
 
   @spec get_player_state(id, String.t) :: {:ok, %{grid: list, hand: list}} | {:err, atom}
   def get_player_state(table_id, player_name) do
-    {:ok, pid} = get_or_single__(table_id)
+    {:ok, pid} = get(table_id)
     case GenServer.call(pid, :get_state) do
       {:err, _} = err -> err
       {:ok, table} ->
@@ -101,7 +79,7 @@ defmodule Yagg.Table do
 
   @spec subscribe(id, String.t) :: {:ok, pid}
   def subscribe(table_id, player) do
-    {:ok, pid} = get_or_single__(table_id)
+    {:ok, pid} = get(table_id)
     IO.inspect(table: table_id, pid: pid)
     Process.monitor(pid)
     GenServer.call(pid, {:subscribe, player})
@@ -113,7 +91,7 @@ defmodule Yagg.Table do
     GenServer.call(pid, {:table_action, player_name, action})
   end
   def table_action(table_id, player_name, action) do
-    {:ok, pid} = get_or_single__(table_id)
+    {:ok, pid} = get(table_id)
     table_action(pid, player_name, action)
   end
 
@@ -122,7 +100,7 @@ defmodule Yagg.Table do
     GenServer.call(pid, {:board_action, player_name, action})
   end
   def board_action(table_id, player_name, action) do
-    {:ok, pid} = get_or_single__(table_id)
+    {:ok, pid} = get(table_id)
     board_action(pid, player_name, action)
   end
 

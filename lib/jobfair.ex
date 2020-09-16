@@ -64,14 +64,19 @@ defmodule Yagg.Jobfair do
     if MapSet.size(MapSet.new(indices)) < length(indices) do
       {:err, :duplicates}
     else
-      fair = %{Map.get(jobfair, position) | chosen: indices, ready: :true}
-      {:ok, Map.put(jobfair, position, fair)}
+      fair = Map.fetch!(jobfair, position)
+      if Enum.all?(indices, &Map.has_key?(fair.choices, &1)) do
+        {:ok, Map.put(jobfair, position, %{fair | chosen: indices, ready: :true})}
+      else
+        IO.inspect(indices: indices, choices: fair.choices, map: Enum.map(indices, fn(i) -> {i, Map.has_key?(fair.choices, i)} end))
+        {:err, :badindex}
+      end
     end
   end
 
   def chosen(jobfair, position) do
     fair = Map.get(jobfair, position)
-    Enum.map(fair.chosen, fn(i) -> fair.choices[i] end)
+    Enum.map(fair.chosen, fn(i) -> Map.fetch!(fair.choices, i) end)
   end
 
   def everybody_ready?(%{north: %{ready: :true}, south: %{ready: :true}}), do: :true
