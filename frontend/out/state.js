@@ -5,3 +5,7 @@ export const gmeta = {
     turn: null,
     phase: null,
 };
+export function isYourTurn() {
+    return gmeta.position
+        && gmeta.position === gmeta.turn;
+}
