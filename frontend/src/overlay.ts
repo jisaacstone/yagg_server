@@ -21,6 +21,6 @@ export function dismissable(el) {
   const overlay = create();
   overlay.appendChild(el);
   overlay.onclick = () => {
-    overlay.remove();
+    clear();
   }
 }

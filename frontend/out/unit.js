@@ -37,23 +37,25 @@ function render_attrs(unit, el) {
         subel.innerHTML = unit[att];
         el.appendChild(subel);
     }
-    el.style.backgroundImage = `url(img/${unit.name}.png)`;
     if (unit.name === 'monarch') {
         el.className = `monarch ${el.className}`;
     }
 }
 function render_tile(unit, el) {
     render_attrs(unit, el);
+    el.style.backgroundImage = `url(img/${unit.name}.png)`;
     if (unit.ability) {
         ability_button(unit, el);
     }
     detailView(unit, el);
 }
 function detailView(unit, el) {
-    const details = document.createElement('div'), displaybut = document.createElement('button');
+    const details = document.createElement('div'), portrait = document.createElement('div'), displaybut = document.createElement('button');
     details.className = `${el.className} details`;
     render_attrs(unit, details);
-    details.style.backgroundImage = `url(img/${unit.name}.png)`;
+    portrait.className = 'unit-portrait';
+    portrait.style.backgroundImage = `url(img/${unit.name}.png)`;
+    details.appendChild(portrait);
     if (unit.triggers) {
         const triggers = document.createElement('div');
         triggers.className = 'triggers';
@@ -62,13 +64,14 @@ function detailView(unit, el) {
             triggerel.className = 'trigger';
             triggers.appendChild(triggerel);
             triggerel.className = `unit-trigger ${name}-trigger`;
-            triggerel.innerHTML = `{name} trigger: {trigger.description}`;
+            triggerel.innerHTML = `${name} trigger: ${trigger.description}`;
         }
         details.appendChild(triggers);
     }
     if (unit.ability) {
         const ability = document.createElement('div'), abildesc = document.createElement('div'), abilname = document.createElement('div');
         ability.className = 'unit-ability';
+        abilname.className = 'ability-name';
         abilname.innerHTML = unit.ability.name;
         ability.appendChild(abilname);
         abildesc.innerHTML = unit.ability.description;
@@ -77,7 +80,9 @@ function detailView(unit, el) {
     }
     displaybut.className = 'details-button';
     displaybut.innerHTML = '?';
-    displaybut.onclick = () => {
+    displaybut.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         dismissable(details);
     };
     el.appendChild(displaybut);

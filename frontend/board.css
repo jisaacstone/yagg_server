@@ -144,10 +144,12 @@ body > div {
 }
 .unit-name {
   order: 1;
-  padding: 0.3vh;
+  padding-left: 0.3vh;
+  padding-top: 0.3vh;
   text-overflow: ellipsis;
   overflow: hidden;
   text-shadow: white -1px -1px 2px;
+  width: 70%;
 }
 .unit.monarch {
   box-shadow: inset 0 0 2px purple;
@@ -273,6 +275,121 @@ span .tooltip, button .tooltip {
   text-align: center;
 }
 
+.details-button {
+  padding: 0;
+  background-color: rgba(99,106,100,0.2);
+  width: 1.2em;
+  height: 1.2em;
+  order: 2;
+  box-sizing: border-box;
+  border-width: 1px;
+  margin-right: 2px;
+}
+
+/* details */
+
+.unit.details {
+  width: 72vh;
+  height: 72vh;
+  margin: auto;
+  font-size: 110%;
+  cursor: pointer;
+  padding: 1em;
+}
+.unit.details .unit-name {
+  text-align: center;
+  width: 100%;
+  font-weight: bold;
+  font-size: 135%;
+  padding-bottom: 1em;
+}
+.unit-details .unit-name:first-letter {
+  text-transform: capitalize;
+}
+.unit.details .unit-ability {
+  max-width: 100%;
+  width: 100%;
+  padding: 0.5em;
+  order: 7;
+}
+.unit.details .unit-ability::before {
+  content: 'special ability';
+  font-variant-caps: all-small-caps;
+  position: relative;
+  left: -0.3em;
+  top: -0.3em;
+  font-size: 80%;
+  min-width: 80%;
+  border-bottom: 1px solid rgba(46,221,98,0.6);
+}
+
+.ability-name {
+  font-weight: bold;
+  padding: 0.3em;
+}
+.ability-name:first-letter {
+  text-transform: uppercase;
+}
+
+.unit.details .unit-attack {
+  order: 2;
+}
+.unit.details .unit-defense {
+  order: 3;
+}
+
+.unit.details .unit-attack::before {
+  content: 'Attack';
+  font-variant-caps: all-small-caps;
+  position: absolute;
+  margin-left: -0.7em;
+  margin-top: -1.7em;
+  font-size: 80%;
+  min-width: 80%;
+}
+.unit.details .unit-defense::before {
+  content: 'Defense';
+  font-variant-caps: all-small-caps;
+  position: absolute;
+  margin-left: -2.3em;
+  margin-top: -1.7em;
+  font-size: 80%;
+  min-width: 80%;
+}
+
+.unit-portrait {
+  width: 100%;
+  height: 40vh;
+  order: 5;
+  margin: auto;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  border-bottom: 2px inset rgba(190, 65, 43, 0.5);
+}
+
+.unit.details .triggers {
+  order: 6;
+  width: 100%;
+}
+.unit.details .unit-trigger {
+}
+.unit.details .unit-trigger:first-letter {
+  text-transform: capitalize;
+}
+
+.unit.details .triggers:first-child::before {
+  content: 'triggers';
+  font-variant-caps: all-small-caps;
+  position: relative;
+  left: 0.3em;
+  top: -0.3em;
+  font-size: 80%;
+  min-width: 80%;
+  border-bottom: 1px solid rgba(46,221,98,0.6);
+}
+
+
 /* Features */
 
 .feature {
@@ -387,17 +504,17 @@ span .tooltip, button .tooltip {
 .overlaycontainer {
   position: absolute;
   width: 100%;
-  height: 50vh;
+  height: 72vh;
   left: 0;
-  top: 25vh;
+  top: 14vh;
 }
 
 .overlay {
   position: relative;
-  left: 25%;
-  width: 50%;
+  margin: auto;
+  /*
   border-radius: 5vh;
   border: 5px inset steelblue;
   box-shadow: 1vh 2vh 1vh rgba(0,0,5,0.4);
-  box-sizing: border-box;
+  box-sizing: border-box; */
 }
