@@ -24,3 +24,4 @@ yagg_server-*.tar
 *.dump
 
 *.DS_Store
+bugreports

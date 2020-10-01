@@ -7,7 +7,12 @@ alias Yagg.Jobfair
 defmodule Yagg.Board.Configuration do
   @callback starting_units(Player.position()) :: [Unit.t, ...]
   @callback terrain(Board.t) :: [{Board.Grid.coord(), Board.Grid.terrain()}]
-  @callback meta() :: %{dimensions: {4..8, 4..8}}
+  @callback meta() :: %{
+    required(:dimensions) => {4..8, 4..8},
+    optional(:initial_module) => Jobfair | Board,
+    optional(:max) => non_neg_integer,
+    optional(:min) => non_neg_integer,
+  }
 
   def dimensions(configuration) do
     configuration.meta().dimensions

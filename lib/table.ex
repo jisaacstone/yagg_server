@@ -7,7 +7,7 @@ defmodule Yagg.Table do
   use GenServer
   alias __MODULE__
 
-  @enforce_keys [:id, :players, :board, :turn, :configuration]
+  @enforce_keys [:id, :players, :board, :turn, :configuration, :history]
   @derive {Poison.Encoder, only: [:players, :board, :turn, :configuration]}
   defstruct [:subscribors | @enforce_keys]
 
@@ -18,6 +18,7 @@ defmodule Yagg.Table do
     board: :nil | Board.t | Jobfair.t,
     turn: :nil | Player.position(),
     configuration: module(),
+    history: any(),
   }
 
   def start_link([table]) do
@@ -48,6 +49,7 @@ defmodule Yagg.Table do
       board: Configuration.initial_board(configuration),
       turn: :nil,
       configuration: configuration,
+      history: [],
     }
     DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})
   end
@@ -119,52 +121,52 @@ defmodule Yagg.Table do
     {:ok, %{table | id: id}}
   end
 
-  def handle_call(:get_state, _from, game) do
-    {:reply, {:ok, game}, game}
+  def handle_call(:get_state, _from, table) do
+    {:reply, {:ok, table}, table}
   end
-  def handle_call({:subscribe, player}, {pid, _tag}, %{subscribors: subs} = game) do
-    {:reply, :ok, %{game | subscribors: [{player, pid} | subs]}}
+  def handle_call({:subscribe, player}, {pid, _tag}, %{subscribors: subs} = table) do
+    {:reply, :ok, %{table | subscribors: [{player, pid} | subs]}}
   end
 
-  def handle_call({:table_action, player_name, action}, _from, game) do
-    player = Player.by_name(game, player_name)
+  def handle_call({:table_action, player_name, action}, _from, table) do
+    player = Player.by_name(table, player_name)
     # try do
-      case Yagg.Table.Action.resolve(action, game, player) do
-        {:err, _} = err -> {:reply, err, game}
-        {game, events} ->
-          notify(game, events)
-          {:reply, :ok, game}
+      case Yagg.Table.Action.resolve(action, table, player) do
+        {:err, _} = err -> {:reply, err, table}
+        {table, events} ->
+          notify(table, events)
+          {:reply, :ok, table}
       end
     # rescue
-    #   FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
+    #   FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, table}
     # end
   end
 
-  def handle_call({:board_action, player_name, action}, _from, game) do
-    player = Player.by_name(game, player_name)
+  def handle_call({:board_action, player_name, action}, _from, table) do
+    player = Player.by_name(table, player_name)
     # try do
       cond do
-        player == :notfound -> {:reply, {:err, :player_invalid}, game}
-        game.board && Map.get(game.board, :state) == :battle and game.turn != player.position ->
-          {:reply, {:err, :notyourturn}, game}
+        player == :notfound -> {:reply, {:err, :player_invalid}, table}
+        table.board && Map.get(table.board, :state) == :battle and table.turn != player.position ->
+          {:reply, {:err, :notyourturn}, table}
         :true ->
-          case Board.Action.resolve(action, game.board, player.position) do
-            {:err, _} = err -> {:reply, err, game}
+          case Board.Action.resolve(action, table.board, player.position) do
+            {:err, _} = err -> {:reply, err, table}
             {board, events} ->
               # One action per turn. Successful move == next turn
-              game = %{game | board: board}
-              {game, events} = if (board.state == :battle) do
-                game = nxtrn(game)
-                {game, [Event.Turn.new(player: game.turn) | events]}
+              table = %{table | board: board, history: [{table.board, action} | table.history]}
+              {table, events} = if (board.state == :battle) do
+                table = nxtrn(table)
+                {table, [Event.Turn.new(player: table.turn) | events]}
               else
-                {game, events}
+                {table, events}
               end
-              notify(game, events)
-              {:reply, :ok, game}
+              notify(table, events)
+              {:reply, :ok, table}
           end
       end
     # rescue
-      # FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, game}
+      # FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, table}
     # end
   end
 
@@ -172,29 +174,28 @@ defmodule Yagg.Table do
     {:reply, {:err, {:unknown_msg, msg}}, state}
   end
 
-  def handle_info({:DOWN, _ref, :process, pid, reason}, %Table{players: players} = game) do
+  def handle_info({:DOWN, _ref, :process, pid, reason}, %Table{players: players} = table) do
     case Enum.find(players, fn p -> elem(p, 1) == pid end) do
-      :nil -> {:noreply, game}
+      :nil -> {:noreply, table}
       {name, _} -> 
-        :ok = notify(game, Event.new(:player_disconnect, %{player: name, reason: reason}))
-        subs =  Enum.reject(game.subscribors, fn({_, ^pid}) -> :true; (_) -> :false end)
-        {:noreply, %{game | subscribors: subs}}
+        :ok = notify(table, Event.new(:player_disconnect, %{player: name, reason: reason}))
+        subs =  Enum.reject(table.subscribors, fn({_, ^pid}) -> :true; (_) -> :false end)
+        {:noreply, %{table | subscribors: subs}}
     end
   end
-  def handle_info(other, game) do
+  def handle_info(other, table) do
     IO.inspect([unexpected_info: other])
-    {:noreply, game}
+    {:noreply, table}
   end
 
   # Private
 
-  # TODO: Event types, move to another module?
   defp notify(_game, []) do
     :ok
   end
-  defp notify(game, [event | events]) do
-    notify(game, event)
-    notify(game, events)
+  defp notify(table, [event | events]) do
+    notify(table, event)
+    notify(table, events)
   end
   defp notify(%{subscribors: subs, players: players}, %Event{} = event) do
     Enum.each(
@@ -212,8 +213,8 @@ defmodule Yagg.Table do
     )
   end
 
-  defp nxtrn(%Table{board: %Board{state: %State.Placement{}}} = game), do: game
-  defp nxtrn(%Table{turn: :north} = game), do: %{game | turn: :south}
-  defp nxtrn(%Table{turn: :south} = game), do: %{game | turn: :north}
-  defp nxtrn(%Table{turn: :nil} = game), do: %{game | turn: :north}
+  defp nxtrn(%Table{board: %Board{state: %State.Placement{}}} = table), do: table
+  defp nxtrn(%Table{turn: :north} = table), do: %{table | turn: :south}
+  defp nxtrn(%Table{turn: :south} = table), do: %{table | turn: :north}
+  defp nxtrn(%Table{turn: :nil} = table), do: %{table | turn: :north}
 end

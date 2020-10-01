@@ -1,7 +1,7 @@
-import { gameaction, request } from './request.js';
 import { getname, tableid, _name_ } from './urlvars.js';
 import { gmeta } from './state.js';
 import { listen } from './eventlistener.js';
+import * as Request from './request.js';
 import * as Overlay from './overlay.js';
 import * as Event from './event.js';
 import * as Jobfair from './jobfair.js';
@@ -65,17 +65,17 @@ function waitingforplayers() {
     comp.innerHTML = 'play the computer';
     comp.className = 'aibutton';
     comp.onclick = function () {
-        gameaction('ai', {}, 'table').then(() => {
+        Request.gameaction('ai', {}, 'table').then(() => {
             Overlay.clear();
         });
     };
     over.appendChild(comp);
 }
 function fetchgamestate() {
-    request(`table/${tableid()}/state`).then((gamedata) => {
+    Request.request(`table/${tableid()}/state`).then((gamedata) => {
         const phase = gamephase(gamedata.board);
         if (setstate(gamedata, phase)) {
-            request(`board/${tableid()}/player_state/${getname()}`).then((unitdata) => {
+            Request.request(`board/${tableid()}/player_state/${getname()}`).then((unitdata) => {
                 if (phase === 'jobfair') {
                     Jobfair.unitdata(unitdata);
                 }
@@ -96,9 +96,14 @@ function namedialog() {
     return name;
 }
 window.onload = function () {
-    const name = namedialog();
+    const name = namedialog(), errbutton = document.getElementById('errbutton');
+    if (errbutton) {
+        errbutton.onclick = () => {
+            reporterr();
+        };
+    }
     gmeta.name = name;
-    gameaction('join', { player: name }, 'table')
+    Request.gameaction('join', { player: name }, 'table')
         .then(() => {
         fetchgamestate();
         listen(Event);
@@ -123,4 +128,8 @@ function setstate(gamedata, phase) {
         Event.turn({ player: gamedata.turn });
     }
     return players === 2; // continue and fetch player hands
+}
+function reporterr() {
+    const reporttext = prompt("Report an error with game state", "describe the problem");
+    Request.post(`table/${tableid()}/report`, { report: reporttext });
 }

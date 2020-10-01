@@ -70,6 +70,13 @@ defmodule Yagg.Endpoint do
     Table.get_state(table_id) |> to_response(conn)
   end
 
+  post "/table/:table_id/report" do
+    {:ok, body, conn} = Conn.read_body(conn)
+    {:ok, params} = Poison.decode(body)
+    {:ok, state} = Table.get_state(table_id)
+    bugreport(state.board, state.history, Map.get(params, "moves", 3), params["report"]) |> to_response(conn)
+  end
+
   get "/board/:table_id/player_state/:player_name" do
     Table.get_player_state(table_id, player_name) |> to_response(conn)
   end
@@ -127,5 +134,22 @@ defmodule Yagg.Endpoint do
     conn
       |> put_resp_content_type("application/json")
       |> send_resp(code, Poison.encode!(data))
+  end
+
+  defp bugreport(board, history, moves, report) do
+    {:ok, file} = File.open('bugreports', [:append])
+    _ = IO.inspect(file, report, label: "report")
+    _ = IO.inspect(file, DateTime.utc_now(), [])
+    _ = IO.inspect(file, board, pretty: :true, width: :infinity)
+    history
+    |> Enum.take(moves)
+    |> Enum.each(
+      fn({board, action}) ->
+        {
+          IO.inspect(file, action, pretty: :true, width: :infinity),
+          IO.inspect(file, board, pretty: :true, width: :infinity)
+        }
+      end
+    )
   end
 end

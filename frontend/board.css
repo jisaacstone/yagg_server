@@ -48,6 +48,17 @@ body > div {
   margin-top: 2vh;
 }
 
+#errbutton {
+  color: grey;
+  font-size: 60%;
+  position: fixed;
+  top: 1em;
+  right: 1em;
+  z-index: 0;
+  padding: 1px;
+  font-weight: bold;
+}
+
 /* BOARD */
 
 #right {
