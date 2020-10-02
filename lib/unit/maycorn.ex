@@ -13,7 +13,7 @@ defmodule Unit.Maycorn do
       :maycorn,
       3,
       4,
-      Maycorn.Spark.Left,
+      Maycorn.Spark.Front,
       %{
         death: Maycorn.Spark.All
       }
@@ -30,11 +30,9 @@ defmodule Unit.Maycorn do
   end
 
   defp sparkle(board, attack, direction, coord) do
-    case Grid.thing_at(board, coord) do
-      %Unit{defense: a} when a < attack ->
+    case Grid.projectile(board, coord, direction) do
+      {coord, %Unit{defense: a}} when a < attack ->
         Board.unit_death(board, coord)
-      atom when atom == :nil or atom == :water ->
-        sparkle(board, attack, direction, Grid.next(direction, coord))
       _other -> {board, []}
     end
   end

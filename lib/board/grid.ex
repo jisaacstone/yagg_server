@@ -79,6 +79,7 @@ defmodule Yagg.Board.Grid do
   @doc """
   in-place update of unit at coord
   """
+  @spec update(Board.t, coord, (Unit.t -> Unit.t), [Event.t]) :: {Board.t, [Event.t]}
   def update(%Board{} = board, {x, y} = coord, updater, events \\ []) do
     case board.grid[coord] do
       %Unit{} = unit ->
@@ -88,6 +89,23 @@ defmodule Yagg.Board.Grid do
           [Event.UnitChanged.new(unit.position, x: x, y: y, unit: updated) | events]
         }
       _other -> {board, events}
+    end
+  end
+
+  @doc """
+  Find next Unit in direction, starting at coord and skipping empty squares and water
+  """
+  @spec projectile(Board.t, coord, Board.direction) :: {coord, Unit.t} | :out_of_bounds
+  def projectile(board, coord, direction) do
+    IO.inspect([coord, direction])
+    next_coord = next(direction, coord)
+    case thing_at(board, next_coord) do
+      %Unit{} = unit ->
+        {next_coord, unit}
+      atom when atom == :nil or atom == :water ->
+        projectile(board, next_coord, direction)
+      _other ->
+        :out_of_bounds
     end
   end
 end
