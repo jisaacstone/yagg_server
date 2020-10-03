@@ -5,6 +5,7 @@ import * as Unit from './unit.js';
 import { SKULL } from './constants.js';
 import * as Board from './board.js';
 import * as readyButton from './ready.js';
+import * as Dialog from './dialog.js';
 const unitsbyindex = {};
 function gamestatechange(newstate) {
     document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
@@ -128,8 +129,10 @@ export function thing_moved(event) {
     }
 }
 export function gameover(event) {
+    const message = event.winner === gmeta.position ? 'you win!' : 'you lose';
     gamestatechange('gameover');
     document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
+    Dialog.displayMessage(message);
     readyButton.display('REMATCH');
 }
 export function turn(event) {

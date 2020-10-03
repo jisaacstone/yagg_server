@@ -131,5 +131,5 @@ function setstate(gamedata, phase) {
 }
 function reporterr() {
     const reporttext = prompt("Report an error with game state", "describe the problem");
-    Request.post(`table/${tableid()}/report`, { report: reporttext });
+    Request.post(`table/${tableid()}/report`, { report: reporttext, meta: gmeta });
 }
