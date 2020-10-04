@@ -10,8 +10,7 @@ defmodule Yagg.Board.Configuration do
   @callback meta() :: %{
     required(:dimensions) => {4..8, 4..8},
     optional(:initial_module) => Jobfair | Board,
-    optional(:max) => non_neg_integer,
-    optional(:min) => non_neg_integer,
+    optional(:army_size) => non_neg_integer,
   }
 
   def dimensions(configuration) do
@@ -127,8 +126,7 @@ defmodule Board.Configuration.Alpha do
     %{
       dimensions: {5, 5},
       initial_module: Jobfair,
-      min: 6,
-      max: 8
+      army_size: 8
     }
   end
 

@@ -497,6 +497,15 @@ span .tooltip, button .tooltip {
   grid-template-columns: 20vh 20vh 20vh 20vh;
 }
 
+#jobfair .instructions {
+  width: 76%;
+  background-color: rgba(200,199,180,0.8);
+  position: absolute;
+  top: 0;
+  left: 12%;
+  text-align: center;
+}
+
 .candidate {
   display: grid;
   height: 20vh;

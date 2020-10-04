@@ -46,7 +46,6 @@ export function select(thisEl, meta) {
                     action('place', { index: sel.meta.index, x: meta.x, y: meta.y });
                 }
                 else {
-                    console.log({ gmeta });
                     // clickd on a board square
                     if (gmeta.boardstate === 'battle') {
                         action('move', { from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y });
@@ -87,7 +86,6 @@ export function select(thisEl, meta) {
                 }
                 for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
                     const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-                    console.log({ nel, fc: nel && nel.firstElementChild });
                     if (ismoveoption(nel)) {
                         nel.dataset.uistate = 'moveoption';
                         options.push(nel);
@@ -103,7 +101,7 @@ export function bind_hand(card, index, player) {
     card.onclick = select(card, { inhand: true, index, player });
 }
 export function bind_candidate(candidate, index) {
-    candidate.onclick = () => {
+    candidate.onclick = (e) => {
         if (candidate.dataset.uistate === 'selected') {
             if (Jobfair.deselect(index)) {
                 candidate.dataset.uistate = '';

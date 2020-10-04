@@ -7,6 +7,7 @@ import { SKULL } from './constants.js';
 import * as Board from './board.js';
 import * as readyButton from './ready.js';
 import * as Dialog from './dialog.js';
+import * as Jobfair from './jobfair.js';
 
 const unitsbyindex = {};
 
@@ -25,7 +26,12 @@ function gamestatechange(newstate: string): void {
 export function game_started(event) {
   const board = document.getElementById('board'),
     state = (event.state || 'placement').toLowerCase();
-  if (gmeta.phase === 'jobfair') {
+  if (event.army_size || gmeta.phase === 'jobfair') {
+    if (gmeta.boardstate === 'gameover') {
+      Board.clear();
+      gamestatechange(state);
+    }
+    Jobfair.render(event.army_size);
   } else {
     if (event.dimensions) {
       Board.render(board, event.dimensions.x, event.dimensions.y);

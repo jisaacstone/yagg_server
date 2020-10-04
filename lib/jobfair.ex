@@ -3,7 +3,7 @@ alias Yagg.Event
 
 defmodule Yagg.Jobfair do
   alias __MODULE__
-  @enforce_keys [:max, :min, :north, :south]
+  @enforce_keys [:army_size, :north, :south]
   defstruct @enforce_keys
 
   @type key :: non_neg_integer()
@@ -14,16 +14,15 @@ defmodule Yagg.Jobfair do
   }
 
   @type t :: %Jobfair{
-    min: 0..20,
-    max: 1..20,
+    army_size: 1..20,
     north: fair(),
     south: fair()
   }
 
+  @spec new(module) :: t
   def new(configuration) do
     %Jobfair{
-      max: configuration.meta().max,
-      min: configuration.meta().min,
+      army_size: configuration.meta().army_size,
       north: %{
         choices: configuration.starting_units(:north) |> to_choicemap(),
         chosen: [],
@@ -37,10 +36,11 @@ defmodule Yagg.Jobfair do
     }
   end
 
+  @spec setup(t) :: {t, [Event.t]}
   def setup(jobfair) do
     e1 = Enum.map(jobfair.north.choices, &to_event(&1, :north))
     e2 = Enum.map(jobfair.south.choices, &to_event(&1, :south))
-    {jobfair, e1 ++ e2}
+    {jobfair, [Event.GameStarted.new(army_size: jobfair.army_size) | e1 ++ e2]}
   end
 
   defp to_event({index, unit}, position) do
@@ -54,10 +54,10 @@ defmodule Yagg.Jobfair do
     to_choicemap(units, Map.put_new(map, key, unit), key + 1)
   end
 
-  def choose(%{max: max}, _, indices) when length(indices) > max do
+  def choose(%{army_size: army_size}, _, indices) when length(indices) > army_size do
     {:err, :too_many}
   end
-  def choose(%{min: min}, _, indices) when length(indices) < min do
+  def choose(%{army_size: army_size}, _, indices) when length(indices) < army_size do
     {:err, :too_few}
   end
   def choose(jobfair, position, indices) do

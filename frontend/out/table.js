@@ -27,7 +27,7 @@ function render_board(board, players) {
     });
 }
 function render_jobfair(jobfair) {
-    Jobfair.render(jobfair.min, jobfair.max);
+    Jobfair.render(jobfair.army_size);
 }
 function render_(boardstate, phase, players) {
     if (phase === 'jobfair') {
@@ -38,11 +38,10 @@ function render_(boardstate, phase, players) {
     }
 }
 function gamephase(board) {
-    console.log({ board });
-    if (board.min !== undefined && board.max !== undefined) {
+    if (board.army_size !== undefined) {
         return 'jobfair';
     }
-    else if (board.grid) {
+    else if (board.grid !== undefined) {
         return 'board';
     }
     return null;

@@ -155,7 +155,7 @@ defmodule Yagg.Table do
             {board, events} ->
               # One action per turn. Successful move == next turn
               table = %{table | board: board, history: [{table.board, action} | table.history]}
-              {table, events} = if (board.state == :battle) do
+              {table, events} = if (Map.get(board, :state) == :battle) do
                 table = nxtrn(table)
                 {table, [Event.Turn.new(player: table.turn) | events]}
               else

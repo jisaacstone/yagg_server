@@ -26,10 +26,14 @@ defmodule Action.Ready do
     end
   end
   def resolve(_, %Board{state: %Gameover{ready: :nil}} = board, position) do
-      {%{board | state: %Gameover{ready: position}}, [Event.PlayerReady.new(player: position)]}
+    {
+      %{board | state: %Gameover{ready: position}},
+      [Event.PlayerReady.new(player: position)]
+    }
   end
   def resolve(_act, %Board{state: %Gameover{ready: _opponent}} = board, _position) do
-    Board.setup(board)
+    initial = Board.Configuration.initial_board(board.configuration)
+    initial.__struct__.setup(initial)
   end
   def resolve(_, _, _) do
     {:err, :badstate}

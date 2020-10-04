@@ -34,11 +34,9 @@ defmodule Board.Configuration.AlphaTest do
     %{
       dimensions: {5, 5},
       initial_module: Jobfair,
-      min: 2,
-      max: 4
+      army_size: 3
     }
   end
-
 end
 
 defmodule YaggTest.Jobfair do
@@ -87,7 +85,7 @@ defmodule YaggTest.Jobfair do
   defmodule IndiciesTestConfig do
     defmodule Initial do
       def new(_config) do
-        %Yagg.Jobfair{max: 8, min: 6,
+        %Yagg.Jobfair{army_size: 8,
           north: %{choices: %{
             0 => %Yagg.Unit{ability: nil, attack: 5, defense: 4, name: :tactician, position: :north, triggers: %{move: Yagg.Unit.Tactician.Manuver}}, 
             1 => %Yagg.Unit{ability: Yagg.Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :north, triggers: %{}}, 

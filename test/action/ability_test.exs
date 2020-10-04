@@ -1,178 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.Action.Ability
-alias Yagg.Board.State.{Placement, Gameover}
 import Helper.Board
-
-defmodule YaggTest.Action.Place do
-  use ExUnit.Case
-
-  test "place unit" do
-    unit = Unit.new(:north, :test, 3, 3)
-    board = %{new_board() | state: %Placement{}}
-    hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
-    board = %{board | hands: hands}
-    action = %Board.Action.Place{index: 0, x: 4, y: 4}
-    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
-    assert newboard.hands[:north][0] == {unit, {4, 4}}
-  end
-
-  test "place unit occupied" do
-    unit = Unit.new(:north, :test, 3, 3)
-    board = new_board()
-    hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
-    board = %{board | hands: hands, grid: %{{4, 4} => :water}}
-    action = %Board.Action.Place{index: 0, x: 4, y: 4}
-    assert {:err, :occupied} = Board.Action.resolve(action, board, :north)
-  end
-
-  test "place battle" do
-    unit = Unit.new(:north, :test, 3, 3)
-    board = %{new_board() | state: :battle}
-    hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
-    board = %{board | hands: hands}
-    action = %Board.Action.Place{index: 0, x: 4, y: 4}
-    assert {%{grid: grid, hands: hands}, _events} = Board.Action.resolve(action, board, :north)
-    assert hands[:north][0] == :nil
-    assert grid[{4, 4}] == unit
-  end
-
-  test "already_assigned" do
-    unit = Unit.new(:north, :test, 3, 3)
-    board = new_board()
-    hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
-    board = %{board | hands: hands}
-    action = %Board.Action.Place{index: 0, x: 4, y: 4}
-    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
-    assert {:err, _} = Board.Action.resolve(action, newboard, :north)
-  end
-
-  test "occupied" do
-    unit1 = Unit.new(:north, :test1, 3, 3)
-    unit2 = Unit.new(:north, :test2, 3, 3)
-    board = new_board()
-    hands = Map.put(board.hands, :north, %{0 => {unit1, :nil}, 1 => {unit2, :nil}})
-    board = %{board | hands: hands}
-    action = %Board.Action.Place{index: 0, x: 4, y: 4}
-    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
-    action = %Board.Action.Place{index: 1, x: 4, y: 4}
-    assert {:err, _} = Board.Action.resolve(action, newboard, :north)
-  end
-end
-
-defmodule YaggTest.Action.Move do
-  use ExUnit.Case
-
-  test "move unit" do
-    unit = Unit.new(:north, :test, 3, 3)
-    board =
-      new_board() |>
-      Map.put(:state, :battle) |>
-      Board.place(unit, {2, 4}) |> elem(1)
-
-    action = %Board.Action.Move{from_x: 2, from_y: 4, to_x: 2, to_y: 3}
-    assert {newboard, events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{2, 3}] == unit
-    assert Enum.find(events, fn(e) -> e.kind == :thing_moved end)
-  end
-
-  test "attack" do
-    attacker = Unit.new(:north, :test, 3, 3)
-    defender = Unit.new(:south, :t2, 1, 1)
-    board =
-      new_board()
-      |> Map.put(:state, :battle)
-      |> Board.place(attacker, {4, 4}) |> elem(1)
-      |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, defender)} end.()
-    action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
-    assert {newboard, events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{4, 3}] == attacker
-    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-  end
-
-  test "winner winner chicken dinner" do
-    attacker = Unit.new(:north, :test, 3, 3)
-    defender = Unit.new(:south, :monarch, 1, 1, :nil, %{death: Ability.Concede})
-    board =
-      new_board()
-      |> Map.put(:state, :battle)
-      |> Board.place(attacker, {4, 4}) |> elem(1)
-      |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, defender)} end.()
-    action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
-    assert {newboard, events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{4, 3}] == attacker
-    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-    gameover = Enum.find(events, fn(e) -> e.kind == :gameover end)
-    assert gameover.data.winner == :north
-  end
- 
-  test "attackyourself" do
-    unit = Unit.new(:north, :test, 3, 3)
-    unit2 = Unit.new(:north, :test2, 3, 3)
-    board =
-      new_board()
-      |> Map.put(:state, :battle)
-      |> Board.place(unit, {4, 4}) |> elem(1)
-      |> Board.place(unit2, {4, 3}) |> elem(1)
-    action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
-    assert {:err, :noselfattack} = Board.Action.resolve(action, board, :north)
-  end
-
-  test "push block" do
-    unit = Unit.new(:north, :test, 3, 3)
-    board =
-      new_board()
-      |> Map.put(:state, :battle)
-      |> Board.place(unit, {2, 3}) |> elem(1)
-      |> fn (b) -> %{b | grid: Map.put(b.grid, {2, 2}, :block)} end.()
-    action = %Board.Action.Move{from_x: 2, from_y: 3, to_x: 2, to_y: 2}
-    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{2, 2}] == unit
-    assert newboard.grid[{2, 1}] == :block
-  end
-end
-
-defmodule YaggTest.Action.Ready do
-  use ExUnit.Case
-
-  test "ready" do
-    unit = Unit.new(:north, :monarch, 3, 3)
-    board = new_board()
-    hands = Map.put(board.hands, :north, %{0 => {unit, {4, 4}}})
-    board = %{board | hands: hands}
-    action = %Board.Action.Ready{}
-    assert {newboard, [event]} = Board.Action.resolve(action, board, :north)
-    assert %Placement{ready: :north} == newboard.state
-    assert %{player: :north} = event.data
-  end
-
-  test "game start" do
-    unit = Unit.new(:north, :monarch, 3, 3)
-    board = %{new_board() | state: %Placement{ready: :south}}
-    hands = Map.put(board.hands, :north, %{0 => {unit, {4, 4}}})
-    board = %{board | hands: hands}
-    action = %Board.Action.Ready{}
-    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
-    assert :battle == newboard.state
-    assert unit == newboard.grid[{4, 4}]
-  end
-
-  test "restart clears board and hand" do
-    board = new_board(
-      [Unit.Monarch.new(:test), Unit.Spikeder.new(:test), Unit.Sackboom.new(:test)],
-      [],
-      {5, 5}
-    )
-    |> Map.put(:state, %Gameover{ready: :south})
-    |> put_unit(:north, :spikeder, {3, 3})
-    action = %Board.Action.Ready{}
-    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
-    units = Enum.map(newboard.hands[:north], fn({_, {%{name: n}, _}}) -> n end)
-    assert units == [:monarch, :spikeder, :sackboom]
-    assert %Placement{} = newboard.state
-  end
-
-end
 
 defmodule YaggTest.Action.Ability do
   use ExUnit.Case
@@ -208,7 +37,7 @@ defmodule YaggTest.Action.Ability do
     assert Enum.find(events, fn(e) -> e.kind == :add_to_hand end)
   end
 
-  test "manuver" do
+  test "tactician" do
     unitM = Unit.Tactician.new(:south)
     unitF = Unit.new(:south, :unit, 3, 2)
     unitE = Unit.new(:north, :enemy, 5, 4)
@@ -341,3 +170,4 @@ defmodule YaggTest.Action.Ability do
     assert %{from: {1, 2}, to: {3, 2}} = event.data
   end
 end
+

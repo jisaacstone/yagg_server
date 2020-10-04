@@ -5,28 +5,40 @@ import * as readyButton from './ready.js';
 const state = {
     selected: new Set(),
     ready: 'not',
-    min: 0,
-    max: 0
+    armySize: 0
 };
-export function render(min, max) {
-    const jobfair = document.createElement('div'), board = document.getElementById('board');
+export function render(armySize) {
+    const jobfair = document.createElement('div'), instructions = document.createElement('div'), board = document.getElementById('board');
+    instructions.className = 'instructions';
+    jobfair.appendChild(instructions);
     jobfair.id = 'jobfair';
+    board.innerHTML = '';
     board.appendChild(jobfair);
-    state.min = min;
-    state.max = max;
+    if (!armySize) {
+        if (state.armySize) {
+            armySize = state.armySize;
+        }
+        else {
+            console.log({ err: 'noarmysize', state, armySize });
+        }
+    }
+    else {
+        instructions.innerHTML = `recruit ${armySize} units for your army`;
+        state.armySize = armySize;
+    }
+    state.ready = 'not';
+    state.selected = new Set();
 }
 export function select(index) {
-    console.log({ action: 'select', state });
     if (state.ready === 'ready') {
         return false;
     }
-    if (state.selected.size === state.max) {
-        displayerror(`you may only select up to ${state.max}`);
+    if (state.selected.size >= state.armySize) {
+        displayerror(`you may only recruit ${state.armySize}`);
         return false;
     }
     state.selected.add(index);
-    console.log({ r: state.ready, s: state.selected.size, m: state.min });
-    if (state.ready === 'not' && state.selected.size > state.min) {
+    if (state.ready === 'not' && state.selected.size == state.armySize) {
         readyButton.display('RECRUIT', () => {
             state.ready = 'ready';
             gameaction('recruit', { units: Array.from(state.selected) }, 'table').then(() => {
@@ -43,18 +55,17 @@ export function select(index) {
     return true;
 }
 export function deselect(index) {
-    console.log({ action: 'deselect', state });
     if (state.ready === 'ready') {
         return false;
     }
     state.selected.delete(index);
-    if (state.ready === 'displayed' && state.selected.size < state.min) {
+    if (state.ready === 'displayed' && state.selected.size < state.armySize) {
         readyButton.hide();
+        state.ready = 'not';
     }
     return true;
 }
 export function unitdata(unitdata) {
-    console.log({ unitdata });
     for (let [index, unit] of Object.entries(unitdata.choices)) {
         Event.candidate({ index, unit });
     }

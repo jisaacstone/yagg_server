@@ -55,3 +55,8 @@ export function unitdata(unitdata) {
         }
     });
 }
+export function clear() {
+    const board = document.getElementById('board'), hand = document.getElementById('hand');
+    board.innerHTML = '';
+    hand.innerHTML = '';
+}

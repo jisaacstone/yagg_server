@@ -37,7 +37,7 @@ defmodule Yagg.AI.Server do
       %{board: %{state: %Board.State.Placement{}}} ->
         do_initial_placement(table.board, state)
       %{board: %Jobfair{} = jf} ->
-        recruit(Map.get(jf, state.robot.position), jf.max, state)
+        recruit(Map.get(jf, state.robot.position), jf.army_size, state)
       %{board: board, turn: ^position} ->
         take_your_turn(board, state)
       _ -> :do_nothing
@@ -111,8 +111,8 @@ defmodule Yagg.AI.Server do
     end
   end
 
-  defp recruit(fair, max, %{pid: table_pid, robot: robot}) do
-    indices = Map.keys(fair.choices) |> Enum.shuffle |> Enum.take(max)
+  defp recruit(fair, army_size, %{pid: table_pid, robot: robot}) do
+    indices = Map.keys(fair.choices) |> Enum.shuffle |> Enum.take(army_size)
     action = %Action.Recruit{units: indices}
     :ok = Table.table_action(table_pid, robot.name, action)
   end

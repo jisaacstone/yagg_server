@@ -148,8 +148,7 @@ defmodule Yagg.Board do
   Sets up the board for play.
   Overwrites the keys state, hands, grid
   """
-  @spec setup(Board.t) :: {Board.t, [Event.t]}
-  @spec setup(Board.t, %{north: [Unit.t], south: [Unit.t]}) :: {Board.t, [Event.t]}
+  @spec setup(t) :: {t, [Event.t]}
   def setup(%{configuration: configuration} = board) do
     units = %{north: configuration.starting_units(:north), south: configuration.starting_units(:south)}
     setup(board, units)
