@@ -29,4 +29,18 @@ defmodule Helper.Board do
     grid = Map.put(board.grid, coord, feature)
     set_board(%{board | grid: grid}, features)
   end
+
+  def put_unit(board, position, unit_name, coord) do
+    hand = board.hands[position]
+    idx = Enum.find_value(
+      hand,
+      fn
+        ({i, {%{name: ^unit_name}, _}}) -> i
+        (_) -> :false
+      end
+    )
+    {hand, unit} = Map.pop!(hand, idx)
+    grid = Map.put(board.grid, coord, unit)
+    %{board | grid: grid, hands: Map.put(board.hands, position, hand)}
+  end
 end

@@ -1,7 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.Action.Ability
-alias Yagg.Board.State.Placement
+alias Yagg.Board.State.{Placement, Gameover}
 import Helper.Board
 
 defmodule YaggTest.Action.Place do
@@ -146,7 +146,7 @@ defmodule YaggTest.Action.Ready do
     assert %{player: :north} = event.data
   end
 
-  test "gamestart" do
+  test "game start" do
     unit = Unit.new(:north, :monarch, 3, 3)
     board = %{new_board() | state: %Placement{ready: :south}}
     hands = Map.put(board.hands, :north, %{0 => {unit, {4, 4}}})
@@ -156,6 +156,22 @@ defmodule YaggTest.Action.Ready do
     assert :battle == newboard.state
     assert unit == newboard.grid[{4, 4}]
   end
+
+  test "restart clears board and hand" do
+    board = new_board(
+      [Unit.Monarch.new(:test), Unit.Spikeder.new(:test), Unit.Sackboom.new(:test)],
+      [],
+      {5, 5}
+    )
+    |> Map.put(:state, %Gameover{ready: :south})
+    |> put_unit(:north, :spikeder, {3, 3})
+    action = %Board.Action.Ready{}
+    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
+    units = Enum.map(newboard.hands[:north], fn({_, {%{name: n}, _}}) -> n end)
+    assert units == [:monarch, :spikeder, :sackboom]
+    assert %Placement{} = newboard.state
+  end
+
 end
 
 defmodule YaggTest.Action.Ability do
