@@ -1,4 +1,4 @@
-alias Yagg.{Table, Event, Board}
+alias Yagg.{Table, Event, Board, Bugreport}
 alias Plug.Conn
 alias Yagg.Board.Configuration
 
@@ -47,23 +47,17 @@ defmodule Yagg.Endpoint do
   end
 
   post "/board/:table_id/a/:action" do
-    module_name = Module.safe_concat(Board.Action, String.capitalize(action))
-    {:ok, body, conn} = Conn.read_body(conn)
-    conn = Conn.fetch_query_params(conn)
-    movedata = Poison.decode!(body, as: struct(module_name))
-    player_name = Map.get(movedata, :player, conn.query_params["player"])
-
-    Table.board_action(table_id, player_name, movedata) |> to_response(conn)
+    case prep_action(Board.Action, action, conn) do
+      {:err, _} = err -> err
+      {player_name, actiondata} -> Table.board_action(table_id, player_name, actiondata)
+    end |> to_response(conn)
   end
 
   post "/table/:table_id/a/:action" do
-    module_name = Module.safe_concat(Table.Action, String.capitalize(action))
-    {:ok, body, conn} = Conn.read_body(conn)
-    conn = Conn.fetch_query_params(conn)
-    actiondata = Poison.decode!(body, as: struct(module_name))
-    player_name = Map.get(actiondata, :player, conn.query_params["player"])
-
-    Table.table_action(table_id, player_name, actiondata) |> to_response(conn)
+    case prep_action(Table.Action, action, conn) do
+      {:err, _} = err -> err
+      {player_name, actiondata} -> Table.table_action(table_id, player_name, actiondata)
+    end |> to_response(conn)
   end
 
   get "/table/:table_id/state" do
@@ -74,7 +68,13 @@ defmodule Yagg.Endpoint do
     {:ok, body, conn} = Conn.read_body(conn)
     {:ok, params} = Poison.decode(body)
     {:ok, state} = Table.get_state(table_id)
-    bugreport(state.board, state.history, Map.get(params, "moves", 3), params["report"], params["meta"]) |> to_response(conn)
+    Bugreport.report(
+      state.board,
+      state.history,
+      Map.get(params, "moves", 3),
+      params["report"],
+      params["meta"]
+    ) |> to_response(conn)
   end
 
   get "/board/:table_id/player_state/:player_name" do
@@ -136,21 +136,29 @@ defmodule Yagg.Endpoint do
       |> send_resp(code, Poison.encode!(data))
   end
 
-  defp bugreport(board, history, moves, report, meta) do
-    {:ok, file} = File.open('bugreports', [:append])
-    _ = IO.inspect(file, report, label: "report")
-    _ = IO.inspect(file, DateTime.utc_now(), [])
-    _ = IO.inspect(file, meta, pretty: :true)
-    _ = IO.inspect(file, board, pretty: :true, width: :infinity)
-    history
-    |> Enum.take(moves)
-    |> Enum.each(
-      fn({board, action}) ->
-        {
-          IO.inspect(file, action, pretty: :true, width: :infinity),
-          IO.inspect(file, board, pretty: :true, width: :infinity)
-        }
-      end
-    )
+  defp prep_action(namespace, action, conn) do
+    try do
+      module_name = to_module(namespace, action)
+      {:ok, body, conn} = Conn.read_body(conn)
+      conn = Conn.fetch_query_params(conn)
+      actiondata = Poison.decode!(body, as: struct(module_name))
+      player_name = Map.get(actiondata, :player, conn.query_params["player"])
+      {player_name, actiondata}
+    rescue
+      e in ArgumentError ->
+        IO.inspect(e)
+        {:err, :unknown_action}
+      e in Poison.ParseError ->
+        IO.inspect(e)
+        {:err, :malformed_request}
+    end
+  end
+
+  defp to_module(base, name) do
+    module_name = Module.safe_concat(base, String.capitalize(name))
+    if not Code.ensure_loaded?(module_name) do
+      raise ArgumentError, message: "#{module_name} does not exist"
+    end
+    module_name
   end
 end

@@ -92,6 +92,14 @@ defmodule YaggTest.Endpoint do
     stop_ai_servers()
   end
 
+  test "bad action" do
+    %{id: table_id} = call_200("/table/new", %{})
+    assert %{status: 400} = send_json(
+      "/table/#{table_id}/a/oops",
+      Poison.encode!(%{player: "p1"})
+    )
+  end
+
   defp stop_ai_servers() do
     Enum.map(
       Supervisor.which_children(Yagg.AISupervisor),

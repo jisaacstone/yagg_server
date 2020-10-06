@@ -13,7 +13,6 @@ defmodule Action.Place do
     {:err, :already_ready}
   end
   def resolve(act, %Board{state: %State.Placement{}} = board, position) do
-    IO.inspect([:assign, act])
     case Board.assign(board, position, act.index, {act.x, act.y}) do
       {:ok, board} -> 
         {

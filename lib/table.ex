@@ -1,4 +1,4 @@
-alias Yagg.{Event, Board, Jobfair}
+alias Yagg.{Event, Board, Jobfair, Bugreport}
 alias Yagg.Table.Player
 alias Yagg.Board.State
 alias Yagg.Board.Configuration
@@ -187,6 +187,17 @@ defmodule Yagg.Table do
     IO.inspect([unexpected_info: other])
     {:noreply, table}
   end
+
+  def terminate({:shutdown, reason}, table) do
+    Bugreport.report(
+      table.board,
+      table.history,
+      3,
+      "Proccess Terminated",
+      reason
+    )
+  end
+  def terminate(_, _), do: :ok
 
   # Private
 
