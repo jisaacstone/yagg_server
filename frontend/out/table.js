@@ -27,7 +27,7 @@ function render_board(board, players) {
     });
 }
 function render_jobfair(jobfair) {
-    Jobfair.render(jobfair.army_size);
+    Event.game_started(jobfair);
 }
 function render_(boardstate, phase, players) {
     if (phase === 'jobfair') {

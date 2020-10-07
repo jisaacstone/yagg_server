@@ -7,6 +7,10 @@ body[data-gamestate=placement] {
   background: repeating-linear-gradient(40deg, #CCD, #CCD 10px, #eee 10px, #eee 20px, #BAB 20px, #B9B 30px);
 }
 
+body[data-gamestate=jobfair] {
+  background: repeating-linear-gradient(4deg, #CCD, #eee 10px, #CDC 10px, #eee 20px, #BBB 20px, #B9B 50px);
+}
+
 body[data-gamestate=battle] {
   background: repeating-radial-gradient(
     circle at -10% 120%,

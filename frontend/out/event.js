@@ -7,6 +7,7 @@ import * as Board from './board.js';
 import * as readyButton from './ready.js';
 import * as Dialog from './dialog.js';
 import * as Jobfair from './jobfair.js';
+import * as Overlay from './overlay.js';
 const unitsbyindex = {};
 function gamestatechange(newstate) {
     document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
@@ -17,19 +18,23 @@ function gamestatechange(newstate) {
     });
 }
 export function game_started(event) {
-    const board = document.getElementById('board'), state = (event.state || 'placement').toLowerCase();
+    const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
     if (event.army_size || gmeta.phase === 'jobfair') {
         if (gmeta.boardstate === 'gameover') {
             Board.clear();
-            gamestatechange(state);
         }
+        else {
+            Overlay.clear();
+        }
+        gamestatechange(state || 'jobfair');
         Jobfair.render(event.army_size);
     }
     else {
+        Overlay.clear();
         if (event.dimensions) {
             Board.render(board, event.dimensions.x, event.dimensions.y);
         }
-        gamestatechange(state);
+        gamestatechange(state || 'placement');
         if (state === 'placement' || state === 'gameover') {
             readyButton.display(state === 'placement' ? 'READY' : 'REMATCH');
         }
