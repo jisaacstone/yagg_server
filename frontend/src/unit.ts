@@ -60,10 +60,12 @@ function ability_button(unit: Unit, el: HTMLElement) {
 
 function render_attrs(unit: Unit, el: HTMLElement) {
   for (const att of ['name', 'attack', 'defense']) {
-    const subel = document.createElement('span');
-    subel.className = `unit-${att}`;
-    subel.innerHTML = unit[att];
-    el.appendChild(subel);
+    if (unit[att]) {
+      const subel = document.createElement('span');
+      subel.className = `unit-${att}`;
+      subel.innerHTML = unit[att];
+      el.appendChild(subel);
+    }
   }
   if (unit.name === 'monarch') {
     el.className = `monarch ${el.className}`;
@@ -76,7 +78,13 @@ function render_tile(unit: Unit, el: HTMLElement) {
   if (unit.ability) {
     ability_button(unit, el);
   }
-  detailView(unit, el);
+  if (anyDetails(unit)) {
+    detailView(unit, el);
+  }
+}
+
+function anyDetails(unit) {
+  return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
 
 function detailView(unit: Unit, el: HTMLElement) {

@@ -37,7 +37,8 @@ defmodule Yagg.Board do
         |> Poison.Encoder.Map.encode(options)
     end
 
-    defp encode_feature(%Unit{position: pos}), do: %{kind: :unit, player: pos}
+    defp encode_feature(%Unit{visible: :none}), do: :nil
+    defp encode_feature(%Unit{} = unit), do: Map.put_new(Unit.encode(unit), :kind, :unit)
     defp encode_feature(other), do: other
   end
 

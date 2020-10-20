@@ -68,20 +68,26 @@ defmodule Action.Ability.Concede do
   use Action.Ability
 
   def resolve(board, opts) do
+    {grid, events} = reveal_units(board)
     {
-      %{board | state: %State.Gameover{}},
-      [Event.Gameover.new(winner: Player.opposite(opts[:unit].position)) | reveal_units(board)]
+      %{board | state: %State.Gameover{}, grid: grid},
+      [Event.Gameover.new(winner: Player.opposite(opts[:unit].position)) | events]
     }
   end
 
   defp reveal_units(%{grid: grid}) do
-    Enum.reduce(grid, [], &reveal/2)
+    Enum.reduce(grid, {%{}, []}, &reveal/2)
   end
 
-  defp reveal({{x, y}, %Unit{} = unit}, events) do
-    [Event.NewUnit.new(Player.opposite(unit.position), x: x, y: y, unit: unit) | events]
+  defp reveal({{x, y}, %Unit{} = unit}, {grid, events}) do
+    event = Event.NewUnit.new(Player.opposite(unit.position), x: x, y: y, unit: unit)
+    grid = Map.put_new(grid, {x, y}, %{unit | visible: :all})
+    {grid, [event | events]}
   end
-  defp reveal(_, events), do: events
+  defp reveal({k, v}, {grid, events}) do
+    grid = Map.put_new(grid, k, v)
+    {grid, events}
+  end
 end
 
 defmodule Action.Ability.Rowburn do

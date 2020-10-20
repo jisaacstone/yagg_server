@@ -18,7 +18,7 @@ function render_board(board, players) {
         if (feature) {
             const [x, y] = coor.split(',');
             if (feature.kind === 'unit') {
-                Event.unit_placed({ x, y, player: feature.player });
+                Event.unit_placed(Object.assign({ x, y }, feature));
             }
             else {
                 Event.feature({ x, y, feature });

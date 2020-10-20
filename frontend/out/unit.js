@@ -32,10 +32,12 @@ function ability_button(unit, el) {
 }
 function render_attrs(unit, el) {
     for (const att of ['name', 'attack', 'defense']) {
-        const subel = document.createElement('span');
-        subel.className = `unit-${att}`;
-        subel.innerHTML = unit[att];
-        el.appendChild(subel);
+        if (unit[att]) {
+            const subel = document.createElement('span');
+            subel.className = `unit-${att}`;
+            subel.innerHTML = unit[att];
+            el.appendChild(subel);
+        }
     }
     if (unit.name === 'monarch') {
         el.className = `monarch ${el.className}`;
@@ -47,7 +49,12 @@ function render_tile(unit, el) {
     if (unit.ability) {
         ability_button(unit, el);
     }
-    detailView(unit, el);
+    if (anyDetails(unit)) {
+        detailView(unit, el);
+    }
+}
+function anyDetails(unit) {
+    return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
 function detailView(unit, el) {
     const details = document.createElement('div'), portrait = document.createElement('div'), displaybut = document.createElement('button');

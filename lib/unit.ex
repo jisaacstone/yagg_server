@@ -4,8 +4,9 @@ alias Yagg.Board
 
 defmodule Yagg.Unit do
   alias __MODULE__
+
   @enforce_keys [:attack, :defense, :name, :position]
-  defstruct [:ability, :triggers | @enforce_keys]
+  defstruct [:ability, :triggers, :visible | @enforce_keys]
 
   @callback new(Player.position) :: t
 
@@ -19,24 +20,35 @@ defmodule Yagg.Unit do
     :position => Player.position(),
     :ability => :nil | module() | {module(), Keyword.t},
     :triggers => triggers,
+    :visible => :all | :none | [:atom]
   }
 
   defimpl Poison.Encoder, for: Unit do
     def encode(%Unit{} = unit, opts) do
-      %{
-        attack: unit.attack,
-        defense: unit.defense,
-        name: unit.name,
-        player: unit.position,
-        ability: Ability.describe(unit.ability),
-        triggers: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
-      } |> Poison.Encoder.Map.encode(opts)
+      Unit.encode(unit, :all) |> Poison.Encoder.Map.encode(opts)
     end
   end
 
+  def encode(unit), do: encode(unit, unit.visible)
+
+  def encode(_unit, :none), do: :nil
+  def encode(unit, :all), do: encode_fields(unit, [:attack, :defense, :name, :player, :ability, :triggers], %{})
+  def encode(unit, fields) when is_list(fields), do: encode_fields(unit, fields, %{})
+
+  defp encode_fields(_unit, [], encoded), do: encoded
+  defp encode_fields(unit, [field | fields], encoded) do
+    encoded = Map.put_new(encoded, field, encode_field(unit, field))
+    encode_fields(unit, fields, encoded)
+  end
+
+  defp encode_field(unit, :player), do: unit.position
+  defp encode_field(unit, :ability), do: Ability.describe(unit.ability)
+  defp encode_field(unit, :triggers), do: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
+  defp encode_field(unit, field), do: Map.get(unit, field)
+
   @spec new(Player.position, atom, non_neg_integer, non_neg_integer, :nil | module(), %{atom => module()}) :: t 
-  def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}) do
-    %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers}
+  def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}, visible \\ [:player]) do
+    %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers, visible: visible}
   end
 
   def after_death(board, unit, coords, opts \\ []) do

@@ -60,18 +60,11 @@ export function player_left(event) {
     document.getElementById(`${event.player}name`).innerHTML = '';
 }
 export function add_to_hand(event) {
-    const hand = document.getElementById('hand'), card = document.createElement('span'), unit = document.createElement('span');
-    let className = `unit ${event.unit.player}`;
+    const hand = document.getElementById('hand'), card = document.createElement('span'), unit = Unit.render(event.unit, event.index);
     card.dataset.index = event.index;
     card.className = 'card';
     Select.bind_hand(card, event.index, event.unit.player);
     hand.appendChild(card);
-    if (event.unit.player === gmeta.position) {
-        className += ' owned';
-    }
-    unit.className = className;
-    unit.dataset.index = event.index;
-    Unit.render_into(event.unit, unit);
     card.appendChild(unit);
     unitsbyindex[event.index] = unit;
 }
@@ -93,8 +86,7 @@ export function unit_changed(event) {
 export function unit_placed(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`);
     if (!square.firstChild) {
-        const unit = document.createElement('span');
-        unit.className = `unit ${event.player}`;
+        const unit = Unit.render(event, null);
         square.appendChild(unit);
     }
 }
