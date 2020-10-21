@@ -1,5 +1,9 @@
 # YaggServer
 
+moving documentation [here](documentation)
+
+--------
+
 to start the server
 
     mix run --no-halt
