@@ -8,7 +8,12 @@ defmodule Yagg.AI.Choices do
   @spec move(Board.t, Player.position) :: struct
   def move(board, position) do
     chs = choices(board, position)
-    Enum.random(chs.place ++ chs.move ++ chs.ability)
+    if chs == [] do
+      IO.inspect({:no_choices, board, position})
+      concede(owned_units(board.grid, position))
+    else 
+      Enum.random(chs.place ++ chs.move ++ chs.ability)
+    end
   end
 
   def choices(board, position) do
@@ -110,5 +115,12 @@ defmodule Yagg.AI.Choices do
   defp unit_action({{x, y}, %Unit{}}, actions) do
     action = %Action.Ability{x: x, y: y}
     [action | actions]
+  end
+
+  defp concede([{{x, y}, %Unit{name: :monarch}}|_]) do
+    %Action.Ability{x: x, y: y}
+  end
+  defp concede([_|units]) do
+    concede(units)
   end
 end
