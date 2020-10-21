@@ -78,7 +78,7 @@ defmodule Yagg.Event do
     Unit on board has attribute changed
     """
     @spec new(
-      Player.position(),
+      :global | Player.position(),
       [
         x: 0..8,
         y: 0..8,

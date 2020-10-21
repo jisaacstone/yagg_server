@@ -25,8 +25,8 @@ defmodule Yagg.Board.Configuration do
   def all() do
     %{
       "random" => Board.Configuration.Random,
-      "alpha" => Board.Configuration.Alpha,
-      "beta" => Board.Configuration.Chain,
+      "smallz`" => Board.Configuration.Alpha,
+      "bigga" => Board.Configuration.Chain,
     }
   end
 end

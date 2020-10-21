@@ -20,7 +20,7 @@ defmodule Yagg.Unit do
     :position => Player.position(),
     :ability => :nil | module() | {module(), Keyword.t},
     :triggers => triggers,
-    :visible => :all | :none | [:atom]
+    :visible => :all | :none | MapSet.t(:atom)
   }
 
   defimpl Poison.Encoder, for: Unit do
@@ -34,6 +34,7 @@ defmodule Yagg.Unit do
   def encode(_unit, :none), do: :nil
   def encode(unit, :all), do: encode_fields(unit, [:attack, :defense, :name, :player, :ability, :triggers], %{})
   def encode(unit, fields) when is_list(fields), do: encode_fields(unit, fields, %{})
+  def encode(unit, %MapSet{} = fields), do: encode_fields(unit, MapSet.to_list(fields), %{})
 
   defp encode_fields(_unit, [], encoded), do: encoded
   defp encode_fields(unit, [field | fields], encoded) do
@@ -46,8 +47,16 @@ defmodule Yagg.Unit do
   defp encode_field(unit, :triggers), do: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
   defp encode_field(unit, field), do: Map.get(unit, field)
 
-  @spec new(Player.position, atom, non_neg_integer, non_neg_integer, :nil | module(), %{atom => module()}) :: t 
-  def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}, visible \\ [:player]) do
+  def visible?(%{visible: :all}, _), do: :true
+  def visible?(%{visible: :none}, _), do: :false
+  def visible?(%{visible: v}, k), do: MapSet.member?(v, k)
+
+  def make_visible(%{visible: :all} = unit, _), do: unit
+  def make_visible(%{visible: :none} = unit, field), do: %{unit | visible: MapSet.new() |> MapSet.put(field)}
+  def make_visible(unit, field), do: %{unit | visible: MapSet.put(unit.visible, field)}
+
+  @spec new(Player.position, atom, non_neg_integer, non_neg_integer, :nil | module(), %{atom => module()}) :: t
+  def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}, visible \\ MapSet.put(MapSet.new(), :player)) do
     %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers, visible: visible}
   end
 

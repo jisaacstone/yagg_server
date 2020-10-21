@@ -12,16 +12,24 @@ defmodule Action.Ability do
 
   @callback resolve(Yagg.Board.t, keyword()) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
   @callback description() :: String.t
+  @callback reveal?() :: boolean
 
   @enforce_keys [:x, :y]
   defstruct @enforce_keys
 
   @impl Action
   def resolve(data, %Board{state: :battle} = board, position) do
-    coords = {data.x, data.y}
-    case ability_at(board, coords, position) do
+    coord = {data.x, data.y}
+    case ability_at(board, coord, position) do
       {:err, _} = err -> err
-      {:ok, unit} -> unit.ability.resolve(board, unit: unit, coords: coords)
+      {:ok, unit} ->
+        {board, e1} = if unit.ability.reveal?() and not Unit.visible?(unit, :ability) do
+          Grid.update(board, coord, fn(u) -> Unit.make_visible(u, :ability) end)
+        else
+          {board, []}
+        end
+        {board, e2} = unit.ability.resolve(board, unit: unit, coords: coord)
+        {board, e1 ++ e2}
     end
   end
 
@@ -33,14 +41,20 @@ defmodule Action.Ability do
 
   defmacro __using__(opts) do
     struct = Keyword.get(opts, :keys, [])
+    reveal = not(Keyword.get(opts, :noreveal, :false)) # by default using an ability reveals it
     quote do
       @behaviour Action.Ability
 
-      @impl Action.Ability
-      def description(), do: @moduledoc
       @enforce_keys unquote(struct)
       defstruct @enforce_keys
+
       def resolve(%Board{} = board), do: resolve(board, [])
+
+      @impl Action.Ability
+      def description(), do: @moduledoc <> ". Reveals: #{reveal?()}"
+
+      @impl Action.Ability
+      def reveal?(), do: unquote(reveal)
     end
   end
 
@@ -52,6 +66,7 @@ defmodule Action.Ability do
       _ -> {:err, :nounit}
     end
   end
+
 end
 
 defmodule Action.Ability.NOOP do
