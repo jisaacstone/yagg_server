@@ -12,13 +12,13 @@ defmodule Yagg.Table do
   defstruct [:subscribors | @enforce_keys]
 
   @type id :: String.t
-  @type t() :: %Table{
+  @type t :: %Table{
     id: id,
     players: [Player.t],
     board: :nil | Board.t | Jobfair.t,
-    turn: :nil | Player.position(),
-    configuration: module(),
-    history: any(),
+    turn: :nil | Player.position,
+    configuration: Configuration.t,
+    history: any,
   }
 
   def start_link([table]) do
@@ -42,13 +42,14 @@ defmodule Yagg.Table do
 
   @spec new(module) :: {:ok, pid}
   def new(configuration \\ Board.Configuration.Random) do
+    config = configuration.new()
     table = %Table{
       id: :nil,
       players: [],
       subscribors: [],
-      board: Configuration.initial_board(configuration),
+      board: Configuration.setup(config),
       turn: :nil,
-      configuration: configuration,
+      configuration: config,
       history: [],
     }
     DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})

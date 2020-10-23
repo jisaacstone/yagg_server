@@ -20,16 +20,16 @@ defmodule Yagg.Jobfair do
   }
 
   @spec new(module) :: t
-  def new(configuration) do
+  def new(config) do
     %Jobfair{
-      army_size: configuration.meta().army_size,
+      army_size: config.army_size,
       north: %{
-        choices: configuration.starting_units(:north) |> to_choicemap(),
+        choices: config.units[:north] |> to_choicemap(),
         chosen: [],
         ready: false
       },
       south: %{
-        choices: configuration.starting_units(:south) |> to_choicemap(),
+        choices: config.units[:south] |> to_choicemap(),
         chosen: [],
         ready: false
       },
