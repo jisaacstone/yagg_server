@@ -1,6 +1,6 @@
 # YaggServer
 
-moving documentation [here](documentation)
+Code architecture documentation [here](documentation/architecture.md)
 
 --------
 
