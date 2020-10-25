@@ -1,12 +1,18 @@
 import { gameaction } from './request.js';
 import { gmeta } from './state.js';
 import { displayerror } from './err.js';
+import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
 
 const global = { selected: null };
 
-function action(actType, args) {
+function action(actType, args, cb=null) {
   gameaction(actType, args, 'board')
+    .then(() => {
+      if (cb) {
+        cb();
+      }
+    })
     .catch(({ request }) => {
       if (request.status === 400) {
         if (request.responseText.includes('occupied')) {
@@ -45,7 +51,11 @@ export function select(thisEl, meta) {
       // something was perviously selected
       if (sel.element !== thisEl) {
         if (sel.meta.inhand) {
-          action('place', {index: sel.meta.index, x: meta.x, y: meta.y});
+          action(
+            'place',
+            {index: sel.meta.index, x: meta.x, y: meta.y},
+            sel.meta.unit_name === 'monarch' ? Ready.ensureDisplayed() : null,
+          );
         } else {
           // clickd on a board square
           if (gmeta.boardstate === 'battle') {
@@ -99,8 +109,8 @@ export function select(thisEl, meta) {
   return select;
 }
 
-export function bind_hand(card: HTMLElement, index: number, player: string) {
-  card.onclick = select(card, { inhand: true, index, player });
+export function bind_hand(card: HTMLElement, index: number, player: string, unit_name: string) {
+  card.onclick = select(card, { inhand: true, index, player, unit_name });
 }
 
 export function bind_candidate(candidate: HTMLElement, index: number) {

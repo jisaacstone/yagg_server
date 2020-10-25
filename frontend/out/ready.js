@@ -20,6 +20,11 @@ export function display(label = 'READY', onclick = null) {
     }
     document.getElementById('player').appendChild(readyButton);
 }
+export function ensureDisplayed(label = 'READY', onclick = null) {
+    if (!document.getElementById('readybutton')) {
+        display(label, onclick);
+    }
+}
 export function hide() {
     const readyButton = document.getElementById('readybutton');
     if (readyButton) {

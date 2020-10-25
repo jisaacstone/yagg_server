@@ -77,7 +77,7 @@ export function add_to_hand(event) {
     unit = Unit.render(event.unit, event.index);
   card.dataset.index = event.index;
   card.className = 'card';
-  Select.bind_hand(card, event.index, event.unit.player);
+  Select.bind_hand(card, event.index, event.unit.player, event.unit.name);
   hand.appendChild(card);
   card.appendChild(unit);
   unitsbyindex[event.index] = unit;
