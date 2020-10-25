@@ -243,13 +243,13 @@ defmodule Action.Ability.Upgrade do
   use Action.Ability
   @impl Action.Ability
   def resolve(%Board{} = board, opts) do
-    unit = opts[:unit]
+    %{name: name, attack: attack, defense: defense, position: position} = opts[:unit]
     {board, e1} = case board.grid[opts[:coords]] do
       :nil -> {board, []}
-      ^unit -> Board.unit_death(board, opts[:coords])
+      %Unit{name: ^name} -> Board.unit_death(board, opts[:coords])
     end
-    newunit = %{opts[:unit] | attack: unit.attack + 2, defense: unit.defense + 2}
-    {board, e2} = Hand.add_unit(board, unit.position, newunit)
+    newunit = %{opts[:unit] | attack: attack + 2, defense: defense + 2}
+    {board, e2} = Hand.add_unit(board, position, newunit)
     {board, e1 ++ e2}
   end
 end

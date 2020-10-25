@@ -67,8 +67,8 @@ defmodule YaggTest.Action.Ability do
     action = %Board.Action.Ability{x: 2, y: 3}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{2, 3}] == :nil
-    assert newboard.grid[{1, 3}] == unitP
-    assert newboard.grid[{0, 3}] == unitM
+    assert newboard.grid[{1, 3}].name == unitP.name
+    assert newboard.grid[{0, 3}].name == unitM.name
     assert newboard.grid[{2, 1}] == :block
   end
 
@@ -96,7 +96,7 @@ defmodule YaggTest.Action.Ability do
     ])
     action = %Board.Action.Ability{x: 0, y: 2}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
-    assert newboard.grid[{0, 2}] == busybody
+    assert newboard.grid[{0, 2}].name == busybody.name
     assert newboard.grid[{0, 1}] == :water
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
     assert Enum.find(events, fn(e) -> e.kind == :thing_moved end)

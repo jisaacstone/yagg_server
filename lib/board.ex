@@ -133,15 +133,14 @@ defmodule Yagg.Board do
     }
   end
 
-  @spec new(module) :: Board.t
-  def new(), do: new(Configuration.Random)
-  def new(configuration) do
+  @spec new(Configuration.t) :: Board.t
+  def new(config) do
     %Board{
       state: :open,
-      dimensions: Configuration.dimensions(configuration),
+      dimensions: config.dimensions,
       hands: %{north: %{}, south: %{}},
       grid: %{},
-      configuration: configuration,
+      configuration: config,
     }
   end
 
@@ -150,12 +149,12 @@ defmodule Yagg.Board do
   Overwrites the keys state, hands, grid
   """
   @spec setup(t) :: {t, [Event.t]}
-  def setup(%{configuration: configuration} = board) do
-    units = %{north: configuration.starting_units(:north), south: configuration.starting_units(:south)}
+  def setup(%{configuration: config} = board) do
+    units = config.units
     setup(board, units)
   end
-  def setup(%{configuration: configuration} = board, starting_units) do
-    {board, events} = add_features(%{board | grid: %{}}, [], configuration.terrain(board))
+  def setup(%{configuration: config} = board, starting_units) do
+    {board, events} = add_features(%{board | grid: %{}}, [], config.terrain)
     {board, events} = Enum.reduce(
       [:north, :south],
       {board, events},

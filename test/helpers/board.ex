@@ -1,23 +1,37 @@
+alias Yagg.Board
 alias Yagg.Board.Configuration
+alias Helper.TestConfig
 
 defmodule Helper.Board do
   def testconfig(starting_u, terr, dimen) do
     contents = quote do
-      def starting_units(position) do
+      def new() do
+        %Configuration{
+          dimensions: unquote(Macro.escape(dimen)),
+          units: %{north: starting_units(:north), south: starting_units(:south)},
+          terrain: unquote(Macro.escape(terr)),
+          initial_module: Yagg.Board,
+        }
+      end
+
+      defp starting_units(position) do
         Enum.map(unquote(Macro.escape(starting_u)), fn(unit) -> %{unit | position: position} end)
       end
-      def terrain(_), do: unquote(Macro.escape(terr))
-      def meta(), do: %{dimensions: unquote(Macro.escape(dimen))}
     end
-    Module.create(TestConfig, contents, Macro.Env.location(__ENV__))
-    TestConfig
+    Module.create(DynTestConfig, contents, Macro.Env.location(__ENV__))
+    DynTestConfig
   end
+
+  def new_board(), do: new_board(TestConfig)
   def new_board(starting_u, terr, dimen) do
     config = testconfig(starting_u, terr, dimen)
     new_board(config)
   end
-  def new_board(config \\ Configuration.Alpha) do
-    {board, _} = Yagg.Board.setup(Yagg.Board.new(config))
+  def new_board(configuration) when is_atom(configuration) do
+    new_board(configuration.new())
+  end
+  def new_board(%{} = config) do
+    {board, _} = Board.new(config) |> Board.setup(config.units)
     board
   end
 

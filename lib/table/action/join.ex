@@ -52,7 +52,8 @@ defmodule Yagg.Table.Action.Join do
   def resolve(%{}, _table, %Player{}) do
     {:err, :alreadyjoined}
   end
-  def resolve(%{}, _table, _player) do
+  def resolve(a, table, player) do
+    IO.inspect([a, table.board, player])
     {:err, :bad_state}
   end
 end

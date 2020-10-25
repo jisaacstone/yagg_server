@@ -7,8 +7,25 @@ alias Yagg.Table.Action
 defmodule Board.Configuration.AlphaTest do
   @behaviour Board.Configuration
 
-  @impl Board.Configuration
-  def starting_units(position) do
+  def new() do
+    units = %{
+      north: starting_units(:north),
+      south: starting_units(:south)
+    }
+    terrain = [
+      {{1, 2}, :block},
+      {{4, 2}, :water},
+    ]
+    %Board.Configuration{
+      dimensions: {5, 5},
+      initial_module: Jobfair,
+      army_size: 3,
+      units: units,
+      terrain: terrain,
+    }
+  end
+
+  defp starting_units(position) do
     [
       Unit.Monarch.new(position),
       Unit.Tactician.new(position),
@@ -19,23 +36,6 @@ defmodule Board.Configuration.AlphaTest do
       Unit.Sackboom.new(position),
       Unit.Spikeder.new(position),
     ]
-  end
-
-  @impl Board.Configuration
-  def terrain(_) do
-    [
-      {{1, 2}, :block},
-      {{4, 2}, :water},
-    ]
-  end
-
-  @impl Board.Configuration
-  def meta() do
-    %{
-      dimensions: {5, 5},
-      initial_module: Jobfair,
-      army_size: 3
-    }
   end
 end
 
@@ -124,11 +124,12 @@ defmodule YaggTest.Jobfair do
             chosen: [13, 8, 5, 9, 10, 6, 2, 3], ready: true}
         }
       end
+      def setup(board), do: {board, []}
     end
-    def meta() do
-      %{initial_module: Initial, dimensions: {7, 7}}
+    def new() do
+      %Board.Configuration{initial_module: Initial, dimensions: {7, 7}, terrain: [], units: %{}}
     end
-    def terrain(_), do: []
+
   end
   test 'indices' do
     {table_id, table} = start(IndiciesTestConfig)

@@ -1,17 +1,33 @@
-alias Yagg.Table.Player
 alias Yagg.Unit
 alias Yagg.Board.Action.Ability
 alias Yagg.Board
 alias Yagg.Jobfair
+alias Yagg.Event
 
 defmodule Yagg.Board.Configuration do
-  @callback starting_units(Player.position()) :: [Unit.t, ...]
-  @callback terrain(Board.t) :: [{Board.Grid.coord(), Board.Grid.terrain()}]
-  @callback meta() :: %{
-    required(:dimensions) => {4..8, 4..8},
-    optional(:initial_module) => Jobfair | Board,
-    optional(:army_size) => non_neg_integer,
+  alias __MODULE__
+
+  @enforce_keys [:dimensions, :initial_module, :units, :terrain]
+  @derive {Poison.Encoder, only: [:dimensions, :initial_module]}
+  defstruct [:army_size | @enforce_keys]
+
+  @type t :: %Configuration{
+    dimensions: {5..9, 5..9},
+    initial_module: Jobfair | Board,
+    units: any,
+    terrain: any,
   }
+
+  @callback new() :: t
+
+  def init(%Configuration{initial_module: mod} = config) do
+    mod.new(config)
+  end
+
+  @spec setup(t) :: {Jobfair.t | Board.t, [Event.t]}
+  def setup(%Configuration{initial_module: mod} = config) do
+    mod.new(config) |> mod.setup()
+  end
 
   def dimensions(configuration) do
     configuration.meta().dimensions
@@ -25,7 +41,7 @@ defmodule Yagg.Board.Configuration do
   def all() do
     %{
       "random" => Board.Configuration.Random,
-      "smallz`" => Board.Configuration.Alpha,
+      "smallz" => Board.Configuration.Alpha,
       "bigga" => Board.Configuration.Chain,
     }
   end
@@ -34,7 +50,21 @@ end
 defmodule Board.Configuration.Random do
   @behaviour Board.Configuration
   @impl Board.Configuration
-  def starting_units(position) do
+  def new() do
+    nor_units = ten_random_units(:north)
+    sou_units = Enum.map(nor_units, fn(u) -> %{u | position: :south} end)
+    size = Enum.random(5..8)
+    dimensions = {size, size}
+    terrain = random_terrain(dimensions)
+    %Board.Configuration{
+      dimensions: dimensions,
+      terrain: terrain,
+      units: %{north: nor_units, south: sou_units},
+      initial_module: Board,
+    }
+  end
+
+  defp ten_random_units(position) do
     units = Enum.shuffle([
       Unit.Tactician.new(position),
       Unit.new(position, :bezerker, 9, 2),
@@ -51,27 +81,20 @@ defmodule Board.Configuration.Random do
       Unit.Mediacreep.new(position),
       Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
       Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
+      Unit.Catmover.new(position),
       Unit.Maycorn.new(position),
       Unit.Spikeder.new(position),
       Unit.Busybody.new(position),
+      Unit.Howloo.new(position),
     ]) |> Enum.take(10)
     [Unit.Monarch.new(position) | units]
   end
 
-  @impl Board.Configuration
-  def meta do
-    size = Enum.random(4..7)
-    %{
-      dimensions: {size, size},
-    }
-  end
-
-  @impl Board.Configuration
-  def terrain(%{dimensions: dim}) do
+  defp random_terrain(dimensions) do
     gen_terrain(
       %{},
-      dim,
-      Enum.random(0..elem(dim, 0)) + 1
+      dimensions,
+      Enum.random(0..elem(dimensions, 0)) + 1
     )
   end
 
@@ -91,7 +114,25 @@ defmodule Board.Configuration.Alpha do
   @behaviour Board.Configuration
 
   @impl Board.Configuration
-  def starting_units(position) do
+  def new() do
+    units = %{
+      north: starting_units(:north),
+      south: starting_units(:south)
+    }
+    terrain = [
+      {{1, 2}, :block},
+      {{4, 2}, :water},
+    ]
+    %Board.Configuration{
+      dimensions: {5, 5},
+      initial_module: Jobfair,
+      army_size: 8,
+      units: units,
+      terrain: terrain,
+    }
+  end
+
+  defp starting_units(position) do
     [
       Unit.Monarch.new(position),
       Unit.Tactician.new(position),
@@ -102,32 +143,15 @@ defmodule Board.Configuration.Alpha do
       Unit.Sackboom.new(position),
       Unit.Spikeder.new(position),
       Unit.Howloo.new(position),
+      Unit.Catmover.new(position),
       Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
       Unit.new(position, :bezerker, 9, 2),
       Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
-      Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
       Unit.new(position, :tim, 1, 8),
       Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
     ]
-  end
-
-  @impl Board.Configuration
-  def terrain(_) do
-    [
-      {{1, 2}, :block},
-      {{4, 2}, :water},
-    ]
-  end
-
-  @impl Board.Configuration
-  def meta() do
-    %{
-      dimensions: {5, 5},
-      initial_module: Jobfair,
-      army_size: 8
-    }
   end
 
 end
@@ -139,6 +163,27 @@ defmodule Board.Configuration.Chain do
   """
 
   @impl Board.Configuration
+  def new() do
+    units = %{
+      north: starting_units(:north),
+      south: starting_units(:south),
+    }
+    terrain = [
+      {{0, 0}, :water},
+      {{6, 6}, :water},
+      {{0, 6}, :water},
+      {{6, 0}, :water},
+      {{2, 2}, :block},
+      {{4, 4}, :block},
+    ]
+    %Board.Configuration{
+      dimensions: {7, 7},
+      units: units,
+      terrain: terrain,
+      initial_module: Board,
+    }
+  end
+
   def starting_units(position) do
     Enum.shuffle([
       Unit.Monarch.new(position),
@@ -151,24 +196,5 @@ defmodule Board.Configuration.Chain do
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
     ])
-  end
-
-  @impl Board.Configuration
-  def terrain(_) do
-    [
-      {{0, 0}, :water},
-      {{6, 6}, :water},
-      {{0, 6}, :water},
-      {{6, 0}, :water},
-      {{2, 2}, :block},
-      {{4, 4}, :block},
-    ]
-  end
-
-  @impl Board.Configuration
-  def meta do
-    %{
-      dimensions: {7, 7}
-    }
   end
 end

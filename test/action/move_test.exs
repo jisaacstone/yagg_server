@@ -29,7 +29,7 @@ defmodule YaggTest.Action.Move do
       |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, defender)} end.()
     action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
     assert {newboard, events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{4, 3}] == attacker
+    assert newboard.grid[{4, 3}].name == attacker.name
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
   end
 
@@ -43,7 +43,7 @@ defmodule YaggTest.Action.Move do
       |> fn (b) -> %{b | grid: Map.put(b.grid, {4, 3}, defender)} end.()
     action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
     assert {newboard, events} = Board.Action.resolve(action, board, :north)
-    assert newboard.grid[{4, 3}] == attacker
+    assert newboard.grid[{4, 3}].name == attacker.name
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
     gameover = Enum.find(events, fn(e) -> e.kind == :gameover end)
     assert gameover.data.winner == :north

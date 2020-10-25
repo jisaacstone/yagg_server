@@ -2,14 +2,22 @@ alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.State.{Placement, Gameover}
 alias Yagg.Jobfair
+alias Yagg.Board.Configuration
 import Helper.Board
 
 defmodule YaggTest.Action.Ready do
   use ExUnit.Case
 
+  def testconfig(), do: %Configuration{
+    dimensions: {5, 5},
+    units: %{north: [], south: []},
+    terrain: [],
+    initial_module: Board,
+  }
+
   test "ready" do
     unit = Unit.new(:north, :monarch, 3, 3)
-    board = new_board()
+    board = new_board(testconfig())
     hands = Map.put(board.hands, :north, %{0 => {unit, {4, 4}}})
     board = %{board | hands: hands}
     action = %Board.Action.Ready{}
@@ -20,7 +28,7 @@ defmodule YaggTest.Action.Ready do
 
   test "game start" do
     unit = Unit.new(:north, :monarch, 3, 3)
-    board = %{new_board() | state: %Placement{ready: :south}}
+    board = %{new_board(testconfig()) | state: %Placement{ready: :south}}
     hands = Map.put(board.hands, :north, %{0 => {unit, {4, 4}}})
     board = %{board | hands: hands}
     action = %Board.Action.Ready{}
