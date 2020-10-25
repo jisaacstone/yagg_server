@@ -43,11 +43,12 @@ defmodule Yagg.Table do
   @spec new(module) :: {:ok, pid}
   def new(configuration \\ Board.Configuration.Random) do
     config = configuration.new()
+    board = Configuration.init(config)
     table = %Table{
       id: :nil,
       players: [],
       subscribors: [],
-      board: Configuration.setup(config),
+      board: board,
       turn: :nil,
       configuration: config,
       history: [],
@@ -196,6 +197,15 @@ defmodule Yagg.Table do
       3,
       "Proccess Terminated",
       reason
+    )
+  end
+  def terminate({err, reason}, table) do
+    Bugreport.report(
+      table.board,
+      table.history,
+      3,
+      "Proccess Terminated",
+      {err, reason}
     )
   end
   def terminate(_, _), do: :ok

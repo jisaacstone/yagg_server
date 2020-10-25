@@ -8,6 +8,7 @@ defmodule Yagg.Board.Configuration do
   alias __MODULE__
 
   @enforce_keys [:dimensions, :initial_module, :units, :terrain]
+  @derive {Poison.Encoder, only: [:dimensions, :initial_module]}
   defstruct [:army_size | @enforce_keys]
 
   @type t :: %Configuration{
@@ -18,6 +19,10 @@ defmodule Yagg.Board.Configuration do
   }
 
   @callback new() :: t
+
+  def init(%Configuration{initial_module: mod} = config) do
+    mod.new(config)
+  end
 
   @spec setup(t) :: {Jobfair.t | Board.t, [Event.t]}
   def setup(%Configuration{initial_module: mod} = config) do
@@ -51,7 +56,7 @@ defmodule Board.Configuration.Random do
     size = Enum.random(5..8)
     dimensions = {size, size}
     terrain = random_terrain(dimensions)
-    %{
+    %Board.Configuration{
       dimensions: dimensions,
       terrain: terrain,
       units: %{north: nor_units, south: sou_units},

@@ -34,7 +34,8 @@ defmodule Action.Ready do
   def resolve(_act, %Board{state: %Gameover{ready: _opponent}} = board, _position) do
     Board.Configuration.setup(board.configuration)
   end
-  def resolve(_, _, _) do
+  def resolve(a, b, c) do
+    IO.inspect([a, b, c])
     {:err, :badstate}
   end
 

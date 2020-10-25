@@ -1,6 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.State.Placement
+alias Helper.TestConfig
 import Helper.Board
 
 defmodule YaggTest.Action.Place do
@@ -8,7 +9,7 @@ defmodule YaggTest.Action.Place do
 
   test "place unit" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = %{new_board() | state: %Placement{}}
+    board = %{new_board(TestConfig) | state: %Placement{}}
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -18,7 +19,7 @@ defmodule YaggTest.Action.Place do
 
   test "place unit occupied" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = new_board()
+    board = new_board(TestConfig)
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands, grid: %{{4, 4} => :water}}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -27,7 +28,7 @@ defmodule YaggTest.Action.Place do
 
   test "place battle" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = %{new_board() | state: :battle}
+    board = %{new_board(TestConfig) | state: :battle}
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}
@@ -38,7 +39,7 @@ defmodule YaggTest.Action.Place do
 
   test "already_assigned" do
     unit = Unit.new(:north, :test, 3, 3)
-    board = new_board()
+    board = new_board(TestConfig)
     hands = Map.put(board.hands, :north, %{0 => {unit, :nil}})
     board = %{board | hands: hands}
     action = %Board.Action.Place{index: 0, x: 4, y: 4}

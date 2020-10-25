@@ -1,4 +1,6 @@
+alias Yagg.Board
 alias Yagg.Board.Configuration
+alias Helper.TestConfig
 
 defmodule Helper.Board do
   def testconfig(starting_u, terr, dimen) do
@@ -16,11 +18,11 @@ defmodule Helper.Board do
         Enum.map(unquote(Macro.escape(starting_u)), fn(unit) -> %{unit | position: position} end)
       end
     end
-    Module.create(TestConfig, contents, Macro.Env.location(__ENV__))
-    TestConfig
+    Module.create(DynTestConfig, contents, Macro.Env.location(__ENV__))
+    DynTestConfig
   end
 
-  def new_board(), do: new_board(Configuration.Beta)
+  def new_board(), do: new_board(TestConfig)
   def new_board(starting_u, terr, dimen) do
     config = testconfig(starting_u, terr, dimen)
     new_board(config)
@@ -29,7 +31,7 @@ defmodule Helper.Board do
     new_board(configuration.new())
   end
   def new_board(%{} = config) do
-    {board, _} = Configuration.setup(config)
+    {board, _} = Board.new(config) |> Board.setup(config.units)
     board
   end
 

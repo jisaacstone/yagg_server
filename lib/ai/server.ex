@@ -2,6 +2,7 @@ alias Yagg.Table
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Jobfair
+alias Yagg.Bugreport
 alias Yagg.AI.Choices
 alias Yagg.Board.Action.Ready
 alias Yagg.Table.Action
@@ -56,8 +57,12 @@ defmodule Yagg.AI.Server do
     {:noreply, state}
   end
   def handle_info(%{kind: :game_started}, state) do
-    {:ok, %{board: %{state: %Board.State.Placement{}}} = table} = Table.get_state(state.pid)
-    do_initial_placement(table.board, state)
+    case Table.get_state(state.pid) do
+      {:ok, %{board: %{state: %Board.State.Placement{}}} = table} ->
+        do_initial_placement(table.board, state)
+      {:ok, %{board: %Jobfair{} = jf}} ->
+        recruit(Map.get(jf, state.robot.position), jf.army_size, state)
+    end
     {:noreply, state}
   end
 
@@ -68,6 +73,18 @@ defmodule Yagg.AI.Server do
   def handle_info(other, state) do
     IO.inspect(%{unexpected: other})
     {:noreply, state}
+  end
+
+  def terminate(:normal, _), do: :ok
+  def terminate({type, context}, state) do
+    Bugreport.report(
+      state,
+      [],
+      3,
+      "AI Proccess Terminated",
+      {type, context}
+    )
+    :ok
   end
 
   defp take_your_turn(board, state) do
