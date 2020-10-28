@@ -44,6 +44,7 @@ defmodule Unit.Sackboom do
   defp explode_thing(:block, board, coord) do
     {
       %{board | grid: Map.delete(board.grid, coord)},
+      # bit of a hack, clean up someday?
       [Event.ThingMoved.new(from: coord, to: :offscreen)]
     }
   end

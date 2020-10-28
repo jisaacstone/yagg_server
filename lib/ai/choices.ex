@@ -8,7 +8,7 @@ defmodule Yagg.AI.Choices do
   @spec move(Board.t, Player.position) :: struct
   def move(board, position) do
     chs = choices(board, position)
-    if chs == [] do
+    if chs == %{place: [], move: [], ability: []} do
       IO.inspect({:no_choices, board, position})
       concede(owned_units(board.grid, position))
     else 

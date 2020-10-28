@@ -48,12 +48,15 @@ defmodule Unit.Busybody do
           {board, evts} = offscreend(board, thing, from)
           place(board, things, evts ++ events)
         :nil ->
-          event = Event.ThingMoved.new(from: from, to: to)
+          events = [Event.ThingMoved.new(thing, from: from, to: to) | events]
           board = %{board | grid: Map.put(board.grid, to, thing)}
-          place(board, things, [event | events])
+          place(board, things, events)
       end
     end
 
+    defp offscreend(board, %{visible: :none}, _coord) do
+      {board, []}
+    end
     defp offscreend(board, %Unit{} = unit, coord) do
       Board.unit_death(board, coord, unit: unit)
     end

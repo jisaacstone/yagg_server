@@ -90,12 +90,15 @@ export function unit_assigned(event) {
 }
 
 export function new_unit(event) {
-  const unit = document.getElementById(`c${event.x}-${event.y}`).firstElementChild as HTMLElement;
+  const square = Board.square(event.x, event.y),
+    unit = square.firstElementChild as HTMLElement;
   if (!unit) {
-    return console.log({err: 'unitnotfound', event, unit});
+    const newunit = Unit.render(event.unit, 0);
+    square.appendChild(newunit);
+  } else {
+    unit.innerHTML = '';
+    Unit.render_into(event.unit, unit);
   }
-  unit.innerHTML = '';
-  Unit.render_into(event.unit, unit);
 }
 
 export function unit_changed(event) {
@@ -139,8 +142,8 @@ export function unit_died(event) {
 }
 
 export function thing_moved(event) {
-  const to = document.getElementById(`c${event.to.x}-${event.to.y}`),
-    from = document.getElementById(`c${event.from.x}-${event.from.y}`),
+  const to = Board.square(event.to.x, event.to.y),
+    from = Board.square(event.from.x, event.from.y),
     thing = from.firstChild as HTMLElement;
   if (to) {
     const child = to.firstChild as HTMLElement,
@@ -157,7 +160,20 @@ export function thing_moved(event) {
     delete thing.style.position;
     to.appendChild(thing);
   } else {
-    from.removeChild(thing);
+    thing_gone(event.from);
+  }
+}
+
+export function thing_gone(event) {
+  const square = Board.square(event.x, event.y),
+    thing = square.firstChild as HTMLElement;
+  if (thing.className.includes('owned')) {
+    thing.dataset.state = 'invisible';
+  } else {
+    thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
+    setTimeout(function() {
+      thing.remove();
+    }, 850);
   }
 }
 

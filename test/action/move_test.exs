@@ -74,4 +74,3 @@ defmodule YaggTest.Action.Move do
     assert newboard.grid[{2, 1}] == :block
   end
 end
-

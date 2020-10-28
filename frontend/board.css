@@ -404,6 +404,10 @@ span .tooltip, button .tooltip {
   border-bottom: 1px solid rgba(46,221,98,0.6);
 }
 
+.unit[data-state=invisible] {
+  border-style: dotted;
+  border-width: 4px;
+}
 
 /* Features */
 

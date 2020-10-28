@@ -44,6 +44,9 @@ export function render(el, width = 5, height = 5) {
         }
     }
 }
+export function square(x, y) {
+    return document.getElementById(`c${x}-${y}`);
+}
 export function unitdata(unitdata) {
     for (const ob of unitdata.grid) {
         Event.new_unit(ob);

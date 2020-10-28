@@ -169,5 +169,25 @@ defmodule YaggTest.Action.Ability do
     assert event = Enum.find(events, fn(e) -> e.kind == :thing_moved end)
     assert %{from: {1, 2}, to: {3, 2}} = event.data
   end
-end
 
+  test "antente becomes visible" do
+    board = set_board([
+      {{1, 2}, Unit.Antente.new(:south)},
+      {{2, 2}, Unit.Tinker.new(:north)}
+    ])
+
+    action = %Board.Action.Move{from_x: 1, from_y: 2, to_x: 2, to_y: 2}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert %{name: :antente, ability: Unit.Antente.Invisible} = newboard.grid[{2, 2}]
+    plc_idx = Enum.find_index(events, fn(e) -> e.kind == :unit_placed end)
+    mv_idx = Enum.find_index(events, fn(e) -> e.kind == :thing_moved end)
+    assert plc_idx < mv_idx
+    assert %{stream: :global} = Enum.at(events, mv_idx)
+
+    action = %Board.Action.Ability{x: 2, y: 2}
+    assert {board, events} = Board.Action.resolve(action, newboard, :south)
+    assert Enum.any?(events, fn(e) -> e.kind == :thing_gone end)
+    assert %{ability: :nil} = board.grid[{2, 2}]
+  end
+
+end

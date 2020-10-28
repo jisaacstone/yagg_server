@@ -178,6 +178,22 @@ defmodule Yagg.Event do
     def new(params) do
       Event.new(:global, :thing_moved, params)
     end
+    def new(%{visible: :none, position: position}, params) do
+      Event.new(position, :thing_moved, params)
+    end
+    def new(_, params) do
+      new(params)
+    end
+  end
+
+  defmodule ThingGone do
+    @spec new([
+      x: 0..9,
+      y: 0..9,
+    ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :thing_gone, params)
+    end
   end
 
   defmodule Turn do

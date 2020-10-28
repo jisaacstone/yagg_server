@@ -86,6 +86,7 @@ defmodule Board.Configuration.Random do
       Unit.Spikeder.new(position),
       Unit.Busybody.new(position),
       Unit.Howloo.new(position),
+      Unit.Antente.new(position),
     ]) |> Enum.take(10)
     [Unit.Monarch.new(position) | units]
   end
@@ -144,13 +145,13 @@ defmodule Board.Configuration.Alpha do
       Unit.Spikeder.new(position),
       Unit.Howloo.new(position),
       Unit.Catmover.new(position),
+      Unit.Antente.new(position),
       Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),
       Unit.new(position, :bezerker, 9, 2),
       Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
       Unit.new(position, :tim, 1, 8),
-      Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
     ]
   end
 

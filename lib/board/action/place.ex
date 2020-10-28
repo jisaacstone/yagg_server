@@ -29,13 +29,12 @@ defmodule Action.Place do
         case Board.place(board, unit, {act.x, act.y}) do
           {:err, _} = err -> err
           {:ok, board} ->
-            {
-              %{board | hands: %{board.hands | position => hand}},
-              [
-                Event.UnitAssigned.new(position, index: act.index, x: act.x, y: act.y),
-                Event.UnitPlaced.new(x: act.x, y: act.y, player: position),
-              ]
-            }
+            board = %{board | hands: %{board.hands | position => hand}}
+            events = case unit do
+              %{visible: :none} -> []
+              _ -> Event.UnitPlaced.new(x: act.x, y: act.y, player: position)
+            end
+            {board, [Event.UnitAssigned.new(position, index: act.index, x: act.x, y: act.y) | events]}
         end
     end
   end

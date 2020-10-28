@@ -222,10 +222,8 @@ defmodule Yagg.Board do
     grid = Map.put_new(grid, to, unit)
     board = %{board | grid: grid}
     {board, events} = Unit.after_move(board, unit, from, to, opts)
-    {
-      board,
-      [Event.ThingMoved.new(from: from, to: to) | events]
-    }
+    events = [Event.ThingMoved.new(unit, from: from, to: to) | events]
+    {board, events}
   end
 
   defp hand_assign(hand, index, coords) do

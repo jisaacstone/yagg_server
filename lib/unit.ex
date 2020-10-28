@@ -34,7 +34,7 @@ defmodule Yagg.Unit do
   def encode(_unit, :none), do: :nil
   def encode(unit, :all), do: encode_fields(unit, [:attack, :defense, :name, :player, :ability, :triggers], %{})
   def encode(unit, fields) when is_list(fields), do: encode_fields(unit, fields, %{})
-  def encode(unit, %MapSet{} = fields), do: encode_fields(unit, MapSet.to_list(fields), %{})
+  def encode(unit, fields), do: encode_fields(unit, MapSet.to_list(fields), %{})
 
   defp encode_fields(_unit, [], encoded), do: encoded
   defp encode_fields(unit, [field | fields], encoded) do
@@ -58,6 +58,21 @@ defmodule Yagg.Unit do
   @spec new(Player.position, atom, non_neg_integer, non_neg_integer, :nil | module(), %{atom => module()}) :: t
   def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}, visible \\ MapSet.put(MapSet.new(), :player)) do
     %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers, visible: visible}
+  end
+  def new(attrs) do
+    struct(default(), attrs)
+  end
+
+  def default() do
+    %Unit{
+      attack: 0,
+      defense: 0,
+      name: :nil,
+      position: :nil,
+      ability: :nil,
+      triggers: %{},
+      visible: MapSet.new([:player]),
+    }
   end
 
   def after_death(board, unit, coords, opts \\ []) do

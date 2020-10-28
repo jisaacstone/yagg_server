@@ -52,9 +52,12 @@ defmodule Action.Ready do
         board.grid,
         [],
         fn
-          ({{x, y}, %Unit{} = unit}, nfcns) ->
-            [Event.UnitPlaced.new(x: x, y: y, player: unit.position) | nfcns]
-          (_, nfcns) -> nfcns
+          ({_, %Unit{visible: :none}}, events) ->
+            events
+          ({{x, y}, %Unit{} = unit}, events) ->
+            [Event.UnitPlaced.new(x: x, y: y, player: unit.position) | events]
+          (_, events) ->
+            events
         end
       )
       {%{board | state: :battle}, [Event.BattleStarted.new() | notifications]}

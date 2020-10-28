@@ -73,12 +73,15 @@ export function unit_assigned(event) {
     square.appendChild(unit);
 }
 export function new_unit(event) {
-    const unit = document.getElementById(`c${event.x}-${event.y}`).firstElementChild;
+    const square = Board.square(event.x, event.y), unit = square.firstElementChild;
     if (!unit) {
-        return console.log({ err: 'unitnotfound', event, unit });
+        const newunit = Unit.render(event.unit, 0);
+        square.appendChild(newunit);
     }
-    unit.innerHTML = '';
-    Unit.render_into(event.unit, unit);
+    else {
+        unit.innerHTML = '';
+        Unit.render_into(event.unit, unit);
+    }
 }
 export function unit_changed(event) {
     new_unit(event); // for now
@@ -115,7 +118,7 @@ export function unit_died(event) {
     }, 850);
 }
 export function thing_moved(event) {
-    const to = document.getElementById(`c${event.to.x}-${event.to.y}`), from = document.getElementById(`c${event.from.x}-${event.from.y}`), thing = from.firstChild;
+    const to = Board.square(event.to.x, event.to.y), from = Board.square(event.from.x, event.from.y), thing = from.firstChild;
     if (to) {
         const child = to.firstChild, fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), xOffset = Math.round(fromRect.left - toRect.left) + 'px', yOffset = Math.round(fromRect.top - toRect.top) + 'px';
         thing.style.position = 'relative';
@@ -128,7 +131,19 @@ export function thing_moved(event) {
         to.appendChild(thing);
     }
     else {
-        from.removeChild(thing);
+        thing_gone(event.from);
+    }
+}
+export function thing_gone(event) {
+    const square = Board.square(event.x, event.y), thing = square.firstChild;
+    if (thing.className.includes('owned')) {
+        thing.dataset.state = 'invisible';
+    }
+    else {
+        thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
+        setTimeout(function () {
+            thing.remove();
+        }, 850);
     }
 }
 export function gameover(event) {
