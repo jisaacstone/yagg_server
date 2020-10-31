@@ -1,6 +1,51 @@
 body {
   flex-direction: column;
   background: repeating-linear-gradient(90deg, #FFA, #FAF 10px, #AFF 10px, #FAF 20px, #AAF 20px, #AFF 30px);
+  height: 100vh;
+  overflow: hidden;
+}
+
+#table {
+  display: grid;
+  height: 100vh;
+}
+
+@media (orientation: landscape) {
+  #table {
+    grid-template-columns: 20% 60% 20%;
+    grid-template-rows: 30% 40% 30%;
+    grid-template-areas:
+      "opponent board  hand"
+      "infobox  board  hand"
+      "player   board  hand";
+  }
+  #board {
+    width: min(60vw, 95vh);
+    height: min(60vw, 95vh);
+  }
+  #hand {
+    margin-left: 1vw;
+    flex-direction: column;
+  }
+}
+
+@media (orientation: portrait) {
+  #table {
+    grid-template-columns: 30% 40% 30%;
+    grid-template-rows: 20% 60% 20%;
+    grid-template-areas:
+      "player   infobox  opponent"
+      "board    board    board"
+      "hand     hand     hand";
+  }
+  #board {
+    width: min(60vh, 95vw);
+    height: min(60vh, 95vw);
+  }
+  #hand {
+    margin-top: 1vh;
+    flex-direction: row;
+  }
 }
 
 body[data-gamestate=placement] {
@@ -37,11 +82,6 @@ body[data-gamestate=gameover] {
   );
 }
 
-body > div {
-  width: 100%;
-  margin: auto;
-}
-
 .waiting {
   padding: 2vh;
   background: repeating-linear-gradient(40deg, #CFCFD0, #CFCFD0 10px, #e0e0e1 10px, #e0e1e0 20px, #BFAFBE 20px, #BFAEBF 30px);
@@ -65,16 +105,9 @@ body > div {
 
 /* BOARD */
 
-#right {
-  margin-top: 1vh;
-  height: 100vh;
-}
-
 #board {
   margin: auto;
-  width: 80vh;
-  min-height: 80vh;
-  padding: 0.5vh;
+  grid-area: board;
   background-color: #443;
   box-shadow: 1vh 2vh 1vh rgba(30, 33, 0, 0.4);
   display: grid;
@@ -88,6 +121,7 @@ body > div {
   grid-auto-flow: column;
   background-color: #EEE;
   grid-auto-columns: minmax(0, 1fr);
+  overflow: hidden;
 }
 
 .boardsquare {
@@ -96,6 +130,7 @@ body > div {
   box-sizing: border-box;
   background-color: rgba(255,254,254,0.6);
   display: flex;
+  overflow: hidden;
 }
 
 .boardrow.northrow {
@@ -109,16 +144,18 @@ body > div {
 /* HAND */
 
 #hand {
+  grid-area: hand;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 1vh;
+  overflow: scroll;
+  background-color: rgba(195, 225, 220, 0.8);
 }
 
 .card {
   display: flex;
+  flex-shrink: 0;
   height: 15vh;
   width: 15vh;
+  margin: auto;
 }
 
 .card:empty {
@@ -456,20 +493,12 @@ span .tooltip, button .tooltip {
 
 /* Left */
 
-#left {
-  position: absolute;
-  left: 0;
-  top: 2vh;
-  width: 15vh;
-  height: 80%;
-  z-index: 1;
+#gameinfo {
+  grid-area: opponent;
 }
 
 #player {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 15vh;
+  grid-area: player;
 }
 
 .playername, #gamestate {
