@@ -14,7 +14,7 @@ Likewise board actions are stucts and the modules are expected to implement [the
 ## The Board
 
 There are two "board implementations". [Board](../lib/board.ex) and [Jobfair](../lib/jobfair.ex).
-Boards are expected to have a `new\1` and `setup\1` method to create the initial state, and a `units\2` amd `Poison.Encoder` implementation
+Boards are expected to have a `new\1` and `setup\1` method to create the initial state, and a `units\2` and `Poison.Encoder` implementation
 for fetching current state. The `Poison.Encoder` implementation is used for fetching globally visible state, and `units\2` is used to fetch
 state that is only visible to a single player
 
