@@ -9,7 +9,7 @@ Main calls to mutate state are `new`, `table_action` and `board_action`
 
 Table actions have a scope of the entire table, board actions are scoped down to the board only.
 Table actions are structs, the module of the struct is expected to implement [the Table.Action behavior](../lib/table/action.ex).
-Likewise board actions are stucts and the modules are expected to implement [the Board.Action behavior](../lib/board/action.ex).
+Likewise board actions are structs and the modules are expected to implement [the Board.Action behavior](../lib/board/action.ex).
 
 ## The Board
 
