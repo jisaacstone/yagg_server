@@ -1,5 +1,5 @@
 import { getname } from './urlvars.js';
-import { gmeta } from './state.js';
+import { gmeta, gamestatechange, turnchange } from './state.js';
 import * as Select from './select.js';
 import * as Unit from './unit.js';
 import { SKULL } from './constants.js';
@@ -9,14 +9,6 @@ import * as Dialog from './dialog.js';
 import * as Jobfair from './jobfair.js';
 import * as Overlay from './overlay.js';
 const unitsbyindex = {};
-function gamestatechange(newstate) {
-    document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
-    document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
-    gmeta.boardstate = newstate;
-    Array.prototype.forEach.call(document.getElementsByClassName('playername'), el => {
-        el.dataset.ready = null;
-    });
-}
 export function game_started(event) {
     const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
     if (event.army_size || gmeta.phase === 'jobfair') {
@@ -150,19 +142,12 @@ export function gameover(event) {
     const message = event.winner === gmeta.position ? 'you win!' : 'you lose';
     gamestatechange('gameover');
     document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
+    turnchange(null);
     Dialog.displayMessage(message);
     readyButton.display('REMATCH');
 }
 export function turn(event) {
-    gmeta.turn = event.player;
-    if (event.player === gmeta.position) {
-        document.querySelector('#player .playername').dataset.turn = 'true';
-        document.querySelector('#opponent .playername').dataset.turn = 'false';
-    }
-    else {
-        document.querySelector('#player .playername').dataset.turn = 'false';
-        document.querySelector('#opponent .playername').dataset.turn = 'true';
-    }
+    turnchange(event.player);
 }
 export function candidate(event) {
     const jf = document.getElementById('jobfair'), existing = document.getElementById(`candidate-${event.index}`), cdd = document.createElement('div'), unitEl = Unit.render(event.unit, event.index);

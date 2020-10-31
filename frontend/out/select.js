@@ -3,6 +3,7 @@ import { gmeta } from './state.js';
 import { displayerror } from './err.js';
 import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
+import * as Unit from './unit.js';
 const global = { selected: null };
 function action(actType, args, cb = null) {
     gameaction(actType, args, 'board')
@@ -39,6 +40,34 @@ function ismoveoption(el) {
     }
     return true;
 }
+export function deselect(sel = null) {
+    var selected = sel || global.selected;
+    selected.element.dataset.uistate = '';
+    for (const opt of selected.options) {
+        opt.dataset.uistate = '';
+    }
+    selected = {};
+    document.getElementById('infobox').innerHTML = '';
+}
+function moveOrPlace(selected, target) {
+    if (selected.element !== target.element) {
+        if (selected.meta.inhand) {
+            action('place', { index: selected.meta.index, x: target.meta.x, y: target.meta.y }, selected.meta.unit_name === 'monarch' ? Ready.ensureDisplayed() : null);
+        }
+        else {
+            // clickd on a board square
+            if (gmeta.boardstate === 'battle') {
+                action('move', { from_x: selected.meta.x, from_y: selected.meta.y, to_x: target.meta.x, to_y: target.meta.y });
+            }
+            else {
+                // change placement
+                const index = +selected.element.firstChild.dataset.index;
+                action('place', { index: index, x: target.meta.x, y: target.meta.y });
+            }
+        }
+    }
+    deselect(selected);
+}
 export function select(thisEl, meta) {
     function select() {
         if (gmeta.boardstate === 'gameover') {
@@ -47,59 +76,46 @@ export function select(thisEl, meta) {
         const sel = global.selected;
         if (sel && sel.element && sel.element.firstChild) {
             // something was perviously selected
-            if (sel.element !== thisEl) {
-                if (sel.meta.inhand) {
-                    action('place', { index: sel.meta.index, x: meta.x, y: meta.y }, sel.meta.unit_name === 'monarch' ? Ready.ensureDisplayed() : null);
-                }
-                else {
-                    // clickd on a board square
-                    if (gmeta.boardstate === 'battle') {
-                        action('move', { from_x: sel.meta.x, from_y: sel.meta.y, to_x: meta.x, to_y: meta.y });
-                    }
-                    else {
-                        // change placement
-                        const index = +sel.element.firstChild.dataset.index;
-                        action('place', { index: index, x: meta.x, y: meta.y });
-                    }
-                }
-            }
-            sel.element.dataset.uistate = '';
-            for (const opt of sel.options) {
-                opt.dataset.uistate = '';
-            }
-            global.selected = null;
-        }
-        else {
-            if (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) {
-                // Not your turn
-                return;
-            }
-            const options = [];
-            if (meta.inhand || gmeta.boardstate === 'placement') {
-                thisEl.dataset.uistate = 'selected';
-                Array.prototype.forEach.call(document.querySelectorAll(`.${meta.player}row .boardsquare`), el => {
-                    if (!el.firstChild) {
-                        el.dataset.uistate = 'moveoption';
-                        options.push(el);
-                    }
-                });
+            if (Unit.containsOwnedUnit(thisEl)) {
+                // if we are clicking on another of our units ignore previously selected unit
+                deselect(global.selected);
             }
             else {
-                const childEl = thisEl.firstChild;
-                if (!childEl || !childEl.className.includes(gmeta.position)) {
-                    // Square with no owned unit
-                    return;
+                return moveOrPlace(sel, { element: thisEl, meta });
+            }
+        }
+        if (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) {
+            // Not your turn
+            return;
+        }
+        const options = [];
+        const childEl = thisEl.firstChild;
+        if (meta.inhand || gmeta.boardstate === 'placement') {
+            thisEl.dataset.uistate = 'selected';
+            Array.prototype.forEach.call(document.querySelectorAll(`.${meta.player}row .boardsquare`), el => {
+                if (!el.firstChild) {
+                    el.dataset.uistate = 'moveoption';
+                    options.push(el);
                 }
-                for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
-                    const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-                    if (ismoveoption(nel)) {
-                        nel.dataset.uistate = 'moveoption';
-                        options.push(nel);
-                    }
+            });
+        }
+        else {
+            if (!Unit.containsOwnedUnit(thisEl)) {
+                // Square with no owned unit
+                return;
+            }
+            for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
+                const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
+                if (ismoveoption(nel)) {
+                    nel.dataset.uistate = 'moveoption';
+                    options.push(nel);
                 }
             }
-            global.selected = { element: thisEl, meta: meta, options: options };
         }
+        if (childEl) {
+            childEl.dispatchEvent(new Event('sidebar'));
+        }
+        global.selected = { element: thisEl, meta: meta, options: options };
     }
     return select;
 }

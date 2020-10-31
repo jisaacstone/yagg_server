@@ -1,6 +1,6 @@
 import { getname } from './urlvars.js';
 import { gameaction } from './request.js';
-import { gmeta } from './state.js';
+import { gmeta, gamestatechange, turnchange } from './state.js';
 import * as Select from './select.js';
 import * as Unit from './unit.js';
 import { SKULL } from './constants.js';
@@ -11,18 +11,6 @@ import * as Jobfair from './jobfair.js';
 import * as Overlay from './overlay.js';
 
 const unitsbyindex = {};
-
-function gamestatechange(newstate: string): void {
-  document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
-  document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
-  gmeta.boardstate = newstate;
-  Array.prototype.forEach.call(
-    document.getElementsByClassName('playername') as HTMLCollectionOf<HTMLInputElement>,
-    el => {
-      el.dataset.ready = null;
-    }
-  );
-}
 
 export function game_started(event) {
   const board = document.getElementById('board'),
@@ -181,19 +169,13 @@ export function gameover(event) {
   const message = event.winner === gmeta.position ? 'you win!' : 'you lose';
   gamestatechange('gameover');
   document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
+  turnchange(null);
   Dialog.displayMessage(message);
   readyButton.display('REMATCH');
 }
 
 export function turn(event) {
-  gmeta.turn = event.player;
-  if (event.player === gmeta.position) {
-    (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'true';
-    (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'false';
-  } else {
-    (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'false';
-    (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'true';
-  }
+  turnchange(event.player);
 }
 
 export function candidate(event) {
