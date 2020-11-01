@@ -9,6 +9,7 @@ export function display(label = 'READY', onclick = null) {
     }
     else {
         readyButton.onclick = () => {
+            document.getElementById('infobox').innerHTML = '';
             gameaction('ready', {}, 'board').then(() => {
                 readyButton.remove();
             }).catch(({ request }) => {

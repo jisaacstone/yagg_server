@@ -45,12 +45,11 @@ function render_attrs(unit, el) {
         el.className = `monarch ${el.className}`;
     }
 }
-function render_tile(unit, el) {
-    //render_attrs(unit, el);
+function render_tile(unit, el, attrs = false) {
+    if (attrs) {
+        render_attrs(unit, el);
+    }
     el.style.backgroundImage = `url(img/${unit.name}.png)`;
-    /*if (unit.ability) {
-      ability_button(unit, el);
-    }*/
     if (anyDetails(unit)) {
         el.addEventListener('sidebar', () => {
             const infobox = document.getElementById('infobox'), unitInfo = document.createElement('div');
@@ -141,10 +140,10 @@ export function containsOwnedUnit(square) {
     }
     return false;
 }
-export function render_into(unit, el) {
-    return render_tile(unit, el);
+export function render_into(unit, el, attrs = false) {
+    return render_tile(unit, el, attrs);
 }
-export function render(unit, index) {
+export function render(unit, index, attrs = false) {
     const unitEl = document.createElement('span');
     let className = `unit ${unit.player}`;
     if (unit.player === gmeta.position) {
@@ -152,6 +151,6 @@ export function render(unit, index) {
     }
     unitEl.className = className;
     unitEl.dataset.index = index;
-    render_into(unit, unitEl);
+    render_into(unit, unitEl, attrs);
     return unitEl;
 }

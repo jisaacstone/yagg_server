@@ -23,6 +23,7 @@ export function game_started(event) {
     }
     else {
         Overlay.clear();
+        Jobfair.clear();
         if (event.dimensions) {
             Board.render(board, event.dimensions.x, event.dimensions.y);
         }
@@ -150,10 +151,11 @@ export function turn(event) {
     turnchange(event.player);
 }
 export function candidate(event) {
-    const jf = document.getElementById('jobfair'), existing = document.getElementById(`candidate-${event.index}`), cdd = document.createElement('div'), unitEl = Unit.render(event.unit, event.index);
+    const jf = document.getElementById('jobfair'), existing = document.getElementById(`candidate-${event.index}`);
     if (existing) {
         return;
     }
+    const cdd = document.createElement('div'), unitEl = Unit.render(event.unit, event.index, true);
     cdd.className = 'candidate';
     cdd.id = `candidate-${event.index}`;
     cdd.appendChild(unitEl);

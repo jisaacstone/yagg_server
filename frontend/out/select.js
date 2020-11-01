@@ -124,6 +124,8 @@ export function bind_hand(card, index, player, unit_name) {
 }
 export function bind_candidate(candidate, index) {
     candidate.onclick = (e) => {
+        const childEl = candidate.firstElementChild;
+        document.getElementById('infobox').innerHTML = '';
         if (candidate.dataset.uistate === 'selected') {
             if (Jobfair.deselect(index)) {
                 candidate.dataset.uistate = '';
@@ -131,6 +133,7 @@ export function bind_candidate(candidate, index) {
         }
         else {
             if (Jobfair.select(index)) {
+                childEl && childEl.dispatchEvent(new Event('sidebar'));
                 candidate.dataset.uistate = 'selected';
             }
         }

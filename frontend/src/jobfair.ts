@@ -14,14 +14,13 @@ const state = {
 export function render(armySize: number) {
   const jobfair = document.createElement('div'),
     instructions = document.createElement('div'),
-    board = document.getElementById('board');
+    table = document.getElementById('table');
 
   instructions.className = 'instructions';
   jobfair.appendChild(instructions);
 
   jobfair.id = 'jobfair';
-  board.innerHTML = '';
-  board.appendChild(jobfair);
+  table.appendChild(jobfair);
 
   if (!armySize) {
     if (state.armySize) {
@@ -36,6 +35,14 @@ export function render(armySize: number) {
   state.ready = 'not';
   state.selected = new Set();
 }
+
+export function clear() {
+  const jobfair = document.getElementById('jobfair');
+  if (jobfair) {
+    jobfair.remove();
+  }
+}
+
 
 export function select(index) {
   if (state.ready === 'ready') {

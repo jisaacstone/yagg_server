@@ -74,12 +74,11 @@ function render_attrs(unit: Unit, el: HTMLElement) {
   }
 }
 
-function render_tile(unit: Unit, el: HTMLElement) {
-  //render_attrs(unit, el);
+function render_tile(unit: Unit, el: HTMLElement, attrs=false) {
+  if (attrs) {
+    render_attrs(unit, el);
+  }
   el.style.backgroundImage = `url(img/${unit.name}.png)`;
-  /*if (unit.ability) {
-    ability_button(unit, el);
-  }*/
   if (anyDetails(unit)) {
     el.addEventListener('sidebar', () => {
       const infobox = document.getElementById('infobox'),
@@ -182,11 +181,11 @@ export function containsOwnedUnit(square: HTMLElement) {
   return false;
 }
 
-export function render_into(unit: Unit, el: HTMLElement): void {
-  return render_tile(unit, el);
+export function render_into(unit: Unit, el: HTMLElement, attrs=false): void {
+  return render_tile(unit, el, attrs);
 }
 
-export function render(unit: Unit, index): HTMLElement {
+export function render(unit: Unit, index, attrs=false): HTMLElement {
   const unitEl = document.createElement('span');
   let className = `unit ${unit.player}`;
   if (unit.player === gmeta.position) {
@@ -194,6 +193,6 @@ export function render(unit: Unit, index): HTMLElement {
   }
   unitEl.className = className;
   unitEl.dataset.index = index;
-  render_into(unit, unitEl);
+  render_into(unit, unitEl, attrs);
   return unitEl
 }

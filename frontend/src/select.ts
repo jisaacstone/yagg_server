@@ -133,12 +133,15 @@ export function bind_hand(card: HTMLElement, index: number, player: string, unit
 
 export function bind_candidate(candidate: HTMLElement, index: number) {
   candidate.onclick = (e) => {
+    const childEl = candidate.firstElementChild;
+    document.getElementById('infobox').innerHTML='';
     if (candidate.dataset.uistate === 'selected') {
       if (Jobfair.deselect(index)) {
         candidate.dataset.uistate = '';
       }
     } else {
       if (Jobfair.select(index)) {
+        childEl && childEl.dispatchEvent(new Event('sidebar'));
         candidate.dataset.uistate = 'selected';
       }
     }
