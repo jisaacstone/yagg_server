@@ -31,6 +31,13 @@ body {
     width: min(38vh, 18vw);
     height: min(38vh, 18vw);
   }
+  #jobfair {
+    grid-column: 2 / span 2;
+    grid-row: 1 / span 3;
+  }
+  #jobfair .candidate {
+    min-height: 20vw;
+  }
 }
 
 @media (orientation: portrait) {
@@ -53,6 +60,13 @@ body {
   #infobox .info {
     width: min(39vw, 19vh);
     height: min(39vw, 19vh);
+  }
+  #jobfair {
+    grid-column: 1 / span 3;
+    grid-row: 2 / span 2;
+  }
+  #jobfair .candidate {
+    min-height: 25vw;
   }
 }
 
@@ -555,9 +569,7 @@ span .tooltip, button .tooltip {
 
 #jobfair {
   display: grid;
-  grid-column: 1 / span 3;
-  grid-row: 2 / span 2;
-  grid-template-columns: repeat(4, 25vw);
+  grid-template-columns: repeat(4, 1fr);
   overflow-x: scroll;
   background: repeating-linear-gradient(94deg, #112, #444 10px, #454 10px, #555 20px, #222 20px, #121 50px);
   border-top: 1vh inset #122;
@@ -574,7 +586,6 @@ span .tooltip, button .tooltip {
 
 .candidate {
   display: grid;
-  height: 25vw;
 }
 
 .candidate .unit {
