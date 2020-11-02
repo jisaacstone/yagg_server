@@ -12,9 +12,12 @@ const state = {
 }
 
 export function render(armySize: number) {
-  const jobfair = document.createElement('div'),
+  const jfel = document.getElementById('jobfair'),
+    jobfair = jfel || document.createElement('div'),
     instructions = document.createElement('div'),
     table = document.getElementById('table');
+
+  jobfair.innerHTML = '';
 
   instructions.className = 'instructions';
   jobfair.appendChild(instructions);

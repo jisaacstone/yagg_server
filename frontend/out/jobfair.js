@@ -8,7 +8,8 @@ const state = {
     armySize: 0
 };
 export function render(armySize) {
-    const jobfair = document.createElement('div'), instructions = document.createElement('div'), table = document.getElementById('table');
+    const jfel = document.getElementById('jobfair'), jobfair = jfel || document.createElement('div'), instructions = document.createElement('div'), table = document.getElementById('table');
+    jobfair.innerHTML = '';
     instructions.className = 'instructions';
     jobfair.appendChild(instructions);
     jobfair.id = 'jobfair';

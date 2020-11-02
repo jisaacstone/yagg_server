@@ -3,6 +3,7 @@ body {
   background: repeating-linear-gradient(90deg, #FFA, #FAF 10px, #AFF 10px, #FAF 20px, #AAF 20px, #AFF 30px);
   height: 100vh;
   overflow: hidden;
+  font-size: min(3vh, 3vw);
 }
 
 #table {
@@ -34,6 +35,7 @@ body {
   #jobfair {
     grid-column: 2 / span 2;
     grid-row: 1 / span 3;
+    grid-template-columns: repeat(4, 20vw);
   }
   #jobfair .candidate {
     min-height: 20vw;
@@ -64,6 +66,7 @@ body {
   #jobfair {
     grid-column: 1 / span 3;
     grid-row: 2 / span 2;
+    grid-template-columns: repeat(4, 25vw);
   }
   #jobfair .candidate {
     min-height: 25vw;
@@ -247,13 +250,17 @@ body[data-gamestate=gameover] {
 }
 .unit-attack, .unit-defense {
   font-weight: bold;
-  padding: 2px 4px 0px;
   margin: 2px;
   border-radius: 28%;
   border-width: 2px;
   box-sizing: border-box;
   border-style: inset;
   background-color: rgba(245, 248, 246, 0.1);
+  width: 85%;
+  height: 85%;
+  justify-self: center;
+  align-self: center;
+  text-align: center;
 }
 
 /* attack/defense tooltips */
@@ -316,6 +323,9 @@ body[data-gamestate=gameover] {
 
 .trigger-symbol {
   margin: auto;
+  width: 100%;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .unit-trigger:hover .tooltip {
@@ -347,7 +357,7 @@ span .tooltip, button .tooltip {
 }
 
 .details-button {
-  padding: 2px 4px 0px;
+  padding: 0;
   background-color: rgba(99,106,100,0.2);
   border-radius: 28%;
   border-width: 2px;
@@ -355,6 +365,11 @@ span .tooltip, button .tooltip {
   border-style: inset;
   margin: 2px;
   grid-area: details;
+  width: 85%;
+  height: 85%;
+  text-align: center;
+  justify-self: center;
+  align-self: center;
 }
 
 /* details */
@@ -407,8 +422,6 @@ span .tooltip, button .tooltip {
 .unit.details .unit-attack,
 .unit.details .unit-defense {
   font-size: 7vh;
-  padding-left: 25%;
-  padding-top: 10%;
 }
 
 .unit.details .unit-attack::before {
@@ -569,7 +582,6 @@ span .tooltip, button .tooltip {
 
 #jobfair {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   overflow-x: scroll;
   background: repeating-linear-gradient(94deg, #112, #444 10px, #454 10px, #555 20px, #222 20px, #121 50px);
   border-top: 1vh inset #122;

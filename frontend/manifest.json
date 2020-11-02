@@ -1,0 +1,6 @@
+{
+  "name" : "yet another game - game",
+  "short_name": "YAGG",
+  "start_url": "/fe/index.html",
+  "display": "standalone"
+}
