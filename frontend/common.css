@@ -1,5 +1,8 @@
 body {
-  display: flex;
   justify-content: center;
   box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-size: max(2vh, 2vw);
 }

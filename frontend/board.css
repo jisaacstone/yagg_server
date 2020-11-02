@@ -1,9 +1,6 @@
 body {
   flex-direction: column;
   background: repeating-linear-gradient(90deg, #FFA, #FAF 10px, #AFF 10px, #FAF 20px, #AAF 20px, #AFF 30px);
-  height: 100vh;
-  overflow: hidden;
-  font-size: min(3vh, 3vw);
 }
 
 #table {
@@ -35,10 +32,12 @@ body {
   #jobfair {
     grid-column: 2 / span 2;
     grid-row: 1 / span 3;
-    grid-template-columns: repeat(4, 20vw);
+    grid-template-columns: repeat(4, 19vw);
+    border-left: 1vh inset #122;
   }
   #jobfair .candidate {
-    min-height: 20vw;
+    min-height: 19vw;
+    max-height: 23vw;
   }
 }
 
@@ -66,10 +65,13 @@ body {
   #jobfair {
     grid-column: 1 / span 3;
     grid-row: 2 / span 2;
-    grid-template-columns: repeat(4, 25vw);
+    grid-template-columns: repeat(4, 24.5vw);
+    height: 100%;
+    border-top: 1vh inset #122;
   }
   #jobfair .candidate {
-    min-height: 25vw;
+    min-height: 24vw;
+    max-height: 27vw;
   }
 }
 
@@ -201,7 +203,6 @@ body[data-gamestate=gameover] {
   box-sizing: border-box;
   border: 2px inset #C89;
   background-size: cover;
-  font-size: 90%;
   grid-template-rows: 15% 70% 15%;
   grid-template-columns: 15% 70% 15%;
   grid-template-areas:
@@ -264,15 +265,15 @@ body[data-gamestate=gameover] {
 }
 
 /* attack/defense tooltips */
-.unit-attack::after {
+.unit-attack:hover::after {
   content: 'attack';
 }
-.unit-defense::after {
+.unit-defense:hover::after {
   content: 'defense';
 }
 .unit-attack::after, .unit-defense::after {
   visibility: hidden;
-  position: absolute;
+  /*position: absolute; breaks ios */
   color: #221;
   font-weight: normal;
   padding: 3px;
@@ -282,6 +283,7 @@ body[data-gamestate=gameover] {
   text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
 }
 .unit-attack:hover::after, .unit-defense:hover::after {
+  position: absolute;
   visibility: visible;
 }
 
@@ -378,20 +380,20 @@ span .tooltip, button .tooltip {
   width: min(98vw, 72vh);
   height: min(98vw, 72vh);
   margin: auto;
-  font-size: 110%;
   cursor: pointer;
   padding: min(1vw, 1vh);
   grid-template-areas:
     "defense name attack"
     "info info info"
     "ability ability ability";
+  grid-template-rows: 15% 55% 30%;
 }
 .unit.details .unit-name {
   text-align: center;
+  align-self: center;
   width: 100%;
   font-weight: bold;
-  font-size: 135%;
-  padding-bottom: 1em;
+  font-size: min(6vw, 6vh);
 }
 .unit-details .unit-name:first-letter {
   text-transform: capitalize;
@@ -399,16 +401,13 @@ span .tooltip, button .tooltip {
 .unit.details .unit-ability {
   max-width: 100%;
   padding: min(1vw, 1vh);
+  background: none;
 }
 .unit.details .unit-ability::before {
   content: 'special ability';
   font-variant-caps: all-small-caps;
-  position: relative;
-  left: -0.3em;
-  top: -0.3em;
+  float: right;
   font-size: 80%;
-  min-width: 80%;
-  border-bottom: 1px solid rgba(46,221,98,0.6);
 }
 
 .ability-name {
@@ -422,25 +421,29 @@ span .tooltip, button .tooltip {
 .unit.details .unit-attack,
 .unit.details .unit-defense {
   font-size: 7vh;
+  line-height: 1.3;
 }
 
-.unit.details .unit-attack::before {
-  content: 'Attack';
+.unit.details .unit-attack::after,
+.unit.details .unit-defense::after {
   font-variant-caps: all-small-caps;
-  position: absolute;
-  margin-left: -1vh;
-  margin-top: -3vh;
-  font-size: 2vh;
-  min-width: 80%;
+  position: relative;
+  display: block;
+  font-size: min(2vw, 2vh);
+  width: 100%;
+  margin-top: 0.2vh;
+  margin-left: -0.5vh;
+  visibility: visible;
+  border: none;
 }
-.unit.details .unit-defense::before {
+
+.unit.details .unit-attack::after {
+  content: 'Attack';
+  background-color: rgba(0, 1, 50, 0.1);
+}
+.unit.details .unit-defense::after {
   content: 'Defense';
-  font-variant-caps: all-small-caps;
-  position: absolute;
-  margin-left: -2vh;
-  margin-top: -3vh;
-  font-size: 2vh;
-  min-width: 80%;
+  background-color: rgba(0, 50, 1, 0.1);
 }
 
 .unit-portrait {
@@ -456,8 +459,11 @@ span .tooltip, button .tooltip {
 
 .unit.details .triggers {
   width: 100%;
+  padding: min(1vw, 1vh);
+  grid-area: ability;
 }
 .unit.details .unit-trigger {
+  margin: 0;
 }
 .unit.details .unit-trigger:first-letter {
   text-transform: capitalize;
@@ -584,7 +590,8 @@ span .tooltip, button .tooltip {
   display: grid;
   overflow-x: scroll;
   background: repeating-linear-gradient(94deg, #112, #444 10px, #454 10px, #555 20px, #222 20px, #121 50px);
-  border-top: 1vh inset #122;
+  align-content: center;
+  justify-content: center;
 }
 
 #jobfair .instructions {
