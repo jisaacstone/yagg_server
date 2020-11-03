@@ -190,4 +190,13 @@ defmodule YaggTest.Action.Ability do
     assert %{ability: :nil} = board.grid[{2, 2}]
   end
 
+  test "strange move" do
+    board = set_board([
+      {{3, 1}, %Unit{ability: nil, attack: 9, defense: 2, name: :bezerker, position: :south, triggers: %{}, visible: MapSet.new([:player])}}, 
+      {{3, 2}, nil} 
+    ])
+    action = %Board.Action.Move{from_x: 3, from_y: 1, to_x: 3, to_y: 2}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
+    assert %{name: :bezerker} = newboard.grid[{3, 2}]
+  end
 end

@@ -32,13 +32,13 @@ defmodule Yagg.Board do
         state when is_atom(state) ->
           %{state: state}
       end
-        |> Map.put_new(:grid, encodeable)
-        |> Map.put_new(:dimensions, board.dimensions)
+        |> Map.put(:grid, encodeable)
+        |> Map.put(:dimensions, board.dimensions)
         |> Poison.Encoder.Map.encode(options)
     end
 
     defp encode_feature(%Unit{visible: :none}), do: :nil
-    defp encode_feature(%Unit{} = unit), do: Map.put_new(Unit.encode(unit), :kind, :unit)
+    defp encode_feature(%Unit{} = unit), do: Map.put(Unit.encode(unit), :kind, :unit)
     defp encode_feature(other), do: other
   end
 
@@ -70,7 +70,7 @@ defmodule Yagg.Board do
         unless can_place?(board, unit.position, coords) do
           {:err, :illegal_placement}
         else
-          {:ok, %{board | grid: Map.put_new(grid, coords, unit)}}
+          {:ok, %{board | grid: Map.put(grid, coords, unit)}}
         end
       _something -> {:err, :occupied}
     end
@@ -208,7 +208,7 @@ defmodule Yagg.Board do
   
   defp add_features(board, events, []), do: {board, events}
   defp add_features(board, events, [{{x, y}, feature} | features]) do
-    board = %{board | grid: Map.put_new(board.grid, {x, y}, feature)}
+    board = %{board | grid: Map.put(board.grid, {x, y}, feature)}
     events = [Event.Feature.new(x: x, y: y, feature: feature) | events]
     add_features(board, events, features)
   end
@@ -218,8 +218,8 @@ defmodule Yagg.Board do
   end
 
   defp do_move(%Board{} = board, from, to, opts \\ []) do
-    {unit, grid} = Map.pop(board.grid, from)
-    grid = Map.put_new(grid, to, unit)
+    {unit, grid} = IO.inspect(Map.pop(board.grid, from))
+    grid = IO.inspect(Map.put(grid, to, unit))
     board = %{board | grid: grid}
     {board, events} = Unit.after_move(board, unit, from, to, opts)
     events = [Event.ThingMoved.new(unit, from: from, to: to) | events]
