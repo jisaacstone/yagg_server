@@ -170,6 +170,17 @@ defmodule YaggTest.Action.Ability do
     assert %{from: {1, 2}, to: {3, 2}} = event.data
   end
 
+  test "jump oob" do
+    board = set_board([
+      {{3, 2}, Unit.Catmover.new(:south)},
+      {{4, 2}, Unit.Tinker.new(:north)}
+    ])
+    action = %Board.Action.Move{from_x: 3, from_y: 2, to_x: 4, to_y: 2}
+    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert event = Enum.find(events, fn(e) -> e.kind == :unit_died end)
+    assert %{name: :tinker} = newboard.grid[{4, 2}]
+  end
+
   test "antente becomes visible" do
     board = set_board([
       {{1, 2}, Unit.Antente.new(:south)},

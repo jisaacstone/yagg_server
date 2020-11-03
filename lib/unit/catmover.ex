@@ -26,16 +26,20 @@ defmodule Unit.Catmover.Jump do
   use Ability
   @impl Ability
   def resolve(board, opts) do
-    next = IO.inspect(Grid.direction(opts[:from], opts[:to]) |> Grid.next(opts[:to]))
-    case Grid.thing_at(board, next) do
-      :nil -> IO.inspect(jump(board, next, opts))
-      _ -> Board.do_battle(board, opts[:unit], opts[:opponent], opts[:from], opts[:to])
-    end
+    next = Grid.direction(opts[:from], opts[:to]) |> Grid.next(opts[:to])
+    maybe_jump(board, next, Grid.thing_at(board, next), opts)
+  end
+
+  def maybe_jump(board, next, :nil, opts) do
+    jump(board, next, opts)
+  end
+  def maybe_jump(board, _, _, opts) do
+    Board.do_battle(board, opts[:unit], opts[:opponent], opts[:from], opts[:to])
   end
 
   defp jump(board, destination, opts) do
     {unit, grid} = Map.pop(board.grid, opts[:from])
-    board = %{board | grid: Map.put_new(grid, destination, unit)}
+    board = %{board | grid: Map.put(grid, destination, unit)}
     {board, events} = Board.unit_death(board, opts[:to]) 
     {
       board,

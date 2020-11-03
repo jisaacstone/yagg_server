@@ -99,7 +99,6 @@ defmodule Yagg.Board.Grid do
   """
   @spec projectile(Board.t, coord, Board.direction) :: {coord, Unit.t} | :out_of_bounds
   def projectile(board, coord, direction) do
-    IO.inspect([coord, direction])
     next_coord = next(direction, coord)
     case thing_at(board, next_coord) do
       %Unit{} = unit ->

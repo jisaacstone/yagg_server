@@ -114,7 +114,7 @@ defmodule Yagg.Board do
         end
       {%Unit{}, _coords} -> {:err, :nocontrol}
       :nil -> {:err, :empty}
-      _ -> {:err, :illegal}
+      _ -> {:err, :immobile}
     end
   end
 
@@ -173,7 +173,7 @@ defmodule Yagg.Board do
   def push_block(board, from, to) do
     dir = Grid.direction(from, to)
     square = Grid.next(dir, to)
-    case board.grid[square] do
+    case Grid.thing_at(board, square) do
       :nil -> 
         {board, events1} = do_move(board, to, square)
         {board, events2} = do_move(board, from, to, action: :push)
@@ -218,8 +218,8 @@ defmodule Yagg.Board do
   end
 
   defp do_move(%Board{} = board, from, to, opts \\ []) do
-    {unit, grid} = IO.inspect(Map.pop(board.grid, from))
-    grid = IO.inspect(Map.put(grid, to, unit))
+    {unit, grid} = Map.pop(board.grid, from)
+    grid = Map.put(grid, to, unit)
     board = %{board | grid: grid}
     {board, events} = Unit.after_move(board, unit, from, to, opts)
     events = [Event.ThingMoved.new(unit, from: from, to: to) | events]
