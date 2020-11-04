@@ -1,5 +1,7 @@
 body {
   margin-top: 1em;
+  display: flex;
+  align-content: center;
   flex-wrap: wrap;
   background: repeating-linear-gradient(90deg, #344, #344 2px, #556 2px, #556 12px, #9ab 12px, #9ab 22px, #789 22px, #789 32px, #344 32px, #344 34px, #94b 34px, #94b 50px);
 }
