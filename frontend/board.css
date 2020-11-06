@@ -23,7 +23,7 @@ body {
   }
   #hand {
     margin-left: 1vw;
-    padding-right: 3vw;
+    padding-right: 4vw;
     flex-direction: column;
   }
   #infobox {
@@ -38,7 +38,7 @@ body {
     grid-column: 2 / span 2;
     grid-row: 1 / span 3;
     grid-template-columns: repeat(4, 19vw);
-    border-left: 1vh inset #122;
+    border-left: 2px inset #325;
   }
   #jobfair .candidate {
     min-height: 19vw;
@@ -62,7 +62,7 @@ body {
   #hand {
     margin-top: 1vh;
     flex-direction: row;
-    padding-bottom: 3vh;
+    padding-bottom: 4vh;
   }
   #infobox {
     align-self: end;
@@ -77,7 +77,7 @@ body {
     grid-row: 2 / span 2;
     grid-template-columns: repeat(4, 24.5vw);
     height: 100%;
-    border-top: 1vh inset #122;
+    border-top: 2px inset #325;
   }
   #jobfair .candidate {
     min-height: 24vw;
@@ -86,26 +86,26 @@ body {
 }
 
 body[data-gamestate=placement] {
-  background: repeating-linear-gradient(40deg, #CCD, #CCD 10px, #eee 10px, #eee 20px, #BAB 20px, #B9B 30px);
+  background: repeating-linear-gradient(40deg, #CCD, #CCD 15px, #eee 15px, #eee 30px, #BAB 30px, #B9B 45px);
 }
 
 body[data-gamestate=jobfair] {
-  background: repeating-linear-gradient(4deg, #CCD, #eee 10px, #CDC 10px, #eee 20px, #BBB 20px, #B9B 50px);
+  background-image: url("img/paper_bg_purp.png");
 }
 
 body[data-gamestate=battle] {
   background: repeating-radial-gradient(
     circle at -10% 120%,
     #dCD,
-    #dCE 10px,
-    transparent 10px,
-    transparent 20px
+    #dCE 20px,
+    transparent 20px,
+    transparent 40px
   ), repeating-radial-gradient(
     circle at 110% 120%,
     rgba(175, 165, 160, 0.5),
-    rgba(175, 165, 160, 0.5) 10px,
-    #FED 10px,
-    #fdc 20px
+    rgba(175, 165, 160, 0.5) 20px,
+    #FED 20px,
+    #fdc 40px
   );
 }
 
@@ -184,7 +184,9 @@ body[data-gamestate=gameover] {
   grid-area: hand;
   display: flex;
   overflow: scroll;
-  background-color: rgba(195, 225, 220, 0.8);
+  background-color: rgba(185, 235, 220, 0.6);
+  background-image: url("img/paper_bg_transparent.png");
+  border-top: 2px solid rgba(75, 90, 80, 0.8);
 }
 
 .card {
@@ -611,7 +613,7 @@ span .tooltip, button .tooltip {
 #jobfair {
   display: grid;
   overflow-x: scroll;
-  background: repeating-linear-gradient(94deg, #112, #444 10px, #454 10px, #555 20px, #222 20px, #121 50px);
+  background: url("img/paper_bg.png");
   align-content: center;
   justify-content: center;
 }
