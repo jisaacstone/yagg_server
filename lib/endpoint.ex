@@ -22,6 +22,17 @@ defmodule Yagg.Endpoint do
       |> send_resp(302, "")
   end
 
+  post "/player/guest" do
+    {:ok, body, conn} = Conn.read_body(conn)
+    %{name: name} = Poison.Parser.parse!(body, %{keys: :atoms!})
+    player = Table.Player.new(name)
+    respond(conn, 200, player)
+  end
+
+  get "/player/:id" do
+    id |> String.to_integer() |> Table.Player.fetch() |> to_response(conn)
+  end
+
   post "/table/new" do
     {:ok, body, conn} = Conn.read_body(conn)
     data = Poison.Parser.parse!(body, %{keys: :atoms!})
@@ -78,7 +89,10 @@ defmodule Yagg.Endpoint do
   end
 
   get "/board/:table_id/player_state/:player_name" do
-    Table.get_player_state(table_id, player_name) |> to_response(conn)
+    case get_player(conn) do
+      :error -> {:err, :no}
+      id -> Table.get_player_state(table_id, id)
+    end |> to_response(conn)
   end
 
   get "/configurations" do
@@ -142,8 +156,11 @@ defmodule Yagg.Endpoint do
       {:ok, body, conn} = Conn.read_body(conn)
       conn = Conn.fetch_query_params(conn)
       actiondata = Poison.decode!(body, as: struct(module_name))
-      player_name = Map.get(actiondata, :player, conn.query_params["player"])
-      {player_name, actiondata}
+      player = case Map.get(actiondata, :player) do
+        :nil -> get_player(conn)
+        name -> name
+      end
+      {player, actiondata}
     rescue
       e in ArgumentError ->
         IO.inspect(e)
@@ -151,6 +168,13 @@ defmodule Yagg.Endpoint do
       e in Poison.ParseError ->
         IO.inspect(e)
         {:err, :malformed_request}
+    end
+  end
+
+  defp get_player(conn) do
+    case Conn.get_req_header(conn, "x-userid") do
+      [id_str | _] -> String.to_integer(id_str)
+      [] -> :error
     end
   end
 

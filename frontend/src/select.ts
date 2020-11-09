@@ -82,7 +82,7 @@ export function select(thisEl, meta) {
     const sel = global.selected;
     if (sel && sel.element && sel.element.firstChild) {
       // something was perviously selected
-      if (Unit.containsOwnedUnit(thisEl)) {
+      if (Unit.containsOwnedUnit(thisEl) || (meta.inhand && sel.meta.inhand)) {
         // if we are clicking on another of our units ignore previously selected unit
         deselect(global.selected);
       } else {

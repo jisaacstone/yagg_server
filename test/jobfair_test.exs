@@ -1,5 +1,6 @@
 alias Yagg.Table
 alias Yagg.Board
+alias Yagg.Table.Player
 alias Yagg.Jobfair
 alias Yagg.Unit
 alias Yagg.Table.Action
@@ -45,40 +46,40 @@ defmodule YaggTest.Jobfair do
   def start(conf \\ Board.Configuration.AlphaTest) do
     {:ok, pid} = Table.new(conf)
     table_id = Table.pid_to_id(pid)
-    :ok = Table.table_action(table_id, "p1", %Action.Join{player: "p1"})
-    :ok = Table.table_action(table_id, "p2", %Action.Join{player: "p2"})
+    :ok = Table.table_action(table_id, Player.new("p1"), %Action.Join{})
+    :ok = Table.table_action(table_id, Player.new("p2"), %Action.Join{})
     {:ok, table} = Table.get_state(table_id)
     {table_id, table}
   end
 
   test "recruit" do
     {table_id, table} = start()
-    p1 = hd(table.players)
+    {position, p1} = hd(table.players)
     choices = [0,2,4]
     action = %Action.Recruit{units: choices}
-    :ok = Table.table_action(table_id, p1.name, action)
+    :ok = Table.table_action(table_id, p1, action)
     {:ok, table} = Table.get_state(table_id)
-    fair = Map.get(table.board, p1.position)
+    fair = Map.get(table.board, position)
     assert fair.ready == :true
   end
 
   test "gamestart" do
     {table_id, table} = start()
-    [p1, p2] = table.players
-    u1 = Map.get(table.board, p1.position).choices
-    u2 = Map.get(table.board, p2.position).choices
+    [{p1pos, p1}, {p2pos, p2}] = table.players
+    u1 = Map.get(table.board, p1pos).choices
+    u2 = Map.get(table.board, p2pos).choices
     {c1, c2} = {[0,2,4], [1,3,4]}
-    :ok = Table.table_action(table_id, p1.name, %Action.Recruit{units: c1})
-    :ok = Table.table_action(table_id, p2.name, %Action.Recruit{units: c2})
+    :ok = Table.table_action(table_id, p1, %Action.Recruit{units: c1})
+    :ok = Table.table_action(table_id, p2, %Action.Recruit{units: c2})
     {:ok, table} = Table.get_state(table_id)
     assert %Board{} = table.board
-    h1 = table.board.hands[p1.position]
+    h1 = table.board.hands[p1pos]
     hu1 = Enum.map(h1, fn({_, {v, _}}) -> v end) |> MapSet.new()
-    ou1 = [Unit.Monarch.new(p1.position), u1[0], u1[2], u1[4]] |> MapSet.new()
+    ou1 = [Unit.Monarch.new(p1pos), u1[0], u1[2], u1[4]] |> MapSet.new()
     assert hu1 == ou1
-    h2 = table.board.hands[p2.position]
+    h2 = table.board.hands[p2pos]
     hu2 = Enum.map(h2, fn({_, {v, _}}) -> v end) |> MapSet.new()
-    ou2 = [Unit.Monarch.new(p2.position), u2[1], u2[3], u2[4]] |> MapSet.new()
+    ou2 = [Unit.Monarch.new(p2pos), u2[1], u2[3], u2[4]] |> MapSet.new()
     assert hu2 == ou2
   end
 
@@ -133,9 +134,9 @@ defmodule YaggTest.Jobfair do
   end
   test 'indices' do
     {table_id, table} = start(IndiciesTestConfig)
-    north = Enum.find(table.players, fn(p) -> p.position == :north end)
+    {_, north} = Enum.find(table.players, fn({pos, _}) -> pos == :north end)
     action = %Action.Recruit{units: [10, 15, 11, 7, 6, 5, 1, 0]}
-    :ok = Table.table_action(table_id, north.name, action)
+    :ok = Table.table_action(table_id, north, action)
     {:ok, table} = Table.get_state(table_id)
     assert %Board{} = table.board
   end

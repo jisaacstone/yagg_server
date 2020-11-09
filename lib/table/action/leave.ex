@@ -1,23 +1,21 @@
 alias Yagg.Table
 alias Yagg.Event
+alias Yagg.Table.Player
 
 defmodule Table.Action.Leave do
   defstruct []
   @behaviour Table.Action
 
   @impl Table.Action
-  def resolve(%{}, game, %Table.Player{} = player) do
-    case Enum.find_index(game.players, fn(p) -> p.name == player.name end) do
-      :nil ->
-        {[], game}
-      index ->
+  def resolve(%{}, table, %{id: id}) do
+    case Player.by_id(table, id) do
+      :notfound ->
+        {[], table}
+      {position, player} ->
         {
-          %{game | players: List.delete_at(game.players, index)},
-          [Event.new(:player_left, player: player.position, name: player.name)],
+          Player.remove(table, player),
+          [Event.new(:player_left, player: position, name: player.name)],
         }
     end
-  end
-  def resolve(%{}, game, :notfound) do
-    {[], game}
   end
 end

@@ -1,6 +1,7 @@
-import { getname, tableid, _name_ } from './urlvars.js';
+import { getname, tableid } from './urlvars.js';
 import { gmeta } from './state.js';
 import { listen } from './eventlistener.js';
+import * as Player from './playerdata.js';
 import * as Request from './request.js';
 import * as Overlay from './overlay.js';
 import * as Event from './event.js';
@@ -85,24 +86,15 @@ function fetchgamestate() {
         }
     });
 }
-function namedialog() {
-    const gn = getname();
-    if (gn) {
-        return gn;
-    }
-    const name = prompt('enter your name', _name_());
-    history.pushState({ name }, '', `${window.location}&player=${name}`);
-    return name;
-}
 window.onload = function () {
-    const name = namedialog(), errbutton = document.getElementById('errbutton');
+    const errbutton = document.getElementById('errbutton');
     if (errbutton) {
         errbutton.onclick = () => {
             reporterr();
         };
     }
-    gmeta.name = name;
-    Request.gameaction('join', { player: name }, 'table')
+    Player.check();
+    Request.gameaction('join', {}, 'table')
         .then(() => {
         fetchgamestate();
         listen(Event);
@@ -113,7 +105,6 @@ window.onload = function () {
     });
 };
 function setstate(gamedata, phase) {
-    console.log({ gamedata, phase });
     let players = 0;
     for (const player of gamedata.players) {
         Event.player_joined(player);

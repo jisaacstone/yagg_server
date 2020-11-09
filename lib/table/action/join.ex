@@ -1,58 +1,45 @@
 alias Yagg.Table.Player
 alias Yagg.Table.Action
 alias Yagg.Event
-alias Yagg.Board
 alias Yagg.Jobfair
 
 defmodule Yagg.Table.Action.Join do
-  defstruct [:player]
+  defstruct []
   @behaviour Action
 
   @impl Action
-  def resolve(%{player: ""}, _table, _) do
-    {:err, :noname}
+  def resolve(_, %{board: %{state: :open}} = table, player) do
+    join(table, player, Player.by_id(table, player.id))
   end
-  def resolve(%{player: player_name}, %{board: %{state: :open}} = table, :notfound) do
-    case table.players do
-      [] -> {
-          %{table | players: [Player.new(player_name, :north)]},
-          [Event.PlayerJoined.new(name: player_name, position: :north)]
-        }
-      [p1] -> 
-        p2 = Player.new(player_name, Player.opposite(p1.position))
-        # start game implicitly when two players join
-        {board, events} = Board.setup(table.board)
-        {
-          %{table | players: [p1, p2], board: board},
-          [Event.PlayerJoined.new(name: player_name, position: p2.position) | events]
-        }
-      [_p1, _p2] -> {:err, :table_full}
-    end
+  def resolve(_, %{board: %Jobfair{}} = table, player) do
+    join(table, player, Player.by_id(table, player.id))
   end
-  def resolve(%{player: player_name}, %{board: %Jobfair{}} = table, :notfound) do
-    case table.players do
-      [] -> {
-          %{table | players: [Player.new(player_name, :north)]},
-          [Event.PlayerJoined.new(name: player_name, position: :north)]
-        }
-      [p1] -> 
-        p2 = Player.new(player_name, Player.opposite(p1.position))
-        {jf, events} = Jobfair.setup(table.board)
-        {
-          %{table | players: [p1, p2], board: jf},
-          [
-            Event.PlayerJoined.new(name: player_name, position: p2.position),
-            Event.GameStarted.new()
-            | events
-          ]
-        }
-      [_p1, _p2] -> {:err, :table_full}
-    end
+  def resolve(_, _, _) do
+    {:err, :badstate}
   end
-  def resolve(%{}, _table, %Player{}) do
+
+  defp join(%{players: []} = table, player, :notfound) do
+    {
+      %{table | players: [{:north, player}]},
+      [Event.PlayerJoined.new(name: player.name, position: :north)]
+    }
+  end
+  defp join(%{players: [{p1pos, _p1}]} = table, player, :notfound) do
+    position = Player.opposite(p1pos)
+    # start game implicitly when two players join
+    {board, events} = table.configuration.initial_module.setup(table.board)
+    {
+      %{table | players: [{position, player} | table.players], board: board},
+      [Event.PlayerJoined.new(name: player.name, position: position), Event.GameStarted.new() | events]
+    }
+  end
+  defp join(%{players: [_p1, _p2 | []]}, _, _) do
+    {:err, :table_full}
+  end
+  defp join(%{}, _table, {_, %Player{}}) do
     {:err, :alreadyjoined}
   end
-  def resolve(a, table, player) do
+  defp join(a, table, player) do
     IO.inspect([a, table.board, player])
     {:err, :bad_state}
   end

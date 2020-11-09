@@ -1,11 +1,12 @@
 body {
   flex-direction: column;
-  background: repeating-linear-gradient(90deg, #FFA, #FAF 10px, #AFF 10px, #FAF 20px, #AAF 20px, #AFF 30px);
+  background-color: #B090B2;
 }
 
 #table {
   display: grid;
   height: 100vh;
+  background-image: url("img/paper_bg_transparent.png");
 }
 
 @media (orientation: landscape) {
@@ -151,31 +152,32 @@ body[data-gamestate=gameover] {
   grid-auto-flow: row;
   align-content: stretch;
   grid-auto-rows: minmax(0, 1fr);
+  background-image: url("img/orgyelgrad.png");
+  background-size: cover;
 }
 
 .boardrow {
   display: grid;
   grid-auto-flow: column;
-  background-color: #EDD;
+  background-color: #rgba(181,220,205,0.3);
   grid-auto-columns: minmax(0, 1fr);
   overflow: hidden;
 }
 
 .boardsquare {
-  border-radius: 5%;
   border: 2px inset #4B9;
   box-sizing: border-box;
-  background-color: rgba(255,254,254,0.6);
+  background-color: rgba(255,254,254,0.5);
   display: flex;
   overflow: hidden;
 }
 
 .boardrow.northrow {
-  background-color: #BAF;
+  background-color: rgba(225,108,240,0.4);
 }
 
 .boardrow.southrow {
-  background-color: #FE9;
+  background-color: rgba(245,230,108,0.4);
 }
 
 /* HAND */
@@ -183,9 +185,9 @@ body[data-gamestate=gameover] {
 #hand {
   grid-area: hand;
   display: flex;
-  overflow: scroll;
+  overflow-x: scroll;
   background-color: rgba(185, 235, 220, 0.6);
-  background-image: url("img/paper_bg_transparent.png");
+  background-image: url("img/paper_bg_transparent_med.png");
   border-top: 2px solid rgba(75, 90, 80, 0.8);
 }
 
@@ -209,8 +211,8 @@ body[data-gamestate=gameover] {
 
 .unit {
   display: grid;
-  width: 94%;
-  margin: 3% auto;
+  width: 100%;
+  margin: 2px;
   border-radius: 5%;
   box-sizing: border-box;
   border: 2px inset #C89;
@@ -647,6 +649,7 @@ span .tooltip, button .tooltip {
   height: min(72vh, 100vw);
   left: 0;
   top: 14vh;
+  display: grid;
 }
 
 .overlay {

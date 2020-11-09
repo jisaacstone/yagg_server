@@ -3,7 +3,6 @@ defmodule Yagg.Application do
 
   def start(_type, _args) do
     port = System.get_env("PORT", "8000") |> String.to_integer()
-    IO.inspect(port: port)
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
@@ -22,7 +21,8 @@ defmodule Yagg.Application do
       {DynamicSupervisor, name: Yagg.AISupervisor, strategy: :one_for_one},
     ]
 
+    _ets_table = Yagg.Table.Player.init_db()
     opts = [strategy: :one_for_one, name: Yagg.Supervisor]
-    IO.inspect(Supervisor.start_link(children, opts))
+    Supervisor.start_link(children, opts)
   end
 end

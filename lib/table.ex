@@ -11,14 +11,16 @@ defmodule Yagg.Table do
   @derive {Poison.Encoder, only: [:players, :board, :turn, :configuration]}
   defstruct [:subscribors | @enforce_keys]
 
+  @opaque history :: [Board.t]
+
   @type id :: String.t
   @type t :: %Table{
     id: id,
-    players: [Player.t],
+    players: [{Player.position, Player.t}],
     board: :nil | Board.t | Jobfair.t,
     turn: :nil | Player.position,
     configuration: Configuration.t,
-    history: any,
+    history: history,
   }
 
   def start_link([table]) do
@@ -67,15 +69,15 @@ defmodule Yagg.Table do
     GenServer.call(pid, :get_state)
   end
 
-  @spec get_player_state(id, String.t) :: {:ok, %{grid: list, hand: list}} | {:err, atom}
-  def get_player_state(table_id, player_name) do
+  @spec get_player_state(id, Player.t) :: {:ok, %{grid: list, hand: list}} | {:err, atom}
+  def get_player_state(table_id, id) do
     {:ok, pid} = get(table_id)
     case GenServer.call(pid, :get_state) do
       {:err, _} = err -> err
       {:ok, table} ->
-        case Player.by_name(table, player_name) do
-          %Player{position: position} -> 
-            table.board.__struct__.units(table.board, position)
+        case Player.by_id(table, id) do
+          {position, %Player{}} -> 
+            table.configuration.initial_module.units(table.board, position)
           _ -> {:err, :unknown_player}
         end
     end
@@ -84,28 +86,39 @@ defmodule Yagg.Table do
   @spec subscribe(id, String.t) :: {:ok, pid}
   def subscribe(table_id, player) do
     {:ok, pid} = get(table_id)
-    IO.inspect(table: table_id, pid: pid)
     Process.monitor(pid)
     GenServer.call(pid, {:subscribe, player})
     {:ok, pid}
   end
 
   @spec table_action(id | pid, String.t, struct) :: :ok | {:err, atom}
-  def table_action(pid, player_name, action) when is_pid(pid) do
-    GenServer.call(pid, {:table_action, player_name, action})
+  def table_action(pid, player, action) when is_pid(pid) do
+    GenServer.call(pid, {:table_action, player, action})
   end
-  def table_action(table_id, player_name, action) do
+  def table_action(pid, player_id, action) when is_integer(player_id) do
+    case Player.fetch(player_id) do
+      {:ok, player} -> table_action(pid, player, action)
+      {:err, _} = err -> err
+    end
+  end
+  def table_action(table_id, player, action) do
     {:ok, pid} = get(table_id)
-    table_action(pid, player_name, action)
+    table_action(pid, player, action)
   end
 
-  @spec board_action(id | pid, String.t, struct) :: :ok | {:err, atom}
-  def board_action(pid, player_name, action) when is_pid(pid) do
-    GenServer.call(pid, {:board_action, player_name, action})
+  @spec board_action(id | pid, non_neg_integer | Player.t, struct) :: :ok | {:err, atom}
+  def board_action(pid, player, action) when is_pid(pid) do
+    GenServer.call(pid, {:board_action, player, action})
   end
-  def board_action(table_id, player_name, action) do
+  def board_action(pid, player_id, action) when is_integer(player_id) do
+    case Player.fetch(player_id) do
+      {:ok, player} -> board_action(pid, player, action)
+      {:err, _} = err -> err
+    end
+  end
+  def board_action(table_id, player, action) do
     {:ok, pid} = get(table_id)
-    board_action(pid, player_name, action)
+    board_action(pid, player, action)
   end
 
   def pid_to_id(pid) do
@@ -130,46 +143,18 @@ defmodule Yagg.Table do
     {:reply, :ok, %{table | subscribors: [{player, pid} | subs]}}
   end
 
-  def handle_call({:table_action, player_name, action}, _from, table) do
-    player = Player.by_name(table, player_name)
-    # try do
-      case Yagg.Table.Action.resolve(action, table, player) do
-        {:err, _} = err -> {:reply, err, table}
-        {table, events} ->
-          notify(table, events)
-          {:reply, :ok, table}
-      end
-    # rescue
-    #   FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, table}
-    # end
+  def handle_call({:table_action, player, action}, _from, table) do
+    case handle_table_action(player, action, table) do
+      {:err, _} = err -> {:reply, err, table}
+      {:ok, table} -> {:reply, :ok, table}
+    end
   end
 
-  def handle_call({:board_action, player_name, action}, _from, table) do
-    player = Player.by_name(table, player_name)
-    # try do
-      cond do
-        player == :notfound -> {:reply, {:err, :player_invalid}, table}
-        table.board && Map.get(table.board, :state) == :battle and table.turn != player.position ->
-          {:reply, {:err, :notyourturn}, table}
-        :true ->
-          case Board.Action.resolve(action, table.board, player.position) do
-            {:err, _} = err -> {:reply, err, table}
-            {board, events} ->
-              # One action per turn. Successful move == next turn
-              table = %{table | board: board, history: [{table.board, action} | table.history]}
-              {table, events} = if (Map.get(board, :state) == :battle) do
-                table = nxtrn(table)
-                {table, [Event.Turn.new(player: table.turn) | events]}
-              else
-                {table, events}
-              end
-              notify(table, events)
-              {:reply, :ok, table}
-          end
-      end
-    # rescue
-      # FunctionClauseError -> {:reply, {:err, :invalid_or_unknown}, table}
-    # end
+  def handle_call({:board_action, player, action}, _, table) do
+    case handle_board_action(player, action, table) do
+      {:err, _} = err -> {:reply, err, table}
+      {:ok, table} -> {:reply, :ok, table}
+    end
   end
 
   def handle_call(msg, _from, state) do
@@ -212,6 +197,43 @@ defmodule Yagg.Table do
 
   # Private
 
+  defp handle_table_action(player, action, table) do
+    case Yagg.Table.Action.resolve(action, table, player) do
+      {:err, _} = err -> err
+      {table, events} ->
+        notify(table, events)
+        {:ok, table}
+    end
+  end
+
+  defp handle_board_action(%{id: id}, action, table) do
+    case Player.by_id(table, id) do
+      :notfound -> {:err, :notfound}
+      {position, _} -> handle_board_action_2(position, action, table)
+    end
+  end
+  defp handle_board_action_2(position, action, table) do
+    cond do
+      table.board && Map.get(table.board, :state) == :battle and table.turn != position ->
+        {:err, :notyourturn}
+      :true ->
+        case Board.Action.resolve(action, table.board, position) do
+          {:err, _} = err -> err
+          {board, events} ->
+            # One action per turn. Successful move == next turn
+            table = %{table | board: board, history: [{table.board, action} | table.history]}
+            {table, events} = if (Map.get(board, :state) == :battle) do
+              table = nxtrn(table)
+              {table, [Event.Turn.new(player: table.turn) | events]}
+            else
+              {table, events}
+            end
+            notify(table, events)
+            {:ok, table}
+        end
+    end
+  end
+
   defp notify(_game, []) do
     :ok
   end
@@ -227,7 +249,7 @@ defmodule Yagg.Table do
           :global ->
             send(pid, event)
           stream ->
-            if Enum.any?(players, fn(p) -> p.name == player and p.position == stream end) do
+            if Enum.any?(players, fn({pos, p}) -> p.id == player and pos == stream end) do
               send(pid, event)
             end
         end

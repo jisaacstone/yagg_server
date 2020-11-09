@@ -5,13 +5,19 @@ defmodule Yagg.Websocket do
   @behaviour :cowboy_websocket
   @impl :cowboy_websocket
   def init(req, _state) do
-    [table_id, player] = String.split(req.path, "/") |> Enum.take(-2)
-    {:cowboy_websocket, req, %{path: req.path, player: player, table_id: table_id}}
+    [table_id, player_str] = String.split(req.path, "/") |> Enum.take(-2)
+    player_id = String.to_integer(player_str)
+    {:cowboy_websocket, req, %{path: req.path, player: player_id, table_id: table_id}}
   end
   @impl :cowboy_websocket
   def websocket_init(state) do
-    {:ok, pid} = Table.subscribe(state.table_id, state.player)
-    {:ok, Map.put(state, :pid, pid)}
+    case Table.Player.fetch(state.player) do
+      :notfound ->
+        {:stop, state}
+      _ ->
+        {:ok, pid} = Table.subscribe(state.table_id, state.player)
+        {:ok, Map.put(state, :pid, pid)}
+    end
   end
 
   # Handle 'ping' messages from the browser - reply

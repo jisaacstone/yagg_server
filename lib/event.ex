@@ -18,11 +18,6 @@ defmodule Yagg.Event do
       Poison.Encoder.Map.encode(Map.put_new(data, :event, kind), options)
     end
   end
-  defimpl Poison.Encoder, for: Tuple do
-    def encode({x, y}, options) when is_integer(x) and is_integer(y) do
-      Poison.Encoder.Map.encode(%{x: x, y: y}, options)
-    end
-  end
 
   def new(kind) do
     new(:global, kind, %{})

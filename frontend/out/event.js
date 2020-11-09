@@ -1,4 +1,3 @@
-import { getname } from './urlvars.js';
 import { gmeta, gamestatechange, turnchange } from './state.js';
 import * as Select from './select.js';
 import * as Unit from './unit.js';
@@ -8,6 +7,7 @@ import * as readyButton from './ready.js';
 import * as Dialog from './dialog.js';
 import * as Jobfair from './jobfair.js';
 import * as Overlay from './overlay.js';
+import * as Player from './playerdata.js';
 const unitsbyindex = {};
 export function game_started(event) {
     const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
@@ -38,8 +38,8 @@ export function battle_started() {
 }
 export function player_joined(event) {
     console.log({ e: 'player_joined', event });
-    const nameEl = document.createElement('div'), whois = event.name === getname() ? 'player' : 'opponent', container = document.getElementById(whois);
-    if (container.firstElementChild) {
+    const nameEl = document.createElement('div'), player = Player.getLocal(), whois = event.name === player.name ? 'player' : 'opponent', container = document.getElementById(whois);
+    if (container.firstElementChild && container.firstElementChild.className === 'playername') {
         return;
     }
     nameEl.className = 'playername';

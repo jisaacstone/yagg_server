@@ -1,5 +1,5 @@
 import { request, post, gameaction } from './request.js';
-import { getname, _name_ } from './urlvars.js';
+import * as Player from './playerdata.js';
 
 function fetchConfigs(sel_el: HTMLElement) {
   request('configurations').then(
@@ -43,9 +43,8 @@ function displayTableData(tablesEl, data) {
       });
 
       el.onclick = () => {
-        const name = (document.getElementById('name') as HTMLInputElement).value || _name_();
-        gameaction('join', { player: name }, 'table', table.id).then(() => {
-          window.location.href = `board.html?table=${table.id}&player=${name}`;
+        gameaction('join', {}, 'table', table.id).then(() => {
+          window.location.href = `board.html?table=${table.id}`;
         });
       };
       tablesEl.appendChild(el);
@@ -56,13 +55,9 @@ function displayTableData(tablesEl, data) {
 window.onload = function() {
   const tables = document.getElementById('tables'),
     ct = document.getElementById('createtable'),
-    name_el = document.getElementById('name') as HTMLInputElement,
-    sel_el = document.getElementById('config') as HTMLInputElement,
-    name = getname();
+    sel_el = document.getElementById('config') as HTMLInputElement;
 
-  if (name) {
-    name_el.value = name;
-  }
+  Player.check();
 
   request('table').then(tabledata => {
     console.log({ tabledata });
@@ -71,11 +66,10 @@ window.onload = function() {
   fetchConfigs(sel_el);
 
   ct.onclick = () => {
-    const conf = sel_el.value || 'random',
-      name = name_el.value || _name_();
+    const conf = sel_el.value || 'random';
     post('table/new', { configuration: conf }).then(({ id }) => {
-      gameaction('join', { player: name }, 'table', id).then(() => {
-        window.location.href = `board.html?table=${id}&player=${name}`;
+      gameaction('join', {}, 'table', id).then(() => {
+        window.location.href = `board.html?table=${id}`;
       });
     });
   };

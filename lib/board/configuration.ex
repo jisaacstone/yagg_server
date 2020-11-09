@@ -11,10 +11,12 @@ defmodule Yagg.Board.Configuration do
   @derive {Poison.Encoder, only: [:dimensions, :initial_module]}
   defstruct [:army_size | @enforce_keys]
 
+  @opaque units :: %{north: [Unit.t], south: [Unit.t]}
+
   @type t :: %Configuration{
     dimensions: {5..9, 5..9},
     initial_module: Jobfair | Board,
-    units: any,
+    units: units,
     terrain: any,
   }
 

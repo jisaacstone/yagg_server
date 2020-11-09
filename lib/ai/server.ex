@@ -10,26 +10,24 @@ alias Yagg.Table.Action
 defmodule Yagg.AI.Server do
   use GenServer
 
-  def init({table_id, robot}) do
-    IO.inspect(aiinit: robot)
+  def init({table_id, robot, position}) do
     GenServer.cast(self(), :subscribe_table)
-    {:ok, %{robot: robot, table_id: table_id}}
+    {:ok, %{robot: robot, table_id: table_id, position: position}}
   end
 
-  def start_link([{table_id, robot}]) do
-    GenServer.start_link(__MODULE__, {table_id, robot})
+  def start_link([{table_id, robot, position}]) do
+    GenServer.start_link(__MODULE__, {table_id, robot, position})
   end
 
   def handle_cast(:subscribe_table, %{robot: robot, table_id: table_id} = state) do
     {:ok, pid} = Table.subscribe(table_id, robot.name)
     send(self(), :check_game_started)
-    IO.inspect(:cgs_called)
     {:noreply, Map.put(state, :pid, pid)}
   end
 
   def handle_info(:check_game_started, state) do
     {:ok, table} = Table.get_state(state.pid)
-    position = state.robot.position
+    position = state.position
     _ = case table do
       %{board: %{state: :open}} ->
         Process.send_after(self(), :check_game_started, 500)
@@ -38,7 +36,7 @@ defmodule Yagg.AI.Server do
       %{board: %{state: %Board.State.Placement{}}} ->
         do_initial_placement(table.board, state)
       %{board: %Jobfair{} = jf} ->
-        recruit(Map.get(jf, state.robot.position), jf.army_size, state)
+        recruit(Map.get(jf, state.position), jf.army_size, state)
       %{board: board, turn: ^position} ->
         take_your_turn(board, state)
       _ -> :do_nothing
@@ -47,13 +45,13 @@ defmodule Yagg.AI.Server do
     {:noreply, state}
   end
 
-  def handle_info(%{kind: :turn, data: %{player: pos}}, %{robot: %{position: pos}} = state) do
+  def handle_info(%{kind: :turn, data: %{player: pos}}, %{position: pos} = state) do
     {:ok, table} = Table.get_state(state.pid)
     take_your_turn(table.board, state)
     {:noreply, state}
   end
   def handle_info(%{kind: :gameover}, state) do
-    :ok = Table.board_action(state.pid, state.robot.name, IO.inspect(%Ready{}))
+    :ok = Table.board_action(state.pid, state.robot, %Ready{})
     {:noreply, state}
   end
   def handle_info(%{kind: :game_started}, state) do
@@ -61,7 +59,7 @@ defmodule Yagg.AI.Server do
       {:ok, %{board: %{state: %Board.State.Placement{}}} = table} ->
         do_initial_placement(table.board, state)
       {:ok, %{board: %Jobfair{} = jf}} ->
-        recruit(Map.get(jf, state.robot.position), jf.army_size, state)
+        recruit(Map.get(jf, state.position), jf.army_size, state)
     end
     {:noreply, state}
   end
@@ -88,14 +86,14 @@ defmodule Yagg.AI.Server do
   end
 
   defp take_your_turn(board, state) do
-    action = Choices.move(board, state.robot.position)
-    {:ok, _} = :timer.apply_after(500, Table, :board_action, [state.pid, state.robot.name, action])
+    action = Choices.move(board, state.position)
+    {:ok, _} = :timer.apply_after(500, Table, :board_action, [state.pid, state.robot, action])
     :ok
   end
 
-  defp do_initial_placement(board, %{pid: table_pid, robot: robot}) do
-    %{place: place_choices} = Choices.choices(board, robot.position)
-    {monarch_idx, _} = Enum.find(board.hands[robot.position], fn({_, {u, _}}) -> u.name == :monarch end)
+  defp do_initial_placement(board, %{pid: table_pid, robot: robot, position: position}) do
+    %{place: place_choices} = Choices.choices(board, position)
+    {monarch_idx, _} = Enum.find(board.hands[position], fn({_, {u, _}}) -> u.name == :monarch end)
     choices = Enum.shuffle(place_choices)
     # place monarch first to ensure there will be space
     place_monarch = Enum.find(choices, &cpm(&1, monarch_idx, board.grid))
@@ -106,9 +104,9 @@ defmodule Yagg.AI.Server do
 
     Enum.each(
       actions,
-      fn(action) -> :ok = Table.board_action(table_pid, robot.name, IO.inspect(action)) end
+      fn(action) -> :ok = Table.board_action(table_pid, robot, action) end
     )
-    :ok = Table.board_action(table_pid, robot.name, IO.inspect(%Ready{}))
+    :ok = Table.board_action(table_pid, robot, %Ready{})
   end
 
   defp cpm(%{index: i, x: x, y: y}, i, grid) do
@@ -131,6 +129,6 @@ defmodule Yagg.AI.Server do
   defp recruit(fair, army_size, %{pid: table_pid, robot: robot}) do
     indices = Map.keys(fair.choices) |> Enum.shuffle |> Enum.take(army_size)
     action = %Action.Recruit{units: indices}
-    :ok = Table.table_action(table_pid, robot.name, action)
+    :ok = Table.table_action(table_pid, robot, action)
   end
 end
