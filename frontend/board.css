@@ -273,8 +273,7 @@ body[data-gamestate=gameover] {
   background-color: rgba(245, 248, 246, 0.1);
   width: 85%;
   height: 85%;
-  justify-self: center;
-  align-self: center;
+  place-self: center;
   text-align: center;
 }
 
@@ -391,8 +390,8 @@ span .tooltip, button .tooltip {
 /* details */
 
 .unit.details {
-  width: min(98vw, 72vh);
-  height: min(98vw, 72vh);
+  width: min(96vw, 96vh);
+  height: min(96vw, 96vh);
   margin: auto;
   cursor: pointer;
   padding: min(1vw, 1vh);
@@ -434,8 +433,7 @@ span .tooltip, button .tooltip {
 
 .unit.details .unit-attack,
 .unit.details .unit-defense {
-  font-size: 7vh;
-  line-height: 1.3;
+  font-size: max(5vw, 5vh);
 }
 
 .unit.details .unit-attack::after,
@@ -646,15 +644,14 @@ span .tooltip, button .tooltip {
 .overlaycontainer {
   position: absolute;
   width: 100%;
-  height: min(72vh, 100vw);
+  height: 100%;
   left: 0;
-  top: 14vh;
+  top: 0;
   display: grid;
 }
 
 .overlay {
-  position: relative;
-  margin: auto;
+  place-self: center;
 }
 .overlay.waiting {
   border-radius: 5vh;
