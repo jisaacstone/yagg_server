@@ -118,7 +118,6 @@ export function feature(event) {
   const square = document.getElementById(`c${event.x}-${event.y}`),
     feature = document.createElement('div');
   feature.className = `feature ${event.feature}`;
-  feature.innerHTML = event.feature;
   square.appendChild(feature);
 }
 

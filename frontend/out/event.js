@@ -99,7 +99,6 @@ export function feature(event) {
     console.log({ feature: event });
     const square = document.getElementById(`c${event.x}-${event.y}`), feature = document.createElement('div');
     feature.className = `feature ${event.feature}`;
-    feature.innerHTML = event.feature;
     square.appendChild(feature);
 }
 export function unit_died(event) {
