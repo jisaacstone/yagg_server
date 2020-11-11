@@ -80,7 +80,15 @@ export function select(thisEl, meta) {
       return;
     }
     const sel = global.selected;
-    if (sel && sel.element && sel.element.firstChild) {
+    if (sel && sel.element) {
+      if (!sel.element.firstChild) {
+        console.log({ error: 'no child of selected element', sel, thisEl, meta });
+        return deselect();
+      }
+      if (sel.element === thisEl) {
+        // clicking the same thing again deselects
+        deselect();
+      }
       // something was perviously selected
       if (Unit.containsOwnedUnit(thisEl) || (meta.inhand && sel.meta.inhand)) {
         // if we are clicking on another of our units ignore previously selected unit

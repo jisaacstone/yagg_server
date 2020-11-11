@@ -51,7 +51,7 @@ defmodule Action.Ability do
       def resolve(%Board{} = board), do: resolve(board, [])
 
       @impl Action.Ability
-      def description(), do: @moduledoc <> ". Reveals: #{reveal?()}"
+      def description(), do: @moduledoc
 
       @impl Action.Ability
       def reveal?(), do: unquote(reveal)
