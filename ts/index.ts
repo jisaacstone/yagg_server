@@ -6,7 +6,6 @@ function fetchConfigs(sel_el: HTMLElement) {
     (configs: any) => {
       for (const config of Object.keys(configs)) {
         const opt = document.createElement('option');
-        opt.value = config;
         opt.innerHTML = config;
         sel_el.appendChild(opt);
       }
@@ -15,13 +14,16 @@ function fetchConfigs(sel_el: HTMLElement) {
 }
 
 function displayTableData(tablesEl, data) {
-  const currentName = (document.getElementById('name') as HTMLInputElement).value;
-
   if (! data.tables || ! data.tables.length) {
     tablesEl.innerHTML = '<p>No open tables right now';
   }
+  Player.get().then(({ name }) => {
+    displayTables(tablesEl, data.tables, name);
+  });
+}
 
-  for (const table of data.tables) {
+function displayTables(tablesEl, tables, currentName) {
+  for (const table of tables) {
     if (currentName && table.players.some(({ name }) => name === currentName)) {
       const el = document.createElement('div');
       el.className = 'table';

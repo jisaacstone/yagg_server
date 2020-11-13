@@ -4,18 +4,21 @@ function fetchConfigs(sel_el) {
     request('configurations').then((configs) => {
         for (const config of Object.keys(configs)) {
             const opt = document.createElement('option');
-            opt.value = config;
             opt.innerHTML = config;
             sel_el.appendChild(opt);
         }
     });
 }
 function displayTableData(tablesEl, data) {
-    const currentName = document.getElementById('name').value;
     if (!data.tables || !data.tables.length) {
         tablesEl.innerHTML = '<p>No open tables right now';
     }
-    for (const table of data.tables) {
+    Player.get().then(({ name }) => {
+        displayTables(tablesEl, data.tables, name);
+    });
+}
+function displayTables(tablesEl, tables, currentName) {
+    for (const table of tables) {
         if (currentName && table.players.some(({ name }) => name === currentName)) {
             const el = document.createElement('div');
             el.className = 'table';
