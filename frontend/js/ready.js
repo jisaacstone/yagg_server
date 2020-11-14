@@ -3,6 +3,7 @@ import { displayerror } from './err.js';
 export function display(label = 'READY', onclick = null) {
     const readyButton = document.createElement('button');
     readyButton.id = 'readybutton';
+    readyButton.className = 'uibutton';
     readyButton.innerHTML = label;
     if (onclick !== null) {
         readyButton.onclick = onclick;
@@ -19,7 +20,7 @@ export function display(label = 'READY', onclick = null) {
             });
         };
     }
-    document.getElementById('player').appendChild(readyButton);
+    document.getElementById('player').prepend(readyButton);
 }
 export function ensureDisplayed(label = 'READY', onclick = null) {
     if (!document.getElementById('readybutton')) {

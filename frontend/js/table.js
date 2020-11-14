@@ -87,10 +87,15 @@ function fetchgamestate() {
     });
 }
 window.onload = function () {
-    const errbutton = document.getElementById('errbutton');
+    const errbutton = document.getElementById('errbutton'), leavebutton = document.getElementById('leavebutton');
     if (errbutton) {
         errbutton.onclick = () => {
             reporterr();
+        };
+    }
+    if (leavebutton) {
+        leavebutton.onclick = () => {
+            leave();
         };
     }
     Player.check();
@@ -104,6 +109,11 @@ window.onload = function () {
         listen(Event);
     });
 };
+function leave() {
+    Request.gameaction('leave', {}, 'table').then(() => {
+        window.location.href = 'index.html';
+    });
+}
 function setstate(gamedata, phase) {
     let players = 0;
     for (const player of gamedata.players) {
