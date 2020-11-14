@@ -12,10 +12,10 @@ defmodule Table.Action.Leave do
       :notfound ->
         {[], table}
       {position, player} ->
-        {
-          Player.remove(table, player),
-          [Event.new(:player_left, player: position, name: player.name)],
-        }
+        case Player.remove(table, player) do
+          %{players: []} -> :shutdown_table
+          table -> {table, [Event.new(:player_left, player: position, name: player.name)]}
+        end
     end
   end
 end

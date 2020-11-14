@@ -55,7 +55,14 @@ defmodule Yagg.Table do
       configuration: config,
       history: [],
     }
-    DynamicSupervisor.start_child(Yagg.TableSupervisor, {Yagg.Table, [table]})
+    DynamicSupervisor.start_child(
+      Yagg.TableSupervisor,
+      %{
+        id: Yagg.Table,
+        start: {Yagg.Table, :start_link, [[table]]}, 
+        restart: :transient
+      }
+    )
   end
 
   # API
@@ -147,6 +154,7 @@ defmodule Yagg.Table do
     case handle_table_action(player, action, table) do
       {:err, _} = err -> {:reply, err, table}
       {:ok, table} -> {:reply, :ok, table}
+      :shutdown_table -> {IO.inspect(:stop), :normal, :ok, table}
     end
   end
 
@@ -200,6 +208,7 @@ defmodule Yagg.Table do
   defp handle_table_action(player, action, table) do
     case Yagg.Table.Action.resolve(action, table, player) do
       {:err, _} = err -> err
+      :shutdown_table -> :shutdown_table
       {table, events} ->
         notify(table, events)
         {:ok, table}

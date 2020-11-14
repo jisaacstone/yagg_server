@@ -106,6 +106,7 @@ window.onload = function() {
 
   ct.onclick = () => {
     const conf = sel_el.value || 'random';
+    Player.check();
     post('table/new', { configuration: conf }).then(({ id }) => {
       gameaction('join', {}, 'table', id).then(() => {
         window.location.href = `board.html?table=${id}`;
