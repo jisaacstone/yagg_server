@@ -66,6 +66,13 @@ body > div, body > form {
   cursor: pointer;
   color: #662d7c;
   text-shadow: 2px 2px 4px rgba(23, 14, 33, 0.3), -1px -1px 0 rgba(244, 246, 250, 0.3);
+  display: flex;
+  flex-flow: row wrap;
+  place-content: space-around;
+}
+
+.table div {
+  margin: 2px max(1vh, 1vw);
 }
 
 .table:hover {

@@ -53,6 +53,7 @@ function waitingforplayers() {
   const waiting = document.createElement('div'),
     copy = document.createElement('button'),
     comp = document.createElement('button'),
+    leav = document.createElement('button'),
     over = Overlay.create();
 
   over.className = over.className + ' waiting';
@@ -78,6 +79,11 @@ function waitingforplayers() {
     });
   }
   over.appendChild(comp);
+
+  leav.innerHTML = 'exit';
+  leav.className = 'exitbutton';
+  leav.onclick = leave;
+  over.appendChild(leav);
 }
 
 function fetchgamestate() {

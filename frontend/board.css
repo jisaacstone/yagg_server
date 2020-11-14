@@ -47,6 +47,9 @@ body {
     min-height: 19vw;
     max-height: 23vw;
   }
+  #player .playername {
+    grid-column: 1/3;
+  }
 }
 
 @media (orientation: portrait) {
@@ -86,6 +89,13 @@ body {
   #jobfair .candidate {
     min-height: 32vw;
     max-height: 37vw;
+  }
+  #player .uibutton {
+    padding: 18px 4px;
+    margin-bottom: 9px;
+  }
+  #readybutton.uibutton {
+    grid-row: 2;
   }
 }
 
@@ -176,11 +186,11 @@ body[data-gamestate=gameover] {
 }
 
 .boardrow.northrow {
-  background-color: rgba(225,108,240,0.4);
+  background-color: rgba(101,108,200,0.4);
 }
 
 .boardrow.southrow {
-  background-color: rgba(245,230,108,0.4);
+  background-color: rgba(110,80,45,0.4);
 }
 
 /* HAND */
@@ -586,18 +596,21 @@ span .tooltip, button .tooltip {
   background-color: rgba(80, 225, 92, 0.30);
 }
 
-.playername, #gamestate {
-  padding: 1vh;
-  margin: 1vh;
+.playername, #gamestate, .uibutton {
+  padding: 7px 3px;
+  margin: 3px;
   border-radius: 5%;
   text-align: center;
-  font-weight: bold;
+  text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
+}
+.playername, #gamestate {
   background-color: rgba(245, 244, 249, 0.2);
+  font-weight: bold;
 }
 
 .playername {
-  grid-row: 2;
-  grid-column: 1/3;
+  grid-row: 3;
+  color: #425;
 }
 
 .playername[data-ready='true'] {
@@ -609,13 +622,10 @@ span .tooltip, button .tooltip {
 }
 
 .uibutton {
-  padding: 10px;
-  background-color: rgba(200, 215, 230, 0.9);
+  background-color: rgba(190, 215, 230, 0.8);
   border-radius: 5%;
   cursor: pointer;
-  text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
   color: #2D7C66;
-  margin: 3%;
   grid-row: 1;
 }
 
@@ -691,6 +701,21 @@ span .tooltip, button .tooltip {
   border: 5px inset steelblue;
   box-sizing: border-box;
   padding: 10vh;
+  text-align: center;
+}
+
+.waiting button {
+  padding: max(1vh, 1vw);
+  margin: max(1vh, 1vw);
+}
+
+.waiting div {
+  margin-bottom: max(2vh, 2vw);
+  color: #2e5678;
+  text-shadow: 1px 1px 2px rgba(0, 1, 36, 0.2);
+  font-size: max(2.5vw, 2.5vh);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 2px;
 }
 
 .details {

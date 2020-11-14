@@ -51,7 +51,7 @@ defmodule Yagg.Endpoint do
       fn (pid) ->
         id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
         {:ok, table} = Table.get_state(pid)
-        %{id: id, players: table.players}
+        %{id: id, players: table.players, config: table.configuration}
       end
     )
     respond(conn, 200, %{tables: tables})

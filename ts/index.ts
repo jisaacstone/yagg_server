@@ -1,6 +1,8 @@
 import { request, post, gameaction } from './request.js';
 import * as Player from './playerdata.js';
 
+const displayedTables = {};
+
 function fetchConfigs(sel_el: HTMLElement) {
   request('configurations').then(
     (configs: any) => {
@@ -22,21 +24,48 @@ function displayTableData(tablesEl, data) {
   });
 }
 
+function renderTable(table, text) {
+  const tblbtn = document.createElement('div'),
+    dimensions = document.createElement('div'),
+    module = document.createElement('div'),
+    id = document.createElement('div'),
+    txt = document.createElement('div');
+  tblbtn.className = 'table';
+  dimensions.className = 'dimensions';
+  module.className = 'module';
+  id.className = 'tableid';
+  txt.className = 'tabletxt';
+  dimensions.innerHTML = `${table.config.dimensions.x}x${table.config.dimensions.y}`;
+  module.innerHTML = table.config.initial_module.split('.').pop();
+  id.innerHTML = table.id;
+  txt.innerHTML = text;
+  tblbtn.append(id);
+  tblbtn.append(dimensions);
+  tblbtn.append(module);
+  tblbtn.append(txt);
+  return tblbtn;
+}
+
 function displayTables(tablesEl, tables, currentName) {
+  const toRemove = new Set(Object.keys(displayedTables));
   for (const table of tables) {
     if (currentName && table.players.some(({ name }) => name === currentName)) {
-      const el = document.createElement('div');
-      el.className = 'table';
-      el.innerHTML = `REJOIN ${table.id}`;
+      if (toRemove.has(table.id)) {
+        toRemove.delete(table.id);
+        continue;
+      }
+      const el = renderTable(table, 'REJOIN');
       el.onclick = () => {
-        window.location.href = `board.html?table=${table.id}&player=${currentName}`;
+        window.location.href = `board.html?table=${table.id}`;
       };
       tablesEl.appendChild(el);
+      displayedTables[table.id] = el;
     } else if (table.players.length < 2) {
-      const el = document.createElement('div');
-      el.className = 'table';
-      el.innerHTML = table.id;
-
+      if (toRemove.has(table.id)) {
+        toRemove.delete(table.id);
+        continue;
+      }
+      const el = renderTable(table, 'JOIN');
       table.players.forEach(({ name }) => {
         const nel = document.createElement('div');
         nel.className = 'playername';
@@ -50,22 +79,30 @@ function displayTables(tablesEl, tables, currentName) {
         });
       };
       tablesEl.appendChild(el);
+      displayedTables[table.id] = el;
     }
   }
+  toRemove.forEach((id) => {
+    displayedTables[id].remove();
+    delete displayTables[id];
+  });
+}
+
+function fetchTableData() {
+  const tables = document.getElementById('tables');
+  request('table').then(tabledata => {
+    displayTableData(tables, tabledata);
+  }).catch((e) => console.log({ e }));
 }
 
 window.onload = function() {
-  const tables = document.getElementById('tables'),
-    ct = document.getElementById('createtable'),
+  const ct = document.getElementById('createtable'),
     sel_el = document.getElementById('config') as HTMLInputElement;
 
   Player.check();
-
-  request('table').then(tabledata => {
-    console.log({ tabledata });
-    displayTableData(tables, tabledata);
-  }).catch((e) => console.log({ e }));
   fetchConfigs(sel_el);
+  fetchTableData();
+  window.setInterval(fetchTableData, 2000);
 
   ct.onclick = () => {
     const conf = sel_el.value || 'random';

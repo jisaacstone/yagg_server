@@ -48,7 +48,7 @@ function gamephase(board) {
     return null;
 }
 function waitingforplayers() {
-    const waiting = document.createElement('div'), copy = document.createElement('button'), comp = document.createElement('button'), over = Overlay.create();
+    const waiting = document.createElement('div'), copy = document.createElement('button'), comp = document.createElement('button'), leav = document.createElement('button'), over = Overlay.create();
     over.className = over.className + ' waiting';
     waiting.innerHTML = 'waiting for opponent';
     over.appendChild(waiting);
@@ -70,6 +70,10 @@ function waitingforplayers() {
         });
     };
     over.appendChild(comp);
+    leav.innerHTML = 'exit';
+    leav.className = 'exitbutton';
+    leav.onclick = leave;
+    over.appendChild(leav);
 }
 function fetchgamestate() {
     Request.request(`table/${tableid()}/state`).then((gamedata) => {
