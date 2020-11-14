@@ -20,7 +20,7 @@ export function display(label = 'READY', onclick = null) {
             });
         };
     }
-    document.getElementById('player').prepend(readyButton);
+    document.getElementById('buttons').appendChild(readyButton);
 }
 export function ensureDisplayed(label = 'READY', onclick = null) {
     if (!document.getElementById('readybutton')) {
