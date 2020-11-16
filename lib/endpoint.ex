@@ -88,7 +88,7 @@ defmodule Yagg.Endpoint do
     ) |> to_response(conn)
   end
 
-  get "/board/:table_id/player_state/:player_name" do
+  get "/board/:table_id/player_state" do
     case get_player(conn) do
       :error -> {:err, :no}
       id -> Table.get_player_state(table_id, id)

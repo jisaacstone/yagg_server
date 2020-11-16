@@ -84,7 +84,7 @@ defmodule Yagg.Table do
       {:ok, table} ->
         case Player.by_id(table, id) do
           {position, %Player{}} -> 
-            table.configuration.initial_module.units(table.board, position)
+            table.board.__struct__.units(table.board, position)
           _ -> {:err, :unknown_player}
         end
     end

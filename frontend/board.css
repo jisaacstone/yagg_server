@@ -36,8 +36,6 @@ body {
     height: min(38vh, 18vw);
   }
   #jobfair {
-    overflow-y: scroll;
-    overflow-y: hidden;
     grid-column: 2 / span 2;
     grid-row: 1 / span 3;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -80,8 +78,6 @@ body {
     height: min(39vw, 19vh);
   }
   #jobfair {
-    overflow-x: scroll;
-    overflow-y: hidden;
     grid-column: 1 / span 3;
     grid-row: 2 / span 2;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -651,6 +647,8 @@ span .tooltip, button .tooltip {
 /* jobfair */
 
 #jobfair {
+  overflow-y: scroll;
+  overflow-x: hidden;
   display: grid;
   background: url("img/paper_bg.png");
   box-sizing: border-box;

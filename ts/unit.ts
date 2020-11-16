@@ -2,7 +2,7 @@ import { gameaction } from './request.js';
 import * as Constants from './constants.js';
 import { gmeta, isYourTurn } from './state.js';
 import { displayerror } from './err.js';
-import { dismissable } from './overlay.js';
+import { dismissable, clear } from './overlay.js';
 import * as Select from './select.js';
 
 interface Ability {
@@ -22,16 +22,8 @@ export interface Unit {
   };
 }
 
-function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = null) {
-  const abilbut = document.createElement('button'),
-    tt = document.createElement('span'),
-    abilname = unit.ability.name,
-    square = unitSquare ? unitSquare : el.parentNode as HTMLElement;
-
-  abilbut.className = 'unit-ability';
-  abilbut.innerHTML = abilname;
-
-  abilbut.onclick = (e) => {
+function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit, cb = null) {
+  abilityButton.onclick = (e) => {
     if (
       gmeta.boardstate !== 'battle' ||
       !isYourTurn() ||
@@ -44,6 +36,9 @@ function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = n
     e.stopPropagation();
     if (window.confirm(unit.ability.description)) {
       Select.deselect();
+      if (cb) {
+        cb();
+      }
       const x = +square.id.charAt(1),
         y = +square.id.charAt(3);
       gameaction('ability', {x: x, y: y}, 'board').catch(({ request }) => {
@@ -53,6 +48,17 @@ function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = n
       });
     }
   };
+}
+
+function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = null) {
+  const abilbut = document.createElement('button'),
+    tt = document.createElement('span'),
+    abilname = unit.ability.name,
+    square = unitSquare ? unitSquare : el.parentNode as HTMLElement;
+
+  abilbut.className = 'unit-ability';
+  abilbut.innerHTML = abilname;
+  bindAbility(abilbut, square, unit);
 
   el.appendChild(abilbut);
   tt.className = 'tooltip';
@@ -106,7 +112,6 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
     const triggers = document.createElement('div');
     triggers.className = 'triggers';
     for (const [name, trigger] of Object.entries(unit.triggers)) {
-      console.log({ name, trigger });
       const trigSym = document.createElement('div');
       trigSym.className = 'trigger-symbol';
       if (name === 'move') {
@@ -125,7 +130,7 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
   }
 }
 
-export function detailViewFn(unit: Unit, className: string) {
+export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
   const details = document.createElement('div'),
     portrait = document.createElement('div');
 
@@ -160,6 +165,9 @@ export function detailViewFn(unit: Unit, className: string) {
     abildesc.innerHTML = unit.ability.description;
     ability.appendChild(abildesc);
     details.appendChild(ability);
+    if (square) {
+      bindAbility(abilname, square, unit, clear);
+    }
   }
 
   return (e) => {
@@ -191,7 +199,21 @@ export function indexOf(square: HTMLElement) {
   return child && +child.dataset.index;
 }
 
+function bindDetailsEvenet(unit: Unit, el: HTMLElement) {
+  const eventListener = (e) => {
+    const parent = el.parentNode as HTMLElement,
+      square = parent.className.includes('boardsquare') ? parent : null;
+    detailViewFn(unit, el.className, square)(e);
+  }; // @ts-ignore
+  if (el.detailsEvent) {  // @ts-ignore
+    el.removeEventListener('details', el.detailsEvent);
+  } // @ts-ignore
+  el.detailsEvent = eventListener;
+  el.addEventListener('details', eventListener);
+}
+
 export function render_into(unit: Unit, el: HTMLElement, attrs=false): void {
+  bindDetailsEvenet(unit, el);
   return render_tile(unit, el, attrs);
 }
 

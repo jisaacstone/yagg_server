@@ -42,9 +42,11 @@ function ismoveoption(el) {
 }
 export function deselect() {
     const selected = global.selected, rb = document.getElementById('returnbutton');
-    selected.element.dataset.uistate = '';
-    for (const opt of selected.options) {
-        opt.dataset.uistate = '';
+    if (selected.element) {
+        selected.element.dataset.uistate = '';
+        for (const opt of selected.options) {
+            opt.dataset.uistate = '';
+        }
     }
     global.selected = {};
     document.getElementById('infobox').innerHTML = '';
@@ -93,6 +95,7 @@ export function select(thisEl, meta) {
                 return deselect();
             }
             if (sel.element === thisEl) {
+                thisEl.firstChild.dispatchEvent(new Event('details'));
                 // clicking the same thing again deselects
                 return deselect();
             }

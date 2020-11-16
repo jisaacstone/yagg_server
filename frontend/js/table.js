@@ -1,4 +1,4 @@
-import { getname, tableid } from './urlvars.js';
+import { tableid } from './urlvars.js';
 import { gmeta } from './state.js';
 import { listen } from './eventlistener.js';
 import * as Player from './playerdata.js';
@@ -79,7 +79,7 @@ function fetchgamestate() {
     Request.request(`table/${tableid()}/state`).then((gamedata) => {
         const phase = gamephase(gamedata.board);
         if (setstate(gamedata, phase)) {
-            Request.request(`board/${tableid()}/player_state/${getname()}`).then((unitdata) => {
+            Request.request(`board/${tableid()}/player_state`).then((unitdata) => {
                 if (phase === 'jobfair') {
                     Jobfair.unitdata(unitdata);
                 }

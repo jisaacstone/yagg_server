@@ -57,7 +57,6 @@ export function add_to_hand(event) {
     card.dataset.index = event.index;
     card.className = 'card';
     Select.bind_hand(card, event.index, event.unit.player, event.unit.name);
-    unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
     hand.appendChild(card);
     card.appendChild(unitEl);
     unitsbyindex[event.index] = unitEl;
@@ -114,7 +113,6 @@ export function thing_moved(event) {
     if (to) {
         const child = to.firstChild, fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), xOffset = Math.round(fromRect.left - toRect.left) + 'px', yOffset = Math.round(fromRect.top - toRect.top) + 'px';
         thing.style.position = 'relative';
-        console.log([from.getBoundingClientRect(), to.getBoundingClientRect()]);
         thing.animate({
             top: [yOffset, '0'],
             left: [xOffset, '0'],

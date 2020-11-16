@@ -23,8 +23,8 @@ function createWSEventListener(eventHandlers) {
     state.eventListener = new WebSocket(`ws://${host}/ws/${tableid()}/${id}`);
 
     state.eventListener.onmessage = (event) => {
-      console.log({ event });
       const evt = JSON.parse(event.data);
+      console.log(evt);
       if (eventHandlers[evt.event]) {
         eventHandlers[evt.event](evt);
       } else {
