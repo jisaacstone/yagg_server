@@ -37,6 +37,7 @@ body {
   }
   #jobfair {
     overflow-y: scroll;
+    overflow-y: hidden;
     grid-column: 2 / span 2;
     grid-row: 1 / span 3;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -80,6 +81,7 @@ body {
   }
   #jobfair {
     overflow-x: scroll;
+    overflow-y: hidden;
     grid-column: 1 / span 3;
     grid-row: 2 / span 2;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -199,6 +201,7 @@ body[data-gamestate=gameover] {
   grid-area: hand;
   display: flex;
   overflow-x: scroll;
+  overflow-y: hidden;
   background-color: rgba(185, 235, 220, 0.6);
   background-image: url("img/paper_bg_transparent_med.png");
   border-top: 2px solid rgba(75, 90, 80, 0.8);
@@ -583,7 +586,8 @@ span .tooltip, button .tooltip {
 }
 
 #infobox .unit {
-  margin 0;
+  margin: 0;
+  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px rgba(0,0,0,0.3);
 }
 
 [data-turn="opponent"] #gameinfo {
@@ -599,18 +603,18 @@ span .tooltip, button .tooltip {
 .playername, #gamestate, .uibutton {
   padding: 7px 3px;
   margin: 3px;
-  border-radius: 5%;
+  border-radius: min(1vh, 1vw);
   text-align: center;
-  text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
 }
 .playername, #gamestate {
   background-color: rgba(245, 244, 249, 0.2);
   font-weight: bold;
+  color: #425;
+  text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
 }
 
 .playername {
   grid-row: 2;
-  color: #425;
 }
 
 .playername[data-ready='true'] {
@@ -627,11 +631,20 @@ span .tooltip, button .tooltip {
 }
 
 .uibutton {
-  background-color: rgba(190, 215, 230, 0.8);
+  background-color: rgba(232, 225, 230, 0.9);
   border-radius: 5%;
+  border-width: 4px;
   cursor: pointer;
-  color: #2D7C66;
+  color: #2C3C16;
+  text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0, rgba(20, 60, 40, 0.5) 1px 1px 1px;
   grid-row: 1;
+}
+
+#returnbutton {
+  position: absolute;
+  right: 1vw;
+  bottom: 1vh;
+  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 0.2vh rgba(0,0,0,0.3);
 }
 
 /* jobfair */

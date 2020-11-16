@@ -149,6 +149,7 @@ export function thing_moved(event) {
     delete thing.style.position;
     to.appendChild(thing);
   } else {
+    thing.className = thing.className.replace(' owned', '');
     thing_gone(event.from);
   }
 }

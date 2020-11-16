@@ -186,6 +186,11 @@ export function containsOwnedUnit(square: HTMLElement) {
   return false;
 }
 
+export function indexOf(square: HTMLElement) {
+  const child = square.firstChild as HTMLElement;
+  return child && +child.dataset.index;
+}
+
 export function render_into(unit: Unit, el: HTMLElement, attrs=false): void {
   return render_tile(unit, el, attrs);
 }

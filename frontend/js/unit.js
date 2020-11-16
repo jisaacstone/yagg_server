@@ -144,6 +144,10 @@ export function containsOwnedUnit(square) {
     }
     return false;
 }
+export function indexOf(square) {
+    const child = square.firstChild;
+    return child && +child.dataset.index;
+}
 export function render_into(unit, el, attrs = false) {
     return render_tile(unit, el, attrs);
 }

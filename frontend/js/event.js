@@ -123,6 +123,7 @@ export function thing_moved(event) {
         to.appendChild(thing);
     }
     else {
+        thing.className = thing.className.replace(' owned', '');
         thing_gone(event.from);
     }
 }

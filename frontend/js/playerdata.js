@@ -17,10 +17,13 @@ export function check() {
                 localStorage.setItem('playerData.name', resp.name);
             }
         }).catch(() => {
+            console.log({ "localstorage": "removePlayerData", id, name });
             localStorage.removeItem('playerData.id');
             localStorage.removeItem('playerData.name');
+            return create();
         });
     }
+    return create();
 }
 export function get() {
     const id = localStorage.getItem('playerData.id'), name = localStorage.getItem('playerData.name');

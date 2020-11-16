@@ -168,11 +168,18 @@ defmodule Yagg.Event do
   defmodule ThingMoved do
     @spec new([
       from: Board.Grid.coord,
-      to: Board.Grid.coord | :offscreen
+      to: Board.Grid.coord | :offscreen | :hand
     ]) :: Event.t
     def new(params) do
       Event.new(:global, :thing_moved, params)
     end
+    @spec new(
+      Unit.t | Player.position,
+      [
+        from: Board.Grid.coord,
+        to: Board.Grid.coord | :offscreen | :hand
+      ]
+    ) :: Event.t
     def new(%{visible: :none, position: position}, params) do
       Event.new(position, :thing_moved, params)
     end

@@ -84,17 +84,19 @@ function fetchTableData() {
 }
 window.onload = function () {
     const ct = document.getElementById('createtable'), sel_el = document.getElementById('config');
-    Player.check();
-    fetchConfigs(sel_el);
-    fetchTableData();
-    window.setInterval(fetchTableData, 2000);
-    ct.onclick = () => {
-        const conf = sel_el.value || 'random';
-        Player.check();
-        post('table/new', { configuration: conf }).then(({ id }) => {
-            gameaction('join', {}, 'table', id).then(() => {
-                window.location.href = `board.html?table=${id}`;
+    Player.check().then(() => {
+        fetchConfigs(sel_el);
+        fetchTableData();
+        window.setInterval(fetchTableData, 2000);
+        ct.onclick = () => {
+            const conf = sel_el.value || 'random';
+            Player.check().then(() => {
+                post('table/new', { configuration: conf }).then(({ id }) => {
+                    gameaction('join', {}, 'table', id).then(() => {
+                        window.location.href = `board.html?table=${id}`;
+                    });
+                });
             });
-        });
-    };
+        };
+    });
 };

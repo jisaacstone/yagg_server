@@ -41,13 +41,16 @@ function ismoveoption(el) {
     return true;
 }
 export function deselect() {
-    const selected = global.selected;
+    const selected = global.selected, rb = document.getElementById('returnbutton');
     selected.element.dataset.uistate = '';
     for (const opt of selected.options) {
         opt.dataset.uistate = '';
     }
     global.selected = {};
     document.getElementById('infobox').innerHTML = '';
+    if (rb) {
+        rb.remove();
+    }
 }
 function moveOrPlace(selected, target) {
     if (selected.element !== target.element) {
@@ -61,12 +64,22 @@ function moveOrPlace(selected, target) {
             }
             else {
                 // change placement
-                const index = +selected.element.firstChild.dataset.index;
+                const index = Unit.indexOf(selected.element);
                 action('place', { index: index, x: target.meta.x, y: target.meta.y });
             }
         }
     }
     deselect();
+}
+function displayReturnButton(el, meta) {
+    const hand = document.getElementById('hand'), button = document.createElement('button');
+    button.className = 'uibutton';
+    button.id = 'returnbutton';
+    button.innerHTML = 'RETURN TO HAND';
+    button.onclick = () => {
+        action('return', { index: Unit.indexOf(el) }, deselect);
+    };
+    hand.appendChild(button);
 }
 export function select(thisEl, meta) {
     function select() {
@@ -98,14 +111,17 @@ export function select(thisEl, meta) {
         }
         const options = [];
         const childEl = thisEl.firstChild;
-        if (meta.inhand || gmeta.boardstate === 'placement') {
+        if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(thisEl))) {
             thisEl.dataset.uistate = 'selected';
-            Array.prototype.forEach.call(document.querySelectorAll(`.${meta.player}row .boardsquare`), el => {
+            Array.prototype.forEach.call(document.querySelectorAll(`.${gmeta.position}row .boardsquare`), el => {
                 if (!el.firstChild) {
                     el.dataset.uistate = 'moveoption';
                     options.push(el);
                 }
             });
+            if (meta.ongrid) {
+                displayReturnButton(thisEl, meta);
+            }
         }
         else {
             if (!Unit.containsOwnedUnit(thisEl)) {
