@@ -615,6 +615,7 @@ span .tooltip, button .tooltip {
 
 .playername {
   grid-row: 2;
+  min-width: 5em;
 }
 
 .playername[data-ready='true'] {

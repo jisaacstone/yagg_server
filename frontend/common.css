@@ -5,4 +5,5 @@ body {
   height: 100vh;
   overflow: hidden;
   font-size: max(2vh, 2vw);
+  font-family: verdana;
 }

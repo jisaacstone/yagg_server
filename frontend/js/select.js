@@ -94,12 +94,16 @@ export function select(thisEl, meta) {
             }
             if (sel.element === thisEl) {
                 // clicking the same thing again deselects
-                deselect();
+                return deselect();
             }
             // something was perviously selected
             if (Unit.containsOwnedUnit(thisEl) || (meta.inhand && sel.meta.inhand)) {
                 // if we are clicking on another of our units ignore previously selected unit
                 deselect();
+            }
+            else if (sel.options && !sel.options.includes(thisEl)) {
+                console.log('not in options');
+                return;
             }
             else {
                 return moveOrPlace(sel, { element: thisEl, meta });
@@ -111,8 +115,8 @@ export function select(thisEl, meta) {
         }
         const options = [];
         const childEl = thisEl.firstChild;
+        thisEl.dataset.uistate = 'selected';
         if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(thisEl))) {
-            thisEl.dataset.uistate = 'selected';
             Array.prototype.forEach.call(document.querySelectorAll(`.${gmeta.position}row .boardsquare`), el => {
                 if (!el.firstChild) {
                     el.dataset.uistate = 'moveoption';
