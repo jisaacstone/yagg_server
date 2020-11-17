@@ -255,7 +255,7 @@ body[data-gamestate=gameover] {
   padding-top: 0.3vh;
   text-overflow: ellipsis;
   overflow: hidden;
-  text-shadow: white -1px -1px 2px;
+  text-shadow: rgba(245, 244, 245, 0.5) -1px -1px 2px;
 }
 .unit.monarch {
   box-shadow: inset 0 0 2px purple;
@@ -300,7 +300,6 @@ body[data-gamestate=gameover] {
 }
 .unit-attack::after, .unit-defense::after {
   visibility: hidden;
-  /*position: absolute; breaks ios */
   color: #221;
   font-weight: normal;
   padding: 3px;
@@ -329,8 +328,6 @@ body[data-gamestate=gameover] {
 .unit-ability:hover {
   cursor: pointer;
   background-color: rgba(170, 175, 177, 0.4);
-  border-style: solid;
-  border-color: #445;
 }
 .unit-ability:hover .tooltip {
   display: block;
@@ -435,14 +432,23 @@ span .tooltip, button .tooltip {
   font-variant-caps: all-small-caps;
   float: right;
   font-size: 80%;
+  padding: 0.1em 3em 0;
 }
 
 .ability-name {
   font-weight: bold;
-  padding: 0.3em;
+  padding: 0.2em 2em 0.4em;
+  box-shadow: inset -0.2em -0.2em 0.1em rgba(3, 9, 6, 0.2), inset 0.2em 0.2em 0.1em rgba(249, 252, 244, 0.1);
+  border-radius: 0.4em;
+  text-align: left;
+  margin-bottom: 0.2em;
+  background-color: rgba(245, 244, 245, 0.1);
 }
 .ability-name:first-letter {
   text-transform: uppercase;
+}
+.owned .ability-name:hover {
+  box-shadow: -0.2em -0.2em 0.1em rgba(3, 9, 6, 0.1), 0.2em 0.2em 0.1em rgba(249, 252, 244, 0.2);
 }
 
 .unit.details .unit-attack,
@@ -461,15 +467,14 @@ span .tooltip, button .tooltip {
   margin-left: -0.5vh;
   visibility: visible;
   border: none;
+  background: none;
 }
 
 .unit.details .unit-attack::after {
   content: 'Attack';
-  background-color: rgba(0, 1, 50, 0.1);
 }
 .unit.details .unit-defense::after {
   content: 'Defense';
-  background-color: rgba(0, 50, 1, 0.1);
 }
 
 .unit-portrait {
@@ -740,5 +745,5 @@ span .tooltip, button .tooltip {
 .details {
   text-align: center;
   font-size: 130%;
-  text-shadow: white -1px -1px 2px;
+  text-shadow: rgba(245, 244, 245, 0.5) -1px -1px 2px;
 }

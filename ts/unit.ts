@@ -114,20 +114,25 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
     for (const [name, trigger] of Object.entries(unit.triggers)) {
       const trigSym = document.createElement('div');
       trigSym.className = 'trigger-symbol';
-      if (name === 'move') {
-        trigSym.innerHTML = Constants.MOVE;
-      } else if (name === 'death') {
-        trigSym.innerHTML = Constants.SKULL;
-      } else if (name === 'attack') {
-        trigSym.innerHTML = Constants.ATTACK;
-      } else {
-        console.log({warn: 'unknown trigger', name, trigger});
-        trigSym.innerHTML = '?';
-      }
+      trigSym.innerHTML = symbolFor(name);
       triggers.appendChild(trigSym);
     }
     el.appendChild(triggers);
   }
+}
+
+function symbolFor(trigger: string): string {
+  if (trigger === 'move') {
+    return Constants.MOVE;
+  }
+  if (trigger === 'death') {
+    return Constants.SKULL;
+  }
+  if (trigger === 'attack') {
+    return Constants.ATTACK;
+  }
+  console.log({warn: 'unknown trigger', trigger});
+  return '?';
 }
 
 export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
@@ -149,7 +154,7 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
       triggerel.className = 'trigger';
       triggers.appendChild(triggerel);
       triggerel.className = `unit-trigger ${name}-trigger`;
-      triggerel.innerHTML = `${name} trigger: ${trigger.description}`;
+      triggerel.innerHTML = `${symbolFor(name)} ${name} trigger: ${trigger.description}`;
     }
     details.appendChild(triggers);
   }

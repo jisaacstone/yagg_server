@@ -11,12 +11,14 @@ import * as Jobfair from './jobfair.js';
 import * as Overlay from './overlay.js';
 import * as Player from './playerdata.js';
 import * as Feature from './feature.js';
+import * as Hand from './hand.js';
 
 const unitsbyindex = {};
 
 export function game_started(event) {
   const board = document.getElementById('board'),
     state = (event.state || '').toLowerCase();
+  Hand.clear();
   if (event.army_size || gmeta.phase === 'jobfair') {
     if (gmeta.boardstate === 'gameover') {
       Board.clear();
@@ -63,14 +65,7 @@ export function player_left(event) {
 }
 
 export function add_to_hand(event) {
-  const hand = document.getElementById('hand'),
-    card = document.createElement('span'),
-    unitEl = Unit.render(event.unit, event.index);
-  card.dataset.index = event.index;
-  card.className = 'card';
-  Select.bind_hand(card, event.index, event.unit.player, event.unit.name);
-  hand.appendChild(card);
-  card.appendChild(unitEl);
+  const unitEl = Hand.createCard(event.unit, event.index)
   unitsbyindex[event.index] = unitEl;
 }
 
@@ -147,7 +142,9 @@ export function thing_moved(event) {
     delete thing.style.position;
     to.appendChild(thing);
   } else {
-    thing.className = thing.className.replace(' owned', '');
+    if (thing) {
+      thing.className = thing.className.replace(' owned', '');
+    }
     thing_gone(event.from);
   }
 }
