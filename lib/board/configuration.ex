@@ -21,6 +21,8 @@ defmodule Yagg.Board.Configuration do
   }
 
   @callback new() :: t
+  @callback name() :: String.t
+  @callback description() :: String.t
 
   def init(%Configuration{initial_module: mod} = config) do
     mod.new(config)
@@ -41,16 +43,32 @@ defmodule Yagg.Board.Configuration do
   end
 
   def all() do
+    configs = [
+      Board.Configuration.Random,
+      Board.Configuration.Alpha,
+      Board.Configuration.Chain,
+    ]
+    Enum.map(configs, &describe(&1))
+  end
+
+  defp describe(module) do
     %{
-      "random" => Board.Configuration.Random,
-      "smallz" => Board.Configuration.Alpha,
-      "bigga" => Board.Configuration.Chain,
+      name: module.name(),
+      description: module.description(),
+      module: module
     }
   end
 end
 
 defmodule Board.Configuration.Random do
   @behaviour Board.Configuration
+
+  @impl Board.Configuration
+  def name(), do: "random"
+
+  @impl Board.Configuration
+  def description(), do: "random sized board with random units"
+
   @impl Board.Configuration
   def new() do
     nor_units = ten_random_units(:north)
@@ -117,6 +135,12 @@ defmodule Board.Configuration.Alpha do
   @behaviour Board.Configuration
 
   @impl Board.Configuration
+  def name(), do: "fivers"
+
+  @impl Board.Configuration
+  def description(), do: "five by five grid"
+
+  @impl Board.Configuration
   def new() do
     units = %{
       north: starting_units(:north),
@@ -161,9 +185,12 @@ end
 
 defmodule Board.Configuration.Chain do
   @behaviour Board.Configuration
-  @doc """
-  Returns ten standard units in a random order
-  """
+
+  @impl Board.Configuration
+  def name(), do: "sevens"
+
+  @impl Board.Configuration
+  def description(), do: "seven by seven grid"
 
   @impl Board.Configuration
   def new() do

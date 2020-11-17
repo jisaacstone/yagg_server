@@ -37,7 +37,7 @@ defmodule Yagg.Endpoint do
     {:ok, body, conn} = Conn.read_body(conn)
     data = Poison.Parser.parse!(body, %{keys: :atoms!})
     config = if Map.has_key?(data, :configuration) do
-      Map.fetch!(Configuration.all(), data.configuration)
+      Enum.find(Configuration.all(), fn(c) -> c.name == data.configuration end).module
     else
       Configuration.Random
     end

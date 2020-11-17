@@ -2,15 +2,23 @@ import { request, post, gameaction } from './request.js';
 import * as Player from './playerdata.js';
 
 const displayedTables = {};
+const configurations = {};
 
-function fetchConfigs(sel_el: HTMLElement) {
+function fetchConfigs(sel_el: HTMLInputElement) {
   request('configurations').then(
     (configs: any) => {
-      for (const config of Object.keys(configs)) {
+      for (const config of configs) {
+        configurations[config.name] = config
         const opt = document.createElement('option');
-        opt.innerHTML = config;
+        opt.innerHTML = config.name;
         sel_el.appendChild(opt);
       }
+      sel_el.addEventListener('change', () => {
+        const configName = sel_el.value,
+          configuration = configurations[configName],
+          descriptionEl = document.getElementById('config-description');
+        descriptionEl.innerHTML = configuration.description;
+      })
     }
   );
 }

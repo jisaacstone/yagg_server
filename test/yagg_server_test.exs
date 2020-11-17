@@ -67,7 +67,8 @@ defmodule YaggTest.Endpoint do
 
   test "game configurations" do
     %{status: 200, resp_body: body} = conn(:get, "/configurations") |> Endpoint.call(@opts)
-    assert %{"random" => _} = Poison.decode!(body)
+    configurations = Poison.decode!(body)
+    assert %{"name" => "random"} = Enum.find(configurations, fn(c) -> c["module"] == "Elixir.Yagg.Board.Configuration.Random" end)
   end
 
   test "start game" do
@@ -83,7 +84,7 @@ defmodule YaggTest.Endpoint do
 
   test "new with config" do
     %{id: id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
-    %{id: table_id} = call_200("/table/new", %{"configuration" => "bigga"}, id)
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "sevens"}, id)
     call_204("/table/#{table_id}/a/join", %{}, id)
     table = get_200("/table/#{table_id}/state")
     assert table.configuration.initial_module == "Elixir.Yagg.Board"
@@ -95,7 +96,7 @@ defmodule YaggTest.Endpoint do
 
   test "with ai" do
     %{id: id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
-    %{id: table_id} = call_200("/table/new", %{"configuration" => "bigga"}, id)
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "sevens"}, id)
     call_204("/table/#{table_id}/a/join", %{player: "p1"}, id)
     table = get_200("/table/#{table_id}/state")
     assert [%{name: "bob"}] = table.players

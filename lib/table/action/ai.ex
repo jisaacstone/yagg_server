@@ -13,13 +13,12 @@ defmodule Action.Ai do
   defp check_players([], _), do: {:err, :nobody}
   defp check_players([_, _], _), do: {:err, :toomany}
   defp check_players([{position, _} = p1], table) do
-    robot = Player.new("randombot")
-    position = Player.opposite(position)
-    {:ok, _pid} = DynamicSupervisor.start_child(Yagg.AISupervisor, {AI.Server, [{table.id, robot, position}]})
+    aipos = Player.opposite(position)
+    {:ok, robot} = AI.Server.start_ai(table, aipos, "randombot")
     {board, events} = table.board.__struct__.setup(table.board)
     {
-      %{table | players: [p1, {position, robot}], board: board},
-      [Event.PlayerJoined.new(name: robot.name, position: position) | events]
+      %{table | players: [p1, {aipos, robot}], board: board},
+      [Event.PlayerJoined.new(name: "randombot", position: aipos) | events]
     }
   end
 end

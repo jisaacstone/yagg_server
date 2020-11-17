@@ -6,9 +6,21 @@ alias Yagg.Bugreport
 alias Yagg.AI.Choices
 alias Yagg.Board.Action.Ready
 alias Yagg.Table.Action
+alias Yagg.Table.Player
 
 defmodule Yagg.AI.Server do
   use GenServer
+
+  def start_ai(table, position, name) do
+    robot = Player.new(name)
+    spec = %{
+      id: Yagg.AI.Server,
+      start: {Yagg.AI.Server, :start_link, [[{table.id, robot, position}]]},
+      restart: :transient
+    }
+    {:ok, _pid} = DynamicSupervisor.start_child(Yagg.AISupervisor, spec)
+    {:ok, robot}
+  end
 
   def init({table_id, robot, position}) do
     GenServer.cast(self(), :subscribe_table)
@@ -41,7 +53,6 @@ defmodule Yagg.AI.Server do
         take_your_turn(board, state)
       _ -> :do_nothing
     end
-    IO.inspect(:cgs_done)
     {:noreply, state}
   end
 
@@ -64,7 +75,7 @@ defmodule Yagg.AI.Server do
     {:noreply, state}
   end
   def handle_info(%{kind: :player_left}, state) do
-    :ok = Table.board_action(state.pid, state.robot, %Action.Leave{})
+    :ok = Table.table_action(state.pid, state.robot, %Action.Leave{})
     {:stop, :normal, state}
   end
 
