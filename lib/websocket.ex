@@ -12,7 +12,7 @@ defmodule Yagg.Websocket do
   @impl :cowboy_websocket
   def websocket_init(state) do
     case Table.Player.fetch(state.player) do
-      :notfound ->
+      {:err, :notfound} ->
         {:stop, state}
       _ ->
         {:ok, pid} = Table.subscribe(state.table_id, state.player)

@@ -63,6 +63,10 @@ defmodule Yagg.AI.Server do
     end
     {:noreply, state}
   end
+  def handle_info(%{kind: :player_left}, state) do
+    :ok = Table.board_action(state.pid, state.robot, %Action.Leave{})
+    {:stop, :normal, state}
+  end
 
   def handle_info(%Event{}, state) do
     # IO.inspect(unhandled_event: event)
@@ -79,7 +83,7 @@ defmodule Yagg.AI.Server do
       state,
       [],
       3,
-      "AI Proccess Terminated",
+      IO.inspect("AI Proccess Terminated"),
       {type, context}
     )
     :ok

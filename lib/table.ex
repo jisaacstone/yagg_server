@@ -76,7 +76,7 @@ defmodule Yagg.Table do
     GenServer.call(pid, :get_state)
   end
 
-  @spec get_player_state(id, Player.t) :: {:ok, %{grid: list, hand: list}} | {:err, atom}
+  @spec get_player_state(id, non_neg_integer) :: {:ok, %{grid: list, hand: list}} | {:err, atom}
   def get_player_state(table_id, id) do
     {:ok, pid} = get(table_id)
     case GenServer.call(pid, :get_state) do
@@ -98,7 +98,7 @@ defmodule Yagg.Table do
     {:ok, pid}
   end
 
-  @spec table_action(id | pid, String.t, struct) :: :ok | {:err, atom}
+  @spec table_action(id | pid, non_neg_integer | Player.t, struct) :: :ok | {:err, atom}
   def table_action(pid, player, action) when is_pid(pid) do
     GenServer.call(pid, {:table_action, player, action})
   end
@@ -154,7 +154,7 @@ defmodule Yagg.Table do
     case handle_table_action(player, action, table) do
       {:err, _} = err -> {:reply, err, table}
       {:ok, table} -> {:reply, :ok, table}
-      :shutdown_table -> {IO.inspect(:stop), :normal, :ok, table}
+      :shutdown_table -> {:stop, :normal, :ok, table}
     end
   end
 

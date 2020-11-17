@@ -23,6 +23,7 @@ defmodule Table.Player do
     player
   end
 
+  @spec fetch(non_neg_integer) :: {:ok, t} | {:err, :notfound}
   def fetch(id) do
     case :ets.lookup(:players, id) do
       [{^id, player}] -> {:ok, player}
