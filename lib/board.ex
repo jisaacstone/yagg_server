@@ -178,6 +178,8 @@ defmodule Yagg.Board do
         {board, events1} = do_move(board, to, square)
         {board, events2} = do_move(board, from, to, action: :push)
         {board, events1 ++ events2}
+      :out_of_bounds ->
+        {:err, :out_of_bounds}
       _ ->
         {:err, :occupied}
     end

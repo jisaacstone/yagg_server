@@ -77,15 +77,15 @@ defmodule Yagg.Unit do
   end
 
   def after_death(board, unit, coords, opts \\ []) do
-    trigger_module(unit, :death).resolve(board, [{:coords, coords}, {:unit, unit} | opts])
+    trigger_module(unit, :death).resolve(board, [{:event, :death}, {:coords, coords}, {:unit, unit} | opts])
   end
   def after_move(board, unit, from, to, opts \\ []) do
-    trigger_module(unit, :move).resolve(board, [{:from, from}, {:to, to}, {:unit, unit} | opts])
+    trigger_module(unit, :move).resolve(board, [{:event, :move}, {:from, from}, {:to, to}, {:unit, unit} | opts])
   end
   def attack(board, unit, opponent, from, to, opts \\ []) do
     case trigger_module(unit, :attack) do
       Ability.NOOP -> Board.do_battle(board, unit, opponent, from, to)
-      module -> module.resolve(board, [{:from, from}, {:to, to}, {:opponent, opponent}, {:unit, unit} | opts])
+      module -> module.resolve(board, [{:event, :attack}, {:from, from}, {:to, to}, {:opponent, opponent}, {:unit, unit} | opts])
     end
   end
 

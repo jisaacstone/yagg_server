@@ -172,6 +172,7 @@ defmodule Board.Configuration.Alpha do
       Unit.Howloo.new(position),
       Unit.Catmover.new(position),
       Unit.Antente.new(position),
+      Unit.Shenamouse.new(position),
       Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),

@@ -190,51 +190,6 @@ defmodule Action.Ability.Copyleft do
   end
 end
 
-defmodule Action.Ability.Push do
-  @moduledoc """
-  push surrounding units back one square
-  the push is as if the owner had moved the unit (will attack if new square is occupied)
-  units at the edge are pushed off the board (and die)
-  """
-  use Action.Ability
-
-  @impl Action.Ability
-  def resolve(board, opts) do
-    push_adjacent_units(board, opts[:coords])
-  end
-
-  defp push_adjacent_units(board, coords) do
-    Enum.reduce(
-      Grid.surrounding(coords),
-      {board, []},
-      fn({direction, coord}, b_e) ->
-        case board.grid[coord] do
-          %Unit{} = unit -> push_unit(b_e, direction, coord, unit)
-          :block -> push_block(b_e, direction, coord)
-          _ -> b_e
-        end
-      end
-    )
-  end
-
-  defp push_unit({board, events}, direction, coord, unit) do
-    case Board.move(board, unit.position, coord, Grid.next(direction, coord)) do
-      {:err, :out_of_bounds} ->
-        {newboard, newevents} = Board.unit_death(board, coord)
-        {newboard, events ++ newevents}
-      {:err, _} -> {board, events}
-      {newboard, newevents} -> {newboard, events ++ newevents}
-    end
-  end
-
-  defp push_block({board, events}, direction, coord) do
-    case Board.push_block(board, coord, Grid.next(direction, coord)) do
-      {:err, _} -> {board, events}
-      {newboard, newevents} -> {newboard, events ++ newevents}
-    end
-  end
-end
-
 defmodule Action.Ability.Upgrade do
   @moduledoc """
   Return to your hand and gain +2 attack and +2 defense
