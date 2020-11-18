@@ -96,70 +96,92 @@ function displayReturnButton(el, meta) {
   hand.appendChild(button);
 }
 
+function handleSomethingAlreadySelected(el: HTMLElement, meta): boolean {
+  // return "true" if select event was handled, false if logic should continue
+  const sel = global.selected;
+  if (sel && sel.element) {
+    if (!sel.element.firstChild) {
+      console.log({ error: 'no child of selected element', sel, el, meta });
+      deselect();
+      return true;
+    }
+    if (sel.element === el) {
+      el.firstChild.dispatchEvent(new Event('details'));
+      // clicking the same thing again deselects
+      deselect();
+      return true;
+    }
+    // something was perviously selected
+    if (Unit.containsOwnedUnit(el) || (meta.inhand && sel.meta.inhand)) {
+      // if we are clicking on another of our units ignore previously selected unit
+      deselect();
+      return false;
+    } else if (sel.options && !sel.options.includes(el)) {
+      console.log('not in options');
+      // for now ignore clicks on things that are not move options
+      maybeSidebar(el);
+      return true;
+    } else {
+      moveOrPlace(sel, { element: el, meta });
+      return true;
+    }
+  }
+  return false;
+}
+
+function maybeSidebar(el: HTMLElement) {
+  const childEl = el.firstChild;
+  if (childEl) {
+    childEl.dispatchEvent(new Event('sidebar'));
+  }
+}
+
+function handleSelect(el: HTMLElement, meta) {
+  const options = [];
+  maybeSidebar(el);
+  if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
+    Array.prototype.forEach.call(
+      document.querySelectorAll(`.${gmeta.position}row .boardsquare`),
+      el => {
+        if (! el.firstChild) {
+          el.dataset.uistate = 'moveoption';
+          options.push(el);
+        }
+      }
+    );
+    if (meta.ongrid) {
+      displayReturnButton(el, meta);
+    }
+  } else {
+    if (! Unit.containsOwnedUnit(el)) {
+      // Square with no owned unit
+      return;
+    }
+    for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
+      const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
+      if (ismoveoption(nel)) {
+        nel.dataset.uistate = 'moveoption';
+        options.push(nel);
+      }
+    }
+  }
+  el.dataset.uistate = 'selected';
+  global.selected = {element: el, meta: meta, options: options};
+}
+
 export function select(thisEl, meta) {
   function select() {
     if (gmeta.boardstate === 'gameover') {
       return;
     }
-    const sel = global.selected;
-    if (sel && sel.element) {
-      if (!sel.element.firstChild) {
-        console.log({ error: 'no child of selected element', sel, thisEl, meta });
-        return deselect();
-      }
-      if (sel.element === thisEl) {
-        thisEl.firstChild.dispatchEvent(new Event('details'));
-        // clicking the same thing again deselects
-        return deselect();
-      }
-      // something was perviously selected
-      if (Unit.containsOwnedUnit(thisEl) || (meta.inhand && sel.meta.inhand)) {
-        // if we are clicking on another of our units ignore previously selected unit
-        deselect();
-      } else if (sel.options && !sel.options.includes(thisEl)) {
-        console.log('not in options');
-        return;
-      } else {
-        return moveOrPlace(sel, { element: thisEl, meta });
-      }
-    }
     if (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) {
       // Not your turn
       return;
     }
-    const options = [];
-    const childEl = thisEl.firstChild;
-    thisEl.dataset.uistate = 'selected';
-    if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(thisEl))) {
-      Array.prototype.forEach.call(
-        document.querySelectorAll(`.${gmeta.position}row .boardsquare`),
-        el => {
-          if (! el.firstChild) {
-            el.dataset.uistate = 'moveoption';
-            options.push(el);
-          }
-        }
-      );
-      if (meta.ongrid) {
-        displayReturnButton(thisEl, meta);
-      }
-    } else {
-      if (! Unit.containsOwnedUnit(thisEl)) {
-        // Square with no owned unit
-        return;
-      }
-      for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
-        const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-        if (ismoveoption(nel)) {
-          nel.dataset.uistate = 'moveoption';
-          options.push(nel);
-        }
-      }
+    if (handleSomethingAlreadySelected(thisEl, meta)) {
+      return;
     }
-    if (childEl) {
-      childEl.dispatchEvent(new Event('sidebar'));
-    }
-    global.selected = {element: thisEl, meta: meta, options: options};
+    handleSelect(thisEl, meta);
   }
   return select;
 }

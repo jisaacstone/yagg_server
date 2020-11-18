@@ -4,7 +4,7 @@ import * as Select from './select.js';
 export function createCard(unit: Unit.Unit, index: number) {
   const hand = document.getElementById('hand'),
     card = document.createElement('span'),
-    unitEl = Unit.render(unit, index);
+    unitEl = Unit.render(unit, index, true);
   card.dataset.index = `${index}`;
   card.className = 'card';
   Select.bind_hand(card, index, unit.player, unit.name);

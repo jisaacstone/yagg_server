@@ -83,7 +83,7 @@ export function new_unit(event) {
     square.appendChild(newunit);
   } else {
     unit.innerHTML = '';
-    Unit.render_into(event.unit, unit);
+    Unit.render_into(event.unit, unit, true);
   }
 }
 

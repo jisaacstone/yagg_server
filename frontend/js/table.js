@@ -116,6 +116,9 @@ window.onload = function () {
 function leave() {
     Request.gameaction('leave', {}, 'table').then(() => {
         window.location.href = 'index.html';
+    }).catch((e) => {
+        console.log({ error: e });
+        window.location.href = 'index.html';
     });
 }
 function setstate(gamedata, phase) {

@@ -70,7 +70,7 @@ export function new_unit(event) {
     }
     else {
         unit.innerHTML = '';
-        Unit.render_into(event.unit, unit);
+        Unit.render_into(event.unit, unit, true);
     }
 }
 export function unit_changed(event) {

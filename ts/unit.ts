@@ -85,16 +85,25 @@ function render_tile(unit: Unit, el: HTMLElement, attrs=false) {
     render_attrs(unit, el);
   }
   el.style.backgroundImage = `url(img/${unit.name}.png)`;
-  if (anyDetails(unit)) {
-    el.addEventListener('sidebar', () => {
-      const infobox = document.getElementById('infobox'),
-        unitInfo = document.createElement('div');
-      unitInfo.className = el.className + ' info';
-      infoview(unit, unitInfo, el.parentNode as HTMLElement);
-      infobox.innerHTML = '';
-      infobox.appendChild(unitInfo);
-    }, false);
-  }
+  // @ts-ignore
+  if (el.sidebar) { // @ts-ignore
+    el.removeEventListener('sidebar', el.sidebar, false);
+  } // @ts-ignore
+  el.sidebar = () => {
+    const infobox = document.getElementById('infobox'),
+      unitInfo = document.createElement('div');
+    unitInfo.className = el.className + ' info';
+    infoview(unit, unitInfo, el.parentNode as HTMLElement);
+    infobox.innerHTML = '';
+    infobox.appendChild(unitInfo);
+    if (! anyDetails(unit)) {
+      const noInfo = document.createElement('div');
+      noInfo.className = 'no-info';
+      noInfo.innerHTML = 'no information';
+      unitInfo.appendChild(noInfo);
+    }
+  }; // @ts-ignore
+  el.addEventListener('sidebar', el.sidebar, false);
 }
 
 function anyDetails(unit) {

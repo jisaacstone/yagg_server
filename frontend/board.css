@@ -32,10 +32,10 @@ body {
   #infobox {
     justify-self: end;
     align-self: center;
+    height: max(80%, min(38vh, 18vw));
   }
   #infobox .info {
     width: min(38vh, 18vw);
-    height: min(38vh, 18vw);
   }
   #jobfair {
     grid-column: 2 / span 2;
@@ -45,7 +45,7 @@ body {
     margin-right: 2px;
   }
   #jobfair .candidate {
-    min-height: 19vw;
+    min-height: 20vw;
     max-height: 23vw;
   }
   #player .playername {
@@ -89,7 +89,7 @@ body {
     border-top: 2px inset #325;
   }
   #jobfair .candidate {
-    min-height: 32vw;
+    min-height: 33vw;
     max-height: 37vw;
   }
   #player .uibutton {
@@ -187,6 +187,18 @@ body[data-gamestate=gameover] {
   overflow: hidden;
 }
 
+.boardsquare .unit {
+  font-size: 50%;
+}
+
+.boardsquare .unit .unit-name {
+  display: none;
+}
+
+.boardsquare .unit-attack, .boardsquare .unit-defense {
+  height: 100%;
+}
+
 .boardrow.northrow {
   background-color: rgba(101,108,200,0.4);
 }
@@ -208,7 +220,7 @@ body[data-gamestate=gameover] {
 .card {
   display: flex;
   flex-shrink: 0;
-  height: max(16vh, 16vw);
+  height: max(18vh, 18vw);
   width: max(16vh, 16vw);
   margin: auto;
 }
@@ -230,7 +242,9 @@ body[data-gamestate=gameover] {
   border-radius: 5%;
   box-sizing: border-box;
   border: 2px inset #C89;
-  background-size: cover;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
   grid-template-rows: 15% 70% 15%;
   grid-template-columns: 15% 70% 15%;
   grid-template-areas:
@@ -281,9 +295,7 @@ body[data-gamestate=gameover] {
   font-weight: bold;
   margin: 2px;
   border-radius: 28%;
-  border-width: 2px;
   box-sizing: border-box;
-  border-style: inset;
   background-color: rgba(245, 248, 246, 0.1);
   width: 85%;
   height: 85%;
@@ -586,6 +598,7 @@ span .tooltip, button .tooltip {
   grid-area: infobox;
   margin-left: 5%;
   margin-right: 5%;
+  display: grid;
 }
 
 #infobox .unit {
