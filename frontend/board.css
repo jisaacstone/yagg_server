@@ -649,7 +649,6 @@ span .tooltip, button .tooltip {
 
 .uibutton {
   background-color: rgba(232, 225, 230, 0.9);
-  border-radius: 5%;
   border-width: 4px;
   cursor: pointer;
   color: #2C3C16;

@@ -51,6 +51,7 @@ defmodule Yagg.Unit do
   def visible?(%{visible: :none}, _), do: :false
   def visible?(%{visible: v}, k), do: MapSet.member?(v, k)
 
+  def make_visible(unit, fields) when is_list(fields), do: Enum.reduce(fields, unit, &make_visible(&2, &1))
   def make_visible(%{visible: :all} = unit, _), do: unit
   def make_visible(%{visible: :none} = unit, field), do: %{unit | visible: MapSet.new() |> MapSet.put(field)}
   def make_visible(unit, field), do: %{unit | visible: MapSet.put(unit.visible, field)}

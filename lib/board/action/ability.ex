@@ -24,7 +24,7 @@ defmodule Action.Ability do
       {:err, _} = err -> err
       {:ok, unit} ->
         {board, e1} = if unit.ability.reveal?() and not Unit.visible?(unit, :ability) do
-          Grid.update(board, coord, fn(u) -> Unit.make_visible(u, :ability) end)
+          Grid.update(board, coord, fn(u) -> Unit.make_visible(u, [:ability, :name]) end)
         else
           {board, []}
         end
@@ -71,7 +71,7 @@ end
 
 defmodule Action.Ability.NOOP do
   @moduledoc "Does Nothing"
-  use Action.Ability
+  use Action.Ability, noreveal: :true
 
   def resolve(board, _) do
     {board, []}
@@ -151,7 +151,7 @@ end
 
 defmodule Action.Ability.Poisonblade do
   @moduledoc "Poisons any units that touch it"
-  use Action.Ability
+  use Action.Ability, noreveal: :true
 
   def resolve(board, opts) do
     case opts[:opponent] do
@@ -239,8 +239,7 @@ defmodule Action.Ability.Upgrade do
   @moduledoc """
   Return to your hand and gain +2 attack and +2 defense
   """
-
-  use Action.Ability
+  use Action.Ability, noreveal: true
   @impl Action.Ability
   def resolve(%Board{} = board, opts) do
     %{name: name, attack: attack, defense: defense, position: position} = opts[:unit]

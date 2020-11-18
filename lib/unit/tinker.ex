@@ -40,7 +40,7 @@ defmodule Unit.Tinker do
     @moduledoc """
     Give units to the right and left +2 attack
     """
-    use Ability
+    use Ability, noreveal: :true
     @impl Ability
     def resolve(%Board{} = board, opts) do
       Tinker.tinktonk(board, opts, [:east, :west], Tinker.Tink)
@@ -51,7 +51,7 @@ defmodule Unit.Tinker do
     @moduledoc """
     Give units to the front and back +2 attack
     """
-    use Ability
+    use Ability, noreveal: true
     @impl Ability
     def resolve(%Board{} = board, opts) do
       Tinker.tinktonk(board, opts, [:north, :south], Tinker.Tonk)
