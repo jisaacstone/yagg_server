@@ -10,7 +10,7 @@ alias Yagg.Board.Action
 defmodule Action.Ability do
   @behaviour Action
 
-  @callback resolve(Yagg.Board.t, keyword()) :: {Yagg.Board.t, [Yagg.Event.t]} | {:err, term}
+  @callback resolve(Board.t, keyword()) :: {Board.t, [Event.t]} | {:err, term}
   @callback description() :: String.t
   @callback reveal?() :: boolean
 
@@ -208,3 +208,11 @@ defmodule Action.Ability.Upgrade do
   end
 end
 
+defmodule Action.Ability.Immobile do
+  @moduledoc """
+  Cannot move
+  """
+  use Action.Ability
+  @impl Action.Ability
+  def resolve(_, _), do: {:err, :immobile}
+end

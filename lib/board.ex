@@ -190,16 +190,14 @@ defmodule Yagg.Board do
     {:err, :noselfattack}
   end
   def do_battle(board, unit, opponent, from, to) do
+    # if attack and defense are ever equal this will crash with :nomatch
     cond do
       unit.attack > opponent.defense ->
         {board, e1} = unit_death(board, to, opponent: {unit, from})
-        {board, e2} = do_move(board, from, to, action: :battle)
-        {board, e1 ++ e2}
-      unit.attack == opponent.defense ->
-        # not currently possible?
-        {board, e1} = unit_death(board, from)
-        {board, e2} = unit_death(board, to)
-        {board, e1 ++ e2}
+        case do_move(board, from, to, action: :battle) do
+          {:err, _} = err -> err
+          {board, e2} -> {board, e1 ++ e2}
+        end
       unit.attack < opponent.defense ->
         {board, events} = unit_death(board, from, opponent: {opponent, to}, attacking: :true)
         {board, events}
@@ -223,9 +221,13 @@ defmodule Yagg.Board do
     {unit, grid} = Map.pop(board.grid, from)
     grid = Map.put(grid, to, unit)
     board = %{board | grid: grid}
-    {board, events} = Unit.after_move(board, unit, from, to, opts)
-    events = [Event.ThingMoved.new(unit, from: from, to: to) | events]
-    {board, events}
+
+    case Unit.after_move(board, unit, from, to, opts) do
+      {:err, _} = err -> err
+      {board, events} ->
+        events = [Event.ThingMoved.new(unit, from: from, to: to) | events]
+        {board, events}
+    end
   end
 
   defp hand_assign(hand, index, coords) do

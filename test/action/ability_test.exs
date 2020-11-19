@@ -210,4 +210,35 @@ defmodule YaggTest.Action.Ability do
     assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
     assert %{name: :bezerker} = newboard.grid[{3, 2}]
   end
+
+  test "electromousetrap" do
+    board = set_board([
+      {{3, 2}, Unit.Tinker.new(:north)},
+      {{4, 2}, Unit.Electromouse.new(:south)}
+    ])
+    action = %Board.Action.Ability{x: 4, y: 2}
+    assert {%Board{} = board, _events} = Board.Action.resolve(action, board, :south)
+    assert %{name: :"electromouse trap", triggers: %{move: Unit.Electromouse.Settrap}} = board.grid[{4, 2}]
+    action = %Board.Action.Move{from_x: 4, from_y: 2, to_x: 4, to_y: 3}
+    assert {%Board{} = board, events} = Board.Action.resolve(action, board, :south)
+    assert %{name: :electromouse, triggers: %{}} = board.grid[{4, 3}]
+    assert Enum.find(events, fn(e) -> e.kind == :new_unit end)
+    assert %{name: :electromousetrap} = board.grid[{4, 2}]
+    action = %Board.Action.Move{from_x: 3, from_y: 2, to_x: 4, to_y: 2}
+    assert {%Board{} = board, _events} = Board.Action.resolve(action, board, :north)
+    assert %{name: :tinker, position: :south} = board.grid[{4, 2}]
+  end
+
+  test "electromousetrap monarch" do
+    board = set_board([
+      {{3, 2}, Unit.Monarch.new(:north)},
+      {{4, 2}, Unit.Electromouse.new(:south)}
+    ])
+    action = %Board.Action.Ability{x: 4, y: 2}
+    assert {%Board{} = board, _events} = Board.Action.resolve(action, board, :south)
+    assert %{name: :"electromouse trap", triggers: %{move: Unit.Electromouse.Settrap}} = board.grid[{4, 2}]
+    action = %Board.Action.Move{from_x: 3, from_y: 2, to_x: 4, to_y: 2}
+    assert {%Board{} = board, events} = Board.Action.resolve(action, board, :north)
+    assert Enum.find(events, fn(e) -> e.kind == :gameover end)
+  end
 end

@@ -12,7 +12,7 @@ interface Ability {
 
 export interface Unit {
   name: string;
-  attack: number;
+  attack: number | "immobile";
   defense: number;
   player: null | string;
   ability: null | Ability;
@@ -66,12 +66,19 @@ function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = n
   abilbut.appendChild(tt);
 }
 
-function render_attrs(unit: Unit, el: HTMLElement) {
+function convertAttr(att, value) {
+  if (att === 'attack' && value === 'immobile') {
+    return '-';
+  }
+  return value;
+}
+
+function renderAttrs(unit: Unit, el: HTMLElement) {
   for (const att of ['name', 'attack', 'defense']) {
     if (unit[att] !== null && unit[att] !== undefined) {
       const subel = document.createElement('span');
       subel.className = `unit-${att}`;
-      subel.innerHTML = unit[att];
+      subel.innerHTML = convertAttr(att, unit[att]);
       el.appendChild(subel);
     }
   }
@@ -80,11 +87,11 @@ function render_attrs(unit: Unit, el: HTMLElement) {
   }
 }
 
-function render_tile(unit: Unit, el: HTMLElement, attrs=false) {
+function renderTile(unit: Unit, el: HTMLElement, attrs=false) {
   if (attrs) {
-    render_attrs(unit, el);
+    renderAttrs(unit, el);
   }
-  el.style.backgroundImage = `url(img/${unit.name}.png)`;
+  el.style.backgroundImage = `url("img/${unit.name}.png")`;
   // @ts-ignore
   if (el.sidebar) { // @ts-ignore
     el.removeEventListener('sidebar', el.sidebar, false);
@@ -111,8 +118,9 @@ function anyDetails(unit) {
 }
 
 function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
-  render_attrs(unit, el);
-  el.style.backgroundImage = `url(img/${unit.name}.png)`;
+  renderAttrs(unit, el);
+  console.log(unit);
+  el.style.backgroundImage = `url("img/${unit.name}.png")`;
   detailView(unit, el);
   if (unit.ability) {
     ability_button(unit, el, squareEl);
@@ -149,10 +157,10 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
     portrait = document.createElement('div');
 
   details.className = `${className} details`;
-  render_attrs(unit, details);
+  renderAttrs(unit, details);
 
   portrait.className = 'unit-portrait';
-  portrait.style.backgroundImage = `url(img/${unit.name}.png)`;
+  portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
   details.appendChild(portrait);
 
   if (unit.triggers) {
@@ -200,9 +208,25 @@ function detailView(unit: Unit, el: HTMLElement) {
   el.appendChild(displaybut);
 }
 
+export function isImmobile(square: HTMLElement) {
+  const child = square.firstChild as HTMLElement;
+  return containsOwnedUnit(square) && child.className.includes('immobile');
+}
+
+export function containsEnemyUnit(square: HTMLElement) {
+  const child = square.firstChild as HTMLElement,
+    position = gmeta.position === 'north' ? 'south' : 'north';
+  if (child && child.className.includes(position)) {
+    console.log('isenemy');
+    return true;
+  }
+  return false;
+}
+
 export function containsOwnedUnit(square: HTMLElement) {
   const child = square.firstChild as HTMLElement;
   if (child && child.className.includes(gmeta.position)) {
+    console.log('isowned');
     return true;
   }
   return false;
@@ -226,18 +250,25 @@ function bindDetailsEvenet(unit: Unit, el: HTMLElement) {
   el.addEventListener('details', eventListener);
 }
 
-export function render_into(unit: Unit, el: HTMLElement, attrs=false): void {
-  bindDetailsEvenet(unit, el);
-  return render_tile(unit, el, attrs);
-}
-
-export function render(unit: Unit, index, attrs=false): HTMLElement {
-  const unitEl = document.createElement('span');
+function setClassName(unit: Unit, el: HTMLElement) {
   let className = `unit ${unit.player}`;
   if (unit.player === gmeta.position) {
     className += ' owned';
   }
-  unitEl.className = className;
+  if (unit.attack === 'immobile') {
+    className += ' immobile';
+  }
+  el.className = className;
+}
+
+export function render_into(unit: Unit, el: HTMLElement, attrs=false): void {
+  bindDetailsEvenet(unit, el);
+  setClassName(unit, el);
+  return renderTile(unit, el, attrs);
+}
+
+export function render(unit: Unit, index, attrs=false): HTMLElement {
+  const unitEl = document.createElement('span');
   unitEl.dataset.index = index;
   render_into(unit, unitEl, attrs);
   return unitEl

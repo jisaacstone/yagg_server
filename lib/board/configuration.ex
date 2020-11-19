@@ -97,7 +97,6 @@ defmodule Board.Configuration.Random do
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 1, 2, Ability.Rowburn),
       Unit.Tinker.new(position),
-      Unit.new(position, :electromouse, 3, 2, Ability.Upgrade),
       Unit.Mediacreep.new(position),
       Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
       Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
@@ -107,6 +106,8 @@ defmodule Board.Configuration.Random do
       Unit.Busybody.new(position),
       Unit.Howloo.new(position),
       Unit.Antente.new(position),
+      Unit.Shenamouse.new(position),
+      Unit.Electromouse.new(position),
     ]) |> Enum.take(10)
     [Unit.Monarch.new(position) | units]
   end
@@ -173,6 +174,7 @@ defmodule Board.Configuration.Alpha do
       Unit.Catmover.new(position),
       Unit.Antente.new(position),
       Unit.Shenamouse.new(position),
+      Unit.Electromouse.new(position),
       Unit.new(position, :dogatron, 1, 0, :nil, %{death: Ability.Upgrade}),
       Unit.new(position, :poisonblade, 3, 4, :nil, %{death: Ability.Poisonblade}),
       Unit.new(position, :rowburninator, 3, 2, Ability.Rowburn),

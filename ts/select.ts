@@ -153,6 +153,12 @@ function handleSelect(el: HTMLElement, meta) {
       displayReturnButton(el, meta);
     }
   } else {
+    console.log({imm: Unit.isImmobile(el)});
+    if (Unit.isImmobile(el) || Unit.containsEnemyUnit(el)) {
+      console.log('deets');
+      el.dispatchEvent(new Event('details'));
+      return;
+    }
     if (! Unit.containsOwnedUnit(el)) {
       // Square with no owned unit
       return;

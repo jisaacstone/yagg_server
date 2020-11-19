@@ -18,6 +18,10 @@ body > div, body > form {
   box-shadow: 5px 10px 7px rgba(0, 0, 0, 0.5);
 }
 
+#config {
+  padding: 0.4em 0.2em 0.6em;
+}
+
 #nameform {
   min-width: 40%;
   max-width: 80%;
@@ -63,6 +67,7 @@ body > div, body > form {
   border: 2px solid #556;
   background-color: #789;
   display: grid;
+  color: #344;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
@@ -91,4 +96,20 @@ body > div, body > form {
 
 .table:hover {
   border-style: outset;
+}
+
+.table::after {
+  content: 'join this game';
+  visibility: hidden;
+  position: absolute;
+  color: #221;
+  font-weight: normal;
+  padding: 3px;
+  font-size: 12px;
+  background-color: rgba(169, 168, 166, 0.8);
+  border: 2px solid rgba(89, 78, 86, 0.9);
+  text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
+}
+.table:hover::after {
+  visibility: visible;
 }

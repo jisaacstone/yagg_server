@@ -41,8 +41,7 @@ defmodule Unit.Shenamouse.SpyAttacker do
   def resolve(board, opts) do
     case opts[:opponent] do
       :nil -> {board, []}
-      _ ->
-        coord = opts[:coords]
+      {_, coord} ->
         position = opts[:unit].position
         {board, events, _} = Unit.Shenamouse.reveal(coord, board, position)
         {board, events}

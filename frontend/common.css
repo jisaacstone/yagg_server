@@ -4,6 +4,6 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  font-size: max(2vh, 2vw);
+  font-size: min(2.5vh, 2.5vw);
   font-family: verdana;
 }

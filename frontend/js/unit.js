@@ -38,12 +38,18 @@ function ability_button(unit, el, unitSquare = null) {
     tt.innerHTML = unit.ability.description;
     abilbut.appendChild(tt);
 }
-function render_attrs(unit, el) {
+function convertAttr(att, value) {
+    if (att === 'attack' && value === 'immobile') {
+        return '-';
+    }
+    return value;
+}
+function renderAttrs(unit, el) {
     for (const att of ['name', 'attack', 'defense']) {
         if (unit[att] !== null && unit[att] !== undefined) {
             const subel = document.createElement('span');
             subel.className = `unit-${att}`;
-            subel.innerHTML = unit[att];
+            subel.innerHTML = convertAttr(att, unit[att]);
             el.appendChild(subel);
         }
     }
@@ -51,11 +57,11 @@ function render_attrs(unit, el) {
         el.className = `monarch ${el.className}`;
     }
 }
-function render_tile(unit, el, attrs = false) {
+function renderTile(unit, el, attrs = false) {
     if (attrs) {
-        render_attrs(unit, el);
+        renderAttrs(unit, el);
     }
-    el.style.backgroundImage = `url(img/${unit.name}.png)`;
+    el.style.backgroundImage = `url("img/${unit.name}.png")`;
     // @ts-ignore
     if (el.sidebar) { // @ts-ignore
         el.removeEventListener('sidebar', el.sidebar, false);
@@ -79,8 +85,9 @@ function anyDetails(unit) {
     return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
 function infoview(unit, el, squareEl) {
-    render_attrs(unit, el);
-    el.style.backgroundImage = `url(img/${unit.name}.png)`;
+    renderAttrs(unit, el);
+    console.log(unit);
+    el.style.backgroundImage = `url("img/${unit.name}.png")`;
     detailView(unit, el);
     if (unit.ability) {
         ability_button(unit, el, squareEl);
@@ -113,9 +120,9 @@ function symbolFor(trigger) {
 export function detailViewFn(unit, className, square = null) {
     const details = document.createElement('div'), portrait = document.createElement('div');
     details.className = `${className} details`;
-    render_attrs(unit, details);
+    renderAttrs(unit, details);
     portrait.className = 'unit-portrait';
-    portrait.style.backgroundImage = `url(img/${unit.name}.png)`;
+    portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
     details.appendChild(portrait);
     if (unit.triggers) {
         const triggers = document.createElement('div');
@@ -155,9 +162,22 @@ function detailView(unit, el) {
     displaybut.onclick = detailViewFn(unit, el.className);
     el.appendChild(displaybut);
 }
+export function isImmobile(square) {
+    const child = square.firstChild;
+    return containsOwnedUnit(square) && child.className.includes('immobile');
+}
+export function containsEnemyUnit(square) {
+    const child = square.firstChild, position = gmeta.position === 'north' ? 'south' : 'north';
+    if (child && child.className.includes(position)) {
+        console.log('isenemy');
+        return true;
+    }
+    return false;
+}
 export function containsOwnedUnit(square) {
     const child = square.firstChild;
     if (child && child.className.includes(gmeta.position)) {
+        console.log('isowned');
         return true;
     }
     return false;
@@ -177,17 +197,23 @@ function bindDetailsEvenet(unit, el) {
     el.detailsEvent = eventListener;
     el.addEventListener('details', eventListener);
 }
-export function render_into(unit, el, attrs = false) {
-    bindDetailsEvenet(unit, el);
-    return render_tile(unit, el, attrs);
-}
-export function render(unit, index, attrs = false) {
-    const unitEl = document.createElement('span');
+function setClassName(unit, el) {
     let className = `unit ${unit.player}`;
     if (unit.player === gmeta.position) {
         className += ' owned';
     }
-    unitEl.className = className;
+    if (unit.attack === 'immobile') {
+        className += ' immobile';
+    }
+    el.className = className;
+}
+export function render_into(unit, el, attrs = false) {
+    bindDetailsEvenet(unit, el);
+    setClassName(unit, el);
+    return renderTile(unit, el, attrs);
+}
+export function render(unit, index, attrs = false) {
+    const unitEl = document.createElement('span');
     unitEl.dataset.index = index;
     render_into(unit, unitEl, attrs);
     return unitEl;
