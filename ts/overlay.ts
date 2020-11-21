@@ -18,9 +18,10 @@ export function clear() {
 }
 
 export function dismissable(el) {
-  const overlay = create();
+  const overlay = create(),
+    container = overlay.parentNode as HTMLElement;
   overlay.appendChild(el);
-  overlay.onclick = () => {
+  container.onclick = () => {
     clear();
   }
 }

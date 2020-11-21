@@ -96,10 +96,13 @@ function infoview(unit, el, squareEl) {
         const triggers = document.createElement('div');
         triggers.className = 'triggers';
         for (const [name, trigger] of Object.entries(unit.triggers)) {
-            const trigSym = document.createElement('div');
+            const trigSym = document.createElement('div'), tt = document.createElement('span');
             trigSym.className = 'trigger-symbol';
             trigSym.innerHTML = symbolFor(name);
             triggers.appendChild(trigSym);
+            tt.className = 'tooltip';
+            tt.innerHTML = trigger.description;
+            trigSym.appendChild(tt);
         }
         el.appendChild(triggers);
     }
@@ -118,36 +121,44 @@ function symbolFor(trigger) {
     return '?';
 }
 export function detailViewFn(unit, className, square = null) {
-    const details = document.createElement('div'), portrait = document.createElement('div');
+    const details = document.createElement('div'), portrait = document.createElement('div'), descriptions = document.createElement('div');
     details.className = `${className} details`;
     renderAttrs(unit, details);
     portrait.className = 'unit-portrait';
     portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
     details.appendChild(portrait);
+    descriptions.className = 'descriptions';
+    details.appendChild(descriptions);
+    if (unit.ability) {
+        const ability = document.createElement('div'), abildesc = document.createElement('div'), abilname = document.createElement('div');
+        ability.className = 'unit-ability';
+        abilname.className = 'ability-name uibutton';
+        abilname.innerHTML = unit.ability.name;
+        abildesc.className = 'ability-description';
+        ability.appendChild(abilname);
+        abildesc.innerHTML = unit.ability.description;
+        ability.appendChild(abildesc);
+        descriptions.appendChild(ability);
+        if (square) {
+            bindAbility(abilname, square, unit, clear);
+        }
+    }
     if (unit.triggers) {
         const triggers = document.createElement('div');
         triggers.className = 'triggers';
         for (const [name, trigger] of Object.entries(unit.triggers)) {
-            const triggerel = document.createElement('div');
+            const triggerel = document.createElement('div'), tsym = document.createElement('div'), tdes = document.createElement('div');
             triggerel.className = 'trigger';
             triggers.appendChild(triggerel);
             triggerel.className = `unit-trigger ${name}-trigger`;
-            triggerel.innerHTML = `${symbolFor(name)} ${name} trigger: ${trigger.description}`;
+            tsym.className = 'trigger-symbol';
+            tsym.innerHTML = symbolFor(name);
+            triggerel.appendChild(tsym);
+            tdes.className = 'trigger-description';
+            tdes.innerHTML = `${name} trigger: ${trigger.description}`;
+            triggerel.appendChild(tdes);
         }
-        details.appendChild(triggers);
-    }
-    if (unit.ability) {
-        const ability = document.createElement('div'), abildesc = document.createElement('div'), abilname = document.createElement('div');
-        ability.className = 'unit-ability';
-        abilname.className = 'ability-name';
-        abilname.innerHTML = unit.ability.name;
-        ability.appendChild(abilname);
-        abildesc.innerHTML = unit.ability.description;
-        ability.appendChild(abildesc);
-        details.appendChild(ability);
-        if (square) {
-            bindAbility(abilname, square, unit, clear);
-        }
+        descriptions.appendChild(triggers);
     }
     return (e) => {
         e.preventDefault();
@@ -156,11 +167,7 @@ export function detailViewFn(unit, className, square = null) {
     };
 }
 function detailView(unit, el) {
-    const displaybut = document.createElement('button');
-    displaybut.className = 'details-button';
-    displaybut.innerHTML = '?';
-    displaybut.onclick = detailViewFn(unit, el.className);
-    el.appendChild(displaybut);
+    el.onclick = detailViewFn(unit, el.className);
 }
 export function isImmobile(square) {
     const child = square.firstChild;
