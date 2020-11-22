@@ -121,7 +121,7 @@ defmodule YaggTest.Action.Ability do
 
   test "timeout" do
     grid = %{
-      {0, 2} => %Unit{ability: nil, attack: 1, defense: 0, name: :dogatron, position: :south, triggers: %{death: Board.Action.Ability.Upgrade}},
+      {0, 2} => Unit.Dogatron.new(:south),
       {1, 2} => Unit.Explody.new(:north),
       {1, 3} => %Unit{ability: Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :north, triggers: %{}},
       {2, 0} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, triggers: %{death: Board.Action.Ability.Concede}},

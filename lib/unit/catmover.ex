@@ -21,7 +21,8 @@ end
 
 defmodule Unit.Catmover.Jump do
   @moduledoc """
-  If there is an empty square on the other side it will jump the enemy and kill it.
+  Can destroy an enemy unit by jumping over it.
+  Will jump instead of attacking if there is an empty square on the other side of the enemy.
   """
   use Ability
   @impl Ability

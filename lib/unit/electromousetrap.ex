@@ -22,7 +22,7 @@ defmodule Unit.Electromousetrap do
 
   defmodule Trap do
     @moduledoc """
-    Invisible, immobile. Captures attacker, giving you control
+    Invisible. Captures attacker, giving you control
     """
     use Ability, noreveal: :true
 

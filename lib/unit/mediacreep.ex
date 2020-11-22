@@ -20,7 +20,7 @@ defmodule Unit.Mediacreep do
 
   defmodule Duplicate do
     @moduledoc """
-    leave behind an inferior copy
+    leave behind a copy of itself with attack and defense reduced by 2
     """
     use Ability
 
@@ -33,18 +33,19 @@ defmodule Unit.Mediacreep do
         attack: unit.attack - 2,
         defense: unit.defense - 2
       }
-      if copy.attack < 0 or copy.defense < 0 do
-        { board, [] }
+      copy = if copy.attack < 2 or copy.defense < 2 do
+        %{copy | triggers: %{}}
       else 
-        grid = Map.put(board.grid, opts[:from], copy)
-        {
-          %{board | grid: grid},
-          [
-            Event.UnitPlaced.new(player: unit.position, x: x, y: y),
-            Event.NewUnit.new(unit.position, x: x, y: y, unit: copy)
-          ]
-        }
+        copy
       end
+      grid = Map.put(board.grid, opts[:from], copy)
+      {
+        %{board | grid: grid},
+        [
+          Event.UnitPlaced.new(player: unit.position, x: x, y: y),
+          Event.NewUnit.new(unit.position, x: x, y: y, unit: copy)
+        ]
+      }
     end
   end
 end

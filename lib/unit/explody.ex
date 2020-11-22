@@ -18,7 +18,7 @@ defmodule Unit.Explody do
   end
 
   defmodule Selfdestruct do
-    @moduledoc "Destroy everything within 1 square radius"
+    @moduledoc "Destroy units in this and adjacent squares"
     use Ability
 
     def resolve(board, opts) do

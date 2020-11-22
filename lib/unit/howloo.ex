@@ -18,7 +18,7 @@ defmodule Unit.Howloo do
 
   defmodule Horseshoe do
     @moduledoc """
-    Throw a horseshoe to the front, if it hits a unit that unit's attack is reduced by 2 (minimum 1)
+    Throw a horseshoe forward which reduces a units attack by 2 (minimum 1)
     """
     use Ability
     @impl Ability

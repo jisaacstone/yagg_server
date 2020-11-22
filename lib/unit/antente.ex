@@ -24,7 +24,7 @@ end
 
 defmodule Unit.Antente.Invisible do
   @moduledoc """
-  Become Invisible until your next attack.
+  Become invisible until your next attack
   """
   use Ability, noreveal: :true
 
@@ -47,7 +47,7 @@ end
 
 defmodule Unit.Antente.Visible do
   @moduledoc """
-  This unit is invisible until it attacks.
+  Becomes visible to opponent
   """
   use Ability
 

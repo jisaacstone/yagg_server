@@ -182,6 +182,7 @@ export function select(thisEl, meta) {
     }
     if (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) {
       // Not your turn
+      thisEl.firstChild && thisEl.firstChild.dispatchEvent(new Event('sidebar'));
       return;
     }
     if (handleSomethingAlreadySelected(thisEl, meta)) {

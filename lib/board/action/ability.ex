@@ -105,28 +105,6 @@ defmodule Action.Ability.Concede do
   end
 end
 
-defmodule Action.Ability.Rowburn do
-  @moduledoc "Destory all units in the same row"
-  use Action.Ability
-
-  def resolve(board, opts) do
-    {_, y} = opts[:coords]
-    Enum.reduce(
-      board.grid,
-      {board, []},
-      &burn_unit(&1, &2, y)
-    )
-  end
-
-  defp burn_unit({{x, y}, %Unit{}}, {board, events}, y) do
-    {board, newevents} = Board.unit_death(board, {x, y})
-    {board, newevents ++ events}
-  end
-  defp burn_unit(_, acc, _) do
-    acc
-  end
-end
-
 defmodule Action.Ability.Colburn do
   @moduledoc "Destory all units in the same column"
   use Action.Ability
@@ -146,18 +124,6 @@ defmodule Action.Ability.Colburn do
   end
   defp burn_unit(_, acc, _) do
     acc
-  end
-end
-
-defmodule Action.Ability.Poisonblade do
-  @moduledoc "Poisons any units that touch it"
-  use Action.Ability, noreveal: :true
-
-  def resolve(board, opts) do
-    case opts[:opponent] do
-      :nil -> {board, []}
-      {%Unit{}, coords} -> Board.unit_death(board, coords)
-    end
   end
 end
 
@@ -187,24 +153,6 @@ defmodule Action.Ability.Copyleft do
         Hand.add_unit(board, pos, copy)
       _ -> {board, []}
     end
-  end
-end
-
-defmodule Action.Ability.Upgrade do
-  @moduledoc """
-  Return to your hand and gain +2 attack and +2 defense
-  """
-  use Action.Ability, noreveal: true
-  @impl Action.Ability
-  def resolve(%Board{} = board, opts) do
-    %{name: name, attack: attack, defense: defense, position: position} = opts[:unit]
-    {board, e1} = case board.grid[opts[:coords]] do
-      :nil -> {board, []}
-      %Unit{name: ^name} -> Board.unit_death(board, opts[:coords])
-    end
-    newunit = %{opts[:unit] | attack: attack + 2, defense: defense + 2}
-    {board, e2} = Hand.add_unit(board, position, newunit)
-    {board, e1 ++ e2}
   end
 end
 

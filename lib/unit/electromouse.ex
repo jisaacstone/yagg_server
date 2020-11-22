@@ -19,7 +19,7 @@ defmodule Unit.Electromouse do
 
   defmodule Mousetrap do
     @moduledoc """
-    Set a trap that will capture any unit that moves to the square
+    Set an invisible trap in the current square that captures units
     """
     use Ability, noreveal: :true
 
@@ -35,6 +35,7 @@ defmodule Unit.Electromouse do
     def update(unit) do
       %{unit |
         name: :"electromouse trap",
+        ability: :nil,
         triggers: %{
           move: Unit.Electromouse.Settrap,
           death: Unit.Electromousetrap.Trap
@@ -59,7 +60,12 @@ defmodule Unit.Electromouse do
       Grid.update(
         %{board | grid: grid},
         opts[:to],
-        fn(u) -> %{u | triggers: %{}, name: :electromouse} end,
+        fn(u) -> %{
+          u |
+          triggers: %{},
+          name: :electromouse,
+          ability: Unit.Electromouse.Mousetrap
+        } end,
         events
       )
     end

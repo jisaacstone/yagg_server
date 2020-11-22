@@ -20,7 +20,7 @@ defmodule Unit.Busybody do
   defmodule Spin do
     @moduledoc """
     Everything in adjacent squares is rotated clockwise.
-    Anything that ends up off the edge of the board is gone.
+    Anything that ends up off the edge of the board is destroyed.
     """
     use Ability
     @impl Ability
