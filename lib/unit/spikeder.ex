@@ -14,7 +14,7 @@ defmodule Unit.Spikeder do
       2,
       :nil,
       %{
-        death: Ability.Poisonblade,
+        death: Unit.Ability.Poison,
         move: Unit.Spikeder.Slide,
       }
     )

@@ -61,7 +61,7 @@ function waitingforplayers() {
   over.appendChild(waiting);
 
   copy.innerHTML = 'copy join link';
-  copy.className = 'linkcopy';
+  copy.className = 'linkcopy uibutton';
   copy.onclick = () => {
     const url = new URL(window.location.toString());
     url.searchParams.delete('player');
@@ -72,7 +72,7 @@ function waitingforplayers() {
   over.appendChild(copy);
 
   comp.innerHTML = 'play the computer';
-  comp.className = 'aibutton';
+  comp.className = 'aibutton uibutton';
   comp.onclick = function() {
     Request.gameaction('ai', {}, 'table').then(() => {
       Overlay.clear();
@@ -81,7 +81,7 @@ function waitingforplayers() {
   over.appendChild(comp);
 
   leav.innerHTML = 'exit';
-  leav.className = 'exitbutton';
+  leav.className = 'exitbutton uibutton';
   leav.onclick = leave;
   over.appendChild(leav);
 }
