@@ -1,3 +1,5 @@
+import * as Instructions from './instructions.js';
+
 export const gmeta = {
   position: null,
   name: null,
@@ -5,6 +7,20 @@ export const gmeta = {
   turn: null,
   phase: null,
 };
+
+function instructions(stateName) {
+  if (stateName === 'placement') {
+    Instructions.dropdown(
+      'placement',
+      'place your units on the board. You must place your monarch. You do not need to place all your units');
+  } else if (stateName === 'battle') {
+    Instructions.dropdown(
+      'battle',
+      "Destroy your opponent's monarch. Protect your own monarch");
+  } else {
+    console.log(`no instructions for ${stateName}`);
+  }
+}
 
 export function isYourTurn(): boolean {
   return gmeta.position 
@@ -15,6 +31,7 @@ export function gamestatechange(newstate: string): void {
   document.getElementById('gamestate').innerHTML = `state: ${newstate}`;
   document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
   gmeta.boardstate = newstate;
+  instructions(newstate);
   Array.prototype.forEach.call(
     document.getElementsByClassName('playername') as HTMLCollectionOf<HTMLInputElement>,
     el => {

@@ -2,6 +2,7 @@ import * as Event from './event.js';
 import { displayerror } from './err.js';
 import { gameaction } from './request.js';
 import * as readyButton from './ready.js';
+import * as Instructions from './instructions.js';
 const state = {
     selected: new Set(),
     ready: 'not',
@@ -10,8 +11,6 @@ const state = {
 export function render(armySize) {
     const jfel = document.getElementById('jobfair'), jobfair = jfel || document.createElement('div'), instructions = document.createElement('div'), table = document.getElementById('table');
     jobfair.innerHTML = '';
-    instructions.className = 'instructions';
-    jobfair.appendChild(instructions);
     jobfair.id = 'jobfair';
     table.appendChild(jobfair);
     if (!armySize) {
@@ -23,9 +22,9 @@ export function render(armySize) {
         }
     }
     else {
-        instructions.innerHTML = `recruit ${armySize} units for your army`;
         state.armySize = armySize;
     }
+    Instructions.dropdown('jobfair', `recruit ${armySize} units for your army`);
     state.ready = 'not';
     state.selected = new Set();
 }

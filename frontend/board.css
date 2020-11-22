@@ -672,6 +672,29 @@ span.tooltip, button .tooltip {
   box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 0.2vh rgba(0,0,0,0.3);
 }
 
+.dropdown {
+  width: 76%;
+  background-color: rgba(200,199,180,0.8);
+  position: absolute;
+  top: 0;
+  left: 12%;
+  text-align: center;
+  padding: 0.2em 0.8em 0.2em 0;
+  border-radius: 0 0 0.4em 0.4em;
+  border: 0.1em solid #ce8f9f;
+  border-top: none;
+}
+
+.dropdown .dismiss {
+  width: 1.3em;
+  height: 1.3em;
+  padding: 0;
+  font-size: 80%;
+  position: absolute;
+  top: 0;
+  right: 1px;
+}
+
 /* jobfair */
 
 #jobfair {
@@ -682,15 +705,6 @@ span.tooltip, button .tooltip {
   box-sizing: border-box;
   padding: 2px;
   padding-right: 4px;
-}
-
-#jobfair .instructions {
-  width: 76%;
-  background-color: rgba(200,199,180,0.8);
-  position: absolute;
-  top: 0;
-  left: 12%;
-  text-align: center;
 }
 
 .candidate {

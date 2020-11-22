@@ -4,6 +4,7 @@ import { displayerror } from './err.js';
 import { gameaction } from './request.js';
 import * as readyButton from './ready.js';
 import { gmeta } from './state.js';
+import * as Instructions from './instructions.js';
 
 const state = {
   selected: new Set(),
@@ -19,9 +20,6 @@ export function render(armySize: number) {
 
   jobfair.innerHTML = '';
 
-  instructions.className = 'instructions';
-  jobfair.appendChild(instructions);
-
   jobfair.id = 'jobfair';
   table.appendChild(jobfair);
 
@@ -32,9 +30,9 @@ export function render(armySize: number) {
       console.log({err: 'noarmysize', state, armySize});
     }
   } else {
-    instructions.innerHTML = `recruit ${armySize} units for your army`;
     state.armySize = armySize;
   }
+  Instructions.dropdown('jobfair', `recruit ${armySize} units for your army`);
   state.ready = 'not';
   state.selected = new Set();
 }

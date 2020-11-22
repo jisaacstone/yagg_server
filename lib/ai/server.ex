@@ -62,8 +62,10 @@ defmodule Yagg.AI.Server do
     {:noreply, state}
   end
   def handle_info(%{kind: :gameover}, state) do
-    :ok = Table.board_action(state.pid, state.robot, %Ready{})
-    {:noreply, state}
+    case Table.board_action(state.pid, state.robot, %Ready{}) do
+      {:err, :badstate} -> {:stop, :normal, state}  # opponent left
+      :ok -> {:noreply, state}
+    end
   end
   def handle_info(%{kind: :game_started}, state) do
     case Table.get_state(state.pid) do
