@@ -10,7 +10,7 @@ defmodule Unit.Howloo do
     Unit.new(
       position,
       :howloo,
-      3,
+      5,
       4,
       Howloo.Horseshoe
     )

@@ -98,7 +98,7 @@ defmodule Board.Configuration.Random do
       Unit.Burninator.new(position),
       Unit.Tinker.new(position),
       Unit.Mediacreep.new(position),
-      Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
+      Unit.Sparky.new(position),
       Unit.Dogatron.new(position),
       Unit.Catmover.new(position),
       Unit.Maycorn.new(position),
@@ -178,8 +178,8 @@ defmodule Board.Configuration.Alpha do
       Unit.Dogatron.new(position),
       Unit.Poisonblade.new(position),
       Unit.Burninator.new(position),
+      Unit.Sparky.new(position),
       Unit.new(position, :bezerker, 9, 2),
-      Unit.new(position, :sparky, 1, 0, Ability.Copyleft),
       Unit.new(position, :tim, 1, 8),
     ]
   end
