@@ -169,6 +169,7 @@ body[data-gamestate=gameover] {
   grid-auto-rows: minmax(0, 1fr);
   background-image: url("img/orgyelgrad.png");
   background-size: cover;
+  border: 0.1em inset var(--light-teal);
 }
 
 .boardrow {
@@ -180,9 +181,9 @@ body[data-gamestate=gameover] {
 }
 
 .boardsquare {
-  border: 2px inset #4B9;
+  border: 2px inset var(--light-teal);
   box-sizing: border-box;
-  background-color: rgba(255,254,254,0.5);
+  background-color: var(--transparent-white-20);
   display: flex;
   overflow: hidden;
 }
@@ -200,11 +201,11 @@ body[data-gamestate=gameover] {
 }
 
 .boardrow.northrow {
-  background-color: rgba(101,108,200,0.4);
+  background-color: var(--north-transparent-20);
 }
 
 .boardrow.southrow {
-  background-color: rgba(110,80,45,0.4);
+  background-color: var(--south-transparent-20);
 }
 
 /* HAND */
@@ -212,9 +213,9 @@ body[data-gamestate=gameover] {
 #hand {
   grid-area: hand;
   display: flex;
-  background-color: rgba(185, 235, 220, 0.6);
+  background-color: var(--wood-transparent);
   background-image: url("img/paper_bg_transparent_med.png");
-  border-top: 2px solid rgba(75, 90, 80, 0.8);
+  border-top: 2px solid var(--tealgrey-dark);
 }
 
 .card {
@@ -259,10 +260,10 @@ body[data-gamestate=gameover] {
 }
 
 .unit.north {
-  background-color: rgba(45, 198, 221, 1);
+  background-color: var(--north-main);
 }
 .unit.south {
-  background-color: rgba(230, 188, 62, 1);
+  background-color: var(--south-main);
 }
 .unit-name {
   grid-area: name;
@@ -330,7 +331,7 @@ body[data-gamestate=gameover] {
 .unit-ability {
   margin-bottom: 1px;
   padding: 0 3px;
-  background-color: rgba(232, 225, 239, 0.9);
+  background-color: var(--transparent-white-90);
   color: #1E4658;
   border-width: 2px;
   border-radius: min(1vw, 1vh);
@@ -610,14 +611,11 @@ span.tooltip, button .tooltip {
   box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px rgba(0,0,0,0.3);
 }
 
-[data-turn="opponent"] #gameinfo {
-  background-color: wheat;
-  background-color: rgba(80, 225, 92, 0.30);
-}
-
+[data-turn="opponent"] #gameinfo,
 [data-turn="player"] #player {
   background-color: wheat;
-  background-color: rgba(80, 225, 92, 0.30);
+  background-color: var(--wood-transparent);
+  border: 0.1em solid var(--wood-dark);
 }
 
 .playername, #gamestate, .uibutton {
@@ -627,9 +625,9 @@ span.tooltip, button .tooltip {
   text-align: center;
 }
 .playername, #gamestate {
-  background-color: rgba(245, 244, 249, 0.2);
+  background-color: var(--transparent-white-20);
   font-weight: bold;
-  color: #425;
+  color: var(--wood-dark);
   text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
 }
 
@@ -643,7 +641,7 @@ span.tooltip, button .tooltip {
 }
 
 .playername[data-turn='true'] {
-  background-color: rgba(40, 225, 82, 0.30);
+  background-color: var(--transparent-white-90);
 }
 
 #buttons {
@@ -652,10 +650,10 @@ span.tooltip, button .tooltip {
 }
 
 .uibutton {
-  background-color: rgba(232, 225, 239, 0.9);
-  color: #1E4658;
+  background-color: var(--transparent-white-90);
+  color: var(--black-steelblue);
   border-radius: min(1vw, 1vh);
-  border-color: #2e5678;
+  border-color: var(--dark-steelblue);
   border-width: 0.1em;
   cursor: pointer;
   box-shadow: inset 0.2em 0.2em 0.3em rgba(240, 241, 242, 0.5);
@@ -674,14 +672,14 @@ span.tooltip, button .tooltip {
 
 .dropdown {
   width: 76%;
-  background-color: rgba(200,199,180,0.8);
+  background-color: var(--tealgrey-transparent);
   position: absolute;
   top: 0;
   left: 12%;
   text-align: center;
   padding: 0.2em 0.8em 0.2em 0;
   border-radius: 0 0 0.4em 0.4em;
-  border: 0.1em solid #ce8f9f;
+  border: 0.1em solid var(--salmon);
   border-top: none;
 }
 
@@ -713,7 +711,7 @@ span.tooltip, button .tooltip {
 }
 
 .candidate .unit {
-  background-color: rgba(100, 112, 90, 0.8);
+  background-color: var(--tealgrey-dark);
 }
 
 .candidate .unit-attack, .candidate .unit-defense {
@@ -723,12 +721,13 @@ span.tooltip, button .tooltip {
 }
 
 .candidate[data-uistate='selected'] .unit {
-  background-color: rgba(110, 232, 120, 0.9);
+  background-color: var(--salmon-transparent);
 }
 
 #counter {
   text-align: center;
-  color: #1E4658;
+  color: var(--dark-steelblue);
+  background-color: var(--transparent-white-20);
   font-weight: bold;
   font-size: 110%;
   grid-row: 3;
@@ -738,6 +737,7 @@ span.tooltip, button .tooltip {
 
 .overlaycontainer {
   position: absolute;
+  background-color: var(--transparent-white-20);
   background: repeating-linear-gradient(40deg,
     rgba(240, 230, 221, 0.2),
     rgba(240, 230, 221, 0.2) max(2vh, 2vw),
@@ -763,7 +763,7 @@ span.tooltip, button .tooltip {
 
 .overlay.waiting {
   border-radius: min(5vh, 5vw);
-  border: 5px inset steelblue;
+  border: 5px inset var(--steelblue);
   box-sizing: border-box;
   padding: 10vh;
   text-align: center;
@@ -777,7 +777,7 @@ span.tooltip, button .tooltip {
 
 .waiting div {
   margin-bottom: max(2vh, 2vw);
-  color: #2e5678;
+  color: var(--dark-steelblue);
   text-shadow: 1px 1px 2px rgba(0, 1, 36, 0.2);
   font-size: max(2.5vw, 2.5vh);
   font-variant-caps: all-small-caps;
@@ -786,7 +786,8 @@ span.tooltip, button .tooltip {
 
 .details {
   border-radius: min(5vh, 5vw);
-  border: 5px inset steelblue;
+  padding: 0.5em;
+  border: 5px inset var(--steelblue);
   text-align: center;
   font-size: 130%;
   text-shadow: rgba(245, 244, 245, 0.5) -1px -1px 2px;

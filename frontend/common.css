@@ -1,3 +1,25 @@
+:root {
+  --steelblue: #4682b4;
+  --dark-steelblue: #2e5678;
+  --black-steelblue: #1e3950;
+  --dark-purple: #425;
+  --light-teal: #4B9;
+  --dark-teal: #2d7c66;
+  --salmon: #C89;
+  --dark-salmon: #885a66;
+  --wood-dark: #503840;
+  --tealgrey-transparent: rgba(175, 217, 205, 0.8);
+  --tealgrey-dark: rgba(75, 90, 80, 0.8);
+  --wood-transparent: rgba(185, 170, 154, 0.8);
+  --salmon-transparent: rgba(204, 136, 153, 0.9);
+  --transparent-white-90: rgba(232, 225, 239, 0.9);
+  --transparent-white-20: rgba(232, 225, 239, 0.2);
+  --north-main: rgba(45, 198, 221, 0.9);
+  --north-transparent-20: RGBA(45, 198, 221, 0.3);
+  --south-main: rgba(230, 188, 62, 0.9);
+  --south-transparent-20: rgba(255, 192, 0, 0.4);
+}
+
 body {
   justify-content: center;
   box-sizing: border-box;
@@ -6,4 +28,5 @@ body {
   overflow: hidden;
   font-size: min(2.5vh, 2.5vw);
   font-family: verdana;
+  color: var(--black-steelblue);
 }
