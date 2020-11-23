@@ -17,6 +17,7 @@ export function gameaction(action, data, scope = 'table', id = null) {
     const tableId = id || tableid();
     const host = hostname(), url = `http://${host}/${scope}/${tableId}/a/${action}`;
     return Player.get().then(({ id }) => {
+        document.getElementById('infobox').innerHTML = '';
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.addEventListener('load', function () {

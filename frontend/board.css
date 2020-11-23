@@ -48,9 +48,6 @@ body {
     min-height: 20vw;
     max-height: 23vw;
   }
-  #player .playername, #player #counter {
-    grid-column: 1/3;
-  }
 }
 
 @media (orientation: portrait) {
@@ -215,7 +212,9 @@ body[data-gamestate=gameover] {
   display: flex;
   background-color: var(--wood-transparent);
   background-image: url("img/paper_bg_transparent_med.png");
-  border-top: 2px solid var(--tealgrey-dark);
+  border-top: 0.1em solid var(--tealgrey-dark);
+  border-left: 0.1em solid var(--tealgrey-dark);
+  padding-left: 0.1em;
 }
 
 .card {
@@ -384,7 +383,7 @@ body[data-gamestate=gameover] {
 span.tooltip, button .tooltip {
   display: none;
   position: absolute;
-  margin-left: 5px;
+  margin-left: 0.4em
   min-width: 10%;
   max-width: 20%;
   padding: 4px;
@@ -565,7 +564,7 @@ span.tooltip, button .tooltip {
   border-width: 3px;
 }
 [data-uistate='selected'] .unit {
-  border-width: 5px;
+  border-width: 0.4em
 }
 [data-uistate='moveoption'] {
   cursor: pointer;
@@ -575,28 +574,27 @@ span.tooltip, button .tooltip {
               inset max(-1vh, -1vw) max(-1vh, -1vw) max(3vh, 3vw) rgba(2,41,22,0.3);
 }
 [data-uistate='moveoption']:hover {
-  border-width: 5px;
+  border-width: 0.4em
   background-color: rgba(255,254,254,0.2)
 }
 
 /* Left */
 
-#gameinfo {
-  grid-area: opponent;
+#gameinfo, #player {
   margin: 5%;
   border-radius: 5%;
-  align-content: center;
-  justify-content: center;
+  align-content: stretch;
+  justify-content: stretch;
+  row-gap: 0.3em;
   display: grid;
 }
 
 #player {
   grid-area: player;
-  margin: 5%;
-  border-radius: 5%;
-  align-content: center;
-  justify-content: center;
-  display: grid;
+}
+
+#gameinfo {
+  grid-area: opponent;
 }
 
 #infobox {
@@ -623,7 +621,11 @@ span.tooltip, button .tooltip {
   margin: 3px;
   border-radius: min(1vh, 1vw);
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 .playername, #gamestate {
   background-color: var(--transparent-white-20);
   font-weight: bold;
@@ -641,12 +643,11 @@ span.tooltip, button .tooltip {
 }
 
 .playername[data-turn='true'] {
-  background-color: var(--transparent-white-90);
+  background-color: var(--wood-transpaarent);
 }
 
 #buttons {
   display: grid;
-  grid-column: 1/3;
 }
 
 .uibutton {
@@ -763,7 +764,7 @@ span.tooltip, button .tooltip {
 
 .overlay.waiting {
   border-radius: min(5vh, 5vw);
-  border: 5px inset var(--steelblue);
+  border: 0.4em inset var(--steelblue);
   box-sizing: border-box;
   padding: 10vh;
   text-align: center;
@@ -787,7 +788,7 @@ span.tooltip, button .tooltip {
 .details {
   border-radius: min(5vh, 5vw);
   padding: 0.5em;
-  border: 5px inset var(--steelblue);
+  border: 0.4em inset var(--steelblue);
   text-align: center;
   font-size: 130%;
   text-shadow: rgba(245, 244, 245, 0.5) -1px -1px 2px;
