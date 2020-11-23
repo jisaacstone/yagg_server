@@ -6,13 +6,16 @@ export function dropdown(key: string, text: string) {
   displayDropdown(lsKey, text);
 }
 
+export function clear() {
+  const existing = document.getElementsByClassName('dropdown');
+  Array.prototype.forEach.call(existing, (el) => el.remove());
+}
+
 function displayDropdown(lsKey: string, text: string) {
   const tableEl = document.getElementById('table'),
-    existing = document.getElementsByClassName('dropdown'),
     dropdownEl = document.createElement('div'),
     dropdownText = document.createElement('div'),
     dismiss = document.createElement('button');
-  Array.prototype.forEach.call(existing, (el) => el.remove());
   dropdownEl.className = 'dropdown';
   dropdownEl.appendChild(dropdownText);
   dropdownEl.appendChild(dismiss);

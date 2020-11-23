@@ -46,7 +46,7 @@ defmodule Yagg.Board.Configuration do
     configs = [
       Board.Configuration.Random,
       Board.Configuration.Alpha,
-      Board.Configuration.Chain,
+      Board.Configuration.Ice,
     ]
     Enum.map(configs, &describe(&1))
   end
@@ -86,28 +86,28 @@ defmodule Board.Configuration.Random do
 
   defp ten_random_units(position) do
     units = Enum.shuffle([
+      Unit.Antente.new(position),
+      Unit.Burninator.new(position),
+      Unit.Busybody.new(position),
+      Unit.Catmover.new(position),
+      Unit.Dogatron.new(position),
+      Unit.Electromouse.new(position),
+      Unit.Explody.new(position),
+      Unit.Howloo.new(position),
+      Unit.Maycorn.new(position),
+      Unit.Mediacreep.new(position),
+      Unit.Poisonblade.new(position),
+      Unit.Pushie.new(position),
+      Unit.Sackboom.new(position),
+      Unit.Shenamouse.new(position),
+      Unit.Sparky.new(position),
+      Unit.Spikeder.new(position),
       Unit.Tactician.new(position),
+      Unit.Tinker.new(position),
       Unit.new(position, :bezerker, 9, 2),
       Unit.new(position, :chopper, 7, 4),
-      Unit.new(position, :tim, 1, 8),
       Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
-      Unit.Sackboom.new(position),
-      Unit.Explody.new(position),
-      Unit.Pushie.new(position),
-      Unit.Poisonblade.new(position),
-      Unit.Burninator.new(position),
-      Unit.Tinker.new(position),
-      Unit.Mediacreep.new(position),
-      Unit.Sparky.new(position),
-      Unit.Dogatron.new(position),
-      Unit.Catmover.new(position),
-      Unit.Maycorn.new(position),
-      Unit.Spikeder.new(position),
-      Unit.Busybody.new(position),
-      Unit.Howloo.new(position),
-      Unit.Antente.new(position),
-      Unit.Shenamouse.new(position),
-      Unit.Electromouse.new(position),
+      Unit.new(position, :tim, 1, 8),
     ]) |> Enum.take(10)
     [Unit.Monarch.new(position) | units]
   end
@@ -162,23 +162,24 @@ defmodule Board.Configuration.Alpha do
 
   defp starting_units(position) do
     [
-      Unit.Monarch.new(position),
-      Unit.Tactician.new(position),
-      Unit.Busybody.new(position),
-      Unit.Explody.new(position),
-      Unit.Pushie.new(position),
-      Unit.Mediacreep.new(position),
-      Unit.Sackboom.new(position),
-      Unit.Spikeder.new(position),
-      Unit.Howloo.new(position),
-      Unit.Catmover.new(position),
       Unit.Antente.new(position),
-      Unit.Shenamouse.new(position),
-      Unit.Electromouse.new(position),
-      Unit.Dogatron.new(position),
-      Unit.Poisonblade.new(position),
       Unit.Burninator.new(position),
+      Unit.Busybody.new(position),
+      Unit.Catmover.new(position),
+      Unit.Dogatron.new(position),
+      Unit.Electromouse.new(position),
+      Unit.Explody.new(position),
+      Unit.Howloo.new(position),
+      Unit.Mediacreep.new(position),
+      Unit.Monarch.new(position),
+      Unit.Poisonblade.new(position),
+      Unit.Pushie.new(position),
+      Unit.Sackboom.new(position),
+      Unit.Shenamouse.new(position),
       Unit.Sparky.new(position),
+      Unit.Spikeder.new(position),
+      Unit.Tactician.new(position),
+      Unit.Tinker.new(position),
       Unit.new(position, :bezerker, 9, 2),
       Unit.new(position, :tim, 1, 8),
     ]
@@ -186,14 +187,14 @@ defmodule Board.Configuration.Alpha do
 
 end
 
-defmodule Board.Configuration.Chain do
+defmodule Board.Configuration.Ice do
   @behaviour Board.Configuration
 
   @impl Board.Configuration
-  def name(), do: "sevens"
+  def name(), do: "iceslide"
 
   @impl Board.Configuration
-  def description(), do: "seven by seven grid"
+  def description(), do: "all units slide"
 
   @impl Board.Configuration
   def new() do
@@ -203,31 +204,49 @@ defmodule Board.Configuration.Chain do
     }
     terrain = [
       {{0, 0}, :water},
-      {{6, 6}, :water},
-      {{0, 6}, :water},
-      {{6, 0}, :water},
-      {{2, 2}, :block},
-      {{4, 4}, :block},
+      {{1, 6}, :water},
+      {{2, 4}, :water},
+      {{3, 2}, :water},
+      {{4, 5}, :water},
+      {{5, 3}, :water},
+      {{6, 1}, :water},
+      {{7, 7}, :water},
     ]
     %Board.Configuration{
-      dimensions: {7, 7},
+      dimensions: {8, 8},
       units: units,
       terrain: terrain,
-      initial_module: Board,
+      initial_module: Jobfair,
+      army_size: 12,
     }
   end
 
   def starting_units(position) do
-    Enum.shuffle([
-      Unit.Monarch.new(position),
-      Unit.Catmover.new(position),
-      Unit.new(position, :bezerker, 7, 2),
-      Unit.Dogatron.new(position),
-      Unit.Explody.new(position),
-      Unit.Tactician.new(position),
-      Unit.Sackboom.new(position),
-      Unit.Poisonblade.new(position),
-      Unit.Burninator.new(position),
-    ])
+    Enum.map(
+      [
+        Unit.Monarch.new(position),
+        Unit.new(position, :bezerker, 9, 0),
+        Unit.new(position, :bezerker, 9, 0),
+        Unit.new(position, :chopper, 7, 2),
+        Unit.new(position, :chopper, 7, 2),
+        Unit.new(position, :tim, 1, 8),
+        Unit.new(position, :tim, 1, 8),
+        Unit.new(position, :rollander, 3, 6),
+        Unit.new(position, :rollander, 3, 6),
+        Unit.Antente.new(position),
+        Unit.Antente.new(position),
+        Unit.Explody.new(position),
+        Unit.Explody.new(position),
+        Unit.Pushie.new(position),
+        Unit.Pushie.new(position),
+        Unit.Poisonblade.new(position),
+        Unit.Poisonblade.new(position),
+        Unit.Burninator.new(position),
+        Unit.Burninator.new(position),
+        Unit.Shenamouse.new(position),
+        Unit.Shenamouse.new(position),
+      ],
+      &Unit.set_trigger(&1, :move, Unit.Ability.Slide)
+    )
   end
 end

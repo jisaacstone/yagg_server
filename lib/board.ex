@@ -20,6 +20,7 @@ defmodule Yagg.Board do
     dimensions: {0..8, 0..8},
     configuration: module,
   }
+  @type resolved :: {t, [Event.t]} | {:err, atom}
 
   defimpl Poison.Encoder, for: Board do
     def encode(%Board{grid: grid} = board, options) do
@@ -94,7 +95,7 @@ defmodule Yagg.Board do
     {:ok, %{grid: ongrid, hand: hand}}
   end
 
-  @spec move(t, Player.position, Grid.coord, Grid.coord) :: {t, [Event.t]} | {:err, atom}
+  @spec move(t, Player.position, Grid.coord, Grid.coord) :: resolved
   def move(%Board{} = board, position, from, to) do
     case board.grid[from] do
       %Unit{position: ^position} = unit ->
@@ -169,7 +170,7 @@ defmodule Yagg.Board do
     }
   end
 
-  @spec push_block(t, Grid.coord, Grid.coord) :: {t, [Event.t]} | {:err, atom}
+  @spec push_block(t, Grid.coord, Grid.coord) :: resolved
   def push_block(board, from, to) do
     dir = Grid.direction(from, to)
     square = Grid.next(dir, to)
@@ -185,7 +186,7 @@ defmodule Yagg.Board do
     end
   end
 
-  @spec do_battle(t, Unit.t, Unit.t, Grid.coord, Grid.coord) :: {t, [Event.t]} | {:err, atom}
+  @spec do_battle(t, Unit.t, Unit.t, Grid.coord, Grid.coord) :: resolved
   def do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _) do
     {:err, :noselfattack}
   end

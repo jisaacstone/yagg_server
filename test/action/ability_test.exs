@@ -74,7 +74,7 @@ defmodule YaggTest.Action.Ability do
 
   test "spikeder slide" do
     spikeder = Unit.Spikeder.new(:south)
-    enemy = Unit.Pushie.new(:north)
+    enemy = Unit.Sparky.new(:north)
     board = set_board(
         [
           {{3, 0}, spikeder},

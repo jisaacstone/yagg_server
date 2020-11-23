@@ -12,7 +12,7 @@ defmodule Unit.Antente do
     Unit.new(
       name: :antente,
       attack: 5,
-      defense: 3,
+      defense: 4,
       triggers: %{
         attack: Unit.Antente.Visible,
       },

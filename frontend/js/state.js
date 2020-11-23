@@ -7,6 +7,7 @@ export const gmeta = {
     phase: null,
 };
 function instructions(stateName) {
+    Instructions.clear();
     if (stateName === 'placement') {
         Instructions.dropdown('placement', 'place your units on the board. You must place your monarch. You do not need to place all your units');
     }

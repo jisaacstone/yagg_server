@@ -9,6 +9,7 @@ export const gmeta = {
 };
 
 function instructions(stateName) {
+  Instructions.clear();
   if (stateName === 'placement') {
     Instructions.dropdown(
       'placement',

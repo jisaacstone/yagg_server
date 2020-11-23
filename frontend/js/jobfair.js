@@ -9,7 +9,7 @@ const state = {
     armySize: 0
 };
 export function render(armySize) {
-    const jfel = document.getElementById('jobfair'), jobfair = jfel || document.createElement('div'), instructions = document.createElement('div'), table = document.getElementById('table');
+    const jfel = document.getElementById('jobfair'), jobfair = jfel || document.createElement('div'), counter = getCounter(), table = document.getElementById('table');
     jobfair.innerHTML = '';
     jobfair.id = 'jobfair';
     table.appendChild(jobfair);
@@ -25,6 +25,7 @@ export function render(armySize) {
         state.armySize = armySize;
     }
     Instructions.dropdown('jobfair', `recruit ${armySize} units for your army`);
+    counter.innerHTML = `${armySize}`;
     state.ready = 'not';
     state.selected = new Set();
 }
@@ -34,18 +35,23 @@ export function clear() {
         jobfair.remove();
     }
 }
-export function select(index) {
-    if (state.ready === 'ready') {
-        return false;
+function getCounter() {
+    const counter = document.getElementById('counter');
+    if (counter) {
+        return counter;
     }
-    if (state.selected.size >= state.armySize) {
-        displayerror(`you may only recruit ${state.armySize}`);
-        return false;
-    }
-    state.selected.add(index);
-    if (state.ready === 'not' && state.selected.size == state.armySize) {
+    const c = document.createElement('div');
+    c.id = 'counter';
+    document.getElementById('player').appendChild(c);
+    return c;
+}
+function countDown() {
+    const counter = document.getElementById('counter');
+    counter.innerHTML = `${state.armySize - state.selected.size}`;
+    if (state.selected.size == state.armySize) {
         readyButton.display('RECRUIT', () => {
-            state.ready = 'ready';
+            state.ready = 'READY';
+            counter.remove();
             gameaction('recruit', { units: Array.from(state.selected) }, 'table').then(() => {
                 readyButton.hide();
             }).catch(({ request }) => {
@@ -57,13 +63,28 @@ export function select(index) {
         });
         state.ready = 'displayed';
     }
+}
+export function select(index) {
+    if (state.ready === 'ready') {
+        return false;
+    }
+    if (state.selected.size >= state.armySize) {
+        displayerror(`you may only recruit ${state.armySize}`);
+        return false;
+    }
+    state.selected.add(index);
+    if (state.ready === 'not') {
+        countDown();
+    }
     return true;
 }
 export function deselect(index) {
     if (state.ready === 'ready') {
         return false;
     }
+    const counter = document.getElementById('counter');
     state.selected.delete(index);
+    counter.innerHTML = `${state.armySize - state.selected.size}`;
     if (state.ready === 'displayed' && state.selected.size < state.armySize) {
         readyButton.hide();
         state.ready = 'not';

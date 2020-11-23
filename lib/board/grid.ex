@@ -4,7 +4,7 @@ alias Yagg.Event
 alias Yagg.Table.Player
 
 defmodule Yagg.Board.Grid do
-  @type coord() :: {0..5, 0..5}
+  @type coord :: {0..9, 0..9}
   @type terrain :: :water | :block | Unit.t
   @type relative :: :left | :right | :front | :back
   @type t :: %{coord => terrain}

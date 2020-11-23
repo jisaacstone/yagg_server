@@ -10,7 +10,7 @@ defmodule Unit.Explody do
     Unit.new(
       position,
       :explody,
-      3,
+      5,
       2,
       :nil,
       %{death: Unit.Explody.Selfdestruct}

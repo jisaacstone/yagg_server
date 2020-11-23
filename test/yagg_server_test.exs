@@ -84,19 +84,19 @@ defmodule YaggTest.Endpoint do
 
   test "new with config" do
     %{id: id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
-    %{id: table_id} = call_200("/table/new", %{"configuration" => "sevens"}, id)
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "iceslide"}, id)
     call_204("/table/#{table_id}/a/join", %{}, id)
     table = get_200("/table/#{table_id}/state")
-    assert table.configuration.initial_module == "Elixir.Yagg.Board"
+    assert table.configuration.initial_module == "Elixir.Yagg.Jobfair"
     %{id: p2id} = call_200("/player/guest", %{"name" => "djill"})
     call_204("/table/#{table_id}/a/join", %{}, p2id)
     table = get_200("/table/#{table_id}/state")
-    assert table.board.grid[:"2,2"] == "block"
+    assert [_, _] = table.players
   end
 
   test "with ai" do
     %{id: id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
-    %{id: table_id} = call_200("/table/new", %{"configuration" => "sevens"}, id)
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "iceslide"}, id)
     call_204("/table/#{table_id}/a/join", %{player: "p1"}, id)
     table = get_200("/table/#{table_id}/state")
     assert [%{name: "bob"}] = table.players

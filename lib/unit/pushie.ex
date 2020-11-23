@@ -12,7 +12,7 @@ defmodule Unit.Pushie do
       position: position,
       name: :pushie,
       attack: 5,
-      defense: 0,
+      defense: 4,
       ability: Unit.Pushie.Push
     )
   end
