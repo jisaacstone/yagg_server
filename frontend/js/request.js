@@ -1,5 +1,6 @@
 import { hostname, getname, tableid } from './urlvars.js';
 import * as Player from './playerdata.js';
+import * as Infobox from './infobox.js';
 const dn = { name: null };
 function _name_() {
     // random name
@@ -17,7 +18,7 @@ export function gameaction(action, data, scope = 'table', id = null) {
     const tableId = id || tableid();
     const host = hostname(), url = `http://${host}/${scope}/${tableId}/a/${action}`;
     return Player.get().then(({ id }) => {
-        document.getElementById('infobox').innerHTML = '';
+        Infobox.clear();
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.addEventListener('load', function () {

@@ -4,6 +4,7 @@ import { displayerror } from './err.js';
 import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
 import * as Unit from './unit.js';
+import * as Infobox from './infobox.js';
 const global = { selected: null };
 function action(actType, args, cb = null) {
     gameaction(actType, args, 'board')
@@ -49,7 +50,7 @@ export function deselect() {
         }
     }
     global.selected = {};
-    document.getElementById('infobox').innerHTML = '';
+    Infobox.clear();
     if (rb) {
         rb.remove();
     }
@@ -182,7 +183,7 @@ export function bind_hand(card, index, player, unit_name) {
 export function bind_candidate(candidate, index) {
     candidate.onclick = (e) => {
         const childEl = candidate.firstElementChild;
-        document.getElementById('infobox').innerHTML = '';
+        Infobox.clear();
         if (candidate.dataset.uistate === 'selected') {
             if (Jobfair.deselect(index)) {
                 candidate.dataset.uistate = '';
