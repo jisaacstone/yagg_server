@@ -239,10 +239,10 @@ body[data-gamestate=gameover] {
   display: grid;
   font-size: 90%;
   width: 100%;
-  margin: 2px;
+  margin: 0.1em;
   border-radius: 5%;
   box-sizing: border-box;
-  border: 2px inset #C89;
+  border: 0.1em inset var(--salmon);
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -295,10 +295,9 @@ body[data-gamestate=gameover] {
 }
 .unit-attack, .unit-defense {
   font-weight: bold;
-  margin: 2px;
+  margin: 0.1em;
   border-radius: 28%;
   box-sizing: border-box;
-  background-color: rgba(245, 248, 246, 0.1);
   width: 85%;
   height: 85%;
   place-self: center;
@@ -312,15 +311,16 @@ body[data-gamestate=gameover] {
 .unit-defense:hover::after {
   content: 'defense';
 }
+
 .unit-attack::after, .unit-defense::after {
   visibility: hidden;
   color: #221;
   font-weight: normal;
   padding: 3px;
   font-size: 12px;
-  background-color: rgba(169, 168, 166, 0.8);
-  border: 2px solid rgba(89, 78, 86, 0.9);
-  text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
+  background-color: var(--wood-transparent);
+  border: 0.1em solid rgba(89, 78, 86, 0.9);
+  text-shadow: rgba(220, 218, 219, 0.2) -0.1em -0.1em 0;
 }
 .unit-attack:hover::after, .unit-defense:hover::after {
   position: absolute;
@@ -633,13 +633,17 @@ span.tooltip, button .tooltip {
   text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
 }
 
-.playername {
+#gamestate {
+  display: none;
+}
+
+.playername, #opponent {
   grid-row: 2;
   min-width: 5em;
 }
 
 .playername[data-ready='true'] {
-  color: #251;
+  background-color: var(--salmon-transparent);
 }
 
 .playername[data-turn='true'] {
@@ -657,7 +661,8 @@ span.tooltip, button .tooltip {
   border-color: var(--dark-steelblue);
   border-width: 0.1em;
   cursor: pointer;
-  box-shadow: inset 0.2em 0.2em 0.3em rgba(240, 241, 242, 0.5);
+  box-shadow: inset 0.2em 0.2em 0.3em white;
+  box-shadow: inset 0.2em 0.2em 0.3em white, inset -0.2em -0.1em 0.2em rgba(12, 4, 0, 0.2);
 }
 
 #player .uibutton {

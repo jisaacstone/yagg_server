@@ -94,7 +94,6 @@ function handleSomethingAlreadySelected(el, meta) {
             return true;
         }
         if (sel.element === el) {
-            el.firstChild.dispatchEvent(new Event('details'));
             // clicking the same thing again deselects
             deselect();
             return true;
@@ -140,11 +139,6 @@ function handleSelect(el, meta) {
     }
     else {
         console.log({ imm: Unit.isImmobile(el) });
-        if (Unit.isImmobile(el) || Unit.containsEnemyUnit(el)) {
-            console.log('deets');
-            el.dispatchEvent(new Event('details'));
-            return;
-        }
         if (!Unit.containsOwnedUnit(el)) {
             // Square with no owned unit
             return;
@@ -163,6 +157,7 @@ function handleSelect(el, meta) {
 export function select(thisEl, meta) {
     function select() {
         if (gmeta.boardstate === 'gameover') {
+            thisEl.firstChild && thisEl.firstChild.dispatchEvent(new Event('sidebar'));
             return;
         }
         if (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) {

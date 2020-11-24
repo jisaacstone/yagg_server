@@ -48,11 +48,6 @@ body > div, body > form {
 
 #createtable {
   padding: 0.4em;
-  border-radius: 0.6em;
-  border-size: 2px;
-  border-color: #556;
-  box-shadow: 2px 2px 2px rgba(0, 12, 16, 0.3);
-  cursor: pointer;
 }
 #createtable:hover {
   box-shadow: inset -2px -2px 2px rgba(0, 12, 16, 0.3);
