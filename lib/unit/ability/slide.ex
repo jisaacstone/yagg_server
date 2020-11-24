@@ -5,7 +5,7 @@ alias Yagg.Board.Action.Ability
 
 defmodule Unit.Ability.Slide do
   @moduledoc """
-  Keeps moving until it hits something
+  Slides through empty squares
   """
   use Ability
   @impl Ability

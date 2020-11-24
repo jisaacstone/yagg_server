@@ -202,7 +202,7 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
       tsym.innerHTML = symbolFor(name);
       triggerel.appendChild(tsym);
       tdes.className = 'trigger-description';
-      tdes.innerHTML = `${name} trigger: ${trigger.description}`;
+      tdes.innerHTML = `${trigger.description}`;
       triggerel.appendChild(tdes);
     }
     descriptions.appendChild(triggers);

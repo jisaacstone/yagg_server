@@ -18,7 +18,9 @@ defmodule Unit.Sparky do
   end
 
   defmodule Copyleft do
-    @moduledoc "copy the unit to the left of this unit, put the copy in your hand"
+    @moduledoc """
+    Duplicate the left unit into your hand
+    """
     use Ability
 
     @impl Ability

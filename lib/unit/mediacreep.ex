@@ -20,7 +20,7 @@ defmodule Unit.Mediacreep do
 
   defmodule Duplicate do
     @moduledoc """
-    leave behind a copy of itself with attack and defense reduced by 2
+    Leave behind a replica with -2 attack and defense
     """
     use Ability
 

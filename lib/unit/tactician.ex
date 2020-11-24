@@ -21,7 +21,7 @@ defmodule Unit.Tactician do
 
   defmodule Manuver do
     @moduledoc """
-    all adjacent friendly units move in the same direction
+    Move all adjacent friendly units in the same direction
     """
     use Ability
 

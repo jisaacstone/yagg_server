@@ -38,7 +38,7 @@ defmodule Unit.Tinker do
 
   defmodule Tonk do
     @moduledoc """
-    Give units to the right and left +2 attack
+    Give right and left units +2 attack
     """
     use Ability, noreveal: :true
     @impl Ability
@@ -49,7 +49,7 @@ defmodule Unit.Tinker do
 
   defmodule Tink do
     @moduledoc """
-    Give units to the front and back +2 attack
+    Give front and back units +2 attack
     """
     use Ability, noreveal: true
     @impl Ability

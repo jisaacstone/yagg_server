@@ -19,8 +19,7 @@ defmodule Unit.Pushie do
 
   defmodule Push do
     @moduledoc """
-    surrounding units move one square back
-    units at the edge are pushed off the board and die
+    Push adjacent units one square away or off the board
     """
     use Ability
 

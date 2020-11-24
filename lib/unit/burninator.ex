@@ -17,7 +17,7 @@ defmodule Unit.Burninator do
   end
 
   defmodule Rowburn do
-    @moduledoc "Destory all units in the same row"
+    @moduledoc "Destroy all units in the same row"
     use Ability
 
     def resolve(board, opts) do

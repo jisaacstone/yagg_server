@@ -56,8 +56,7 @@ defmodule Unit.Sackboom.Move do
   alias __MODULE__
   defmodule Zero do
     @moduledoc """
-    After three moves explode a bomb, destroying whatever is in the square to the left
-    (3 left)
+    Destroy everything in the left square on its third move
     """
     use Ability
     @impl Ability
@@ -68,8 +67,7 @@ defmodule Unit.Sackboom.Move do
 
   defmodule One do
     @moduledoc """
-    After three moves explode a bomb, destroying whatever is in the square to the left
-    (2 left)
+    Destroy everything in the left square on its second move
     """
     use Ability
     @impl Ability
@@ -80,7 +78,7 @@ defmodule Unit.Sackboom.Move do
 
   defmodule Two do
     @moduledoc """
-    Explode a bomb, destroying whatever is in the square to the left
+    Destroy everything in the left square on its next move
     """
     use Ability
     @impl Ability

@@ -3,7 +3,7 @@ alias Yagg.Board
 alias Yagg.Board.Action.Ability
 
 defmodule Unit.Ability.Poison do
-  @moduledoc "Poisons any units that touch it"
+  @moduledoc "Destroys units it touches"
   use Ability, noreveal: :true
 
   def resolve(board, opts) do

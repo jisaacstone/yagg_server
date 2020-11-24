@@ -33,7 +33,7 @@ end
 
 defmodule Unit.Shenamouse.SpyAttacker do
   @moduledoc """
-  reveal all information about any attacker
+  Reveal attacker
   """
   use Ability, noreveal: :true
 
@@ -51,7 +51,7 @@ end
 
 defmodule Unit.Shenamouse.Spy do
   @moduledoc """
-  reveal all information about surrounding units
+  Reveal adjacent units
   """
   use Ability, noreveal: :true
 

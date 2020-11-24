@@ -124,7 +124,7 @@ body[data-gamestate=battle] {
 
 body[data-gamestate=gameover] {
   background: repeating-radial-gradient(
-  circle at 50% 100%,
+  circle at 50% 102%,
   #FAB, #FAB 10px,
   #DD8 10px, #DD8 20px,
   #CFD 20px, #CFD 30px,
@@ -370,6 +370,7 @@ body[data-gamestate=gameover] {
   width: 100%;
   line-height: 1.5;
   text-align: center;
+  width: 2em;
 }
 
 .unit div:hover .tooltip {
@@ -512,18 +513,18 @@ span.tooltip, button .tooltip {
 }
 .unit.details .unit-trigger {
   margin: 0;
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: center;
 }
 .unit.details .unit-trigger:first-letter {
   text-transform: capitalize;
 }
 
 .unit.details .triggers:first-child::before {
-  content: 'triggers';
-  font-variant-caps: all-small-caps;
+  content: 'Triggers:';
   position: relative;
-  left: 0.3em;
-  top: -0.3em;
-  font-size: 80%;
   min-width: 80%;
 }
 

@@ -10,7 +10,7 @@ defmodule Unit.Monarch do
       :monarch,
       1,
       0,
-      Ability.Concede,
+      :nil,
       %{death: Ability.Concede}
     )
   end

@@ -20,7 +20,7 @@ defmodule Unit.Dogatron do
 
   defmodule Upgrade do
     @moduledoc """
-    Return to your hand and gain +2 attack and +2 defense
+    Add a copy to hand with +2 attack and defense.
     """
     use Ability, noreveal: true
     @impl Ability

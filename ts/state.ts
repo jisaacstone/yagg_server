@@ -13,11 +13,11 @@ function instructions(stateName) {
   if (stateName === 'placement') {
     Instructions.dropdown(
       'placement',
-      'place your units on the board. You must place your monarch. You do not need to place all your units');
+      'Place your monarch and as many other units as desired');
   } else if (stateName === 'battle') {
     Instructions.dropdown(
       'battle',
-      "Destroy your opponent's monarch. Protect your own monarch");
+      "Destroy your opponent's monarch while protecting your own");
   } else {
     console.log(`no instructions for ${stateName}`);
   }
