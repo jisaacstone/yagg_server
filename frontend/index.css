@@ -5,13 +5,13 @@ body {
   flex-wrap: wrap;
   background: repeating-linear-gradient(
     90deg,
-    #94b, #94b 10px,
+    var(--south-main), var(--south-main) 10px,
     #344 10px, #344 12px,
     #556 12px, #556 27px,
     #9ab 27px, #9ab 42px,
     #789 42px, #789 57px,
     #344 57px, #344 59px,
-    #94b 59px, #94b 70px);
+    var(--south-main) 59px, var(--south-main) 70px);
 }
 
 body > div, body > form {
@@ -26,8 +26,8 @@ body > div, body > form {
   min-width: 40%;
   max-width: 80%;
   max-height: 5em;
-  border: 2px solid #556;
-  background-color: #9AB;
+  border: 0.2em solid var(--ui-main-light);
+  background-color: var(--ui-main-desaturated);
   border-radius: 10px;
   padding: 1em;
   margin: 1em;
@@ -36,13 +36,13 @@ body > div, body > form {
 #createdialog {
   min-width: 40%;
   max-width: 80%;
-  border: 2px solid #556;
-  background-color: #ABB;
+  border: 0.2em solid var(--ui-alt-light);
+  background-color: var(--ui-alt-desaturated);
   border-radius: 10px;
   padding: 1em;
   margin: 1em;
   display: grid;
-  color: #344;
+  color: var(ui-alt-dark);
   row-gap: 0.5em;
 }
 
@@ -59,10 +59,10 @@ body > div, body > form {
   padding: 1em;
   margin: 1em;
   border-radius: 10px;
-  border: 2px solid #556;
-  background-color: #789;
+  border: 0.2em solid var(--ui-main-light);
+  background-color: var(--ui-main-desaturated);
   display: grid;
-  color: #344;
+  color: var(ui-main-dark);
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
@@ -71,14 +71,14 @@ body > div, body > form {
 }
 
 .table {
-  border: 2px inset #94B;
+  border: 0.2em inset var(--ui-main-saturated);
   border-radius: 5px;
   padding: 5px 2px;
   margin: 2px;
-  background-color: #9BC;
+  background-color: var(--ui-alt-light);
   text-align: center;
   cursor: pointer;
-  color: #662d7c;
+  color: var(--ui-alt-dark);
   text-shadow: 2px 2px 4px rgba(23, 14, 33, 0.3), -1px -1px 0 rgba(244, 246, 250, 0.3);
   display: flex;
   flex-flow: row wrap;

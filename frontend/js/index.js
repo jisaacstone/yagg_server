@@ -25,17 +25,14 @@ function displayTableData(tablesEl, data) {
     });
 }
 function renderTable(table, text) {
-    const tblbtn = document.createElement('div'), dimensions = document.createElement('div'), module = document.createElement('div'), id = document.createElement('div'), txt = document.createElement('div');
+    const tblbtn = document.createElement('div'), dimensions = document.createElement('div'), module = document.createElement('div'), txt = document.createElement('div');
     tblbtn.className = 'table';
     dimensions.className = 'dimensions';
     module.className = 'module';
-    id.className = 'tableid';
     txt.className = 'tabletxt';
     dimensions.innerHTML = `${table.config.dimensions.x}x${table.config.dimensions.y}`;
     module.innerHTML = table.config.initial_module.split('.').pop();
-    id.innerHTML = table.id;
     txt.innerHTML = text;
-    tblbtn.append(id);
     tblbtn.append(dimensions);
     tblbtn.append(module);
     tblbtn.append(txt);

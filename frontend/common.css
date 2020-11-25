@@ -35,7 +35,7 @@ body {
 
 .uibutton {
   background-color: var(--ui-main-light);
-  color: var(--ui-alt-dark);
+  color: var(--ui-alt-dark-dark);
   border-radius: min(1vw, 1vh);
   border-color: var(--ui-main-dark);
   border-width: 0.1em;

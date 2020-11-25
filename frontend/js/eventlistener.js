@@ -20,8 +20,12 @@ function readEventQueu(delay = 50) {
     const next = state.queue.shift();
     if (next) {
         if (Event[next.event]) {
-            console.log(`handeling ${next.event}`);
-            Event[next.event](next);
+            try {
+                Event[next.event](next);
+            }
+            catch (error) {
+                console.error({ error, next });
+            }
         }
         else {
             console.log({ msg: `no event handler for ${next.event}`, next });
