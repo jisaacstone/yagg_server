@@ -98,24 +98,33 @@ export function feature(event) {
     square.appendChild(feature);
 }
 export function unit_died(event) {
-    const square = document.getElementById(`c${event.x}-${event.y}`), unit = square.firstChild;
+    const square = document.getElementById(`c${event.x}-${event.y}`), unit = square.firstChild, animation = unit.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
     unit.innerHTML = `<div class="death">${SKULL}</div>`;
-    unit.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
-    setTimeout(function () {
+    const aniPromise = animation.finished.then(() => {
         unit.remove();
-    }, 850);
+    });
+    return { animation: aniPromise, squares: [`${event.x},${event.y}`] };
 }
 export function thing_moved(event) {
     const to = Board.square(event.to.x, event.to.y), from = Board.square(event.from.x, event.from.y), thing = from.firstChild;
     if (to) {
-        const child = to.firstChild, fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), xOffset = Math.round(fromRect.left - toRect.left) + 'px', yOffset = Math.round(fromRect.top - toRect.top) + 'px';
-        thing.style.position = 'relative';
-        thing.animate({
-            top: [yOffset, '0'],
-            left: [xOffset, '0'],
-        }, { duration: 100, easing: 'ease-in' });
-        delete thing.style.position;
+        const child = to.firstChild, fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), thingRect = thing.getBoundingClientRect(), animation = thing.animate({
+            top: [fromRect.top + 'px', toRect.top + 'px'],
+            left: [fromRect.left + 'px', toRect.left + 'px'],
+        }, { duration: 200, easing: 'ease-in-out' });
+        Object.assign(thing.style, {
+            position: 'fixed',
+            width: thingRect.width + 'px',
+            height: thingRect.height + 'px',
+        });
         to.appendChild(thing);
+        const aniPromise = animation.finished.then(() => {
+            thing.style.position = '';
+            thing.style.width = '';
+            thing.style.height = '';
+            console.log(`animation ${event.to.x},${event.to.y} finished`);
+        });
+        return { animation: aniPromise, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
     }
     else {
         if (thing) {
@@ -130,10 +139,10 @@ export function thing_gone(event) {
         thing.dataset.state = 'invisible';
     }
     else {
-        thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
-        setTimeout(function () {
+        const animation = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" }), aniPromise = animation.finished.then(() => {
             thing.remove();
-        }, 850);
+        });
+        return { animation: aniPromise, squares: [`${event.x},${event.y}`] };
     }
 }
 export function gameover(event) {

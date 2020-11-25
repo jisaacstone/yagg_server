@@ -7,6 +7,7 @@ const state = {
   interval: null,
   timeout: null,
   queue: [],
+  animations: {},
 }
 
 export function listen() {
@@ -20,12 +21,49 @@ function handleEvent(event) {
   state.queue.push(event);
 }
 
+function awaitAnimations(result): Promise<any> {
+  if (! result || !result.squares) {
+    return Promise.resolve(true);
+  }
+  if (result.squares.some((k) => state.animations[k])) {
+    console.log({start: 'waiting', xy: result.squares[0]});
+    const promises = [];
+    for (const [k, v] of Object.entries(state.animations)) {
+      // @ts-ignore
+      promises.push(v.then(() => {
+        console.log(`done waiting ${k}`);
+      }));
+    }
+    return Promise.all(promises).then(() => {
+      console.log({done: 'waiting', xy: result.squares[0]});
+      state.animations = {};
+      for (const k of result.squares) {
+        state.animations[k] = result.animation;
+      }
+    });
+  } else {
+    console.log('not waiting');
+    for (const k of result.squares) {
+      state.animations[k] = result.animation;
+    }
+    return Promise.resolve(true);
+  }
+}
+
 function readEventQueu(delay = 50) {
   const next = state.queue.shift();
   if (next) {
     if (Event[next.event]) {
+      console.log({handling: next});
       try {
-        Event[next.event](next);
+        const result = Event[next.event](next);
+        awaitAnimations(result).then(() => {
+          readEventQueu();
+        }).catch((error) => {
+          console.error({error, next});
+          readEventQueu();
+        });
+        return;
       } catch (error) {
         console.error({error, next});
       }

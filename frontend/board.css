@@ -182,7 +182,7 @@ body[data-gamestate=gameover] {
 .boardrow {
   display: grid;
   grid-auto-flow: column;
-  background-color: var(--ui-alt-desaturated-transparent);
+  background-color: var(--white-transparent-med);
   grid-auto-columns: minmax(0, 1fr);
   overflow: hidden;
 }
@@ -190,7 +190,7 @@ body[data-gamestate=gameover] {
 .boardsquare {
   border: 2px inset var(--ui-main-desaturated-transparent);
   box-sizing: border-box;
-  background-color: var(--white-transparent-high);
+  /* background-color: var(--white-transparent-med); */
   display: flex;
   overflow: hidden;
 }
