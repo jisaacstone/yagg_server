@@ -98,33 +98,38 @@ export function feature(event) {
     square.appendChild(feature);
 }
 export function unit_died(event) {
-    const square = document.getElementById(`c${event.x}-${event.y}`), unit = square.firstChild, animation = unit.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
-    unit.innerHTML = `<div class="death">${SKULL}</div>`;
-    const aniPromise = animation.finished.then(() => {
-        unit.remove();
-    });
-    return { animation: aniPromise, squares: [`${event.x},${event.y}`] };
+    const square = document.getElementById(`c${event.x}-${event.y}`), unit = square.firstChild, animation = () => {
+        const a = unit.animate({ opacity: [1, 0] }, { duration: 500, easing: "ease-in" });
+        unit.innerHTML = `<div class="death">${SKULL}</div>`;
+        return a.finished.then(() => {
+            unit.remove();
+        });
+    };
+    return { animation, squares: [`${event.x},${event.y}`] };
 }
 export function thing_moved(event) {
     const to = Board.square(event.to.x, event.to.y), from = Board.square(event.from.x, event.from.y), thing = from.firstChild;
     if (to) {
-        const child = to.firstChild, fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), thingRect = thing.getBoundingClientRect(), animation = thing.animate({
-            top: [fromRect.top + 'px', toRect.top + 'px'],
-            left: [fromRect.left + 'px', toRect.left + 'px'],
-        }, { duration: 200, easing: 'ease-in-out' });
-        Object.assign(thing.style, {
-            position: 'fixed',
-            width: thingRect.width + 'px',
-            height: thingRect.height + 'px',
-        });
-        to.appendChild(thing);
-        const aniPromise = animation.finished.then(() => {
-            thing.style.position = '';
-            thing.style.width = '';
-            thing.style.height = '';
-            console.log(`animation ${event.to.x},${event.to.y} finished`);
-        });
-        return { animation: aniPromise, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+        const fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), animation = () => {
+            const child = to.firstChild, thingRect = thing.getBoundingClientRect(), xoffset = thingRect.left - fromRect.left, yoffset = thingRect.top - fromRect.top;
+            console.log({ w: animation, event, xoffset, yoffset });
+            const a = thing.animate({
+                top: [fromRect.top + yoffset + 'px', toRect.top + yoffset + 'px'],
+                left: [fromRect.left + xoffset + 'px', toRect.left + xoffset + 'px'],
+            }, { duration: 200, easing: 'ease-in-out' });
+            Object.assign(thing.style, {
+                position: 'fixed',
+                width: thingRect.width + 'px',
+                height: thingRect.height + 'px',
+            });
+            to.appendChild(thing);
+            return a.finished.then(() => {
+                thing.style.position = '';
+                thing.style.width = '';
+                thing.style.height = '';
+            });
+        };
+        return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
     }
     else {
         if (thing) {
@@ -139,10 +144,13 @@ export function thing_gone(event) {
         thing.dataset.state = 'invisible';
     }
     else {
-        const animation = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" }), aniPromise = animation.finished.then(() => {
-            thing.remove();
-        });
-        return { animation: aniPromise, squares: [`${event.x},${event.y}`] };
+        const animation = () => {
+            const a = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
+            return a.finished.then(() => {
+                thing.remove();
+            });
+        };
+        return { animation, squares: [`${event.x},${event.y}`] };
     }
 }
 export function gameover(event) {
