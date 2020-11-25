@@ -14,10 +14,12 @@
   --salmon-transparent: rgba(204, 136, 153, 0.9);
   --transparent-white-90: rgba(232, 225, 239, 0.9);
   --transparent-white-20: rgba(232, 225, 239, 0.2);
+  /*
   --north-main: rgba(45, 198, 221, 0.9);
   --north-transparent-20: RGBA(45, 198, 221, 0.3);
   --south-main: rgba(230, 188, 62, 0.9);
   --south-transparent-20: rgba(255, 192, 0, 0.4);
+  */
 }
 
 body {
@@ -28,14 +30,14 @@ body {
   overflow: hidden;
   font-size: min(2.5vh, 2.5vw);
   font-family: verdana;
-  color: var(--black-steelblue);
+  color: var(--ui-main-dark-dark);
 }
 
 .uibutton {
-  background-color: var(--transparent-white-90);
-  color: var(--black-steelblue);
+  background-color: var(--ui-main-light);
+  color: var(--ui-alt-dark);
   border-radius: min(1vw, 1vh);
-  border-color: var(--dark-steelblue);
+  border-color: var(--ui-main-dark);
   border-width: 0.1em;
   cursor: pointer;
   box-shadow: inset 0.2em 0.2em 0.3em white;

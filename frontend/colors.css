@@ -1,0 +1,23 @@
+:root {
+  --north-main:	hsla(186, 68%, 55%, 1);
+  --north-muted: hsla(202, 52%, 64%, 0.5);
+  --south-main: hsla(278, 54%, 62%, 1);
+  --south-muted: hsla(278, 35%, 64%, 0.5);
+  --ui-alt-saturated: hsla(69, 65%, 50%, 1);
+  --ui-alt-desaturated: hsla(69, 25%, 70%, 0.9);
+  --ui-alt-desaturated-transparent: hsla(69, 35%, 80%, 0.6);
+  --ui-alt-light: hsla(69, 25%, 95%, 0.9);
+  --ui-alt-dark: hsla(69, 45%, 30%, 1);
+  --ui-alt-dark-dark: hsla(69, 45%, 12%, 0.9);
+  --ui-main-saturated: hsla(9, 65%, 50%, 1);
+  --ui-main-desaturated: hsla(9, 25%, 70%, 0.9);
+  --ui-main-light: hsla(9, 15%, 95%, 0.9);
+  --ui-main-desaturated-transparent: hsla(9, 35%, 75%, 0.6);
+  --ui-main-dark: hsla(9, 45%, 33%, 1);
+  --ui-main-dark-dark: hsla(9, 45%, 12%, 0.9);
+  --ui-main-dark-desaturated: hsla(9, 25%, 40%, 0.9);
+  --grey-transparent-med: hsla(0, 0, 50%, 0.4);
+  --white-transparent-high: hsla(0, 0, 99%, 0.2);
+  --white-transparent-low: hsla(0, 0, 99%, 0.9);
+  --black-transparent-med: hsla(9, 9%, 9%, 0.4);
+}

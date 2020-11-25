@@ -113,7 +113,7 @@ body[data-gamestate=placement] {
 }
 
 body[data-gamestate=jobfair] {
-  background-image: url("img/paper_bg_purp.png");
+  background-image: url("img/paper_bg_grn.png");
 }
 
 body[data-gamestate=battle] {
@@ -168,29 +168,29 @@ body[data-gamestate=gameover] {
 #board {
   margin: auto;
   grid-area: board;
-  background-color: #443;
+  background-color: var(--ui-main-desaturated);
   box-shadow: 1vh 2vh 1vh rgba(30, 33, 0, 0.4);
   display: grid;
   grid-auto-flow: row;
   align-content: stretch;
   grid-auto-rows: minmax(0, 1fr);
-  background-image: url("img/orgyelgrad.png");
+  background-image: url("img/oygrad.png");
   background-size: cover;
-  border: 0.1em inset var(--light-teal);
+  border: 0.1em inset var(--ui-main-dark);
 }
 
 .boardrow {
   display: grid;
   grid-auto-flow: column;
-  background-color: #rgba(181,220,205,0.3);
+  background-color: var(--ui-alt-desaturated-transparent);
   grid-auto-columns: minmax(0, 1fr);
   overflow: hidden;
 }
 
 .boardsquare {
-  border: 2px inset var(--light-teal);
+  border: 2px inset var(--ui-main-desaturated-transparent);
   box-sizing: border-box;
-  background-color: var(--transparent-white-20);
+  background-color: var(--white-transparent-high);
   display: flex;
   overflow: hidden;
 }
@@ -208,11 +208,11 @@ body[data-gamestate=gameover] {
 }
 
 .boardrow.northrow {
-  background-color: var(--north-transparent-20);
+  background-color: var(--north-muted);
 }
 
 .boardrow.southrow {
-  background-color: var(--south-transparent-20);
+  background-color: var(--south-muted);
 }
 
 /* HAND */
@@ -220,10 +220,10 @@ body[data-gamestate=gameover] {
 #hand {
   grid-area: hand;
   display: flex;
-  background-color: var(--wood-transparent);
+  background-color: var(--ui-alt-desaturated-transparent);
   background-image: url("img/paper_bg_transparent_med.png");
-  border-top: 0.1em solid var(--tealgrey-dark);
-  border-left: 0.1em solid var(--tealgrey-dark);
+  border-top: 0.1em solid var(--ui-alt-dark);
+  border-left: 0.1em solid var(--ui-alt-dark);
   padding-left: 0.1em;
 }
 
@@ -252,7 +252,7 @@ body[data-gamestate=gameover] {
   margin: 0.15em;
   border-radius: 5%;
   box-sizing: border-box;
-  border: 0.15em inset var(--salmon);
+  border: 0.15em inset var(--ui-main-saturated);
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -271,9 +271,11 @@ body[data-gamestate=gameover] {
 .unit.north {
   background-color: var(--north-main);
 }
+
 .unit.south {
   background-color: var(--south-main);
 }
+
 .unit-name {
   grid-area: name;
   padding-left: 0.3vh;
@@ -283,23 +285,18 @@ body[data-gamestate=gameover] {
   text-shadow: rgba(245, 244, 245, 0.5) -1px -1px 2px;
   min-height: 1.15em;
 }
-.unit.monarch {
-  box-shadow: inset 0 0 2px purple;
-  border-radius: 0;
-}
 
-.unit.monarch .unit-name {
-  color: #301;
-  text-shadow: rgba(240, 248, 219, 0.4) -1px -1px 0;
+.unit.monarch {
+  box-shadow: inset 0 0 5px var(--ui-main-light);
 }
 
 .unit-attack {
-  color: rgba(95, 12, 6, 1);
+  color: var(--ui-main-dark);
   border-color: rgba(199, 45, 46, 0.4);
   grid-area: attack;
 }
 .unit-defense {
-  color: rgba(15, 89, 6, 1);
+  color: var(--ui-alt-dark);
   border-color: rgba(82, 189, 6, 0.4);
   grid-area: defense;
 }
@@ -312,6 +309,8 @@ body[data-gamestate=gameover] {
   height: 85%;
   place-self: center;
   text-align: center;
+  text-shadow: 0.1em 0.1em 0.2em var(--grey-transparent-med);
+  -webkit-text-stroke: 1px var(--black-transparent-med);
 }
 
 /* attack/defense tooltips */
@@ -324,13 +323,14 @@ body[data-gamestate=gameover] {
 
 .unit-attack::after, .unit-defense::after {
   visibility: hidden;
-  color: #221;
+  color: var(--ui-main-dark-dark);
   font-weight: normal;
   padding: 3px;
   font-size: 12px;
-  background-color: var(--wood-transparent);
+  background-color: var(--ui-main-light);
   border: 0.1em solid rgba(89, 78, 86, 0.9);
   text-shadow: rgba(220, 218, 219, 0.2) -0.1em -0.1em 0;
+  -webkit-text-stroke: transparent;
 }
 .unit-attack:hover::after, .unit-defense:hover::after {
   position: absolute;
@@ -340,12 +340,12 @@ body[data-gamestate=gameover] {
 .unit-ability {
   margin-bottom: 1px;
   padding: 0 3px;
-  background-color: var(--transparent-white-90);
-  color: #1E4658;
+  background-color: var(--white-transparent-low);
+  color: var(--ui-alt-dark-dark);
   border-width: 2px;
   border-radius: min(1vw, 1vh);
-  border-color: #2e5678;
-  text-shadow: #CBB -1px -1px 0;
+  border-color: var(--ui-alt-dark);
+  text-shadow: var(--ui-alt-desaturated-transpaarent) -1px -1px 0;
   text-overflow: ellipsis;
   overflow: hidden;
   grid-area: ability;
@@ -355,16 +355,10 @@ body[data-gamestate=gameover] {
 }
 .unit-ability:hover {
   cursor: pointer;
-  background-color: rgba(170, 175, 177, 0.4);
+  background-color: var(--ui-main-light);
 }
 .unit-ability:hover .tooltip {
   display: block;
-}
-.unit.north .unit-ability {
-  color: rgba(15, 68, 61, 1);
-}
-.unit.south .unit-ability {
-  color: rgba(70, 68, 17, 1);
 }
 
 .triggers {
@@ -399,10 +393,9 @@ span.tooltip, button .tooltip {
   max-width: 20%;
   padding: 4px;
   font-size: 80%;
-  color: #221;
-  background-color: rgba(169, 168, 166, 0.8);
-  border: 2px solid rgba(89, 78, 86, 0.9);
-  text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
+  color: var(--ui-main-dark-dark);
+  background-color: var(--ui-main-light);
+  border: 2px solid var(--ui-main-dark);
 }
 
 .death {
@@ -410,22 +403,6 @@ span.tooltip, button .tooltip {
   margin-top: 20px;
   font-size: 200%;
   text-align: center;
-}
-
-.details-button {
-  padding: 0;
-  background-color: rgba(99,106,100,0.2);
-  border-radius: 28%;
-  border-width: 2px;
-  box-sizing: border-box;
-  border-style: inset;
-  margin: 2px;
-  grid-area: details;
-  width: 85%;
-  height: 85%;
-  text-align: center;
-  justify-self: center;
-  align-self: center;
 }
 
 /* details */
@@ -512,7 +489,7 @@ span.tooltip, button .tooltip {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom center;
-  border-bottom: 2px inset rgba(190, 65, 43, 0.5);
+  border-bottom: 0.2em dotted var(--ui-alt-light);
   width: 100%;
   height: 100%;
 }
@@ -566,11 +543,6 @@ span.tooltip, button .tooltip {
 
 /* UIState */
 
-[data-active=true] {
-  background-color: darkgrey;
-  color: white;
-}
-
 [data-uistate='selected'] {
   border-width: 3px;
 }
@@ -579,14 +551,12 @@ span.tooltip, button .tooltip {
 }
 [data-uistate='moveoption'] {
   cursor: pointer;
-  border-color: rgba(105, 145, 45, 1);
-  border-style: inset;
+  border-color: var(--ui-alt-saturated);
   box-shadow: inset min(1vh, 1vw) min(1vh, 1vw) max(1vh, 1vw) rgba(2,4,32,0.5),
               inset max(-1vh, -1vw) max(-1vh, -1vw) max(3vh, 3vw) rgba(2,41,22,0.3);
 }
 [data-uistate='moveoption']:hover {
   border-width: 0.4em
-  background-color: rgba(255,254,254,0.2)
 }
 
 /* Left */
@@ -620,11 +590,10 @@ span.tooltip, button .tooltip {
   box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px rgba(0,0,0,0.3);
 }
 
-[data-turn="opponent"] #gameinfo,
-[data-turn="player"] #player {
-  background-color: wheat;
-  background-color: var(--wood-transparent);
-  border: 0.1em solid var(--wood-dark);
+[data-turn="opponent"] #gameinfo .playername,
+[data-turn="player"] #player .playername {
+  background-color: var(--ui-main-desaturated-transparent);
+  border: 0.1em solid var(--ui-main-light);
 }
 
 .playername, #gamestate, .uibutton {
@@ -638,10 +607,15 @@ span.tooltip, button .tooltip {
 }
 
 .playername, #gamestate {
-  background-color: var(--transparent-white-20);
+  background-color: var(--white-transparent-low);
   font-weight: bold;
-  color: var(--wood-dark);
+  color: var(--ui-alt-dark);
   text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
+}
+
+#opponent .playername {
+  width: 100%;
+  height: 100%;
 }
 
 #gamestate {
@@ -654,31 +628,19 @@ span.tooltip, button .tooltip {
 }
 
 #opponent {
-  display: grid;
-  align-content: center;
+  display: flex;
 }
 
 .playername[data-ready='true'] {
-  background-color: var(--salmon-transparent);
+  background-color: var(--ui-alt-desaturated);
 }
 
 .playername[data-turn='true'] {
-  background-color: var(--wood-transpaarent);
+  /* background-color: var(--ui-main-desaturated); */
 }
 
 #buttons {
   display: grid;
-}
-
-.uibutton {
-  background-color: var(--transparent-white-90);
-  color: var(--black-steelblue);
-  border-radius: min(1vw, 1vh);
-  border-color: var(--dark-steelblue);
-  border-width: 0.1em;
-  cursor: pointer;
-  box-shadow: inset 0.2em 0.2em 0.3em white;
-  box-shadow: inset 0.2em 0.2em 0.3em white, inset -0.2em -0.1em 0.2em rgba(12, 4, 0, 0.2);
 }
 
 #player .uibutton {
@@ -694,14 +656,15 @@ span.tooltip, button .tooltip {
 
 .dropdown {
   width: 76%;
-  background-color: var(--tealgrey-transparent);
+  background-color: var(--ui-alt-desaturated);
+  color: var(--ui-main-dark-dark);
   position: absolute;
   top: 0;
   left: 12%;
   text-align: center;
   padding: 0.2em 0.8em;
   border-radius: 0 0 0.4em 0.4em;
-  border: 0.1em solid var(--salmon);
+  border: 0.1em solid var(--ui-main-dark);
   border-top: none;
 }
 
@@ -732,7 +695,8 @@ span.tooltip, button .tooltip {
 }
 
 .candidate .unit {
-  background-color: var(--tealgrey-dark);
+  background-color: var(--ui-main-desaturated);
+  border-color: var(--ui-main-saturated);
 }
 
 .candidate .unit-attack, .candidate .unit-defense {
@@ -742,23 +706,24 @@ span.tooltip, button .tooltip {
 }
 
 .candidate[data-uistate='selected'] .unit {
-  background-color: var(--salmon-transparent);
+  background-color: var(--ui-alt-desaturated);
 }
 
 #counter {
   text-align: center;
-  color: var(--dark-steelblue);
-  background-color: var(--transparent-white-20);
+  color: var(--ui-main-saturated);
+  background-color: var(--white-transparent-high);
   font-weight: bold;
   font-size: 110%;
   grid-row: 3;
+  text-shadow: 0.2em 0.1em 0.2em var(--ui-alt-desaturated-transparent);
 }
 
 /* overlay */
 
 .overlaycontainer {
   position: absolute;
-  background-color: var(--transparent-white-20);
+  background-color: var(--white-transparent-high);
   background: repeating-linear-gradient(40deg,
     rgba(240, 230, 221, 0.2),
     rgba(240, 230, 221, 0.2) max(2vh, 2vw),
@@ -784,7 +749,7 @@ span.tooltip, button .tooltip {
 
 .overlay.waiting {
   border-radius: min(5vh, 5vw);
-  border: 0.4em inset var(--steelblue);
+  border: 0.4em inset var(--ui-main-saturated);
   box-sizing: border-box;
   padding: 10vh;
   text-align: center;
@@ -798,7 +763,7 @@ span.tooltip, button .tooltip {
 
 .waiting div {
   margin-bottom: max(2vh, 2vw);
-  color: var(--dark-steelblue);
+  color: var(--ui-main-dark);
   text-shadow: 1px 1px 2px rgba(0, 1, 36, 0.2);
   font-size: max(2.5vw, 2.5vh);
   font-variant-caps: all-small-caps;
@@ -808,10 +773,10 @@ span.tooltip, button .tooltip {
 .details {
   border-radius: min(5vh, 5vw);
   padding: 0.5em;
-  border: 0.4em inset var(--steelblue);
+  border: 0.4em solid var(--ui-alt-light);
   text-align: center;
   font-size: 130%;
   text-shadow: rgba(245, 244, 245, 0.5) -1px -1px 2px;
-  background-color: rgba(234, 243, 244, 0.8);
+  background-color: var(--white-transparent-low);
   box-shadow: max(1vh, 1vw) max(2vh, 2vw) max(3vh, 3vw) rgba(0,2,5,0.3);
 }
