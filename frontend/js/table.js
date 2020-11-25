@@ -106,11 +106,11 @@ window.onload = function () {
     Request.gameaction('join', {}, 'table')
         .then(() => {
         fetchgamestate();
-        listen(Event);
+        listen();
     }).catch((err) => {
         console.log({ joinerror: err });
         fetchgamestate();
-        listen(Event);
+        listen();
     });
 };
 function leave() {

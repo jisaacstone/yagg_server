@@ -48,6 +48,9 @@ body {
     min-height: 20vw;
     max-height: 23vw;
   }
+  .dropdown .dismiss {
+    right: 1px;
+  }
 }
 
 @media (orientation: portrait) {
@@ -96,10 +99,17 @@ body {
   #readybutton.uibutton {
     grid-row: 2;
   }
+  .dropdown .dismiss {
+    left: 1px;
+  }
 }
 
 body[data-gamestate=placement] {
-  background: repeating-linear-gradient(40deg, #CCD, #CCD 15px, #eee 15px, #eee 30px, #BAB 30px, #B9B 45px);
+  background: repeating-linear-gradient(
+  40deg,
+  hsl(240, 20%, 83%), hsl(240, 20%, 83%) 15px,
+  hsl(0, 0%, 93%) 15px,	hsl(0, 0%, 93%) 30px,
+  hsl(300, 11%, 70%) 30px, hsl(300, 11%, 70%) 45px);
 }
 
 body[data-gamestate=jobfair] {
@@ -239,10 +249,10 @@ body[data-gamestate=gameover] {
   display: grid;
   font-size: 90%;
   width: 100%;
-  margin: 0.1em;
+  margin: 0.15em;
   border-radius: 5%;
   box-sizing: border-box;
-  border: 0.1em inset var(--salmon);
+  border: 0.15em inset var(--salmon);
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -643,6 +653,11 @@ span.tooltip, button .tooltip {
   min-width: 5em;
 }
 
+#opponent {
+  display: grid;
+  align-content: center;
+}
+
 .playername[data-ready='true'] {
   background-color: var(--salmon-transparent);
 }
@@ -684,20 +699,19 @@ span.tooltip, button .tooltip {
   top: 0;
   left: 12%;
   text-align: center;
-  padding: 0.2em 0.8em 0.2em 0;
+  padding: 0.2em 0.8em;
   border-radius: 0 0 0.4em 0.4em;
   border: 0.1em solid var(--salmon);
   border-top: none;
 }
 
 .dropdown .dismiss {
-  width: 1.3em;
-  height: 1.3em;
+  width: 1.5em;
+  height: 1.5em;
   padding: 0;
   font-size: 80%;
   position: absolute;
   top: 0;
-  right: 1px;
 }
 
 /* jobfair */

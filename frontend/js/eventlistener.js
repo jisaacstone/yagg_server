@@ -1,33 +1,45 @@
-import { getname, tableid, hostname } from './urlvars.js';
+import { tableid, hostname } from './urlvars.js';
 import * as Player from './playerdata.js';
+import * as Event from './event.js';
 const state = {
     eventListener: null,
-    interval: null
+    interval: null,
+    timeout: null,
+    queue: [],
 };
-export function listen(eventHandlers, listener = 'websocket') {
+export function listen() {
     if (state.eventListener === null) {
-        console.log('creating event listener');
-        if (listener === 'websocket') {
-            createWSEventListener(eventHandlers);
-        }
-        else {
-            createSSEventListener(eventHandlers);
-        }
+        createWSEventListener();
+        state.timeout = window.setTimeout(readEventQueu, 50);
     }
 }
-function createWSEventListener(eventHandlers) {
+function handleEvent(event) {
+    state.queue.push(event);
+}
+function readEventQueu(delay = 50) {
+    const next = state.queue.shift();
+    if (next) {
+        if (Event[next.event]) {
+            console.log(`handeling ${next.event}`);
+            Event[next.event](next);
+        }
+        else {
+            console.log({ msg: `no event handler for ${next.event}`, next });
+        }
+        readEventQueu();
+    }
+    else {
+        state.timeout = window.setTimeout(readEventQueu, delay, Math.min(delay * 2, 300));
+    }
+}
+function createWSEventListener() {
     const host = hostname();
     Player.get().then(({ id }) => {
         state.eventListener = new WebSocket(`ws://${host}/ws/${tableid()}/${id}`);
         state.eventListener.onmessage = (event) => {
             const evt = JSON.parse(event.data);
             console.log(evt);
-            if (eventHandlers[evt.event]) {
-                eventHandlers[evt.event](evt);
-            }
-            else {
-                console.log({ msg: `no event handler for ${evt.event}`, evt });
-            }
+            handleEvent(evt);
         };
         state.eventListener.onopen = (event) => {
             state.interval = setInterval(() => state.eventListener.send('ping'), 10000);
@@ -40,20 +52,5 @@ function createWSEventListener(eventHandlers) {
             console.log({ wscb: 'onerror', event });
             clearInterval(state.interval);
         };
-    });
-}
-function createSSEventListener(eventHandlers) {
-    const host = hostname();
-    const playername = getname();
-    state.eventListener = new EventSource(`http://${host}/sse/table/${tableid()}/events?player=${playername}`);
-    state.eventListener.addEventListener('game_event', function (ssevent) {
-        console.log({ ssevent });
-        const evt = JSON.parse(ssevent.data);
-        if (eventHandlers[evt.event]) {
-            eventHandlers[evt.event](evt);
-        }
-        else {
-            console.log({ msg: `no event handler for ${evt.event}`, evt });
-        }
     });
 }
