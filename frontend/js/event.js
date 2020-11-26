@@ -117,9 +117,11 @@ export function feature(event) {
 }
 export function unit_died(event) {
     const square = document.getElementById(`c${event.x}-${event.y}`), animation = () => {
-        const unit = square.firstChild, a = unit.animate({ opacity: [1, 0] }, { duration: 500, easing: "ease-in" });
+        const unit = square.firstChild;
         unit.innerHTML = `<div class="death">${SKULL}</div>`;
-        return a.finished.then(() => {
+        unit.dataset.dead = 'true';
+        return unit.animate({ opacity: [1, 0] }, { duration: 500, easing: "ease-in" }).finished.then(() => {
+            console.log({ unit });
             unit.remove();
         });
     };
@@ -140,7 +142,9 @@ export function thing_moved(event) {
                 width: thingRect.width + 'px',
                 height: thingRect.height + 'px',
             });
-            to.appendChild(thing);
+            if (!thing.dataset.dead) {
+                to.appendChild(thing);
+            }
             return a.finished.then(() => {
                 thing.style.position = '';
                 thing.style.width = '';

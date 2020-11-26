@@ -5,13 +5,13 @@ body {
   flex-wrap: wrap;
   background: repeating-linear-gradient(
     90deg,
-    var(--south-main), var(--south-main) 10px,
-    #344 10px, #344 12px,
-    #556 12px, #556 27px,
-    #9ab 27px, #9ab 42px,
-    #789 42px, #789 57px,
-    #344 57px, #344 59px,
-    var(--south-main) 59px, var(--south-main) 70px);
+    var(--south-muted),                 var(--south-muted)           1em,
+    #555                         1em,   #555                         1.2em,
+    var(--black-transparent-med) 1.2em, var(--black-transparent-med) 2.7em,
+    var(--north-main)            2.7em, var(--north-main)            4.2em,
+    var(--grey-transparent-med)  4.2em, var(--grey-transparent-med)  5.7em,
+    #555                         5.7em, #555                         5.9em,
+    var(--south-muted)           5.9em, var(--south-muted)           7em);
 }
 
 body > div, body > form {

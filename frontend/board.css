@@ -105,6 +105,11 @@ body {
 }
 
 body[data-gamestate=placement] {
+  background: repeating-linear-gradient(
+  40deg,
+  var(--ui-alt-desaturated), var(--ui-alt-desaturated) 2em,
+  var(--ui-main-desaturated) 2em, var(--ui-main-desaturated) 4em,
+  var(--grey-transparent-med) 4em, var(--grey-transparent-med) 6em);
   /*
   background: repeating-linear-gradient(
   40deg,
@@ -119,6 +124,15 @@ body[data-gamestate=jobfair] {
 }
 
 body[data-gamestate=battle] {
+  background: repeating-radial-gradient(
+    circle at -10% 120%,
+    var(--south-muted), var(--south-muted) 2em,
+    transparent 2em, transparent 4em
+  ), repeating-radial-gradient(
+    circle at 110% 120%,
+    var(--north-muted), var(--north-muted) 2em,
+    var(--grey-transparent-med) 2em, var(--grey-transparent-med) 4em
+  );
   /*
   background: repeating-radial-gradient(
     circle at -10% 120%,
@@ -138,11 +152,18 @@ body[data-gamestate=battle] {
 body[data-gamestate=gameover] {
   background: repeating-radial-gradient(
   circle at 50% 102%,
+  var(--ui-main-desaturated-transparent), var(--ui-main-desaturated-transparent) 2em,
+  var(--ui-alt-desaturated-transparent) 2em, var(--ui-alt-desaturated-transparent) 4em,
+  var(--north-muted) 4em, var(--north-muted) 6em,
+  var(--south-muted) 6em, var(--south-muted) 8em);
+  /*
+  background: repeating-radial-gradient(
+  circle at 50% 102%,
   #FAB, #FAB 10px,
   #DD8 10px, #DD8 20px,
   #CFD 20px, #CFD 30px,
   #9AD 30px, #9AD 40px
-  );
+  );*/
 }
 
 .waiting {
@@ -193,7 +214,7 @@ body[data-gamestate=gameover] {
 .boardsquare {
   border: 2px inset var(--ui-main-desaturated-transparent);
   box-sizing: border-box;
-  /* background-color: var(--white-transparent-med); */
+  background-color: var(--white-transparent-high);
   display: flex;
   overflow: hidden;
 }
@@ -211,11 +232,11 @@ body[data-gamestate=gameover] {
 }
 
 .boardrow.northrow {
-  background-color: var(--north-muted);
+  box-shadow: inset 0.2em -0.3em 1em var(--north-muted);
 }
 
 .boardrow.southrow {
-  background-color: var(--south-muted);
+  box-shadow: inset 0.2em -0.3em 1em var(--south-muted);
 }
 
 /* HAND */
@@ -271,12 +292,24 @@ body[data-gamestate=gameover] {
   cursor: pointer;
 }
 
+.unit.north .uibutton,
+.unit.north button {
+  border-color: var(--north-saturated);
+}
+
+.unit.south .uibutton,
+.unit.south button {
+  border-color: var(--south-saturated);
+}
+
 .unit.north {
   background-color: var(--north-main);
+  border-color: var(--south-saturated);
 }
 
 .unit.south {
   background-color: var(--south-main);
+  border-color: var(--north-saturated);
 }
 
 .unit-name {
@@ -720,6 +753,8 @@ span.tooltip, button .tooltip {
   font-size: 110%;
   grid-row: 3;
   text-shadow: 0.2em 0.1em 0.2em var(--ui-alt-desaturated-transparent);
+  display: grid;
+  align-content: center;
 }
 
 /* overlay */
