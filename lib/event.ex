@@ -35,6 +35,18 @@ defmodule Yagg.Event do
     %Event{stream: stream, kind: kind, data: data}
   end
 
+  defmodule Multi do
+    @moduledoc """
+    Multiple events
+    """
+    @spec new(
+      events: [Event.t]
+    ) :: Event.t
+    def new(params) do
+      Event.new(:global, :multi, params)
+    end
+  end
+
   defmodule UnitAssigned do
     @moduledoc """
     Placement Phase: a unit is assigned, from hand to square. never :global

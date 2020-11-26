@@ -15,9 +15,31 @@ import * as Hand from './hand.js';
 
 const unitsbyindex = {};
 
+export function multi({ events }) {
+  let squares = [];
+  const animations = [],
+    module = this;
+  for (const event of events) {
+    const result = module[event.event](event);
+    if (result && result.squares) {
+      squares = squares.concat(result.squares);
+      animations.push(result.animation);
+    }
+  }
+  if (animations.length > 0) {
+    const animation = () => {
+      return Promise.all(
+        animations.map((a) => a())
+      );
+    };
+    return { animation, squares };
+  }
+}
+
 export function game_started(event) {
   const board = document.getElementById('board'),
     state = (event.state || '').toLowerCase();
+  console.log({ self: self, this: this });
   Hand.clear();
   if (event.army_size || gmeta.phase === 'jobfair') {
     if (gmeta.boardstate === 'gameover') {
@@ -116,9 +138,9 @@ export function feature(event) {
 
 export function unit_died(event) {
   const square = document.getElementById(`c${event.x}-${event.y}`),
-    unit = square.firstChild as HTMLElement,
     animation = () => {
-      const a = unit.animate({ opacity: [1, 0] }, { duration: 500, easing: "ease-in" });
+      const unit = square.firstChild as HTMLElement,
+        a = unit.animate({ opacity: [1, 0] }, { duration: 500, easing: "ease-in" });
       unit.innerHTML = `<div class="death">${SKULL}</div>`;
       return a.finished.then(() => {
         unit.remove();

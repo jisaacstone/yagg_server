@@ -93,7 +93,7 @@ function createWSEventListener() {
       clearInterval(state.interval);
     }
     state.eventListener.onerror = (event) => {
-      console.log({ wscb: 'onerror', event });
+      console.error({ wscb: 'onerror', event });
       clearInterval(state.interval);
     }
   });

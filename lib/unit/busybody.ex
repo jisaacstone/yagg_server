@@ -41,7 +41,9 @@ defmodule Unit.Busybody do
       end
     end
 
-    defp place(board, [], events), do: {board, events}
+    defp place(board, [], events) do
+      {board, [Event.Multi.new(events: events)]}
+    end
     defp place(board, [{from, to, thing} | things], events) do
       case Grid.thing_at(board, to) do
         :out_of_bounds ->

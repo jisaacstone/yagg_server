@@ -1,6 +1,6 @@
 body {
   flex-direction: column;
-  background-color: #B090B2;
+  background-color: var(--grey-transparent-med);
 }
 
 #table {
@@ -105,11 +105,13 @@ body {
 }
 
 body[data-gamestate=placement] {
+  /*
   background: repeating-linear-gradient(
   40deg,
   hsl(240, 20%, 83%), hsl(240, 20%, 83%) 15px,
   hsl(0, 0%, 93%) 15px,	hsl(0, 0%, 93%) 30px,
   hsl(300, 11%, 70%) 30px, hsl(300, 11%, 70%) 45px);
+  */
 }
 
 body[data-gamestate=jobfair] {
@@ -117,6 +119,7 @@ body[data-gamestate=jobfair] {
 }
 
 body[data-gamestate=battle] {
+  /*
   background: repeating-radial-gradient(
     circle at -10% 120%,
     #dCD,
@@ -129,7 +132,7 @@ body[data-gamestate=battle] {
     rgba(175, 165, 160, 0.5) 20px,
     #FED 20px,
     #fdc 40px
-  );
+  );*/
 }
 
 body[data-gamestate=gameover] {
