@@ -168,7 +168,11 @@ body[data-gamestate=gameover] {
 
 .waiting {
   padding: 2vh;
-  background: repeating-linear-gradient(40deg, #CFCFD0, #CFCFD0 10px, #e0e0e1 10px, #e0e1e0 20px, #BFAFBE 20px, #BFAEBF 30px);
+  background: repeating-linear-gradient(
+    40deg,
+    var(--ui-alt-desaturated-transparent), var(--ui-alt-desaturated-transparent) 1em,
+    var(--white-transparent-med) 1em, var(--white-transparent-med) 2em,
+    var(--ui-alt-desaturated) 2em, var(--ui-alt-desaturated) 3em);
 }
 
 .linkcopy {
@@ -565,16 +569,16 @@ span.tooltip, button .tooltip {
 }
 
 .feature.block {
-  border: thick inset #785460;
-  background-color: #997876;
+  border: thick inset var(--block-alt);
+  background-color: var(--block-main);
 }
 [data-uistate=moveoption] .feature.block {
   border-color: rgba(105, 145, 45, 1);
 }
 
 .feature.water {
-  border: thick double #32a1ce;
-  background-color: #ABC;
+  border: thick double var(--water-alt);
+  background-color: var(--water-main);
 }
 
 /* UIState */
@@ -629,7 +633,7 @@ span.tooltip, button .tooltip {
 [data-turn="opponent"] #gameinfo .playername,
 [data-turn="player"] #player .playername {
   background-color: var(--ui-main-desaturated-transparent);
-  border: 0.1em solid var(--ui-main-light);
+  border: 0.15em solid var(--ui-alt-saturated);
 }
 
 .playername, #gamestate, .uibutton {
@@ -643,9 +647,10 @@ span.tooltip, button .tooltip {
 }
 
 .playername, #gamestate {
-  background-color: var(--white-transparent-low);
+  background-color: var(--white-transparent-high);
   font-weight: bold;
-  color: var(--ui-alt-dark);
+  color: var(--ui-main-dark);
+  border: 0.1em solid var(--ui-main-light);
   text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
 }
 
@@ -750,11 +755,12 @@ span.tooltip, button .tooltip {
   color: var(--ui-main-saturated);
   background-color: var(--white-transparent-high);
   font-weight: bold;
-  font-size: 110%;
+  font-size: 150%;
   grid-row: 3;
-  text-shadow: 0.2em 0.1em 0.2em var(--ui-alt-desaturated-transparent);
+  text-shadow: 0.2em 0.1em 0.2em 0.2em var(--ui-alt-desaturated);
   display: grid;
   align-content: center;
+  -webkit-text-stroke: 1px var(--ui-main-dark);
 }
 
 /* overlay */

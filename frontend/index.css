@@ -5,13 +5,11 @@ body {
   flex-wrap: wrap;
   background: repeating-linear-gradient(
     90deg,
-    var(--south-muted),                 var(--south-muted)           1em,
-    #555                         1em,   #555                         1.2em,
-    var(--black-transparent-med) 1.2em, var(--black-transparent-med) 2.7em,
-    var(--north-main)            2.7em, var(--north-main)            4.2em,
-    var(--grey-transparent-med)  4.2em, var(--grey-transparent-med)  5.7em,
-    #555                         5.7em, #555                         5.9em,
-    var(--south-muted)           5.9em, var(--south-muted)           7em);
+    var(--south-muted),                 var(--north-muted)           1em,
+    var(--grey-transparent-med) 1em, var(--north-main) 2.5em,
+    var(--black-transparent-med)            2.5em, var(--black-transparent-med)            4.5em,
+    var(--south-main)  4.5em, var(--grey-transparent-med)  6em,
+    var(--north-muted)           6em, var(--south-muted)           7em);
 }
 
 body > div, body > form {
@@ -22,22 +20,12 @@ body > div, body > form {
   padding: 0.4em 0.2em 0.6em;
 }
 
-#nameform {
-  min-width: 40%;
-  max-width: 80%;
-  max-height: 5em;
-  border: 0.2em solid var(--ui-main-light);
-  background-color: var(--ui-main-desaturated);
-  border-radius: 10px;
-  padding: 1em;
-  margin: 1em;
-}
-
 #createdialog {
   min-width: 40%;
   max-width: 80%;
-  border: 0.2em solid var(--ui-alt-light);
+  border: 0.2em solid var(--ui-alt-saturated);
   background-color: var(--ui-alt-desaturated);
+  color: var(--ui-main-dark);
   border-radius: 10px;
   padding: 1em;
   margin: 1em;
@@ -54,15 +42,15 @@ body > div, body > form {
 }
 
 #tables {
-  width: 80%;
+  min-width: 80%;
   text-align: center;
   padding: 1em;
   margin: 1em;
   border-radius: 10px;
-  border: 0.2em solid var(--ui-main-light);
-  background-color: var(--ui-main-desaturated);
+  border: 0.2em solid var(--ui-alt-saturated);
+  background-color: var(--ui-alt-desaturated);
+  color: var(--ui-main-dark);
   display: grid;
-  color: var(ui-main-dark);
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
@@ -79,7 +67,7 @@ body > div, body > form {
   text-align: center;
   cursor: pointer;
   color: var(--ui-alt-dark);
-  text-shadow: 2px 2px 4px rgba(23, 14, 33, 0.3), -1px -1px 0 rgba(244, 246, 250, 0.3);
+  text-shadow: -0.05em -0.05em 0.05em var(--white-transparent-med);
   display: flex;
   flex-flow: row wrap;
   place-content: space-around;
@@ -93,6 +81,7 @@ body > div, body > form {
   border-style: outset;
 }
 
+/*
 .table::after {
   content: 'join this game';
   visibility: hidden;
@@ -107,4 +96,4 @@ body > div, body > form {
 }
 .table:hover::after {
   visibility: visible;
-}
+}*/
