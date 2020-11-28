@@ -1,4 +1,5 @@
 alias Yagg.Unit
+alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.Action.Ability
 
@@ -22,19 +23,29 @@ defmodule Unit.Burninator do
 
     def resolve(board, opts) do
       {_, y} = opts[:coords]
-      Enum.reduce(
-        board.grid,
-        {board, []},
-        &burn_unit(&1, &2, y)
+      {width, _} = board.dimensions
+      {board, effects, events} = Enum.reduce(
+        0..width - 1,
+        {board, [], []},
+        fn(x, acc) -> burn_unit(x, y, Board.Grid.thing_at(board, {x, y}), acc) end
       )
+      {board, [Event.Multi.new(events: effects) | events]}
     end
 
-    defp burn_unit({{x, y}, %Unit{}}, {board, events}, y) do
+    defp burn_unit(x, y, %Unit{}, {board, effects, events}) do
       {board, newevents} = Board.unit_death(board, {x, y})
-      {board, newevents ++ events}
+      {board, [ability_event(x, y) | effects], newevents ++ events}
     end
-    defp burn_unit(_, acc, _) do
-      acc
+    defp burn_unit(x, y, _, {board, effects, events}) do
+      {board, [ability_event(x, y) | effects], events}
+    end
+
+    defp ability_event(x, y) do
+      Event.AbilityUsed.new(
+        type: :fire,
+        x: x,
+        y: y
+      )
     end
   end
 end

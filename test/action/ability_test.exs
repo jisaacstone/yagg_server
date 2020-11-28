@@ -99,7 +99,7 @@ defmodule YaggTest.Action.Ability do
     assert newboard.grid[{0, 2}].name == busybody.name
     assert newboard.grid[{0, 1}] == :water
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-    assert Enum.find(events, fn(e) -> e.kind == :thing_moved end)
+    assert Enum.find(events, fn(e) -> e.kind == :multi end)
   end
 
   test "illegal square" do

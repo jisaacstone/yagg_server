@@ -822,3 +822,17 @@ body[data-gamestate=gameover] {
   background-color: var(--white-transparent-low);
   box-shadow: max(1vh, 1vw) max(2vh, 2vw) max(3vh, 3vw) var(--ui-main-dark-transparent);
 }
+
+/* animations */
+
+.projectile {
+  position: fixed;
+  width: 1.7em;
+  height: 1.7em;
+  background-color: var(--white-transparent-high);
+  border: 0.3em solid var(--ui-main-saturated);
+  border-radius: 0.6em;
+  box-shadow: 0.4em 0.2em 0.2em 0.2em var(--ui-main-dark-transparent);
+  display: grid;
+  place-content: center;
+}

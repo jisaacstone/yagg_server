@@ -119,7 +119,6 @@ function anyDetails(unit) {
 
 function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
   renderAttrs(unit, el);
-  console.log(unit);
   el.style.backgroundImage = `url("img/${unit.name}.png")`;
   detailView(unit, el);
   if (unit.ability) {
@@ -232,7 +231,6 @@ export function containsEnemyUnit(square: HTMLElement) {
   const child = square.firstChild as HTMLElement,
     position = gmeta.position === 'north' ? 'south' : 'north';
   if (child && child.className.includes(position)) {
-    console.log('isenemy');
     return true;
   }
   return false;
@@ -241,7 +239,6 @@ export function containsEnemyUnit(square: HTMLElement) {
 export function containsOwnedUnit(square: HTMLElement) {
   const child = square.firstChild as HTMLElement;
   if (child && child.className.includes(gmeta.position)) {
-    console.log('isowned');
     return true;
   }
   return false;

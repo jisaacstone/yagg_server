@@ -1,4 +1,5 @@
 alias Yagg.Unit
+alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.Grid
 alias Yagg.Board.Action.Ability
@@ -21,19 +22,34 @@ defmodule Unit.Maycorn do
   end
 
   def spark(board, attack, coord, direction, next_ability) do
-    {board, events} = sparkle(board, attack, direction, Grid.next(direction, coord))
-    Grid.update(
+    {board, e1} = Grid.update(
       board,
       coord,
-      fn(unit) -> %{unit | ability: next_ability} end,
-      events)
+      fn(unit) -> %{unit | ability: next_ability} end
+    )
+    {board, e2} = sparkle(board, attack, direction, coord)
+    {board, e2 ++ e1}
   end
 
-  defp sparkle(board, attack, direction, coord) do
-    case Grid.projectile(board, coord, direction) do
+  defp sparkle(board, attack, direction, from) do
+    case Grid.projectile(board, Grid.next(direction, from), direction) do
       {coord, %Unit{defense: a}} when a < attack ->
-        Board.unit_death(board, coord)
-      _other -> {board, []}
+        ability_event = Event.AbilityUsed.new(
+          type: :projectile,
+          subtype: :spark,
+          from: from,
+          to: coord
+        )
+        {board, events} = Board.unit_death(board, coord)
+        {board, [ability_event | events]}
+      {coord, _} ->
+        ability_event = Event.AbilityUsed.new(
+          type: :projectile,
+          subtype: :spark,
+          from: from,
+          to: coord
+        )
+        {board, [ability_event]}
     end
   end
 end
@@ -97,11 +113,11 @@ defmodule Unit.Maycorn.Spark do
     use Ability
     @impl Ability
     def resolve(board, opts) do
-      {board, e1} = Maycorn.spark(board, 1, opts[:coords], :north, nil)
-      {board, e2} = Maycorn.spark(board, 1, opts[:coords], :south, nil)
-      {board, e3} = Maycorn.spark(board, 1, opts[:coords], :east, nil)
-      {board, e4} = Maycorn.spark(board, 1, opts[:coords], :west, nil)
-      {board, e1 ++ e2 ++ e3 ++ e4}
+      {board, [a1 | e1]} = Maycorn.spark(board, 1, opts[:coords], :north, nil)
+      {board, [a2 | e2]} = Maycorn.spark(board, 1, opts[:coords], :south, nil)
+      {board, [a3 | e3]} = Maycorn.spark(board, 1, opts[:coords], :east, nil)
+      {board, [a4 | e4]} = Maycorn.spark(board, 1, opts[:coords], :west, nil)
+      {board, [Event.Multi.new(events: [a1, a2, a3, a4]) | e1 ++ e2 ++ e3 ++ e4]}
     end
   end
 end

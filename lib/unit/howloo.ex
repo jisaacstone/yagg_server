@@ -1,4 +1,5 @@
 alias Yagg.Unit
+alias Yagg.Event
 alias Yagg.Board.Grid
 alias Yagg.Board.Action.Ability
 
@@ -25,10 +26,27 @@ defmodule Unit.Howloo do
     def resolve(board, opts) do
       direction = Grid.cardinal(opts[:unit].position, :front)
       case Grid.projectile(board, opts[:coords], direction) do
+        {coord, %Unit{}} ->
+          ability_event = Event.AbilityUsed.new(
+            type: :projectile,
+            subtype: :horseshoe,
+            from: opts[:coords],
+            to: coord
+          )
+          Grid.update(
+            board,
+            coord,
+            fn(unit) -> %{unit | attack: max(1, unit.attack - 2)} end,
+            [ability_event]
+          )
         {coord, _} ->
-          Grid.update(board, coord, fn(unit) -> %{unit | attack: max(1, unit.attack - 2)} end)
-        _other ->
-          {board, []}
+          ability_event = Event.AbilityUsed.new(
+            type: :projectile,
+            subtype: :horseshoe,
+            from: opts[:coords],
+            to: coord
+          )
+          {board, [ability_event]}
       end
     end
   end

@@ -234,4 +234,10 @@ defmodule Yagg.Event do
     end
   end
 
+  defmodule AbilityUsed do
+    @spec new(Keyword.t) :: Event.t
+    def new(params) do
+      Event.new(:global, :ability_used, params)
+    end
+  end
 end

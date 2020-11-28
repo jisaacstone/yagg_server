@@ -97,7 +97,7 @@ defmodule Yagg.Board.Grid do
   @doc """
   Find next Unit in direction, starting at coord and skipping empty squares and water
   """
-  @spec projectile(Board.t, coord, Board.direction) :: {coord, Unit.t} | :out_of_bounds
+  @spec projectile(Board.t, coord, Board.direction) :: {coord, Unit.t | :out_of_bounds | :blocked}
   def projectile(board, coord, direction) do
     next_coord = next(direction, coord)
     case thing_at(board, next_coord) do
@@ -105,8 +105,10 @@ defmodule Yagg.Board.Grid do
         {next_coord, unit}
       atom when atom == :nil or atom == :water ->
         projectile(board, next_coord, direction)
+      :out_of_bounds ->
+        {coord, :out_of_bounds}
       _other ->
-        :out_of_bounds
+        {next_coord, :blocked}
     end
   end
 end

@@ -26,7 +26,7 @@ defmodule Unit.Busybody do
     @impl Ability
     def resolve(board, opts) do
       {board, things} = gather(board, opts[:coords], [:north, :east, :south, :west, :north], [])
-      place(board, things, [])
+      place(board, things, [], [])
     end
 
     # one extra so hd() below works
@@ -41,18 +41,18 @@ defmodule Unit.Busybody do
       end
     end
 
-    defp place(board, [], events) do
-      {board, [Event.Multi.new(events: events)]}
+    defp place(board, [], effects, events) do
+      {board, events ++ [Event.Multi.new(events: effects)]}
     end
-    defp place(board, [{from, to, thing} | things], events) do
+    defp place(board, [{from, to, thing} | things], effects, events) do
       case Grid.thing_at(board, to) do
         :out_of_bounds ->
           {board, evts} = offscreend(board, thing, from)
-          place(board, things, evts ++ events)
+          place(board, things, effects, evts ++ events)
         :nil ->
-          events = [Event.ThingMoved.new(thing, from: from, to: to) | events]
+          effects = [Event.ThingMoved.new(thing, from: from, to: to) | effects]
           board = %{board | grid: Map.put(board.grid, to, thing)}
-          place(board, things, events)
+          place(board, things, effects, events)
       end
     end
 

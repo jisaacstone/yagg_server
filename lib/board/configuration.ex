@@ -170,6 +170,7 @@ defmodule Board.Configuration.Alpha do
       Unit.Electromouse.new(position),
       Unit.Explody.new(position),
       Unit.Howloo.new(position),
+      Unit.Maycorn.new(position),
       Unit.Mediacreep.new(position),
       Unit.Monarch.new(position),
       Unit.Poisonblade.new(position),

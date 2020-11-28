@@ -12,6 +12,7 @@ import * as Overlay from './overlay.js';
 import * as Player from './playerdata.js';
 import * as Feature from './feature.js';
 import * as Hand from './hand.js';
+import * as AbilityEvent from './abilty_event.js';
 
 const unitsbyindex = {};
 
@@ -165,7 +166,6 @@ export function thing_moved(event) {
           thingRect = thing.getBoundingClientRect(),
           xoffset = thingRect.left - fromRect.left,
           yoffset = thingRect.top - fromRect.top;
-        console.log({w: animation, event, xoffset, yoffset});
         const a = thing.animate({ 
           top: [fromRect.top + yoffset + 'px', toRect.top + yoffset + 'px'],
           left: [fromRect.left + xoffset + 'px', toRect.left + xoffset + 'px'],
@@ -189,7 +189,7 @@ export function thing_moved(event) {
     if (thing) {
       thing.className = thing.className.replace(' owned', '');
     }
-    thing_gone(event.from);
+    return thing_gone(event.from);
   }
 }
 
@@ -236,4 +236,12 @@ export function candidate(event) {
   Select.bind_candidate(cdd, event.index);
   unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
   jf.appendChild(cdd);
+}
+
+export function ability_used(event) {
+  if (!AbilityEvent[event.type]) {
+    console.error({error: 'no ability handler', event});
+    return
+  }
+  return AbilityEvent[event.type](event);
 }

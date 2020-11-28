@@ -153,7 +153,6 @@ function handleSelect(el: HTMLElement, meta) {
       displayReturnButton(el, meta);
     }
   } else {
-    console.log({imm: Unit.isImmobile(el)});
     if (! Unit.containsOwnedUnit(el)) {
       // Square with no owned unit
       return;
