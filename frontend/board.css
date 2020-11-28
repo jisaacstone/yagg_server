@@ -197,7 +197,7 @@ body[data-gamestate=gameover] {
   margin: auto;
   grid-area: board;
   background-color: var(--ui-main-desaturated);
-  box-shadow: 1vh 2vh 1vh rgba(30, 33, 0, 0.4);
+  box-shadow: 1vh 2vh 1vh var(--ui-main-dark-transparent);
   display: grid;
   grid-auto-flow: row;
   align-content: stretch;
@@ -268,7 +268,7 @@ body[data-gamestate=gameover] {
 }
 
 .card .unit {
-  box-shadow: 0.8vh 1vh 0.7vh rgba(0,0,0,0.3);
+  box-shadow: 0.8vh 1vh 0.7vh var(--ui-main-dark-transparent);
 }
 
 /* UNITS */
@@ -349,7 +349,7 @@ body[data-gamestate=gameover] {
   height: 85%;
   place-self: center;
   text-align: center;
-  text-shadow: 0.1em 0.1em 0.2em var(--grey-transparent-med);
+  text-shadow: 1px 1px 1px var(--grey-transparent-med), 0 0 1px var(--white-transparent-low);
   -webkit-text-stroke: 1px var(--black-transparent-med);
 }
 
@@ -385,7 +385,7 @@ body[data-gamestate=gameover] {
   border-width: 2px;
   border-radius: min(1vw, 1vh);
   border-color: var(--ui-alt-dark);
-  text-shadow: var(--ui-alt-desaturated-transpaarent) -1px -1px 0;
+  text-shadow: var(--ui-alt-desaturated-transparent) -1px -1px 0;
   text-overflow: ellipsis;
   overflow: hidden;
   grid-area: ability;
@@ -397,7 +397,8 @@ body[data-gamestate=gameover] {
   cursor: pointer;
   background-color: var(--ui-main-light);
 }
-.unit-ability:hover .tooltip {
+.unit-ability:hover .tooltip ,
+.trigger-symbol:hover .tooltip {
   display: block;
 }
 
@@ -417,21 +418,18 @@ body[data-gamestate=gameover] {
   width: 2em;
 }
 
-.unit div:hover .tooltip {
-  display: block;
-}
-
 .unit-trigger {
   margin-left: 4%;
 }
 
-span.tooltip, button .tooltip {
+.tooltip {
   display: none;
   position: absolute;
   margin-left: 0.4em
   min-width: 10%;
   max-width: 20%;
-  padding: 4px;
+  padding: 0.3em;
+  border-radius: 0.6em;
   font-size: 80%;
   color: var(--ui-main-dark-dark);
   background-color: var(--ui-main-light);
@@ -529,7 +527,7 @@ span.tooltip, button .tooltip {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom center;
-  border-bottom: 0.2em dotted var(--ui-alt-light);
+  border-bottom: 0.2em dotted var(--grey-transparent-med);
   width: 100%;
   height: 100%;
 }
@@ -627,7 +625,7 @@ span.tooltip, button .tooltip {
 
 #infobox .unit {
   margin: 0;
-  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px rgba(0,0,0,0.3);
+  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px var(--ui-main-dark-transparent);
 }
 
 [data-turn="opponent"] #gameinfo .playername,
@@ -692,7 +690,7 @@ span.tooltip, button .tooltip {
   position: absolute;
   right: 1vw;
   bottom: 1vh;
-  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 0.2vh rgba(0,0,0,0.3);
+  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 0.2vh var(--ui-main-dark-transparent);
 }
 
 .dropdown {
@@ -797,7 +795,7 @@ span.tooltip, button .tooltip {
   box-sizing: border-box;
   padding: 10vh;
   text-align: center;
-  box-shadow: max(1vh, 1vw) max(2vh, 2vw) max(3vh, 3vw) rgba(0,2,5,0.3);
+  box-shadow: max(1vh, 1vw) max(2vh, 2vw) max(3vh, 3vw) var(--ui-main-dark-transparent);
 }
 
 .waiting button {
@@ -822,5 +820,5 @@ span.tooltip, button .tooltip {
   font-size: 130%;
   text-shadow: rgba(245, 244, 245, 0.5) -1px -1px 2px;
   background-color: var(--white-transparent-low);
-  box-shadow: max(1vh, 1vw) max(2vh, 2vw) max(3vh, 3vw) rgba(0,2,5,0.3);
+  box-shadow: max(1vh, 1vw) max(2vh, 2vw) max(3vh, 3vw) var(--ui-main-dark-transparent);
 }

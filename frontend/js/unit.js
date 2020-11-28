@@ -143,20 +143,22 @@ export function detailViewFn(unit, className, square = null) {
             bindAbility(abilname, square, unit, clear);
         }
     }
-    if (unit.triggers) {
+    if (unit.triggers && Object.keys(unit.triggers).length > 0) {
         const triggers = document.createElement('div');
         triggers.className = 'triggers';
         for (const [name, trigger] of Object.entries(unit.triggers)) {
-            const triggerel = document.createElement('div'), tsym = document.createElement('div'), tdes = document.createElement('div');
-            triggerel.className = 'trigger';
-            triggers.appendChild(triggerel);
+            const triggerel = document.createElement('div'), tsym = document.createElement('div'), tsymtt = document.createElement('div'), tdes = document.createElement('div');
             triggerel.className = `unit-trigger ${name}-trigger`;
             tsym.className = 'trigger-symbol';
             tsym.innerHTML = symbolFor(name);
-            triggerel.appendChild(tsym);
             tdes.className = 'trigger-description';
             tdes.innerHTML = `${trigger.description}`;
+            tsymtt.className = 'tooltip';
+            tsymtt.innerHTML = `On ${name}`;
+            tsym.appendChild(tsymtt);
+            triggerel.appendChild(tsym);
             triggerel.appendChild(tdes);
+            triggers.appendChild(triggerel);
         }
         descriptions.appendChild(triggers);
     }

@@ -2,7 +2,7 @@
   --north-main:	hsla(196, 78%, 55%, 1);
   --north-muted: hsla(210, 42%, 64%, 0.7);
   --north-saturated:	hsla(196, 98%, 45%, 1);
-  --south-main: hsla(270, 76%, 62%, 1);
+  --south-main: hsla(270, 76%, 66%, 1);
   --south-muted: hsla(262, 42%, 69%, 0.6);
   --south-saturated: hsla(272, 96%, 62%, 1);
   --ui-alt-saturated: hsla(69, 65%, 50%, 1);
@@ -17,6 +17,7 @@
   --ui-main-desaturated-transparent: hsla(38, 35%, 75%, 0.6);
   --ui-main-dark: hsla(24, 45%, 33%, 1);
   --ui-main-dark-dark: hsla(30, 45%, 12%, 0.9);
+  --ui-main-dark-transparent: hsla(24, 45%, 33%, 0.5);
   --ui-main-dark-desaturated: hsla(30, 25%, 40%, 0.9);
   --grey-transparent-med: hsla(0, 0%, 50%, 0.4);
   --white-transparent-high: hsla(0, 0%, 99%, 0.2);
