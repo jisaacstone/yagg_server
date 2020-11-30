@@ -83,13 +83,17 @@ defmodule Yagg.Board.Grid do
   def update(%Board{} = board, {x, y} = coord, updater, events \\ []) do
     case board.grid[coord] do
       %Unit{} = unit ->
-        updated = updater.(unit)
-        private_event = Event.UnitChanged.new(updated.position, x: x, y: y, unit: updated)
-        events = case Unit.encode(updated) do
-          :nil -> [private_event | events]
-          encoded -> [Event.UnitChanged.new(:global, x: x, y: y, unit: encoded), private_event | events]
+        case updater.(unit) do
+          :no_update ->
+            {board, []}
+          updated ->
+            private_event = Event.UnitChanged.new(updated.position, x: x, y: y, unit: updated)
+            events = case Unit.encode(updated) do
+              :nil -> [private_event | events]
+              encoded -> [Event.UnitChanged.new(:global, x: x, y: y, unit: encoded), private_event | events]
+            end
+            {%{board | grid: Map.put(board.grid, coord, updated)}, events}
         end
-        {%{board | grid: Map.put(board.grid, coord, updated)}, events}
       _other -> {board, events}
     end
   end

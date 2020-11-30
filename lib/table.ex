@@ -45,12 +45,11 @@ defmodule Yagg.Table do
   @spec new(module) :: {:ok, pid}
   def new(configuration \\ Board.Configuration.Random) do
     config = configuration.new()
-    board = Configuration.init(config)
     table = %Table{
       id: :nil,
       players: [],
       subscribors: [],
-      board: board,
+      board: :nil,
       turn: :nil,
       configuration: config,
       history: [],

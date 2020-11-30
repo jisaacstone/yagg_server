@@ -39,16 +39,27 @@ defmodule Unit.Sackboom do
   end
 
   defp explode_thing(%Unit{} = unit, board, coord) do
-    Board.unit_death(board, coord, unit: unit)
+    {board, events} = Board.unit_death(board, coord, unit: unit)
+    {board, [ability_event(coord) | events]}
   end
   defp explode_thing(:block, board, coord) do
     {
       %{board | grid: Map.delete(board.grid, coord)},
       # bit of a hack, clean up someday?
-      [Event.ThingMoved.new(from: coord, to: :offscreen)]
+      [ability_event(coord), Event.ThingMoved.new(from: coord, to: :offscreen)]
     }
   end
-  defp explode_thing(_, board, _), do: {board, []}
+  defp explode_thing(_, board, coord) do
+    {board, [ability_event(coord)]}
+  end
+
+  defp ability_event({x, y}) do
+    Event.AbilityUsed.new(
+      type: :fire,
+      x: x,
+      y: y
+    )
+  end
 
 end
 

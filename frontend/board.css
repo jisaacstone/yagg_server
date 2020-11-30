@@ -287,7 +287,7 @@ body[data-gamestate=gameover] {
   grid-template-rows: 15% 70% 15%;
   grid-template-columns: 15% 70% 15%;
   grid-template-areas:
-    "defense name attack"
+    "attack name defense"
     "info . ."
     ". ability .";
 }
@@ -309,11 +309,13 @@ body[data-gamestate=gameover] {
 .unit.north {
   background-color: var(--north-main);
   border-color: var(--south-saturated);
+  box-shadow: 0.1em 0.1em 0.7em var(--ui-north-saturated);
 }
 
 .unit.south {
   background-color: var(--south-main);
   border-color: var(--north-saturated);
+  box-shadow: 0.1em 0.1em 0.7em var(--ui-south-saturated);
 }
 
 .unit-name {
@@ -452,7 +454,7 @@ body[data-gamestate=gameover] {
   cursor: pointer;
   padding: min(1vw, 1vh);
   grid-template-areas:
-    "defense name attack"
+    "attack name defense"
     "info info info"
     "ability ability ability";
   grid-template-rows: 15% 55% 30%;
@@ -631,7 +633,8 @@ body[data-gamestate=gameover] {
 [data-turn="opponent"] #gameinfo .playername,
 [data-turn="player"] #player .playername {
   background-color: var(--ui-main-desaturated-transparent);
-  border: 0.15em solid var(--ui-alt-saturated);
+  border: 0.25em inset var(--ui-alt-saturated);
+  color: var(--ui-alt-dark);
 }
 
 .playername, #gamestate, .uibutton {

@@ -41,7 +41,9 @@ function render_(boardstate, phase, players) {
 }
 
 function gamephase(board) {
-  if (board.army_size !== undefined) {
+  if (!board) {
+    return null;
+  } else if (board.army_size !== undefined) {
     return 'jobfair';
   } else if (board.grid !== undefined) {
     return 'board';

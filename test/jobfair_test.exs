@@ -23,6 +23,7 @@ defmodule Board.Configuration.AlphaTest do
       army_size: 3,
       units: units,
       terrain: terrain,
+      monarch: &Unit.Monarch.new/1,
     }
   end
 
@@ -128,7 +129,7 @@ defmodule YaggTest.Jobfair do
       def setup(board), do: {board, []}
     end
     def new() do
-      %Board.Configuration{initial_module: Initial, dimensions: {7, 7}, terrain: [], units: %{}}
+      %Board.Configuration{initial_module: Initial, dimensions: {7, 7}, terrain: [], units: %{}, monarch: &Unit.Monarch.new/1}
     end
 
   end

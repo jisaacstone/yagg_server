@@ -25,7 +25,7 @@ defmodule Unit.Tinker do
         Grid.update(
           board,
           Grid.next(direction, opts[:coords]),
-          fn(unit) -> %{unit | attack: unit.attack + 2} end,
+          &up_attack/1,
           events)
       end
     )
@@ -34,6 +34,13 @@ defmodule Unit.Tinker do
       opts[:coords],
       fn(unit) -> %{unit | ability: next_ability} end,
       events)
+  end
+
+  defp up_attack(%Unit{attack: attack} = unit) when is_integer(attack) do
+    %{unit | attack: unit.attack + 2}
+  end
+  defp up_attack(_unit) do
+    :no_update
   end
 
   defmodule Tonk do

@@ -32,7 +32,7 @@ defmodule Action.Ready do
     }
   end
   def resolve(_act, %Board{state: %Gameover{ready: _opponent}} = board, _position) do
-    Board.Configuration.setup(board.configuration)
+    Board.Configuration.setup(board.configuration, :nil)
   end
   def resolve(a, b, c) do
     IO.inspect([a, b, c])

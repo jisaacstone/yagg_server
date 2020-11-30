@@ -9,7 +9,7 @@ defmodule Yagg.Board.Configuration do
 
   @enforce_keys [:dimensions, :initial_module, :units, :terrain]
   @derive {Poison.Encoder, only: [:dimensions, :initial_module]}
-  defstruct [:army_size | @enforce_keys]
+  defstruct [:army_size, :monarch | @enforce_keys]
 
   @opaque units :: %{north: [Unit.t], south: [Unit.t]}
 
@@ -18,19 +18,23 @@ defmodule Yagg.Board.Configuration do
     initial_module: Jobfair | Board,
     units: units,
     terrain: any,
+    monarch: (atom -> Unit.t) | :nil,
   }
 
   @callback new() :: t
   @callback name() :: String.t
   @callback description() :: String.t
 
-  def init(%Configuration{initial_module: mod} = config) do
-    mod.new(config)
-  end
-
-  @spec setup(t) :: {Jobfair.t | Board.t, [Event.t]}
-  def setup(%Configuration{initial_module: mod} = config) do
+  @spec setup(t, :nil | Jobfair.t) :: {Jobfair.t | Board.t, [Event.t]}
+  def setup(%Configuration{initial_module: mod} = config, :nil) do
     mod.new(config) |> mod.setup()
+  end
+  def setup(config, %Jobfair{} = jobfair) do
+    units = %{
+      north: [config.monarch.(:north) | Jobfair.chosen(jobfair, :north)] |> Enum.reverse(),
+      south: [config.monarch.(:south) | Jobfair.chosen(jobfair, :south)] |> Enum.reverse()
+    }
+    Board.new(config) |> Board.setup(units)
   end
 
   def dimensions(configuration) do
@@ -109,7 +113,7 @@ defmodule Board.Configuration.Random do
       Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
       Unit.new(position, :tim, 1, 8),
     ]) |> Enum.take(10)
-    [Unit.Monarch.new(position) | units]
+    [Unit.Monarch.new(position) | units] |> Enum.shuffle()
   end
 
   defp random_terrain(dimensions) do
@@ -157,6 +161,7 @@ defmodule Board.Configuration.Alpha do
       army_size: 8,
       units: units,
       terrain: terrain,
+      monarch: &Unit.Monarch.new/1,
     }
   end
 
@@ -172,7 +177,6 @@ defmodule Board.Configuration.Alpha do
       Unit.Howloo.new(position),
       Unit.Maycorn.new(position),
       Unit.Mediacreep.new(position),
-      Unit.Monarch.new(position),
       Unit.Poisonblade.new(position),
       Unit.Pushie.new(position),
       Unit.Sackboom.new(position),
@@ -219,13 +223,13 @@ defmodule Board.Configuration.Ice do
       terrain: terrain,
       initial_module: Jobfair,
       army_size: 12,
+      monarch: fn (p) -> Unit.Monarch.new(p) |> Unit.set_trigger(:move, Unit.Ability.Slide) end
     }
   end
 
   def starting_units(position) do
     Enum.map(
       [
-        Unit.Monarch.new(position),
         Unit.new(position, :bezerker, 9, 0),
         Unit.new(position, :bezerker, 9, 0),
         Unit.new(position, :chopper, 7, 2),

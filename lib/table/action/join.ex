@@ -1,7 +1,7 @@
 alias Yagg.Table.Player
 alias Yagg.Table.Action
 alias Yagg.Event
-alias Yagg.Jobfair
+alias Yagg.Board.Configuration
 
 defmodule Yagg.Table.Action.Join do
   defstruct []
@@ -11,7 +11,7 @@ defmodule Yagg.Table.Action.Join do
   def resolve(_, %{board: %{state: :open}} = table, player) do
     join(table, player, Player.by_id(table, player.id))
   end
-  def resolve(_, %{board: %Jobfair{}} = table, player) do
+  def resolve(_, %{board: :nil} = table, player) do
     join(table, player, Player.by_id(table, player.id))
   end
   def resolve(_, _, _) do
@@ -27,7 +27,7 @@ defmodule Yagg.Table.Action.Join do
   defp join(%{players: [{p1pos, _p1}]} = table, player, :notfound) do
     position = Player.opposite(p1pos)
     # start game implicitly when two players join
-    {board, events} = table.configuration.initial_module.setup(table.board)
+    {board, events} = Configuration.setup(table.configuration, table.board)
     {
       %{table | players: [{position, player} | table.players], board: board},
       [Event.PlayerJoined.new(name: player.name, position: position), Event.GameStarted.new() | events]
@@ -39,8 +39,7 @@ defmodule Yagg.Table.Action.Join do
   defp join(%{}, _table, {_, %Player{}}) do
     {:err, :alreadyjoined}
   end
-  defp join(a, table, player) do
-    IO.inspect([a, table.board, player])
+  defp join(_, _table, _player) do
     {:err, :bad_state}
   end
 end

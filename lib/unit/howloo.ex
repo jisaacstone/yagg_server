@@ -26,7 +26,7 @@ defmodule Unit.Howloo do
     def resolve(board, opts) do
       direction = Grid.cardinal(opts[:unit].position, :front)
       case Grid.projectile(board, opts[:coords], direction) do
-        {coord, %Unit{}} ->
+        {coord, %Unit{attack: a}} when is_integer(a) and a > 2 ->
           ability_event = Event.AbilityUsed.new(
             type: :projectile,
             subtype: :horseshoe,
@@ -36,7 +36,7 @@ defmodule Unit.Howloo do
           Grid.update(
             board,
             coord,
-            fn(unit) -> %{unit | attack: max(1, unit.attack - 2)} end,
+            fn(unit) -> %{unit | attack: unit.attack - 2} end,
             [ability_event]
           )
         {coord, _} ->
