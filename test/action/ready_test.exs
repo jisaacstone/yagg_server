@@ -9,6 +9,7 @@ defmodule YaggTest.Action.Ready do
   use ExUnit.Case
 
   def testconfig(), do: %Configuration{
+    name: :readyconfig,
     dimensions: {5, 5},
     units: %{north: [], south: []},
     terrain: [],

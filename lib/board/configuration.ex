@@ -7,8 +7,8 @@ alias Yagg.Event
 defmodule Yagg.Board.Configuration do
   alias __MODULE__
 
-  @enforce_keys [:dimensions, :initial_module, :units, :terrain]
-  @derive {Poison.Encoder, only: [:dimensions, :initial_module]}
+  @enforce_keys [:name, :dimensions, :initial_module, :units, :terrain]
+  @derive {Poison.Encoder, only: [:name, :dimensions, :initial_module]}
   defstruct [:army_size, :monarch | @enforce_keys]
 
   @opaque units :: %{north: [Unit.t], south: [Unit.t]}
@@ -18,6 +18,7 @@ defmodule Yagg.Board.Configuration do
     initial_module: Jobfair | Board,
     units: units,
     terrain: any,
+    name: String.t,
     monarch: (atom -> Unit.t) | :nil,
   }
 
@@ -81,6 +82,7 @@ defmodule Board.Configuration.Random do
     dimensions = {size, size}
     terrain = random_terrain(dimensions)
     %Board.Configuration{
+      name: name(),
       dimensions: dimensions,
       terrain: terrain,
       units: %{north: nor_units, south: sou_units},
@@ -156,6 +158,7 @@ defmodule Board.Configuration.Alpha do
       {{4, 2}, :water},
     ]
     %Board.Configuration{
+      name: name(),
       dimensions: {5, 5},
       initial_module: Jobfair,
       army_size: 8,
@@ -218,6 +221,7 @@ defmodule Board.Configuration.Ice do
       {{7, 7}, :water},
     ]
     %Board.Configuration{
+      name: name(),
       dimensions: {8, 8},
       units: units,
       terrain: terrain,

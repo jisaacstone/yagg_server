@@ -81,16 +81,20 @@ defmodule Yagg.AI.Choices do
     Enum.map(units, fn(u) -> unit_choices(u, board, position) end) |> Enum.concat()
   end
 
-  defp unit_choices({{fx, fy}, _}, board, position) do
+  defp unit_choices({{fx, fy}, %{attack: a}}, board, position) do
+    combat_repeat = a / 3 |> ceil()
     Enum.reduce(
       Grid.surrounding({fx, fy}),
       [],
       fn({_, {tx, ty}}, moves) ->
-        if can_move_to(Grid.thing_at(board, {tx, ty}), position) do
-          move = %Action.Move{from_x: fx, from_y: fy, to_x: tx, to_y: ty}
-          [move | moves]
-        else
-          moves
+        move = %Action.Move{from_x: fx, from_y: fy, to_x: tx, to_y: ty}
+        case can_move_to(Grid.thing_at(board, {tx, ty}), position) do
+          :false ->
+            moves
+          :true -> 
+            [move | moves]
+          %Unit{} ->
+            List.duplicate(move, combat_repeat) ++ moves
         end
       end
     )
@@ -98,7 +102,7 @@ defmodule Yagg.AI.Choices do
 
   defp can_move_to(:nil, _), do: :true
   defp can_move_to(%Unit{position: pos}, pos), do: :false
-  defp can_move_to(%Unit{}, _), do: :true
+  defp can_move_to(%Unit{} = unit, _), do: unit
   defp can_move_to(_, _), do: :false
 
   # AC

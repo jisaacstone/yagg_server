@@ -7,6 +7,7 @@ defmodule Helper.TestConfig do
   @impl Configuration
   def new() do
     %Configuration{
+      name: :testconfig,
       dimensions: {5, 5},
       initial_module: Board,
       army_size: 8,

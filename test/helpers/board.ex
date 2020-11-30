@@ -7,6 +7,7 @@ defmodule Helper.Board do
     contents = quote do
       def new() do
         %Configuration{
+          name: :helper_testconfig,
           dimensions: unquote(Macro.escape(dimen)),
           units: %{north: starting_units(:north), south: starting_units(:south)},
           terrain: unquote(Macro.escape(terr)),

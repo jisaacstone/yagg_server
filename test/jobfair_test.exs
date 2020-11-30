@@ -18,6 +18,7 @@ defmodule Board.Configuration.AlphaTest do
       {{4, 2}, :water},
     ]
     %Board.Configuration{
+      name: :alphatest,
       dimensions: {5, 5},
       initial_module: Jobfair,
       army_size: 3,
@@ -129,7 +130,7 @@ defmodule YaggTest.Jobfair do
       def setup(board), do: {board, []}
     end
     def new() do
-      %Board.Configuration{initial_module: Initial, dimensions: {7, 7}, terrain: [], units: %{}, monarch: &Unit.Monarch.new/1}
+      %Board.Configuration{initial_module: Initial, dimensions: {7, 7}, terrain: [], units: %{}, monarch: &Unit.Monarch.new/1, name: :test}
     end
 
   end

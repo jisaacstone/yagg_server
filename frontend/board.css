@@ -216,7 +216,7 @@ body[data-gamestate=gameover] {
 }
 
 .boardsquare {
-  border: 2px inset var(--ui-main-desaturated-transparent);
+  border: 0.1em inset var(--ui-main-desaturated-transparent);
   box-sizing: border-box;
   background-color: var(--white-transparent-high);
   display: flex;
@@ -309,13 +309,11 @@ body[data-gamestate=gameover] {
 .unit.north {
   background-color: var(--north-main);
   border-color: var(--south-saturated);
-  box-shadow: 0.1em 0.1em 0.7em var(--ui-north-saturated);
 }
 
 .unit.south {
   background-color: var(--south-main);
   border-color: var(--north-saturated);
-  box-shadow: 0.1em 0.1em 0.7em var(--ui-south-saturated);
 }
 
 .unit-name {
@@ -453,6 +451,7 @@ body[data-gamestate=gameover] {
   margin: auto;
   cursor: pointer;
   padding: min(1vw, 1vh);
+  background-image: url("img/details_bg.png");
   grid-template-areas:
     "attack name defense"
     "info info info"
@@ -569,7 +568,7 @@ body[data-gamestate=gameover] {
 }
 
 .feature.block {
-  border: thick inset var(--block-alt);
+  border: 0.4em inset var(--block-alt);
   background-color: var(--block-main);
 }
 [data-uistate=moveoption] .feature.block {
@@ -577,7 +576,7 @@ body[data-gamestate=gameover] {
 }
 
 .feature.water {
-  border: thick double var(--water-alt);
+  border: 0.4em double var(--water-alt);
   background-color: var(--water-main);
 }
 
@@ -612,6 +611,7 @@ body[data-gamestate=gameover] {
 
 #player {
   grid-area: player;
+  grid-auto-rows: minmax(0, 1fr);
 }
 
 #gameinfo {
@@ -640,7 +640,7 @@ body[data-gamestate=gameover] {
 .playername, #gamestate, .uibutton {
   padding: 7px 3px;
   margin: 3px;
-  border-radius: min(1vh, 1vw);
+  border-radius: 0.4em;
   text-align: center;
   display: flex;
   justify-content: center;
@@ -651,13 +651,8 @@ body[data-gamestate=gameover] {
   background-color: var(--white-transparent-high);
   font-weight: bold;
   color: var(--ui-main-dark);
-  border: 0.1em solid var(--ui-main-light);
+  border: 0.15em inset var(--ui-main-light);
   text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
-}
-
-#opponent .playername {
-  width: 100%;
-  height: 100%;
 }
 
 #gamestate {
@@ -665,28 +660,19 @@ body[data-gamestate=gameover] {
 }
 
 .playername, #opponent {
-  grid-row: 2;
   min-width: 5em;
 }
 
 #opponent {
-  display: flex;
+  display: grid;
 }
 
 .playername[data-ready='true'] {
   background-color: var(--ui-alt-desaturated);
 }
 
-.playername[data-turn='true'] {
-  /* background-color: var(--ui-main-desaturated); */
-}
-
 #buttons {
   display: grid;
-}
-
-#player .uibutton {
-  grid-row: 1;
 }
 
 #returnbutton {
