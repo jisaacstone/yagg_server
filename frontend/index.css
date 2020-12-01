@@ -1,19 +1,23 @@
 body {
-  margin-top: 1em;
   display: flex;
   align-content: center;
   flex-wrap: wrap;
   background: repeating-linear-gradient(
     90deg,
     var(--south-muted),                 var(--north-muted)           1em,
-    var(--grey-transparent-med) 1em, var(--north-main) 2.5em,
-    var(--black-transparent-med)            2.5em, var(--black-transparent-med)            4.5em,
-    var(--south-main)  4.5em, var(--grey-transparent-med)  6em,
-    var(--north-muted)           6em, var(--south-muted)           7em);
+    var(--grey-transparent-med)  1em,   var(--north-main)            2.5em,
+    var(--black-transparent-med) 2.5em, var(--black-transparent-med) 4.5em,
+    var(--south-main)            4.5em, var(--grey-transparent-med)  6em,
+    var(--north-muted)           6em,   var(--south-muted)           7em);
+}
+
+html {
+  background: url('img/r_c_tran.png');
 }
 
 body > div, body > form {
   box-shadow: 5px 10px 7px rgba(0, 0, 0, 0.5);
+  background-image: url("img/paper_bg_transparent_med.png");
 }
 
 #config {

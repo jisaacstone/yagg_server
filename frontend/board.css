@@ -569,6 +569,7 @@ body[data-gamestate=gameover] {
 
 .feature.block {
   border: 0.4em inset var(--block-alt);
+  background-image: url("img/hor_c_tran.png");
   background-color: var(--block-main);
 }
 [data-uistate=moveoption] .feature.block {
@@ -577,6 +578,7 @@ body[data-gamestate=gameover] {
 
 .feature.water {
   border: 0.4em double var(--water-alt);
+  background-image: url("img/water_bg.png");
   background-color: var(--water-main);
 }
 
