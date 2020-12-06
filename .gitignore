@@ -25,3 +25,6 @@ yagg_server-*.tar
 
 *.DS_Store
 bugreports
+
+node_modules
+package-lock.json

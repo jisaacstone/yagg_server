@@ -20,6 +20,6 @@ function displayDropdown(lsKey, text) {
     tableEl.appendChild(dropdownEl);
     dismiss.onclick = () => {
         localStorage.setItem(lsKey, 'dismissed');
-        dropdownEl.remove();
+        tableEl.removeChild(dropdownEl);
     };
 }

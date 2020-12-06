@@ -3,7 +3,11 @@
         "outDir": "./frontend/js",
         "allowJs": true,
         "target": "es6",
-        "lib": ["es2017", "dom", "dom.iterable", "scripthost"]
+        "lib": ["es2017", "dom", "dom.iterable", "scripthost"],
+        "baseUrl": ".",
+        "paths": {
+          "*": ["ts/*", "tstest/*"]
+        }
     },
     "include": [
         "./ts/**/*"
