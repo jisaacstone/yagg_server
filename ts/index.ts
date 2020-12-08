@@ -32,7 +32,7 @@ function displayTableData(tablesEl, data) {
   });
 }
 
-function renderTable(table, text) {
+function renderTable({ config }, text: string): HTMLElement {
   const tblbtn = document.createElement('div'),
     dimensions = document.createElement('div'),
     name = document.createElement('div'),
@@ -41,8 +41,8 @@ function renderTable(table, text) {
   dimensions.className = 'dimensions';
   name.className = 'config-name';
   txt.className = 'tabletxt';
-  dimensions.innerHTML = `${table.config.dimensions.x}x${table.config.dimensions.y}`;
-  name.innerHTML = table.config.name;
+  dimensions.innerHTML = `${config.dimensions.x}x${config.dimensions.y}`;
+  name.innerHTML = config.name;
   txt.innerHTML = text;
   tblbtn.append(name);
   tblbtn.append(dimensions);

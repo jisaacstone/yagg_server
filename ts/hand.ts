@@ -1,7 +1,7 @@
 import * as Unit from './unit.js';
 import * as Select from './select.js';
 
-export function createCard(unit: Unit.Unit, index: number) {
+export function createCard(unit: Unit.Unit, index: number): HTMLElement {
   const hand = document.getElementById('hand'),
     card = document.createElement('span'),
     unitEl = Unit.render(unit, index, true);

@@ -21,7 +21,7 @@ function handleEvent(event) {
   state.queue.push(event);
 }
 
-function awaitAnimations(result): Promise<any> {
+function awaitAnimations(result: Event.animData | null): Promise<any> {
   if (! result || !result.squares) {
     return Promise.resolve(true);
   }

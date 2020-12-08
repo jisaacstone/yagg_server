@@ -3,7 +3,6 @@ import { gmeta } from './state.js';
 import * as Event from './event.js';
 
 export function render(el: HTMLElement, width=5, height=5) {
-  console.log('b2h');
   el.innerHTML = '';
   function makerow(y: number) {
     let row = document.createElement('div'),
@@ -47,16 +46,36 @@ export function render(el: HTMLElement, width=5, height=5) {
   }
 }
 
-export function square(x: number, y: number) {
-  return document.getElementById(`c${x}-${y}`);
+export function square(x: number, y: number): HTMLElement {
+  const el = document.getElementById(`c${x}-${y}`);
+  if (!el) {
+    throw new Error(`square ${x},${y} not found`)
+  }
+  return el;
 }
 
-export function unitdata(unitdata) {
-  for (const ob of unitdata.grid) {
+export function thingAt(x: number, y: number, objType?: string): HTMLElement | null {
+  const el = square(x, y),
+    child = el.firstElementChild as HTMLElement;
+  if (child) {
+    if (objType && !child.className.includes(objType)) {
+      throw new Error(`expected ${objType}, found ${child.className}`)
+    }
+    return child;
+  }
+  if (objType) {
+    throw new Error(`expected ${objType}, found nothing`)
+  }
+  return null;
+}
+
+// simulate events from unit state
+export function unitdata({ grid, hand }) {
+  for (const ob of grid) {
     Event.new_unit(ob);
   }
   Array.prototype.forEach.call(
-    Object.entries(unitdata.hand),
+    Object.entries(hand),
     ([index, card]: [string, any]) => {
       Event.add_to_hand({index: +index, unit: card.unit});
       if (card.assigned) {
@@ -66,9 +85,8 @@ export function unitdata(unitdata) {
   );
 }
 
+// clear board and hand
 export function clear() {
-  const board = document.getElementById('board'),
-    hand = document.getElementById('hand');
+  const board = document.getElementById('board');
   board.innerHTML = '';
-  hand.innerHTML = '';
 }

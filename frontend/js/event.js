@@ -3,7 +3,7 @@ import * as Select from './select.js';
 import * as Unit from './unit.js';
 import { SKULL } from './constants.js';
 import * as Board from './board.js';
-import * as readyButton from './ready.js';
+import * as Ready from './ready.js';
 import * as Dialog from './dialog.js';
 import * as Jobfair from './jobfair.js';
 import * as Overlay from './overlay.js';
@@ -51,73 +51,76 @@ export function game_started(event) {
         }
         gamestatechange(state || 'placement');
         if (state === 'placement' || state === 'gameover') {
-            readyButton.display(state === 'placement' ? 'READY' : 'REMATCH');
+            Ready.display(state === 'placement' ? 'READY' : 'REMATCH');
         }
     }
 }
 export function battle_started() {
     gamestatechange('battle');
 }
-export function player_joined(event) {
-    const nameEl = document.createElement('div'), player = Player.getLocal(), whois = event.name === player.name ? 'player' : 'opponent', container = document.getElementById(whois);
+export function player_joined({ name, position }) {
+    const nameEl = document.createElement('div'), player = Player.getLocal(), whois = name === player.name ? 'player' : 'opponent', container = document.getElementById(whois);
     if (container.firstElementChild && container.firstElementChild.className === 'playername') {
         return;
     }
     nameEl.className = 'playername';
-    nameEl.innerHTML = event.name;
+    nameEl.innerHTML = name;
     container.appendChild(nameEl);
     if (whois === 'player') {
-        gmeta.position = event.position;
+        gmeta.position = position;
     }
 }
-export function player_left(event) {
-    document.getElementById(`${event.player}name`).innerHTML = '';
+export function player_left({ player }) {
+    document.getElementById(`${player}name`).innerHTML = '';
 }
-export function add_to_hand(event) {
-    const unitEl = Hand.createCard(event.unit, event.index);
-    unitsbyindex[event.index] = unitEl;
+export function add_to_hand({ unit, index }) {
+    const unitEl = Hand.createCard(unit, index);
+    unitsbyindex[index] = unitEl;
 }
-export function unit_assigned(event) {
-    const square = document.getElementById(`c${event.x}-${event.y}`), unit = unitsbyindex[event.index];
+export function unit_assigned({ x, y, index }) {
+    const square = Board.square(x, y), unit = unitsbyindex[index];
     square.appendChild(unit);
 }
-export function new_unit(event) {
-    const square = Board.square(event.x, event.y), unit = square.firstElementChild;
-    if (!unit) {
-        const newunit = Unit.render(event.unit, 0);
+export function new_unit({ x, y, unit }) {
+    const exist = Board.thingAt(x, y);
+    if (!exist) {
+        const newunit = Unit.render(unit, 0), square = Board.square(x, y);
         square.appendChild(newunit);
     }
     else {
-        unit.innerHTML = '';
-        Unit.render_into(event.unit, unit, true);
+        // don't overwrite existing data
+        exist.innerHTML = '';
+        unit.render_into(exist, unit, true);
     }
 }
 export function unit_changed(event) {
     new_unit(event); // for now
 }
 export function unit_placed(event) {
-    const square = document.getElementById(`c${event.x}-${event.y}`);
+    const square = Board.square(event.x, event.y);
     if (!square.firstChild) {
         const unit = Unit.render(event, null);
         square.appendChild(unit);
+    }
+    else {
+        console.error({ msg: `${event.x},${event.y} already occupied`, event });
     }
 }
 export function player_ready(event) {
     if (event.player === gmeta.position) {
         document.querySelector('#player .playername').dataset.ready = 'true';
-        readyButton.hide();
+        Ready.hide();
     }
     else {
         document.querySelector('#opponent .playername').dataset.ready = 'true';
     }
 }
 export function feature(event) {
-    const square = document.getElementById(`c${event.x}-${event.y}`), feature = Feature.render(event.feature);
-    ;
+    const square = Board.square(event.x, event.y), feature = Feature.render(event.feature);
     square.appendChild(feature);
 }
 export function unit_died(event) {
-    const square = document.getElementById(`c${event.x}-${event.y}`), animation = () => {
+    const square = Board.square(event.x, event.y), animation = () => {
         const unit = square.firstChild;
         unit.innerHTML = `<div class="death">${SKULL}</div>`;
         unit.dataset.dead = 'true';
@@ -161,7 +164,11 @@ export function thing_moved(event) {
     }
 }
 export function thing_gone(event) {
-    const square = Board.square(event.x, event.y), thing = square.firstChild;
+    const thing = Board.thingAt(event.x, event.y);
+    if (!thing) {
+        console.error({ msg: `nothing at ${event.x},${event.y}`, event });
+        return;
+    }
     if (thing.className.includes('owned')) {
         thing.dataset.state = 'invisible';
     }
@@ -175,16 +182,15 @@ export function thing_gone(event) {
         return { animation, squares: [`${event.x},${event.y}`] };
     }
 }
-export function gameover(event) {
-    const message = event.winner === gmeta.position ? 'you win!' : 'you lose';
+export function gameover({ winner }) {
+    const message = winner === gmeta.position ? 'you win!' : 'you lose';
     gamestatechange('gameover');
-    document.getElementById('gamestate').innerHTML = `state: gameover, winner: ${event.winner}!`;
     turnchange(null);
     Dialog.displayMessage(message);
-    readyButton.display('REMATCH');
+    Ready.display('REMATCH');
 }
-export function turn(event) {
-    turnchange(event.player);
+export function turn({ player }) {
+    turnchange(player);
 }
 export function candidate(event) {
     const jf = document.getElementById('jobfair'), existing = document.getElementById(`candidate-${event.index}`);
@@ -202,7 +208,7 @@ export function candidate(event) {
 export function ability_used(event) {
     if (!AbilityEvent[event.type]) {
         console.error({ error: 'no ability handler', event });
-        return;
+        return null;
     }
     return AbilityEvent[event.type](event);
 }
