@@ -22,15 +22,15 @@ defmodule Unit.Dogatron do
     @moduledoc """
     Add a copy to hand with +2 attack and defense.
     """
-    use Ability, noreveal: true
-    @impl Ability
-    def resolve(%Board{} = board, opts) do
-      %{name: name, attack: attack, defense: defense, position: position} = opts[:unit]
-      {board, e1} = case board.grid[opts[:coords]] do
+    use Ability.OnDeath, noreveal: true
+    @impl Ability.OnDeath
+    def on_death(%Board{} = board, data) do
+      %{name: name, attack: attack, defense: defense, position: position} = data.unit
+      {board, e1} = case board.grid[data.coord] do
         :nil -> {board, []}
-        %Unit{name: ^name} -> Board.unit_death(board, opts[:coords])
+        %Unit{name: ^name} -> Board.unit_death(board, data.coord)
       end
-      newunit = %{opts[:unit] | attack: attack + 2, defense: defense + 2}
+      newunit = %{data.unit | attack: attack + 2, defense: defense + 2}
       {board, e2} = Board.Hand.add_unit(board, position, newunit)
       {board, e1 ++ e2}
     end

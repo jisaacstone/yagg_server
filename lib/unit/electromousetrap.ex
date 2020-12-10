@@ -24,11 +24,11 @@ defmodule Unit.Electromousetrap do
     @moduledoc """
     Invisible. Captures attacker, giving you control
     """
-    use Ability, noreveal: :true
+    use Ability.OnDeath, noreveal: :true
 
-    @impl Ability
-    def resolve(board, opts) do
-      control(board, opts[:opponent], opts[:unit])
+    @impl Ability.OnDeath
+    def on_death(board, %{unit: unit, opponent: opponent}) do
+      control(board, opponent, unit)
     end
 
     defp control(board, :nil, _) do

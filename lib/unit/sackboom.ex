@@ -69,10 +69,10 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its third move
     """
-    use Ability
-    @impl Ability
-    def resolve(board, opts) do
-      Unit.Sackboom.move(board, opts[:to], Move.One)
+    use Ability.AfterMove
+    @impl Ability.AfterMove
+    def after_move(board, %{to: to}) do
+      Unit.Sackboom.move(board, to, Move.One)
     end
   end
 
@@ -80,10 +80,10 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its second move
     """
-    use Ability
-    @impl Ability
-    def resolve(board, opts) do
-      Unit.Sackboom.move(board, opts[:to], Move.Two)
+    use Ability.AfterMove
+    @impl Ability.AfterMove
+    def after_move(board, %{to: to}) do
+      Unit.Sackboom.move(board, to, Move.Two)
     end
   end
 
@@ -91,10 +91,10 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its next move
     """
-    use Ability
-    @impl Ability
-    def resolve(board, opts) do
-      Unit.Sackboom.explode(board, opts[:unit], opts[:to])
+    use Ability.AfterMove
+    @impl Ability.AfterMove
+    def after_move(board, %{unit: unit, to: to}) do
+      Unit.Sackboom.explode(board, unit, to)
     end
   end
 end

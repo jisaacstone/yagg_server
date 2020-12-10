@@ -20,11 +20,12 @@ defmodule Unit.Explody do
 
   defmodule Selfdestruct do
     @moduledoc "Destroy units in this and adjacent squares"
-    use Ability
+    use Ability.OnDeath
 
-    def resolve(board, opts) do
+    @impl Ability.OnDeath
+    def on_death(board, data) do
       {board, effects, events} = Enum.reduce(
-        [{:_, opts[:coords]} | Grid.surrounding(opts[:coords])],
+        [{:_, data.coord} | Grid.surrounding(data.coord)],
         {board, [], []},
         fn({_, {x, y}}, b_e) ->
           killunit({x, y}, Grid.thing_at(board, {x, y}), b_e)

@@ -48,18 +48,18 @@ defmodule Unit.Electromouse do
     @moduledoc """
     Leave the unit capture trap behind
     """
-    use Ability, noreveal: :true
+    use Ability.AfterMove, noreveal: :true
 
-    @impl Ability
-    def resolve(board, opts) do
-      position = opts[:unit].position
-      {x, y} = opts[:from]
+    @impl Ability.AfterMove
+    def after_move(board, %{unit: unit, from: from, to: to}) do
+      position = unit.position
+      {x, y} = from
       trap = Unit.Electromousetrap.new(position)
-      grid = Map.put(board.grid, opts[:from], trap)
+      grid = Map.put(board.grid, from, trap)
       events = [Event.NewUnit.new(position, x: x, y: y, unit: trap)]
       Grid.update(
         %{board | grid: grid},
-        opts[:to],
+        to,
         fn(u) -> %{
           u |
           triggers: %{},

@@ -22,14 +22,13 @@ defmodule Unit.Mediacreep do
     @moduledoc """
     Leave behind a replica with -2 attack and defense
     """
-    use Ability
+    use Ability.AfterMove
 
-    @impl Ability
-    def resolve(%Board{} = board, opts) do
-      unit = opts[:unit]
-      {x, y} = opts[:from]
+    @impl Ability.AfterMove
+    def after_move(%Board{} = board, %{from: from, unit: unit}) do
+      {x, y} = from
       copy = %{
-        opts[:unit] |
+        unit |
         attack: unit.attack - 2,
         defense: unit.defense - 2
       }
@@ -38,7 +37,7 @@ defmodule Unit.Mediacreep do
       else 
         copy
       end
-      grid = Map.put(board.grid, opts[:from], copy)
+      grid = Map.put(board.grid, from, copy)
       {
         %{board | grid: grid},
         [

@@ -49,15 +49,15 @@ defmodule Unit.Antente.Visible do
   @moduledoc """
   Becomes visible to opponent
   """
-  use Ability
+  use Ability.BeforeAttack
 
-  @impl Ability
-  def resolve(board, opts) do
-    %{position: position} = opts[:unit]
-    {x, y} = opts[:from]
+  @impl Ability.BeforeAttack
+  def before_attack(board, data) do
+    %{position: position} = data.unit
+    {x, y} = data.from
     vis_event = Event.UnitPlaced.new(x: x, y: y, player: position)
-    {board, e1} = Grid.update(board, opts[:from], &make_visible/1, [vis_event])
-    {board, e2} = Board.do_battle(board, opts[:unit], opts[:opponent], opts[:from], opts[:to])
+    {board, e1} = Grid.update(board, data.from, &make_visible/1, [vis_event])
+    {board, e2} = Board.do_battle(board, data.unit, data.opponent, data.from, data.to)
     {board, e1 ++ e2}
   end
 

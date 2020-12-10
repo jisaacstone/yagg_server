@@ -66,7 +66,98 @@ defmodule Action.Ability do
       _ -> {:err, :nounit}
     end
   end
+end
 
+defmodule Action.Ability.OnDeath do
+  alias __MODULE__
+
+  @enforce_keys [:coord, :unit]
+  defstruct [:opponent | @enforce_keys]
+
+  @type t :: %OnDeath{
+    coord: Grid.coord,
+    unit: Unit.t,
+    opponent: :nil | Unit.t
+  }
+
+  @callback on_death(Board.t, t) :: {Board.t, [Event.t]} | {:err, atom}
+
+  defmacro __using__(opts) do
+    quote do
+      require Action.Ability
+      Action.Ability.__using__(unquote(opts))
+      @behaviour Action.Ability.OnDeath
+      def resolve(board, opts) do
+        {coord, opts} = Keyword.pop!(opts, :coords)
+        {unit, opts} = Keyword.pop!(opts, :unit)
+        {opponent, opts} = Keyword.pop(opts, :opponent)
+        data = %OnDeath{coord: coord, unit: unit, opponent: opponent}
+        on_death(board, data)
+      end
+    end
+  end
+end
+
+defmodule Action.Ability.AfterMove do
+  alias __MODULE__
+
+  @enforce_keys [:from, :to, :unit]
+  defstruct @enforce_keys
+
+  @type t :: %AfterMove{
+    from: Grid.coord,
+    to: Grid.coord,
+    unit: Unit.t
+  }
+
+  @callback after_move(Board.t, t) :: {Board.t, [Event.t]} | {:err, atom}
+
+  defmacro __using__(opts) do
+    quote do
+      require Action.Ability
+      Action.Ability.__using__(unquote(opts))
+      @behaviour Action.Ability.AfterMove
+      def resolve(board, opts) do
+        {from, opts} = Keyword.pop!(opts, :from)
+        {to, opts} = Keyword.pop!(opts, :to)
+        {unit, opts} = Keyword.pop!(opts, :unit)
+        data = %AfterMove{from: from, to: to, unit: unit}
+        after_move(board, data)
+      end
+    end
+  end
+end
+
+defmodule Action.Ability.BeforeAttack do
+  alias __MODULE__
+
+  @enforce_keys [:from, :to, :unit, :opponent]
+  defstruct @enforce_keys
+
+  @type t :: %BeforeAttack{
+    from: Grid.coord,
+    to: Grid.coord,
+    unit: Unit.t,
+    opponent: Unit.t
+  }
+
+  @callback before_attack(Board.t, t) :: {Board.t, [Event.t]} | {:err, atom}
+
+  defmacro __using__(opts) do
+    quote do
+      require Action.Ability
+      Action.Ability.__using__(unquote(opts))
+      @behaviour Action.Ability.BeforeAttack
+      def resolve(board, opts) do
+        {from, opts} = Keyword.pop!(opts, :from)
+        {to, opts} = Keyword.pop!(opts, :to)
+        {unit, opts} = Keyword.pop!(opts, :unit)
+        {opponent, opts} = Keyword.pop!(opts, :opponent)
+        data = %BeforeAttack{from: from, to: to, unit: unit, opponent: opponent}
+        before_attack(board, data)
+      end
+    end
+  end
 end
 
 defmodule Action.Ability.NOOP do
@@ -105,28 +196,6 @@ defmodule Action.Ability.Concede do
   end
 end
 
-defmodule Action.Ability.Colburn do
-  @moduledoc "Destory all units in the same column"
-  use Action.Ability
-
-  def resolve(board, opts) do
-    {x, _} = opts[:coords]
-    Enum.reduce(
-      board.grid,
-      {board, []},
-      &burn_unit(&1, &2, x)
-    )
-  end
-
-  defp burn_unit({{x, y}, %Unit{}}, {board, events}, x) do
-    {board, newevents} = Board.unit_death(board, {x, y})
-    {board, newevents ++ events}
-  end
-  defp burn_unit(_, acc, _) do
-    acc
-  end
-end
-
 defmodule Action.Ability.Secondwind do
   @moduledoc "goes back into hand"
   use Action.Ability
@@ -136,23 +205,6 @@ defmodule Action.Ability.Secondwind do
     pos = opts[:unit].position
     newunit = %{opts[:unit] | triggers: %{}}
     Hand.add_unit(board, pos, newunit)
-  end
-end
-
-defmodule Action.Ability.Copyleft do
-  @moduledoc "copy the unit to the left of this unit, put the copy in your hand"
-  use Action.Ability
-
-  @impl Action.Ability
-  def resolve(board, opts) do
-    pos = opts[:unit].position
-    coord = Grid.cardinal(pos, :left) |> Grid.next(opts[:coords])
-    case board.grid[coord] do
-      %Unit{} = unit ->
-        copy = %{unit | position: pos}
-        Hand.add_unit(board, pos, copy)
-      _ -> {board, []}
-    end
   end
 end
 

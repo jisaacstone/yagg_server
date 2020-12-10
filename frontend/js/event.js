@@ -31,7 +31,6 @@ export function multi({ events }) {
 }
 export function game_started(event) {
     const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
-    console.log({ self: self, this: this });
     Hand.clear();
     if (event.army_size || gmeta.phase === 'jobfair') {
         if (gmeta.boardstate === 'gameover') {
@@ -90,7 +89,7 @@ export function new_unit({ x, y, unit }) {
     else {
         // don't overwrite existing data
         exist.innerHTML = '';
-        unit.render_into(exist, unit, true);
+        Unit.render_into(unit, exist, true);
     }
 }
 export function unit_changed(event) {
@@ -125,7 +124,6 @@ export function unit_died(event) {
         unit.innerHTML = `<div class="death">${SKULL}</div>`;
         unit.dataset.dead = 'true';
         return unit.animate({ opacity: [1, 0] }, { duration: 500, easing: "ease-in" }).finished.then(() => {
-            console.log({ unit });
             unit.remove();
         });
     };

@@ -60,13 +60,13 @@ defmodule Unit.Maycorn.Spark do
     @moduledoc """
     Fire a spark in all directions that kills units having 0 defense
     """
-    use Ability
-    @impl Ability
-    def resolve(board, opts) do
-      {board, [a1 | e1]} = Maycorn.spark(board, 1, opts[:coords], :north)
-      {board, [a2 | e2]} = Maycorn.spark(board, 1, opts[:coords], :south)
-      {board, [a3 | e3]} = Maycorn.spark(board, 1, opts[:coords], :east)
-      {board, [a4 | e4]} = Maycorn.spark(board, 1, opts[:coords], :west)
+    use Ability.OnDeath
+    @impl Ability.OnDeath
+    def on_death(board, %{coord: coord}) do
+      {board, [a1 | e1]} = Maycorn.spark(board, 1, coord, :north)
+      {board, [a2 | e2]} = Maycorn.spark(board, 1, coord, :south)
+      {board, [a3 | e3]} = Maycorn.spark(board, 1, coord, :east)
+      {board, [a4 | e4]} = Maycorn.spark(board, 1, coord, :west)
       {board, [Event.Multi.new(events: [a1, a2, a3, a4]) | e1 ++ e2 ++ e3 ++ e4]}
     end
   end
