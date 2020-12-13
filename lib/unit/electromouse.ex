@@ -1,5 +1,6 @@
 alias Yagg.Unit
 alias Yagg.Event
+alias Yagg.Board
 alias Yagg.Board.Grid
 alias Yagg.Board.Action.Ability
 
@@ -38,9 +39,40 @@ defmodule Unit.Electromouse do
         ability: :nil,
         triggers: %{
           move: Unit.Electromouse.Settrap,
+          attack: Unit.Electromouse.SetAtrap,
           death: Unit.Electromousetrap.Trap
         }
       }
+    end
+  end
+
+  defmodule SetAtrap do
+    @moduledoc """
+    Leave the unit capture trap behind
+    """
+    use Ability.BeforeAttack, noreveal: :true
+
+    @impl Ability.BeforeAttack
+    def before_attack(board, %{unit: %{position: position}, opponent: opponent, from: from, to: to}) do
+      # change the thing at from to normal electromouse
+      {board, e1} = Grid.update(
+        board,
+        from,
+        fn(u) -> %{
+          u |
+          triggers: %{},
+          name: :electromouse,
+          ability: Unit.Electromouse.Mousetrap
+        } end
+      )
+      # do battle
+      {board, e2} = Board.do_battle(board, Grid.thing_at(board, from), opponent, from, to)
+      # create the trap
+      {x, y} = from
+      trap = Unit.Electromousetrap.new(position)
+      grid = Map.put(board.grid, from, trap)
+      events = e1 ++ e2 ++ [Event.NewUnit.new(position, x: x, y: y, unit: trap)]
+      {%{board | grid: grid}, events}
     end
   end
 
