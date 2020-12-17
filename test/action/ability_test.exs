@@ -242,7 +242,6 @@ defmodule YaggTest.Action.Ability do
     assert Enum.find(events, fn(e) -> e.kind == :gameover end)
   end
 
-
   test "electromouse trap" do
     board = set_board([
       {{2, 2}, %Unit{ability: nil, attack: 9, defense: 2, name: :bezerker, position: :south, triggers: %{}, visible: MapSet.new([:player])}},
@@ -251,5 +250,19 @@ defmodule YaggTest.Action.Ability do
     action = %Board.Action.Move{from_x: 2, from_y: 2, to_x: 2, to_y: 3}
     assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
     assert %{name: :bezerker, position: :north} = newboard.grid[{2, 3}]
+  end
+
+  test "electromousetrap attack" do
+    board = set_board([
+      {{3, 2}, Unit.Sackboom.new(:north)},
+      {{4, 2}, Unit.Electromouse.new(:south)}
+    ])
+    action = %Board.Action.Ability{x: 4, y: 2}
+    assert {%Board{} = board, _events} = Board.Action.resolve(action, board, :south)
+    assert %{name: :"electromouse trap", triggers: %{move: Unit.Electromouse.Settrap}} = board.grid[{4, 2}]
+    action = %Board.Action.Move{from_x: 4, from_y: 2, to_x: 3, to_y: 2}
+    assert {%Board{} = board, _events} = Board.Action.resolve(action, board, :south)
+    assert %{name: :electromousetrap, triggers: %{death: Unit.Electromousetrap.Trap}} = board.grid[{4, 2}]
+    assert %{name: :sackboom} = board.grid[{3, 2}]
   end
 end
