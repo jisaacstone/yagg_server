@@ -159,11 +159,11 @@ export function unit_died(event): animData {
 }
 
 export function thing_moved(event): animData {
-  const to = Board.square(event.to.x, event.to.y),
-    from = Board.square(event.from.x, event.from.y),
+  const from = Board.square(event.from.x, event.from.y),
     thing = from.firstChild as HTMLElement;
-  if (to) {
-    const fromRect = from.getBoundingClientRect(),
+  if (event.to.x && event.to.y) {
+    const to = Board.square(event.to.x, event.to.y),
+      fromRect = from.getBoundingClientRect(),
       toRect = to.getBoundingClientRect(),
       animation = () => {
         const child = to.firstChild as HTMLElement,

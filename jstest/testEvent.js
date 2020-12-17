@@ -58,4 +58,11 @@ describe('event', () => {
     const unitName = document.querySelector('#c2-0 .unit-name');
     expect(unitName.firstChild.textContent).equal('foo');
   });
+  it('moved offscreen', () => {
+    const boardEl = document.getElementById('board');
+    Board.render(boardEl, 5, 5);
+    Event.feature({ x: 0, y: 1, feature: 'block' });
+    const result = Event.thing_moved({ from: { x: 0, y: 1}, to: 'offscrean' });
+    expect(result.squares[0]).equal('0,1');
+  });
 });
