@@ -70,9 +70,18 @@ defmodule YaggTest.AI do
     board = 
       HB.new_board([], [], {4, 4})
       |> Map.put(:state, :battle)
-      |> Board.place!(Unit.Pushie.new(:north), {3, 3})
+      |> Board.place!(Unit.Howloo.new(:north), {3, 3})
     choices = Choices.choices(board, :north)
     assert Enum.member?(choices.ability, %Action.Ability{x: 3, y: 3})
     assert choices.place == []
+  end
+
+  test "pushie" do
+    board = 
+      HB.new_board([], [], {4, 4})
+      |> Map.put(:state, :battle)
+      |> Board.place!(Unit.Pushie.new(:north), {3, 3})
+    choices = Choices.choices(board, :north)
+    refute Enum.member?(choices.ability, %Action.Ability{x: 3, y: 3})
   end
 end

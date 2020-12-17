@@ -20,7 +20,7 @@ defmodule Yagg.AI.Choices do
     pc = place_choices(board.grid, board.dimensions, board.hands[position], position)
     units = owned_units(board.grid, position)
     mc = move_choices(units, board, position)
-    ac = ability_choices(units)
+    ac = ability_choices(board.grid, units)
     %{place: pc, move: mc, ability: ac}
   end
 
@@ -106,17 +106,52 @@ defmodule Yagg.AI.Choices do
   defp can_move_to(_, _), do: :false
 
   # AC
-  defp ability_choices(units) do
+  defp ability_choices(grid, units) do
     Enum.reduce(
       units,
       [],
-      fn(u, a) -> unit_action(u, a) end
+      fn(u, a) -> unit_action(grid, u, a) end
     )
   end
 
-  defp unit_action({_, %Unit{ability: :nil}}, actions), do: actions
-  defp unit_action({_, %Unit{name: :monarch}}, actions), do: actions
-  defp unit_action({{x, y}, %Unit{}}, actions) do
+  defp unit_action(_, {_, %Unit{ability: :nil}}, actions), do: actions
+  defp unit_action(_, {_, %Unit{name: :monarch}}, actions), do: actions
+  defp unit_action(_, {_, %Unit{name: :shenamouse}}, actions), do: actions
+  defp unit_action(grid, {{x, y}, %Unit{name: :burninator, position: pos}}, actions) do
+    {us, them} = Enum.reduce(
+      grid,
+      {0, 0},
+      fn
+        ({{_, ^y}, %{position: ^pos}}, {u, t}) -> {u + 1, t}
+        ({{_, ^y}, %{position: _}}, {u, t}) -> {u, t + 1}
+        (_, u_t) -> u_t
+      end
+    )
+    case them - us do
+      n when n <= 0 -> actions
+      n -> 
+        action = %Action.Ability{x: x, y: y}
+        List.duplicate(action, n) ++ actions
+    end
+  end
+  defp unit_action(grid, {{x, y}, %Unit{name: :pushie, position: pos}}, actions) do
+    {us, them} = Enum.reduce(
+      Enum.map(Grid.surrounding({x, y}), fn({_, coord}) -> Map.get(grid, coord) end),
+      {0, 0},
+      fn
+        (%{position: ^pos}, {u, t}) -> {u + 1, t}
+        (%{position: _}, {u, t}) -> {u, t + 1}
+        (_, u_t) -> u_t
+      end
+    )
+    case them - us do
+      n when n <= 0 -> actions
+      n -> 
+        action = %Action.Ability{x: x, y: y}
+        List.duplicate(action, n) ++ actions
+    end
+  end
+  defp unit_action(_, {{x, y}, %Unit{}}, actions) do
     action = %Action.Ability{x: x, y: y}
     [action | actions]
   end
