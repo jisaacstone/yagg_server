@@ -7,6 +7,7 @@ import * as Overlay from './overlay.js';
 import * as Event from './event.js';
 import * as Jobfair from './jobfair.js';
 import * as Board from './board.js';
+import * as Dialog from './dialog.js';
 function render_board(board, players) {
     if (players !== 2) {
         return;
@@ -60,8 +61,15 @@ function waitingforplayers() {
     copy.onclick = () => {
         const url = new URL(window.location.toString());
         url.searchParams.delete('player');
+        if (!navigator.clipboard) {
+            Dialog.displayMessage('could not access clipboard, sorry. You can still copy the url and send manually', 'error');
+            return;
+        }
         navigator.clipboard.writeText(url.toString()).then(() => {
-            alert('copied!');
+            Dialog.displayMessage('copied!');
+        }).catch((e) => {
+            console.error(e);
+            Dialog.displayMessage('could not access clipboard, sorry. You can still copy the url and send manually', 'error');
         });
     };
     over.appendChild(copy);

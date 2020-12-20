@@ -1,4 +1,5 @@
 alias Yagg.Unit
+alias Yagg.Event
 alias Yagg.Board.Grid
 alias Yagg.Table.Player
 alias Yagg.Board.Action.Ability
@@ -19,12 +20,17 @@ defmodule Unit.Shenamouse do
     )
   end
 
-  def reveal(coord, board, position, events \\ []) do
+  def reveal({x, y}, board, position, events \\ []) do
     enemy = Player.opposite(position)
-    {board, events} = case board.grid[coord] do
+    {board, events} = case board.grid[{x, y}] do
       %Unit{visible: :all} -> {board, events}
       %Unit{position: ^enemy} ->
-        Grid.update(board, coord, fn(u) -> %{u | visible: :all} end, events)
+        Grid.update(
+          board,
+          {x, y},
+          fn(u) -> %{u | visible: :all} end,
+          [Event.AbilityUsed.new(position, type: :scan, x: x, y: y) | events]
+        )
       _ -> {board, events}
     end
     {board, events, position}

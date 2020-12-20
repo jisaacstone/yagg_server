@@ -1,26 +1,3 @@
-:root {
-  --steelblue: #4682b4;
-  --dark-steelblue: #2e5678;
-  --black-steelblue: #1e3950;
-  --dark-purple: #425;
-  --light-teal: #4B9;
-  --dark-teal: #2d7c66;
-  --salmon: #C89;
-  --dark-salmon: #885a66;
-  --wood-dark: #503840;
-  --tealgrey-transparent: rgba(175, 217, 205, 0.8);
-  --tealgrey-dark: rgba(75, 90, 80, 0.8);
-  --wood-transparent: rgba(185, 170, 154, 0.8);
-  --salmon-transparent: rgba(204, 136, 153, 0.9);
-  --transparent-white-90: rgba(232, 225, 239, 0.9);
-  --transparent-white-20: rgba(232, 225, 239, 0.2);
-  /*
-  --north-main: rgba(45, 198, 221, 0.9);
-  --north-transparent-20: RGBA(45, 198, 221, 0.3);
-  --south-main: rgba(230, 188, 62, 0.9);
-  --south-transparent-20: rgba(255, 192, 0, 0.4);
-  */
-}
 
 body {
   justify-content: center;
@@ -42,4 +19,56 @@ body {
   cursor: pointer;
   box-shadow: inset 0.2em 0.2em 0.3em white;
   box-shadow: inset 0.2em 0.2em 0.3em white, inset -0.2em -0.1em 0.2em rgba(12, 4, 0, 0.2);
+}
+
+/* overlay */
+
+.overlaycontainer {
+  position: absolute;
+  background-color: var(--white-transparent-high);
+  background: repeating-linear-gradient(40deg,
+    rgba(240, 230, 221, 0.3),
+    rgba(240, 230, 221, 0.3) max(2vh, 2vw),
+    rgba(231, 210, 235, 0.3) max(2vh, 2vw),
+    rgba(231, 210, 235, 0.3) max(4vh, 4vw),
+    rgba(201, 250, 241, 0.3) max(4vh, 4vw),
+    rgba(201, 250, 241, 0.3) max(6vh, 6vw));
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  display: grid;
+}
+
+.overlay {
+  display: grid;
+  place-self: center;
+  place-content: center;
+  min-width: 50%;
+  min-height: 50%;
+  padding: 5%;
+}
+
+.overlaycontainer .message {
+  background-image: url("img/r_c_tran.png");
+  color: var(--ui-main-dark);
+  background-color: var(--ui-alt-light);
+  font-size: 120%;
+  padding: 1.2em;
+  border: 0.3em inset var(--ui-main-desaturated);
+  border-radius: 0.4em;
+  box-shadow: 0.8em 1.2em 1.3em var(--ui-main-dark-transparent);
+  display: grid;
+  row-gap: 0.6em;
+  column-gap: 0.5em;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+.overlaycontainer .confirm button {
+  grid-row: 2;
+  margin: 0 1em;
+}
+
+.overlaycontainer .confirm div {
+  grid-column: 1 / 3;
 }

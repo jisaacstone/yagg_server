@@ -42,6 +42,19 @@ function createProjectile(subtype: string): HTMLElement {
   return projectileEl
 }
 
+export function scan({ x, y }) {
+  const child = Board.thingAt(x, y);
+  if (child) {
+    const animation = () => {
+      return child.animate(
+        { opacity: [1, 0.5, 1] }, 
+        { duration: 150 }
+      ).finished;
+    }
+    return { animation, squares: [`${x},${y}`] };
+  }
+}
+
 export function fire(event) {
   const square = Board.square(event.x, event.y),
     child = square.firstElementChild as HTMLElement;

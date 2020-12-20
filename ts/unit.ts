@@ -4,6 +4,7 @@ import { gmeta, isYourTurn } from './state.js';
 import { displayerror } from './err.js';
 import { dismissable, clear } from './overlay.js';
 import * as Select from './select.js';
+import * as Dialog from './dialog.js';
 
 interface Ability {
   name: string;
@@ -34,8 +35,11 @@ function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit
     }
     e.preventDefault();
     e.stopPropagation();
-    if (window.confirm(unit.ability.description)) {
+    return Dialog.confirm(unit.ability.description, 'use').then((confirmed) => {
       Select.deselect();
+      if (!confirmed) {
+        return;
+      }
       if (cb) {
         cb();
       }
@@ -46,7 +50,7 @@ function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit
           displayerror(request.responseText);
         }
       });
-    }
+    });
   };
 }
 
@@ -120,7 +124,7 @@ function anyDetails(unit) {
 function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
   renderAttrs(unit, el);
   el.style.backgroundImage = `url("img/${unit.name}.png")`;
-  detailView(unit, el);
+  el.onclick = detailViewFn(unit, el.className, squareEl);
   if (unit.ability) {
     ability_button(unit, el, squareEl);
   }
@@ -216,10 +220,6 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
     e.stopPropagation();
     dismissable(details);
   }
-}
-
-function detailView(unit: Unit, el: HTMLElement) {
-  el.onclick = detailViewFn(unit, el.className);
 }
 
 export function isImmobile(square: HTMLElement) {

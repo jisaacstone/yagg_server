@@ -17,11 +17,20 @@ export function clear() {
   );
 }
 
-export function dismissable(el) {
+export function dismissable(el: HTMLElement) {
   const overlay = create(),
     container = overlay.parentNode as HTMLElement;
   overlay.appendChild(el);
   container.onclick = () => {
-    clear();
+    container.remove();
+  }
+}
+
+export function clearable(el: HTMLElement): () => void {
+  const overlay = create(),
+    container = overlay.parentNode as HTMLElement;
+  overlay.appendChild(el);
+  return () => {
+    container.remove();
   }
 }

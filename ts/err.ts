@@ -1,3 +1,5 @@
+import * as Dialog from './dialog.js';
+
 export function displayerror(message: string) {
-  alert(message);
+  Dialog.displayMessage(message, 'error');
 }

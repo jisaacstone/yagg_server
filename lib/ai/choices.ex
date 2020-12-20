@@ -82,7 +82,7 @@ defmodule Yagg.AI.Choices do
   end
 
   defp unit_choices({{fx, fy}, %{attack: a}}, board, position) do
-    combat_repeat = a / 3 |> ceil()
+    combat_repeat = min(a, 0) / 3 |> ceil()
     Enum.reduce(
       Grid.surrounding({fx, fy}),
       [],

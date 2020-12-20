@@ -239,5 +239,9 @@ defmodule Yagg.Event do
     def new(params) do
       Event.new(:global, :ability_used, params)
     end
+    @spec new(Player.position, Keyword.t) :: Event.t
+    def new(position, params) do
+      Event.new(position, :ability_used, params)
+    end
   end
 end

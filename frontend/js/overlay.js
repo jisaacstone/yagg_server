@@ -15,6 +15,13 @@ export function dismissable(el) {
     const overlay = create(), container = overlay.parentNode;
     overlay.appendChild(el);
     container.onclick = () => {
-        clear();
+        container.remove();
+    };
+}
+export function clearable(el) {
+    const overlay = create(), container = overlay.parentNode;
+    overlay.appendChild(el);
+    return () => {
+        container.remove();
     };
 }
