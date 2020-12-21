@@ -5,6 +5,7 @@ import { displayerror } from './err.js';
 import { dismissable, clear } from './overlay.js';
 import * as Select from './select.js';
 import * as Dialog from './dialog.js';
+import * as Element from './element.js';
 
 interface Ability {
   name: string;
@@ -55,19 +56,19 @@ function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit
 }
 
 function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = null) {
-  const abilbut = document.createElement('button'),
-    tt = document.createElement('span'),
-    abilname = unit.ability.name,
+  const abilbut = Element.create({
+    tag: 'button',
+    className: 'unit-ability',
+    innerHTML: unit.ability.name,
+    children: [
+      Element.create({
+        className: 'tooltip',
+        innerHTML: unit.ability.description})
+    ]}),
     square = unitSquare ? unitSquare : el.parentNode as HTMLElement;
 
-  abilbut.className = 'unit-ability';
-  abilbut.innerHTML = abilname;
   bindAbility(abilbut, square, unit);
-
   el.appendChild(abilbut);
-  tt.className = 'tooltip';
-  tt.innerHTML = unit.ability.description;
-  abilbut.appendChild(tt);
 }
 
 function convertAttr(att, value) {
@@ -80,10 +81,10 @@ function convertAttr(att, value) {
 function renderAttrs(unit: Unit, el: HTMLElement) {
   for (const att of ['name', 'attack', 'defense']) {
     if (unit[att] !== null && unit[att] !== undefined) {
-      const subel = document.createElement('span');
-      subel.className = `unit-${att}`;
-      subel.innerHTML = convertAttr(att, unit[att]);
-      el.appendChild(subel);
+      el.appendChild(Element.create({
+        className: `unit-${att}`,
+        innerHTML: convertAttr(att, unit[att])
+      }));
     }
   }
   if (unit.name === 'monarch') {
@@ -108,10 +109,10 @@ function renderTile(unit: Unit, el: HTMLElement, attrs=false) {
     infobox.innerHTML = '';
     infobox.appendChild(unitInfo);
     if (! anyDetails(unit)) {
-      const noInfo = document.createElement('div');
-      noInfo.className = 'no-info';
-      noInfo.innerHTML = 'no information';
-      unitInfo.appendChild(noInfo);
+      unitInfo.appendChild(Element.create({
+        className: 'no-info',
+        innerHTML: 'no information'
+      }));
     }
   }; // @ts-ignore
   el.addEventListener('sidebar', el.sidebar, false);
@@ -129,17 +130,18 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
     ability_button(unit, el, squareEl);
   }
   if (unit.triggers && Object.keys(unit.triggers).length !== 0) {
-    const triggers = document.createElement('div');
-    triggers.className = 'triggers';
+    const triggers = Element.create({ className: 'triggers' });
     for (const [name, trigger] of Object.entries(unit.triggers)) {
-      const trigSym = document.createElement('div'),
-        tt = document.createElement('span');
-      trigSym.className = 'trigger-symbol';
-      trigSym.innerHTML = symbolFor(name);
-      triggers.appendChild(trigSym);
-      tt.className = 'tooltip';
-      tt.innerHTML = trigger.description;
-      trigSym.appendChild(tt);
+      triggers.appendChild(Element.create({
+        className: 'trigger-symbol',
+        innerHTML: symbolFor(name),
+        children: [
+          Element.create({
+            className: 'tooltip',
+            innerHTML: trigger.description
+          })
+        ]})
+      );
     }
     el.appendChild(triggers);
   }
@@ -160,57 +162,56 @@ function symbolFor(trigger: string): string {
 }
 
 export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
-  const details = document.createElement('div'),
-    portrait = document.createElement('div'),
-    descriptions = document.createElement('div');
-
-  details.className = `${className} details`;
+  const descriptions = Element.create({ className: 'descriptions' }),
+    portrait = Element.create({ className: 'unit-portrait' }),
+    details = Element.create({
+      className: `${className} details`,
+      children: [descriptions, portrait]
+    });
+  
   renderAttrs(unit, details);
-
-  portrait.className = 'unit-portrait';
   portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
-  details.appendChild(portrait);
-
-  descriptions.className = 'descriptions';
-  details.appendChild(descriptions);
 
   if (unit.ability) {
-    const ability = document.createElement('div'),
-      abildesc = document.createElement('div'),
-      abilname = document.createElement('div');
-    ability.className = 'unit-ability';
-    abilname.className = 'ability-name uibutton';
-    abilname.innerHTML = unit.ability.name;
-    abildesc.className = 'ability-description';
-    ability.appendChild(abilname);
-    abildesc.innerHTML = unit.ability.description;
-    ability.appendChild(abildesc);
-    descriptions.appendChild(ability);
+    const abilname = Element.create({
+        className: 'ability-name uibutton',
+        innerHTML: unit.ability.name,
+      }),
+      abildesc = Element.create({
+        className: 'ability-description',
+        innerHTML: unit.ability.description
+      }),
+      ability = Element.create({
+        className: 'unit-ability',
+        children: [abilname, abildesc]
+      });
     if (square) {
       bindAbility(abilname, square, unit, clear);
     }
   }
 
   if (unit.triggers && Object.keys(unit.triggers).length > 0) {
-    const triggers = document.createElement('div');
-    triggers.className = 'triggers';
+    const triggers = Element.create({ className: 'triggers' });
     for (const [name, trigger] of Object.entries(unit.triggers)) {
-      const triggerel = document.createElement('div'),
-        tsym = document.createElement('div'),
-        tsymtt = document.createElement('div'),
-        tdes = document.createElement('div');
-      triggerel.className = `unit-trigger ${name}-trigger`;
-      tsym.className = 'trigger-symbol';
-      tsym.innerHTML = symbolFor(name);
-      tdes.className = 'trigger-description';
-      tdes.innerHTML = `${trigger.description}`;
-      tsymtt.className = 'tooltip';
-      tsymtt.innerHTML = `On ${name}`;
-
-      tsym.appendChild(tsymtt);
-      triggerel.appendChild(tsym);
-      triggerel.appendChild(tdes);
-      triggers.appendChild(triggerel);
+      triggers.appendChild(Element.create({
+        className: `unit-trigger ${name}-trigger`,
+        children: [
+          Element.create({
+            className: 'trigger-symbol',
+            innerHTML: symbolFor(name),
+            children: [
+              Element.create({
+                className: 'tooltip',
+                innerHTML: `On ${name}`
+              })
+            ]
+          }),
+          Element.create({
+            className: 'trigger-description',
+            innerHTML: `${trigger.description}`
+          })
+        ]
+      }));
     }
     descriptions.appendChild(triggers);
   }

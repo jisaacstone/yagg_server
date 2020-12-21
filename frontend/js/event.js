@@ -11,6 +11,7 @@ import * as Player from './playerdata.js';
 import * as Feature from './feature.js';
 import * as Hand from './hand.js';
 import * as AbilityEvent from './abilty_event.js';
+import * as Element from './element.js';
 const unitsbyindex = {};
 export function multi({ events }) {
     let squares = [];
@@ -58,12 +59,10 @@ export function battle_started() {
     gamestatechange('battle');
 }
 export function player_joined({ name, position }) {
-    const nameEl = document.createElement('div'), player = Player.getLocal(), whois = name === player.name ? 'player' : 'opponent', container = document.getElementById(whois);
+    const nameEl = Element.create({ className: 'playername', innerHTML: name }), player = Player.getLocal(), whois = name === player.name ? 'player' : 'opponent', container = document.getElementById(whois);
     if (container.firstElementChild && container.firstElementChild.className === 'playername') {
         return;
     }
-    nameEl.className = 'playername';
-    nameEl.innerHTML = name;
     container.appendChild(nameEl);
     if (whois === 'player') {
         gmeta.position = position;
@@ -195,10 +194,11 @@ export function candidate(event) {
     if (existing) {
         return;
     }
-    const cdd = document.createElement('div'), unitEl = Unit.render(event.unit, event.index, true);
-    cdd.className = 'candidate';
-    cdd.id = `candidate-${event.index}`;
-    cdd.appendChild(unitEl);
+    const unitEl = Unit.render(event.unit, event.index, true), cdd = Element.create({
+        className: 'candidate',
+        id: `candidate-${event.index}`,
+        children: [unitEl]
+    });
     Select.bind_candidate(cdd, event.index);
     unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
     jf.appendChild(cdd);

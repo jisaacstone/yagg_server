@@ -1,14 +1,13 @@
 import { request, post, gameaction } from './request.js';
 import * as Player from './playerdata.js';
+import * as Element from './element.js';
 const displayedTables = {};
 const configurations = {};
 function fetchConfigs(sel_el) {
     request('configurations').then((configs) => {
         for (const config of configs) {
             configurations[config.name] = config;
-            const opt = document.createElement('option');
-            opt.innerHTML = config.name;
-            sel_el.appendChild(opt);
+            sel_el.appendChild(Element.create({ tag: 'option', innerHTML: config.name }));
         }
         sel_el.addEventListener('change', () => {
             const configName = sel_el.value, configuration = configurations[configName], descriptionEl = document.getElementById('config-description');
@@ -25,18 +24,23 @@ function displayTableData(tablesEl, data) {
     });
 }
 function renderTable({ config }, text) {
-    const tblbtn = document.createElement('div'), dimensions = document.createElement('div'), name = document.createElement('div'), txt = document.createElement('div');
-    tblbtn.className = 'table';
-    dimensions.className = 'dimensions';
-    name.className = 'config-name';
-    txt.className = 'tabletxt';
-    dimensions.innerHTML = `${config.dimensions.x}x${config.dimensions.y}`;
-    name.innerHTML = config.name;
-    txt.innerHTML = text;
-    tblbtn.append(name);
-    tblbtn.append(dimensions);
-    tblbtn.append(txt);
-    return tblbtn;
+    return Element.create({
+        className: 'table',
+        children: [
+            Element.create({
+                className: 'config-name',
+                innerHTML: config.name
+            }),
+            Element.create({
+                className: 'dimensions',
+                innerHTML: `${config.dimensions.x}x${config.dimensions.y}`
+            }),
+            Element.create({
+                className: 'tabletxt',
+                innerHTML: text
+            })
+        ]
+    });
 }
 function displayTables(tablesEl, tables, currentName) {
     const toRemove = new Set(Object.keys(displayedTables));
@@ -50,7 +54,7 @@ function displayTables(tablesEl, tables, currentName) {
             el.onclick = () => {
                 window.location.href = `board.html?table=${table.id}`;
             };
-            tablesEl.appendChild(el);
+            tablesEl.prepend(el);
             displayedTables[table.id] = el;
         }
         else if (table.players.length < 2) {
@@ -60,10 +64,7 @@ function displayTables(tablesEl, tables, currentName) {
             }
             const el = renderTable(table, 'JOIN');
             table.players.forEach(({ name }) => {
-                const nel = document.createElement('div');
-                nel.className = 'playername';
-                nel.innerHTML = name;
-                el.appendChild(nel);
+                el.appendChild(Element.create({ className: 'playername', innerHTML: name }));
             });
             el.onclick = () => {
                 gameaction('join', {}, 'table', table.id).then(() => {
