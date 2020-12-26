@@ -130,7 +130,7 @@ export function unit_died(event) {
 }
 export function thing_moved(event) {
     const from = Board.square(event.from.x, event.from.y), thing = from.firstChild;
-    if (event.to.x && event.to.y) {
+    if (event.to.x !== undefined && event.to.y !== undefined) {
         const to = Board.square(event.to.x, event.to.y), fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), animation = () => {
             const child = to.firstChild, thingRect = thing.getBoundingClientRect(), xoffset = thingRect.left - fromRect.left, yoffset = thingRect.top - fromRect.top;
             const a = thing.animate({
@@ -171,6 +171,7 @@ export function thing_gone(event) {
     }
     else {
         const animation = () => {
+            console.log({ thing, a: thing.animate });
             const a = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
             return a.finished.then(() => {
                 thing.remove();

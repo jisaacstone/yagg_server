@@ -160,7 +160,7 @@ export function unit_died(event): animData {
 export function thing_moved(event): animData {
   const from = Board.square(event.from.x, event.from.y),
     thing = from.firstChild as HTMLElement;
-  if (event.to.x && event.to.y) {
+  if (event.to.x !== undefined && event.to.y !== undefined) {
     const to = Board.square(event.to.x, event.to.y),
       fromRect = from.getBoundingClientRect(),
       toRect = to.getBoundingClientRect(),
@@ -206,6 +206,7 @@ export function thing_gone(event) {
     thing.dataset.state = 'invisible';
   } else {
     const animation = () => {
+      console.log({ thing, a: thing.animate });
       const a = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
       return a.finished.then(() => {
         thing.remove();
