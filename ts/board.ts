@@ -69,6 +69,34 @@ export function thingAt(x: number, y: number, objType?: string): HTMLElement | n
   return null;
 }
 
+export function in_direction(direction: string, distance: number): {x: number, y: number} {
+  if ((direction === 'north' && gmeta.position === 'south')  || (direction === 'south' && gmeta.position === 'north')) {
+    return {x: 0, y: -distance};
+  }
+  if ((direction === 'south' && gmeta.position === 'south') || (direction === 'north' && gmeta.position === 'north')) {
+    return {x: 0, y: distance};
+  }
+  if ((direction === 'east' && gmeta.position === 'south') || (direction === 'west' && gmeta.position === 'north')) {
+    return {x: distance, y: 0};
+  }
+  if ((direction === 'west' && gmeta.position === 'south') || (direction === 'east' && gmeta.position === 'north')) {
+    return {x: -distance, y: 0};
+  }
+  if ((direction === 'northeast' && gmeta.position === 'south')  || (direction === 'southwest' && gmeta.position === 'north')) {
+    return {x: distance, y: -distance};
+  }
+  if ((direction === 'southeast' && gmeta.position === 'south') || (direction === 'northwest' && gmeta.position === 'north')) {
+    return {x: distance, y: distance};
+  }
+  if ((direction === 'northwest' && gmeta.position === 'south') || (direction === 'southeast' && gmeta.position === 'north')) {
+    return {x: -distance, y: -distance};
+  }
+  if ((direction === 'southwest' && gmeta.position === 'south') || (direction === 'northeast' && gmeta.position === 'north')) {
+    return {x: -distance, y: distance};
+  }
+  throw new Error(`direction ${direction} unknown`)
+}
+
 // simulate events from unit state
 export function unitdata({ grid, hand }) {
   for (const ob of grid) {

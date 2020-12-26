@@ -47,6 +47,7 @@ defmodule Unit.Busybody do
     defp place(board, [{from, to, thing} | things], effects, events) do
       case Grid.thing_at(board, to) do
         :out_of_bounds ->
+          effects = [Event.ThingMoved.new(from: from, to: :offscreen, direction: direction(from, to)) | effects]
           {board, evts} = offscreend(board, thing, from)
           place(board, things, effects, evts ++ events)
         :nil ->
@@ -56,15 +57,19 @@ defmodule Unit.Busybody do
       end
     end
 
+    defp direction({x1, y1}, {x2, y2}) when x1 > x2 and y1 > y2, do: :southwest
+    defp direction({x1, y1}, {x2, y2}) when x1 > x2 and y1 < y2, do: :northwest
+    defp direction({x1, y1}, {x2, y2}) when x1 < x2 and y1 > y2, do: :southeast
+    defp direction({x1, y1}, {x2, y2}) when x1 < x2 and y1 < y2, do: :northeast
+
     defp offscreend(board, %{visible: :none}, _coord) do
       {board, []}
     end
     defp offscreend(board, %Unit{} = unit, coord) do
       Board.unit_death(board, coord, unit: unit)
     end
-    defp offscreend(board, _feature, coord) do
-      event = Event.ThingMoved.new(from: coord, to: :offscreen)
-      {board, [event]}
+    defp offscreend(board, _feature, _coord) do
+      {board, []}
     end
   end
 end

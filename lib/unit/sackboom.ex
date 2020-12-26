@@ -45,8 +45,10 @@ defmodule Unit.Sackboom do
   defp explode_thing(:block, board, coord) do
     {
       %{board | grid: Map.delete(board.grid, coord)},
-      # bit of a hack, clean up someday?
-      [ability_event(coord), Event.ThingMoved.new(from: coord, to: :offscreen)]
+      [
+        ability_event(coord),
+        Event.ThingMoved.new(from: coord, to: :offscreen)
+      ]
     }
   end
   defp explode_thing(_, board, coord) do

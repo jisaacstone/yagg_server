@@ -142,9 +142,12 @@ export function feature(event) {
 }
 
 export function unit_died(event): animData {
-  const square = Board.square(event.x, event.y),
+  const square = Board.thingAt(event.x, event.y),
     animation = () => {
       const unit = square.firstChild as HTMLElement;
+      if (! unit) {
+        return Promise.resolve(true);
+      }
       unit.innerHTML = `<div class="death">${SKULL}</div>`;
       unit.dataset.dead = 'true';
       return unit.animate(
@@ -165,8 +168,7 @@ export function thing_moved(event): animData {
       fromRect = from.getBoundingClientRect(),
       toRect = to.getBoundingClientRect(),
       animation = () => {
-        const child = to.firstChild as HTMLElement,
-          thingRect = thing.getBoundingClientRect(),
+        const thingRect = thing.getBoundingClientRect(),
           xoffset = thingRect.left - fromRect.left,
           yoffset = thingRect.top - fromRect.top;
         const a = thing.animate({ 
@@ -192,7 +194,44 @@ export function thing_moved(event): animData {
     if (thing) {
       thing.className = thing.className.replace(' owned', '');
     }
-    return thing_gone(event.from);
+    if (event.direction) {
+      // moved offscreen
+      const animation = () => {
+          const thingRect = thing.getBoundingClientRect(),
+            xpos = thingRect.left,
+            ypos = thingRect.top,
+            { x, y } = Board.in_direction(event.direction, thingRect.width);
+          const a = thing.animate([
+            { 
+              top: ypos + 'px',
+              left: xpos + 'px',
+              opacity: 1
+            },
+            {
+              top: ypos + y + 'px',
+              left: xpos + x + 'px',
+              opacity: 0.9
+            },
+            {
+              top: ypos + y + 'px',
+              left: xpos + x + 'px',
+              opacity: 0
+            },
+            ],
+            { duration: 400, easing: 'ease-in-out' });
+          Object.assign(thing.style, {
+            position: 'fixed',
+            width: thingRect.width + 'px',
+            height: thingRect.height + 'px',
+          });
+          return a.finished.then(() => {
+            thing.remove();
+          });
+        };
+      return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+    } else {
+      return thing_gone(event.from);
+    }
   }
 }
 
