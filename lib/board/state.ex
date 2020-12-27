@@ -3,7 +3,7 @@ defmodule Yagg.Board.State do
     defstruct [:ready]
   end
   defmodule Gameover do
-    defstruct [:ready]
+    defstruct [:ready, :winner]
   end
 
   @type t :: %Placement{} | %Gameover{} | :battle | :open

@@ -152,6 +152,7 @@ export function detailViewFn(unit, className, square = null) {
         if (square) {
             bindAbility(abilname, square, unit, clear);
         }
+        details.appendChild(ability);
     }
     if (unit.triggers && Object.keys(unit.triggers).length > 0) {
         const triggers = Element.create({ className: 'triggers' });

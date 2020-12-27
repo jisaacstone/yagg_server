@@ -188,6 +188,7 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
     if (square) {
       bindAbility(abilname, square, unit, clear);
     }
+    details.appendChild(ability);
   }
 
   if (unit.triggers && Object.keys(unit.triggers).length > 0) {

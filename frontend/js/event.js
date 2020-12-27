@@ -118,7 +118,7 @@ export function feature(event) {
     square.appendChild(feature);
 }
 export function unit_died(event) {
-    const square = Board.thingAt(event.x, event.y), animation = () => {
+    const square = Board.square(event.x, event.y), animation = () => {
         const unit = square.firstChild;
         if (!unit) {
             return Promise.resolve(true);
@@ -218,10 +218,17 @@ export function thing_gone(event) {
     }
 }
 export function gameover({ winner }) {
-    const message = winner === gmeta.position ? 'you win!' : 'you lose';
     gamestatechange('gameover');
     turnchange(null);
-    Dialog.displayMessage(message);
+    if (winner === gmeta.position) {
+        Dialog.displayMessage('you win!');
+    }
+    else if (winner === 'draw') {
+        Dialog.displayMessage('draw game');
+    }
+    else {
+        Dialog.displayMessage('you lose');
+    }
     Ready.display('REMATCH');
 }
 export function turn({ player }) {

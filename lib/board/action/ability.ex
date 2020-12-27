@@ -173,12 +173,17 @@ defmodule Action.Ability.Concede do
   @moduledoc "Lose the game"
   use Action.Ability
 
+  def resolve(%{state: %State.Gameover{winner: winner}} = board, opts) do
+    case Player.opposite(opts[:unit].position) do
+      ^winner -> {board, []}
+      _ -> {%{board | state: Map.put(board.state, :winner, :draw)}, []}
+    end
+  end
   def resolve(board, opts) do
     {grid, events} = reveal_units(board)
-    {
-      %{board | state: %State.Gameover{}, grid: grid},
-      [Event.Gameover.new(winner: Player.opposite(opts[:unit].position)) | events]
-    }
+    winner = Player.opposite(opts[:unit].position)
+    board = %{board | state: %State.Gameover{winner: winner}, grid: grid}
+    {board, events}
   end
 
   defp reveal_units(%{grid: grid}) do

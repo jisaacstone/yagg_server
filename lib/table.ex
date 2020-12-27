@@ -221,26 +221,38 @@ defmodule Yagg.Table do
     end
   end
   defp handle_board_action_2(position, action, table) do
-    cond do
-      table.board && Map.get(table.board, :state) == :battle and table.turn != position ->
-        {:err, :notyourturn}
-      :true ->
-        case Board.Action.resolve(action, table.board, position) do
-          {:err, _} = err -> err
-          {board, events} ->
-            # One action per turn. Successful move == next turn
-            table = %{table | board: board, history: [{table.board, action} | table.history]}
-            {table, events} = if (Map.get(board, :state) == :battle) do
-              table = nxtrn(table)
-              {table, [Event.Turn.new(player: table.turn) | events]}
-            else
-              {table, events}
-            end
-            notify(table, events)
-            {:ok, table}
-        end
+    if table.board && Map.get(table.board, :state) == :battle and table.turn != position do
+      {:err, :notyourturn}
+    else
+      case Board.Action.resolve(action, table.board, position) do
+        {:err, _} = err -> err
+        {board, events} ->
+          events = handle_gameover(Map.get(table.board, :state), Map.get(board, :state), events)
+          table = add_history(table, board, action)
+          {table, events} = handle_turn(table, events)
+          notify(table, events)
+          {:ok, table}
+      end
     end
   end
+
+  defp handle_gameover(%State.Gameover{}, %State.Gameover{}, events), do: events
+  defp handle_gameover(_, %{winner: winner}, events) do
+    [Event.Gameover.new(winner: winner) | events]
+  end
+  defp handle_gameover(_, _, events) do
+    events
+  end
+
+  defp add_history(table, board, action) do
+      %{table | board: board, history: [{table.board, action} | table.history]}
+  end
+
+  defp handle_turn(%{board: %{state: :battle}} = table, events) do
+    table = nxtrn(table)
+    {table, [Event.Turn.new(player: table.turn) | events]}
+  end
+  defp handle_turn(table, events), do: {table, events}
 
   defp notify(_game, []) do
     :ok
@@ -265,8 +277,7 @@ defmodule Yagg.Table do
     )
   end
 
-  defp nxtrn(%Table{board: %Board{state: %State.Placement{}}} = table), do: table
   defp nxtrn(%Table{turn: :north} = table), do: %{table | turn: :south}
   defp nxtrn(%Table{turn: :south} = table), do: %{table | turn: :north}
-  defp nxtrn(%Table{turn: :nil} = table), do: %{table | turn: :north}
+  defp nxtrn(%Table{turn: :nil} = table), do: %{table | turn: Enum.random([:north, :south])}
 end

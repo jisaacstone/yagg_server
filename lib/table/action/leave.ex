@@ -1,6 +1,7 @@
 alias Yagg.Table
 alias Yagg.Event
 alias Yagg.Table.Player
+alias Yagg.Board.State.Gameover
 
 defmodule Table.Action.Leave do
   defstruct []
@@ -24,8 +25,8 @@ defmodule Table.Action.Leave do
   end
 
   defp maybe_set_state(%{board: %{state: s}} = table, position) when s != :gameover do
-    board = %{table.board | state: :gameover}
-    {%{table | board: board}, [Event.Gameover.new(winner: Player.opposite(position))]}
+    board = %{table.board | state: %Gameover{winner: Player.opposite(position)}}
+    {%{table | board: board}, []}
   end
   defp maybe_set_state(table, _), do: {table, []}
 end

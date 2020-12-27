@@ -45,8 +45,7 @@ defmodule YaggTest.Action.Move do
     assert {newboard, events} = Board.Action.resolve(action, board, :north)
     assert newboard.grid[{4, 3}].name == attacker.name
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-    gameover = Enum.find(events, fn(e) -> e.kind == :gameover end)
-    assert gameover.data.winner == :north
+    assert %Board.State.Gameover{winner: :north} = newboard.state
   end
  
   test "attackyourself" do

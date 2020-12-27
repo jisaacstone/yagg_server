@@ -54,7 +54,7 @@ defmodule Helper.Board do
         (_) -> :false
       end
     )
-    {hand, unit} = Map.pop!(hand, idx)
+    {{unit, _}, hand} = Map.pop!(hand, idx)
     grid = Map.put(board.grid, coord, unit)
     %{board | grid: grid, hands: Map.put(board.hands, position, hand)}
   end
