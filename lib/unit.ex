@@ -54,7 +54,7 @@ defmodule Yagg.Unit do
   def encode(unit), do: encode(unit, unit.visible)
 
   def encode(_unit, :none), do: :nil
-  def encode(unit, :all), do: encode_fields(unit, [:attack, :defense, :name, :player, :ability, :triggers], %{})
+  def encode(unit, :all), do: encode_fields(unit, [:attack, :defense, :name, :player, :ability, :triggers, :attributes], %{})
   def encode(unit, fields) when is_list(fields), do: encode_fields(unit, fields, %{})
   def encode(unit, fields), do: encode_fields(unit, MapSet.to_list(fields), %{})
 
@@ -111,5 +111,7 @@ defmodule Yagg.Unit do
   defp encode_field(unit, :player), do: unit.position
   defp encode_field(unit, :ability), do: Ability.describe(unit.ability)
   defp encode_field(unit, :triggers), do: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
+  defp encode_field(%{visible: :none}, :attributes), do: [:invisible]
+  defp encode_field(_, :attributes), do: []
   defp encode_field(unit, field), do: Map.get(unit, field)
 end

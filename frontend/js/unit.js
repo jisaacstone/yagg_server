@@ -226,6 +226,9 @@ function setClassName(unit, el) {
     if (unit.attack === 'immobile') {
         className += ' immobile';
     }
+    for (const attr of unit.attributes || []) {
+        className += ` ${attr}`;
+    }
     el.className = className;
 }
 export function render_into(unit, el, attrs = false) {

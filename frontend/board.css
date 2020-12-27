@@ -554,7 +554,7 @@ body[data-gamestate=gameover] {
   min-width: 80%;
 }
 
-.unit[data-state=invisible] {
+.unit.invisible {
   border-style: dotted;
   border-width: 4px;
 }

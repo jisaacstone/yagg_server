@@ -22,6 +22,7 @@ export interface Unit {
     move?: Ability;
     death?: Ability;
   };
+  attributes: string[];
 }
 
 function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit, cb = null) {
@@ -271,6 +272,9 @@ function setClassName(unit: Unit, el: HTMLElement) {
   }
   if (unit.attack === 'immobile') {
     className += ' immobile';
+  }
+  for (const attr of unit.attributes || []) {
+    className += ` ${attr}`;
   }
   el.className = className;
 }
