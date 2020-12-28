@@ -115,7 +115,7 @@ defmodule Yagg.AI.Choices do
   end
 
   defp unit_action(_, {_, %Unit{ability: :nil}}, actions), do: actions
-  defp unit_action(_, {_, %Unit{name: :monarch}}, actions), do: actions
+  defp unit_action(_, {_, %Unit{ability: Unit.Ability.Concede}}, actions), do: actions
   defp unit_action(_, {_, %Unit{name: :shenamouse}}, actions), do: actions
   defp unit_action(grid, {{x, y}, %Unit{name: :burninator, position: pos}}, actions) do
     {us, them} = Enum.reduce(

@@ -35,7 +35,7 @@ defmodule YaggTest.Action.Move do
 
   test "winner winner chicken dinner" do
     attacker = Unit.new(:north, :test, 3, 3)
-    defender = Unit.new(:south, :monarch, 1, 1, :nil, %{death: Ability.Concede})
+    defender = Unit.new(:south, :monarch, 1, 1, :nil, %{death: Unit.Ability.Concede})
     board =
       new_board()
       |> Map.put(:state, :battle)

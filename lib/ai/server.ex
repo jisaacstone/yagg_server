@@ -110,7 +110,7 @@ defmodule Yagg.AI.Server do
 
   defp do_initial_placement(board, %{pid: table_pid, robot: robot, position: position}) do
     %{place: place_choices} = Choices.choices(board, position)
-    {monarch_idx, _} = Enum.find(board.hands[position], fn({_, {u, _}}) -> u.name == :monarch end)
+    {monarch_idx, _} = Enum.find(board.hands[position], fn({_, {u, _}}) -> u.monarch end)
     choices = Enum.shuffle(place_choices)
     # place monarch first to ensure there will be space
     place_monarch = Enum.find(choices, &cpm(&1, monarch_idx, board.grid))

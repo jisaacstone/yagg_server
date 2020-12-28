@@ -1,6 +1,7 @@
 import { request, post, gameaction } from './request.js';
 import * as Player from './playerdata.js';
 import * as Element from './element.js';
+import * as Err from './err.js';
 
 const displayedTables = {};
 const configurations = {};
@@ -97,13 +98,26 @@ window.onload = function() {
   const ct = document.getElementById('createtable'),
     sel_el = document.getElementById('config') as HTMLInputElement;
 
+  ct.style.display = 'hidden';
+  sel_el.onchange = () => {
+    if (sel_el.value) {
+      sel_el.style.display = 'block';
+    } else {
+      sel_el.style.display = 'hidden';
+    }
+  }
+
   Player.check().then(() => {
     fetchConfigs(sel_el);
     fetchTableData();
     window.setInterval(fetchTableData, 2000);
 
     ct.onclick = () => {
-      const conf = sel_el.value || 'random';
+      const conf = sel_el.value;
+      if (! conf) {
+        Err.displayerror('select a game type');
+        return;
+      }
       Player.check().then(() => {
         post('table/new', { configuration: conf }).then(({ id }) => {
           gameaction('join', {}, 'table', id).then(() => {

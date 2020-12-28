@@ -9,8 +9,7 @@ defmodule Action.Ready do
   defstruct []
 
   @impl Action
-  def resolve(_, %Board{state: %{ready: position}} = bord, position) do
-    IO.inspect(bord: bord, pos: position)
+  def resolve(_, %Board{state: %{ready: position}}, position) do
     {:err, :already_ready}
   end
   def resolve(_act, %Board{state: %Placement{ready: :nil}} = board, position) do
@@ -41,7 +40,7 @@ defmodule Action.Ready do
 
   defp units_assigned?(%{hands: hands}, position) do
     # for not just check if the monarch has been placed
-    !!Enum.find(hands[position], fn({_, {unit, coords}}) -> (unit.name == :monarch) and coords end)
+    !!Enum.find(hands[position], fn({_, {unit, coords}}) -> unit.monarch and coords end)
   end
 
   defp start_battle(board) do

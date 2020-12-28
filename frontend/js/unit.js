@@ -52,15 +52,19 @@ function convertAttr(att, value) {
     if (att === 'attack' && value === 'immobile') {
         return '-';
     }
-    return value;
+    return `${value}`;
 }
 function renderAttrs(unit, el) {
     for (const att of ['name', 'attack', 'defense']) {
         if (unit[att] !== null && unit[att] !== undefined) {
+            console.log({ att, val: unit[att], conv: convertAttr(att, unit[att]) });
             el.appendChild(Element.create({
                 className: `unit-${att}`,
                 innerHTML: convertAttr(att, unit[att])
             }));
+        }
+        else {
+            console.error({ att, val: unit[att] });
         }
     }
     if (unit.name === 'monarch') {
@@ -222,9 +226,6 @@ function setClassName(unit, el) {
     let className = `unit ${unit.player}`;
     if (unit.player === gmeta.position) {
         className += ' owned';
-    }
-    if (unit.attack === 'immobile') {
-        className += ' immobile';
     }
     for (const attr of unit.attributes || []) {
         className += ` ${attr}`;

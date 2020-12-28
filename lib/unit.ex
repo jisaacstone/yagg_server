@@ -6,7 +6,7 @@ defmodule Yagg.Unit do
   alias __MODULE__
 
   @enforce_keys [:attack, :defense, :name, :position]
-  defstruct [:ability, :triggers, :visible | @enforce_keys]
+  defstruct [:ability, :triggers, :visible, :monarch | @enforce_keys]
 
   @callback new(Player.position) :: t
 
@@ -17,6 +17,7 @@ defmodule Yagg.Unit do
     :attack => 1 | 3 | 5 | 7 | 9,
     :defense => 0 | 2 | 4 | 6 | 8,
     :name => atom(),
+    :monarch => boolean,
     :position => Player.position(),
     :ability => :nil | module() | {module(), Keyword.t},
     :triggers => triggers,
@@ -32,14 +33,17 @@ defmodule Yagg.Unit do
 
   @spec new(Player.position, atom, non_neg_integer, non_neg_integer, :nil | module(), %{atom => module()}) :: t
   def new(position, name, attack, defense, ability \\ :nil, triggers \\ %{}, visible \\ MapSet.put(MapSet.new(), :player)) do
-    %Unit{position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers, visible: visible}
+    new(position: position, name: name, attack: attack, defense: defense, ability: ability, triggers: triggers, visible: visible)
   end
   def new(attrs) do
-    struct(default(), attrs)
+    # monarch is indicated by boolean or name
+    monarch = Keyword.get(attrs, :monarch, Keyword.get(attrs, :name) == :monarch)
+    struct(default(), [{:monarch, monarch} | attrs])
   end
 
   def default() do
     %Unit{
+      monarch: :false,
       attack: 0,
       defense: 0,
       name: :nil,
@@ -111,7 +115,19 @@ defmodule Yagg.Unit do
   defp encode_field(unit, :player), do: unit.position
   defp encode_field(unit, :ability), do: Ability.describe(unit.ability)
   defp encode_field(unit, :triggers), do: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
-  defp encode_field(%{visible: :none}, :attributes), do: [:invisible]
-  defp encode_field(_, :attributes), do: []
+  defp encode_field(unit, :attributes) do
+    Enum.reduce(
+      [
+        monarch: unit.monarch,
+        invisible: unit.visible == :none, 
+        immobile: unit.attack == :immobile
+      ],
+      [],
+      fn
+        ({k, :true}, attr) -> [k | attr]
+        (_, attr) -> attr
+      end
+    )
+  end
   defp encode_field(unit, field), do: Map.get(unit, field)
 end

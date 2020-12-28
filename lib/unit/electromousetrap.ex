@@ -42,8 +42,8 @@ defmodule Unit.Electromousetrap do
       ) |> maybe_gameover(unit, unit.triggers[:death])
     end
 
-    defp maybe_gameover({board, events}, unit, Ability.Concede) do
-      {board, e2} = Ability.Concede.resolve(board, unit: unit)
+    defp maybe_gameover({board, events}, unit, Unit.Ability.Concede) do
+      {board, e2} = Unit.Ability.Concede.resolve(board, unit: unit)
       {board, events ++ e2}
     end
     defp maybe_gameover(b_e, _, _), do: b_e

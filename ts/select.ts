@@ -65,7 +65,7 @@ function moveOrPlace(selected, target) {
       action(
         'place',
         {index: selected.meta.index, x: target.meta.x, y: target.meta.y},
-        selected.meta.unit_name === 'monarch' ? Ready.ensureDisplayed() : null,
+        selected.meta.attributes.includes('monarch') ? Ready.ensureDisplayed() : null,
       );
     } else {
       // clickd on a board square
@@ -171,12 +171,11 @@ function handleSelect(el: HTMLElement, meta) {
 
 export function select(thisEl, meta) {
   function select() {
-    if (gmeta.boardstate === 'gameover') {
-      thisEl.firstChild && thisEl.firstChild.dispatchEvent(new Event('sidebar'));
-      return;
-    }
-    if (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) {
-      // Not your turn
+    if (
+      (gmeta.boardstate === 'gameover') ||
+      (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) ||  // not your turn
+      (thisEl.firstChild && thisEl.firstChild.className.includes(' immobile'))
+    ){
       thisEl.firstChild && thisEl.firstChild.dispatchEvent(new Event('sidebar'));
       return;
     }
@@ -188,8 +187,8 @@ export function select(thisEl, meta) {
   return select;
 }
 
-export function bind_hand(card: HTMLElement, index: number, player: string, unit_name: string) {
-  card.onclick = select(card, { inhand: true, index, player, unit_name });
+export function bind_hand(card: HTMLElement, index: number, player: string, attributes: string[]) {
+  card.onclick = select(card, { inhand: true, index, player, attributes });
 }
 
 export function bind_candidate(candidate: HTMLElement, index: number) {

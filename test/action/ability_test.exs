@@ -110,9 +110,9 @@ defmodule YaggTest.Action.Ability do
       {1, 0} => :water,
       {1, 1} => %Unit{ability: Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :south, triggers: %{}},
       {1, 2} => %Unit{ability: nil, attack: 1, defense: 8, name: :tim, position: :south, triggers: %{}},
-      {3, 0} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, triggers: %{death: Board.Action.Ability.Concede}},
+      {3, 0} => %Unit{ability: Unit.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, triggers: %{death: Unit.Ability.Concede}},
       {3, 3} => %Unit{ability: nil, attack: 9, defense: 2, name: :bezerker, position: :north, triggers: %{}},
-      {3, 4} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, triggers: %{death: Board.Action.Ability.Concede}},
+      {3, 4} => %Unit{ability: Unit.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, triggers: %{death: Unit.Ability.Concede}},
       {4, 3} => :water
     }
     action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 0, to_y: 3}
@@ -125,8 +125,8 @@ defmodule YaggTest.Action.Ability do
       {0, 2} => Unit.Dogatron.new(:south),
       {1, 2} => Unit.Explody.new(:north),
       {1, 3} => %Unit{ability: Unit.Busybody.Spin, attack: 3, defense: 6, name: :busybody, position: :north, triggers: %{}},
-      {2, 0} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, triggers: %{death: Board.Action.Ability.Concede}},
-      {4, 4} => %Unit{ability: Board.Action.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, triggers: %{death: Board.Action.Ability.Concede}},
+      {2, 0} => %Unit{ability: Unit.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :south, triggers: %{death: Unit.Ability.Concede}},
+      {4, 4} => %Unit{ability: Unit.Ability.Concede, attack: 1, defense: 0, name: :monarch, position: :north, triggers: %{death: Unit.Ability.Concede}},
       {4, 3} => :water
     }
     action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 1, to_y: 2}

@@ -7,7 +7,7 @@ defmodule Unit.Poisonblade do
   def new(position) do
     Unit.new(
       name: :poisonblade,
-      attack: 3,
+      attack: 5,
       defense: 4,
       triggers: %{
         death: Unit.Ability.Poison

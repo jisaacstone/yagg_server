@@ -7,7 +7,7 @@ export function createCard(unit: Unit.Unit, index: number): HTMLElement {
     unitEl = Unit.render(unit, index, true);
   card.dataset.index = `${index}`;
   card.className = 'card';
-  Select.bind_hand(card, index, unit.player, unit.name);
+  Select.bind_hand(card, index, unit.player, unit.attributes);
   hand.appendChild(card);
   card.appendChild(unitEl);
   return unitEl;

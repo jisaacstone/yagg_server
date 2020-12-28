@@ -52,6 +52,7 @@ defmodule Yagg.Board.Configuration do
       Board.Configuration.Random,
       Board.Configuration.Alpha,
       Board.Configuration.Ice,
+      # Board.Configuration.Strat,
     ]
     Enum.map(configs, &describe(&1))
   end
@@ -192,7 +193,6 @@ defmodule Board.Configuration.Alpha do
       Unit.new(position, :tim, 1, 8),
     ]
   end
-
 end
 
 defmodule Board.Configuration.Ice do
@@ -257,5 +257,56 @@ defmodule Board.Configuration.Ice do
       ],
       &Unit.set_trigger(&1, :move, Unit.Ability.Slide)
     )
+  end
+end
+
+defmodule Board.Configuration.Strat do
+  @behaviour Board.Configuration
+
+  @impl Board.Configuration
+  def name(), do: "strat"
+
+  @impl Board.Configuration
+  def description(), do: "capture the flag"
+
+  @impl Board.Configuration
+  def new() do
+    units = %{
+      north: starting_units(:north),
+      south: starting_units(:south),
+    }
+    terrain = [
+      {{1, 2}, :water},
+      {{1, 3}, :water},
+      {{4, 2}, :block},
+      {{4, 3}, :block},
+    ]
+    %Board.Configuration{
+      name: name(),
+      dimensions: {6, 6},
+      units: units,
+      terrain: terrain,
+      initial_module: Board,
+      army_size: 12,
+    }
+  end
+  defp starting_units(position) do
+    [
+      Unit.Flag.new(position),
+      Unit.Bomb.new(position),
+      Unit.Bomb.new(position),
+
+      Unit.Spy.new(position),
+      Unit.Miner.new(position),
+      Unit.Scout.new(position),
+
+      Unit.new(position, :marshal, 9, 6),
+      Unit.new(position, :sergeant, 5, 4),
+      Unit.new(position, :sergeant, 5, 4),
+
+      Unit.new(position, :general, 7, 8),
+      Unit.new(position, :major, 3, 6),
+      Unit.new(position, :major, 3, 6),
+    ]
   end
 end
