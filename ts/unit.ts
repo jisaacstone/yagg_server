@@ -82,7 +82,6 @@ function convertAttr(att, value) {
 function renderAttrs(unit: Unit, el: HTMLElement) {
   for (const att of ['name', 'attack', 'defense']) {
     if (unit[att] !== null && unit[att] !== undefined) {
-      console.log({ att, val: unit[att], conv: convertAttr(att, unit[att])});
       el.appendChild(Element.create({
         className: `unit-${att}`,
         innerHTML: convertAttr(att, unit[att])

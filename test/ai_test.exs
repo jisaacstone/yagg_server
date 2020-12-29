@@ -66,6 +66,20 @@ defmodule YaggTest.AI do
     assert choices.ability == []
   end
 
+  test "attack" do
+    board = 
+      HB.new_board([], [], {4, 4})
+      |> Map.put(:state, :battle)
+      |> HB.set_board([
+        {{3, 3}, Unit.Monarch.new(:north)},
+        {{3, 2}, Unit.Monarch.new(:south)},
+      ])
+    choices = Choices.choices(board, :north)
+    assert Enum.member?(choices.move, %Action.Move{from_x: 3, from_y: 3, to_x: 3, to_y: 2})
+    assert choices.place == []
+    assert choices.ability == []
+  end
+
   test "ability" do
     board = 
       HB.new_board([], [], {4, 4})

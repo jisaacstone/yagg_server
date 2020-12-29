@@ -47,6 +47,16 @@ defmodule YaggTest.Action.Move do
     assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
     assert %Board.State.Gameover{winner: :north} = newboard.state
   end
+
+  test "cross the road" do
+    board = set_board([
+      {{1, 1}, Unit.Monarch.new(:south)},
+      {{0, 0}, Unit.Monarch.new(:north)},
+    ])
+    action = %Board.Action.Move{from_x: 1, from_y: 1, to_x: 1, to_y: 0}
+    assert {newboard, events} = Board.Action.resolve(action, board, :south)
+    assert %Board.State.Gameover{winner: :south} = newboard.state
+  end
  
   test "attackyourself" do
     unit = Unit.new(:north, :test, 3, 3)

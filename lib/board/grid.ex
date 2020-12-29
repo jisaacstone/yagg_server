@@ -115,4 +115,19 @@ defmodule Yagg.Board.Grid do
         {next_coord, :blocked}
     end
   end
+
+  @spec reveal_units(t) :: {t, [Event.t]}
+  def reveal_units(grid) do
+    Enum.reduce(grid, {%{}, []}, &reveal/2)
+  end
+
+  defp reveal({{x, y}, %Unit{} = unit}, {grid, events}) do
+    event = Event.NewUnit.new(Player.opposite(unit.position), x: x, y: y, unit: unit)
+    grid = Map.put_new(grid, {x, y}, %{unit | visible: :all})
+    {grid, [event | events]}
+  end
+  defp reveal({k, v}, {grid, events}) do
+    grid = Map.put_new(grid, k, v)
+    {grid, events}
+  end
 end

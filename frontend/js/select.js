@@ -157,7 +157,7 @@ export function select(thisEl, meta) {
     function select() {
         if ((gmeta.boardstate === 'gameover') ||
             (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) || // not your turn
-            (thisEl.firstChild && thisEl.firstChild.className.includes(' immobile'))) {
+            (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile'))) {
             thisEl.firstChild && thisEl.firstChild.dispatchEvent(new Event('sidebar'));
             return;
         }

@@ -25,4 +25,39 @@ defmodule YaggTest.Board do
     )
     assert table.board.state == %Board.State.Gameover{winner: :draw, ready: nil}
   end
+
+  test "immobile draw" do
+    board = set_board([
+      {{0, 0}, Unit.Flag.new(:north)},
+      {{1, 1}, Unit.Burninator.new(:north)},
+      {{2, 2}, Unit.Flag.new(:south)}
+    ])
+    player = Table.Player.new("north")
+    table = %Table{id: :test, turn: :north, board: board, history: [], players: [north: player], configuration: %{}, subscribors: []}
+    assert {:reply, :ok, table} = Table.handle_call(
+      {:board_action, player, %Board.Action.Ability{x: 1, y: 1}},
+      self(),
+      table
+    )
+    assert :nil == table.board.grid[{1, 1}]
+    assert table.board.state == %Board.State.Gameover{winner: :draw, ready: nil}
+  end
+
+  test "immobile lose" do
+    board = set_board([
+      {{0, 0}, Unit.Flag.new(:north)},
+      {{1, 1}, Unit.Burninator.new(:north)},
+      {{1, 2}, Unit.Tinker.new(:south)},
+      {{2, 2}, Unit.Flag.new(:south)}
+    ])
+    player = Table.Player.new("north")
+    table = %Table{id: :test, turn: :north, board: board, history: [], players: [north: player], configuration: %{}, subscribors: []}
+    assert {:reply, :ok, table} = Table.handle_call(
+      {:board_action, player, %Board.Action.Ability{x: 1, y: 1}},
+      self(),
+      table
+    )
+    assert :nil == table.board.grid[{1, 1}]
+    assert table.board.state == %Board.State.Gameover{winner: :south, ready: nil}
+  end
 end

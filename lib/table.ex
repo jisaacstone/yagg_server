@@ -1,6 +1,7 @@
 alias Yagg.{Event, Board, Jobfair, Bugreport}
 alias Yagg.Table.Player
 alias Yagg.Board.State
+alias Yagg.Board.Grid
 alias Yagg.Board.Configuration
 
 defmodule Yagg.Table do
@@ -228,6 +229,7 @@ defmodule Yagg.Table do
         {:err, _} = err -> err
         {board, events} ->
           events = handle_gameover(Map.get(table.board, :state), Map.get(board, :state), events)
+          {board, events} = check_all_immobile(board, events)
           table = add_history(table, board, action)
           {table, events} = handle_turn(table, events)
           notify(table, events)
@@ -243,6 +245,29 @@ defmodule Yagg.Table do
   defp handle_gameover(_, _, events) do
     events
   end
+
+  defp check_all_immobile(%{hands: %{north: n, south: s}} = board, events) when map_size(n) > 0 and map_size(s) > 0, do: {board, events}
+  defp check_all_immobile(%{hands: hands, grid: grid} = board, events) do
+    values = Map.values(grid)
+    north = map_size(hands.north) == 0 and no_mobile_units(:north, values)
+    south = map_size(hands.south) == 0 and no_mobile_units(:south, values)
+    case {north, south} do
+      {:false, :false} -> {board, events}
+      {:true, :true} ->
+        {grid, events} = Grid.reveal_units(grid)
+        {%{board | grid: grid, state: %State.Gameover{winner: :draw}}, [Event.Gameover.new(winner: :draw) | events]}
+      {:true, :false} ->
+        {grid, events} = Grid.reveal_units(grid)
+        {%{board | grid: grid, state: %State.Gameover{winner: :south}}, [Event.Gameover.new(winner: :south) | events]}
+      {:false, :true} ->
+        {grid, events} = Grid.reveal_units(grid)
+        {%{board | grid: grid, state: %State.Gameover{winner: :north}}, [Event.Gameover.new(winner: :north) | events]}
+    end
+  end
+
+  defp no_mobile_units(_, []), do: :true
+  defp no_mobile_units(p, [%{position: p, attack: a} | _]) when is_integer(a), do: :false
+  defp no_mobile_units(p, [_ | t]), do: no_mobile_units(p, t)
 
   defp add_history(table, board, action) do
       %{table | board: board, history: [{table.board, action} | table.history]}

@@ -52,7 +52,7 @@ defmodule Yagg.Board.Configuration do
       Board.Configuration.Random,
       Board.Configuration.Alpha,
       Board.Configuration.Ice,
-      # Board.Configuration.Strat,
+      Board.Configuration.Strat,
     ]
     Enum.map(configs, &describe(&1))
   end
