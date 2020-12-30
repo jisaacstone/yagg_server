@@ -7,7 +7,7 @@ defmodule Unit.Spy do
     Unit.new(
       position: position,
       name: :spy,
-      attack: 11,
+      attack: 9,
       defense: 0
     )
   end

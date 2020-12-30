@@ -246,8 +246,8 @@ defmodule Yagg.Table do
     events
   end
 
-  defp check_all_immobile(%{hands: %{north: n, south: s}} = board, events) when map_size(n) > 0 and map_size(s) > 0, do: {board, events}
-  defp check_all_immobile(%{hands: hands, grid: grid} = board, events) do
+  defp check_all_immobile(%{state: :battle, hands: %{north: n, south: s}} = board, events) when map_size(n) > 0 and map_size(s) > 0, do: {board, events}
+  defp check_all_immobile(%{state: :battle, hands: hands, grid: grid} = board, events) do
     values = Map.values(grid)
     north = map_size(hands.north) == 0 and no_mobile_units(:north, values)
     south = map_size(hands.south) == 0 and no_mobile_units(:south, values)
@@ -264,6 +264,7 @@ defmodule Yagg.Table do
         {%{board | grid: grid, state: %State.Gameover{winner: :north}}, [Event.Gameover.new(winner: :north) | events]}
     end
   end
+  defp check_all_immobile(board, events), do: {board, events}
 
   defp no_mobile_units(_, []), do: :true
   defp no_mobile_units(p, [%{position: p, attack: a} | _]) when is_integer(a), do: :false

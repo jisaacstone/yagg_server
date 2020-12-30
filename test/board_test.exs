@@ -60,4 +60,17 @@ defmodule YaggTest.Board do
     assert :nil == table.board.grid[{1, 1}]
     assert table.board.state == %Board.State.Gameover{winner: :south, ready: nil}
   end
+
+  test "rematch" do
+    board = new_board()
+    |> Map.put(:state, %Board.State.Gameover{winner: :draw})
+    player = Table.Player.new("north")
+    table = %Table{id: :test, turn: :north, board: board, history: [], players: [north: player], configuration: %{}, subscribors: []}
+    assert {:reply, :ok, table} = Table.handle_call(
+      {:board_action, player, %Board.Action.Ready{}},
+      self(),
+      table
+    )
+    assert table.board.state == %Board.State.Gameover{winner: :draw, ready: :north}
+  end 
 end

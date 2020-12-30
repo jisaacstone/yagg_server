@@ -266,4 +266,14 @@ defmodule YaggTest.Action.Ability do
     assert %{name: :electromousetrap, triggers: %{death: Unit.Electromousetrap.Trap}} = board.grid[{4, 2}]
     assert %{name: :sackboom} = board.grid[{3, 2}]
   end
+
+  test "defuse" do
+    board = set_board([
+      {{2, 0}, Unit.Bomb.new(:south)},
+      {{3, 0}, Unit.Miner.new(:north)},
+    ])
+    action = %Board.Action.Move{from_x: 3, from_y: 0, to_x: 2, to_y: 0}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :north)
+    assert %{name: :miner, position: :north} = newboard.grid[{2, 0}]
+  end
 end

@@ -50,12 +50,12 @@ defmodule YaggTest.Action.Move do
 
   test "cross the road" do
     board = set_board([
-      {{1, 1}, Unit.Monarch.new(:south)},
-      {{0, 0}, Unit.Monarch.new(:north)},
+      {{1, 1}, Unit.Monarch.new(:north)},
+      {{0, 0}, Unit.Monarch.new(:south)},
     ])
     action = %Board.Action.Move{from_x: 1, from_y: 1, to_x: 1, to_y: 0}
-    assert {newboard, events} = Board.Action.resolve(action, board, :south)
-    assert %Board.State.Gameover{winner: :south} = newboard.state
+    assert {newboard, events} = Board.Action.resolve(action, board, :north)
+    assert %Board.State.Gameover{winner: :north} = newboard.state
   end
  
   test "attackyourself" do

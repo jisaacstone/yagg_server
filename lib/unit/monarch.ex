@@ -36,8 +36,8 @@ defmodule Unit.Monarch do
       end
     end
 
-    defp accross(_, :south, {_, 0}), do: :true
-    defp accross({_, h}, :north, {_, y}) when y == h - 1, do: :true
+    defp accross(_, :north, {_, 0}), do: :true
+    defp accross({_, h}, :south, {_, y}) when y == h - 1, do: :true
     defp accross(_, _, _), do: :false
   end
 end

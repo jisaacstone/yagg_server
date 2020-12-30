@@ -194,10 +194,11 @@ defmodule Yagg.Board do
     # if attack and defense are ever equal this will crash with :nomatch
     cond do
       unit.attack > opponent.defense ->
+        {board, e0} = Unit.Ability.reveal(to, board, unit.position)
         {board, e1} = unit_death(board, to, opponent: {unit, from})
         case do_move(board, from, to, action: :battle) do
           {:err, _} = err -> err
-          {board, e2} -> {board, e1 ++ e2}
+          {board, e2} -> {board, e0 ++ e1 ++ e2}
         end
       unit.attack < opponent.defense ->
         {board, events} = unit_death(board, from, opponent: {opponent, to}, attacking: :true)

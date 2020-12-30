@@ -115,6 +115,9 @@ defmodule Board.Configuration.Random do
       Unit.new(position, :chopper, 7, 4),
       Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
       Unit.new(position, :tim, 1, 8),
+      Unit.Bomb.new(position),
+      Unit.Miner.new(position),
+      Unit.Scout.new(position),
     ]) |> Enum.take(10)
     [Unit.Monarch.new(position) | units] |> Enum.shuffle()
   end

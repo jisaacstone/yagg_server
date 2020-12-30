@@ -43,8 +43,11 @@ defmodule Unit.Miner do
 
     defp refuse(board, coord, %{triggers: %{death: death}}) do
       unit = board.grid[coord]
-      triggers = %{unit.triggers | death: death}
+      triggers = Map.put(unit.triggers, :death, death)
       %{board | grid: Map.put(board.grid, coord, %{unit | triggers: triggers})}
+    end
+    defp refuse(board, _, _) do
+      board
     end
 
   end
