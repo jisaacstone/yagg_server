@@ -479,6 +479,10 @@ body[data-gamestate=gameover] {
   grid-area: ability;
 }
 
+.bio {
+  padding-top: 0.6em;
+}
+
 .unit.details .ability-name {
   border-style: inset;
   margin-left: auto;

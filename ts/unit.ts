@@ -164,17 +164,37 @@ function symbolFor(trigger: string): string {
   return '?';
 }
 
-export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
-  const descriptions = Element.create({ className: 'descriptions' }),
-    portrait = Element.create({ className: 'unit-portrait' }),
-    details = Element.create({
-      className: `${className} details`,
-      children: [descriptions, portrait]
-    });
-  
-  renderAttrs(unit, details);
-  portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
+const fakeDescriptions = [
+  'Listens to smooth jazz',
+  'Loves action movies',
+  'Smiles at inappropriate times',
+  'Donates to public radio',
+  'Makes excellent chili',
+  'Snacks constantly',
+  'Believes the moon does not exist',
+  'Former child',
+  'Collects viynl',
+  'Aspiring hipster',
+  'Community college graduate',
+  'Good at remembering names',
+  'Never learned to drive',
+  'Taking flute lessons',
+  'Craft beer nerd',
+  'Loves crosswords, hates sudoku',
+  'Amateur BMX racer',
+  'Competitive salsa dancer',
+  'Watches TV until 2am every night',
+  "Has a tattoo, but won't say where",
+  'Once won $2,000 in Vegas',
+  'Went to clown school',
+  'Failed pacifist',
+  'Believes everything that happens was fated to happen',
+  'Pastafarian',
+  'Whistles off key',
+]
 
+function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
+  const descriptions = [];
   if (unit.ability) {
     const abilname = Element.create({
         className: 'ability-name uibutton',
@@ -191,7 +211,7 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
     if (square) {
       bindAbility(abilname, square, unit, clear);
     }
-    details.appendChild(ability);
+    descriptions.push(ability);
   }
 
   if (unit.triggers && Object.keys(unit.triggers).length > 0) {
@@ -217,8 +237,31 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
         ]
       }));
     }
-    descriptions.appendChild(triggers);
+    descriptions.push(triggers);
   }
+
+  if (descriptions.length === 0) {
+    const seed = unit.name.charCodeAt(0) + unit.name.charCodeAt(1) + unit.name.charCodeAt(2) + gmeta.position.charCodeAt(0),
+      desc = fakeDescriptions[seed % fakeDescriptions.length];
+    descriptions.push(Element.create({ className: 'bio', innerHTML: desc }));
+  }
+  
+  return Element.create({
+    className: 'descriptions',
+    children: descriptions
+  });
+}
+
+export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
+  const descriptions = describe(unit, square),
+    portrait = Element.create({ className: 'unit-portrait' }),
+    details = Element.create({
+      className: `${className} details`,
+      children: [descriptions, portrait]
+    });
+  
+  renderAttrs(unit, details);
+  portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
 
   return (e) => {
     e.preventDefault();
