@@ -47,7 +47,7 @@ defmodule Unit.Shenamouse.Spy do
   def resolve(board, opts) do
     coord = opts[:coords]
     position = opts[:unit].position
-    {board, events, _} = Enum.reduce(
+    {board, events} = Enum.reduce(
       Grid.surrounding(coord),
       {board, []},
       fn({_, coord}, {b, e}) -> Unit.Ability.reveal(coord, b, position, e) end

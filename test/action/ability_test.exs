@@ -202,6 +202,18 @@ defmodule YaggTest.Action.Ability do
     assert %{ability: :nil} = board.grid[{2, 2}]
   end
 
+  test "tink" do
+    board = set_board([
+      {{0, 0}, Unit.Monarch.new(:north)},
+      {{0, 1}, Unit.Tinker.new(:north)},
+      {{0, 2}, Unit.Bomb.new(:north)},
+    ])
+    action = %Board.Action.Ability{x: 0, y: 1}
+    {board, _} = Board.Action.resolve(action, board, :north)
+    assert %{attack: 3} = board.grid[{0, 0}]
+    assert %{attack: :immobile} = board.grid[{0, 2}]
+  end
+
   test "strange move" do
     board = set_board([
       {{3, 1}, %Unit{ability: nil, attack: 9, defense: 2, name: :bezerker, position: :south, triggers: %{}, visible: MapSet.new([:player])}}, 
