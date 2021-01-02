@@ -19,7 +19,7 @@ defmodule Action.Ai do
     {board, events} = Configuration.setup(table.configuration, table.board)
     {
       %{table | players: [p1, {aipos, robot}], board: board},
-      [Event.PlayerJoined.new(name: "randombot", position: aipos) | events]
+      [Event.PlayerJoined.new(player: robot, position: aipos) | events]
     }
   end
 end

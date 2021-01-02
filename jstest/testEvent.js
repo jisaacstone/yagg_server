@@ -74,4 +74,14 @@ describe('event', () => {
       expect(Board.thingAt(0, 1).className).include('block');
     });
   });
+  it('player joined', () => {
+    localStorage.setItem('playerData.id', 1234);
+    localStorage.setItem('playerData.name', 'testname');
+    Event.player_joined({player: {id: 1234, name: 'testname'}, position: 'north'});
+    Event.player_joined({player: {id: 5678, name: 'testname'}, position: 'south'});
+    const pEl = document.querySelector('#player .playername'),
+      oEl = document.querySelector('#opponent .playername');
+    expect(pEl.innerHTML).include('testname');
+    expect(oEl.innerHTML).include('testname');
+  });
 });

@@ -226,7 +226,7 @@ defmodule Yagg.Event do
 
   defmodule PlayerJoined do
     @spec new([
-      name: String.t,
+      player: Player.t,
       position: Player.position
     ]) :: Event.t
     def new(params) do

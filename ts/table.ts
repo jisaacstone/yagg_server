@@ -146,6 +146,7 @@ function leave() {
 }
 
 function setstate(gamedata, phase) {
+  console.log({gamedata, phase});
   let players = 0;
   for (const player of gamedata.players) {
     Event.player_joined(player);

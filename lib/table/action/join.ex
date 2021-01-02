@@ -21,7 +21,7 @@ defmodule Yagg.Table.Action.Join do
   defp join(%{players: []} = table, player, :notfound) do
     {
       %{table | players: [{:north, player}]},
-      [Event.PlayerJoined.new(name: player.name, position: :north)]
+      [Event.PlayerJoined.new(player: player, position: :north)]
     }
   end
   defp join(%{players: [{p1pos, _p1}]} = table, player, :notfound) do
@@ -30,7 +30,7 @@ defmodule Yagg.Table.Action.Join do
     {board, events} = Configuration.setup(table.configuration, table.board)
     {
       %{table | players: [{position, player} | table.players], board: board},
-      [Event.PlayerJoined.new(name: player.name, position: position), Event.GameStarted.new() | events]
+      [Event.PlayerJoined.new(player: player, position: position), Event.GameStarted.new() | events]
     }
   end
   defp join(%{players: [_p1, _p2 | []]}, _, _) do

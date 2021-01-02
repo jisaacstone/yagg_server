@@ -58,8 +58,8 @@ export function game_started(event) {
 export function battle_started() {
     gamestatechange('battle');
 }
-export function player_joined({ name, position }) {
-    const nameEl = Element.create({ className: 'playername', innerHTML: name }), player = Player.getLocal(), whois = name === player.name ? 'player' : 'opponent', container = document.getElementById(whois);
+export function player_joined({ player, position }) {
+    const nameEl = Element.create({ className: 'playername', innerHTML: player.name }), thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois);
     if (container.firstElementChild && container.firstElementChild.className === 'playername') {
         return;
     }
