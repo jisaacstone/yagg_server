@@ -59,11 +59,11 @@ export function battle_started() {
     gamestatechange('battle');
 }
 export function player_joined({ player, position }) {
-    const nameEl = Element.create({ className: 'playername', innerHTML: player.name }), thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois);
+    const nameEl = Element.create({ className: 'playername', innerHTML: player.name }), thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'gameinfo', container = document.getElementById(whois), avatarEl = Player.avatar(player), playerDetailsEl = Element.create({ className: 'playerdetails', children: [avatarEl, nameEl] });
     if (container.firstElementChild && container.firstElementChild.className === 'playername') {
         return;
     }
-    container.appendChild(nameEl);
+    container.appendChild(playerDetailsEl);
     if (whois === 'player') {
         gmeta.position = position;
     }
@@ -110,7 +110,7 @@ export function player_ready(event) {
         Ready.hide();
     }
     else {
-        document.querySelector('#opponent .playername').dataset.ready = 'true';
+        document.querySelector('#gameinfo .playername').dataset.ready = 'true';
     }
 }
 export function feature(event) {

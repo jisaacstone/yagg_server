@@ -1,6 +1,7 @@
 import { _name_ } from './urlvars.js';
 import { post, request } from './request.js';
 import * as Dialog from './dialog.js';
+import * as Element from './element.js';
 
 interface PlayerData {
   id: string;
@@ -52,4 +53,17 @@ export function getLocal(): PlayerData {
   const id = localStorage.getItem('playerData.id'),
     name = localStorage.getItem('playerData.name');
   return { id, name };
+}
+
+export function avatar({ id, name }): HTMLElement {
+  // avatar is radomly chosen based on ui and colored based on name
+  let nameToNum = 0, i = name.length;
+  while(i--) {
+    nameToNum += +name.charCodeAt(i);
+  }
+  const el = Element.create({ className: 'avatar', tag: 'img' });
+  console.log({ id, mod: +id % 5, nameToNum});
+  el.setAttribute('src', `img/avatar_${+id % 5}.png`);
+  el.style.filter = `hue-rotate(${nameToNum % 36}0deg)`;
+  return el;
 }

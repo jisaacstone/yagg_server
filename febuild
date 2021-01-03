@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -ex
+
+mkdir -p build
+
+rm -rf build/*
+rm -f yagg.zip
+
+cp frontend/*.* build/
+cp -r frontend/icons build/
+
+tsc
+cp -r frontend/js build
+
+mkdir build/img
+
+# delete metadata
+exiftool -All= frontend/img/*.png
+
+# optimize images
+while IFS= read -r -d $'\0' path; do
+  file=$( basename "$path" )
+  cat "${path}" | pngquant - > "build/img/${file}"
+done < <(find frontend/img -name "*.png" -print0)
+
+( cd build && zip -r ../yagg ./* )

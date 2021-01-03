@@ -85,19 +85,24 @@ body > div, body > form {
   border-style: outset;
 }
 
-/*
-.table::after {
-  content: 'join this game';
-  visibility: hidden;
+#player {
   position: absolute;
-  color: #221;
-  font-weight: normal;
-  padding: 3px;
-  font-size: 12px;
-  background-color: rgba(169, 168, 166, 0.8);
-  border: 2px solid rgba(89, 78, 86, 0.9);
-  text-shadow: rgba(220, 218, 219, 0.2) -1px -1px 0;
+  top: 1em;
+  right: 1em;
+  display: grid;
+  min-width: 30%;
+  margin: 0.5em;
+  border-radius: 0.5em;
+  border: 0.2em inset var(--ui-main-dark);
 }
-.table:hover::after {
-  visibility: visible;
-}*/
+
+.playerdetails {
+  grid-template-columns: 4em 1fr;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar {
+  width: 4em;
+  height: 4em;
+}

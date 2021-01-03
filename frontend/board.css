@@ -612,12 +612,12 @@ body[data-gamestate=gameover] {
   align-content: stretch;
   justify-content: stretch;
   row-gap: 0.3em;
+  grid-auto-rows: minmax(0, 1fr);
   display: grid;
 }
 
 #player {
   grid-area: player;
-  grid-auto-rows: minmax(0, 1fr);
 }
 
 #gameinfo {
@@ -643,7 +643,7 @@ body[data-gamestate=gameover] {
   color: var(--ui-alt-dark);
 }
 
-.playername, #gamestate, .uibutton {
+.playerdetails, #gamestate, .uibutton {
   padding: 7px 3px;
   margin: 3px;
   border-radius: 0.4em;
@@ -653,28 +653,36 @@ body[data-gamestate=gameover] {
   align-items: center;
 }
 
-.playername, #gamestate {
-  background-color: var(--white-transparent-high);
-  font-weight: bold;
-  color: var(--ui-main-dark);
-  border: 0.15em inset var(--ui-main-light);
-  text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
-}
-
 #gamestate {
   display: none;
 }
 
-.playername, #opponent {
-  min-width: 5em;
+#opponent {
+  display: none;
 }
 
-#opponent {
-  display: grid;
+#counter, #buttons, #leavebutton, .playerdetails {
+  max-height: 3em;
 }
 
 .playername[data-ready='true'] {
   background-color: var(--ui-alt-desaturated);
+}
+
+.avatar {
+  width: 2em;
+  height: 2em;
+}
+
+.playerdetails {
+  grid-template-columns: 2em 1fr;
+  grid-row: 1;
+}
+
+.playername {
+  background-color: var(--white-transparent-high);
+  border: 0.15em inset var(--ui-main-light);
+  width: 100%;
 }
 
 #buttons {

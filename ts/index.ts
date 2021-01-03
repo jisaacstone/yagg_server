@@ -94,6 +94,14 @@ function fetchTableData() {
   }).catch((e) => console.log({ e }));
 }
 
+function showPlayer({ id, name }) {
+  const container = document.getElementById('player'),
+    nameEl = Element.create({ className: 'playername', innerHTML: name }),
+    avatarEl = Player.avatar({ id, name }),
+    playerDetailsEl = Element.create({ className: 'playerdetails', children: [avatarEl, nameEl] });
+  container.appendChild(playerDetailsEl);
+}
+
 window.onload = function() {
   const ct = document.getElementById('createtable'),
     sel_el = document.getElementById('config') as HTMLInputElement;
@@ -107,10 +115,11 @@ window.onload = function() {
     }
   }
 
-  Player.check().then(() => {
+  Player.get().then((player) => {
     fetchConfigs(sel_el);
     fetchTableData();
     window.setInterval(fetchTableData, 2000);
+    showPlayer(player);
 
     ct.onclick = () => {
       const conf = sel_el.value;
