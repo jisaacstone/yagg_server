@@ -149,7 +149,7 @@ defmodule Board.Configuration.Alpha do
   def name(), do: "fivers"
 
   @impl Board.Configuration
-  def description(), do: "five by five grid"
+  def description(), do: "Small board, army selection, kill the monarch or reach the other side to win"
 
   @impl Board.Configuration
   def new() do
@@ -205,7 +205,7 @@ defmodule Board.Configuration.Ice do
   def name(), do: "iceslide"
 
   @impl Board.Configuration
-  def description(), do: "all units slide"
+  def description(), do: "Large board with unit selection, all units slide"
 
   @impl Board.Configuration
   def new() do
@@ -270,7 +270,7 @@ defmodule Board.Configuration.Strat do
   def name(), do: "strat"
 
   @impl Board.Configuration
-  def description(), do: "capture the flag"
+  def description(), do: "Capture the flag to win"
 
   @impl Board.Configuration
   def new() do

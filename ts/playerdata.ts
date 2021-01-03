@@ -8,7 +8,15 @@ interface PlayerData {
   name: string;
 }
 
+const state = {
+  waiting: false
+}
+
 function create(): Promise<PlayerData> {
+  if ( state.waiting ) {
+    return Promise.reject('already waiting');
+  }
+  state.waiting = true;
   return Dialog
     .prompt('enter your name', _name_())
     .then((name) => {
@@ -18,7 +26,10 @@ function create(): Promise<PlayerData> {
       localStorage.setItem('playerData.id', id);
       localStorage.setItem('playerData.name', name);
       return { id, name };
-    });
+    })
+    .finally(() => {
+      state.waiting = false;
+    })
 }
 
 export function check() {
@@ -62,8 +73,7 @@ export function avatar({ id, name }): HTMLElement {
     nameToNum += +name.charCodeAt(i);
   }
   const el = Element.create({ className: 'avatar', tag: 'img' });
-  console.log({ id, mod: +id % 5, nameToNum});
-  el.setAttribute('src', `img/avatar_${+id % 5}.png`);
+  el.setAttribute('src', `img/avatar_${+id % 8}.png`);
   el.style.filter = `hue-rotate(${nameToNum % 36}0deg)`;
   return el;
 }

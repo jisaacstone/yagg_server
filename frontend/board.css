@@ -110,13 +110,6 @@ body[data-gamestate=placement] {
   var(--ui-alt-desaturated), var(--ui-alt-desaturated) 2em,
   var(--ui-main-desaturated) 2em, var(--ui-main-desaturated) 4em,
   var(--grey-transparent-med) 4em, var(--grey-transparent-med) 6em);
-  /*
-  background: repeating-linear-gradient(
-  40deg,
-  hsl(240, 20%, 83%), hsl(240, 20%, 83%) 15px,
-  hsl(0, 0%, 93%) 15px,	hsl(0, 0%, 93%) 30px,
-  hsl(300, 11%, 70%) 30px, hsl(300, 11%, 70%) 45px);
-  */
 }
 
 body[data-gamestate=jobfair] {
@@ -133,20 +126,6 @@ body[data-gamestate=battle] {
     var(--north-muted), var(--north-muted) 2em,
     var(--grey-transparent-med) 2em, var(--grey-transparent-med) 4em
   );
-  /*
-  background: repeating-radial-gradient(
-    circle at -10% 120%,
-    #dCD,
-    #dCE 20px,
-    transparent 20px,
-    transparent 40px
-  ), repeating-radial-gradient(
-    circle at 110% 120%,
-    rgba(175, 165, 160, 0.5),
-    rgba(175, 165, 160, 0.5) 20px,
-    #FED 20px,
-    #fdc 40px
-  );*/
 }
 
 body[data-gamestate=gameover] {
@@ -156,14 +135,6 @@ body[data-gamestate=gameover] {
   var(--ui-alt-desaturated-transparent) 2em, var(--ui-alt-desaturated-transparent) 4em,
   var(--north-muted) 4em, var(--north-muted) 6em,
   var(--south-muted) 6em, var(--south-muted) 8em);
-  /*
-  background: repeating-radial-gradient(
-  circle at 50% 102%,
-  #FAB, #FAB 10px,
-  #DD8 10px, #DD8 20px,
-  #CFD 20px, #CFD 30px,
-  #9AD 30px, #9AD 40px
-  );*/
 }
 
 .waiting {

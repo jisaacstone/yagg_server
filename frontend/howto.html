@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<head>
+  <title>How to play Y A G G</title>
+  <script type="module" src="js/howto.js">
+  </script>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" type="text/css" href="normalized.css">
+  <link rel="stylesheet" type="text/css" href="colors.css">
+  <link rel="stylesheet" type="text/css" href="common.css">
+  <link rel="stylesheet" type="text/css" href="board.css">
+  <link rel="stylesheet" type="text/css" href="howto.css">
+  <link href="icons/sbicon-32x32.png" rel="icon" type="image/png" sizes="32x32">
+  <link href="icons/sbicon-48x48.png" rel="icon" type="image/png" sizes="48x48">
+  <link href="icons/sbicon-192x192.png" rel="icon" sizes="192x192">
+  <link href="icons/sbicon-120x120.png" rel="apple-touch-icon" sizes="120x120">
+  <link href="icons/sbicon-180x180.png" rel="apple-touch-icon" sizes="180x180">
+  <link href="icons/sbicon-512x512.png" rel="apple-touch-icon" sizes="512x512">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="uc-fitscreen=yes"/>
+  <meta name="layoutmode" content="fitscreen/standard">
+  <meta name="full-screen" content="yes">
+  <meta name="browsermode" content="application">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <a href="index.html">back to game</a>
+  <h1>How to play YAGG</h1>
+  <nav>
+  <a href="#phases">phases</a>
+  <a href="#triggers">triggers</a>
+  <a href="#board-features">features</a>
+  <a href="#game-types">game types</a>
+  </nav>
+  <p>YAGG is a turn-based strategy game.
+  <section id="phases">
+    <h2>Phases</h2>
+    <h3>Unit Selection</h3>
+    <p>In some game types you are able to recruit your army before battle. Select desired units and then press "RECRUIT".
+    After your opponent also presses "RECRUIT" you will start the placement phase.
+    <h3>Placement</h3>
+    <p>You select the starting position of your units. The only unit you must place is the Monarch or Flag. All other units may be left in your hand
+    to be placed later. After placing your units press "READY" to start battle.
+    <h3>Battle</h3>
+    <p>On your turn you must do one of the following
+      <h4>Move</h4>
+      <p>Units move one square at a time. Units cannot move diagonally. Some units are immobile. They can neither move nor attack.
+      <h4>Attack</h4>
+      <p>Moving your unit into a square that has an enemy unit is an attack. If the attacker's Attack is greater than the opponent's Defense
+      the opponent is destroyed and the attacker will move into the defender's square. Otherwise the attacker is destroyed.
+      <h4>Place</h4>
+      <p>Units can be placed in the battle phase the same as the placement phase.
+      <h4>Ability</h4>
+      <p>Some units have special abilities. Using any ability will end your turn
+  </section>
+  <a class="top" href="#top">top</a>
+  <section id="triggers">
+    <h2>Triggers</h2>
+    <p>Some units have abilities that trigger under certain conditions
+    <h3>Move</h3>
+    <p>A move trigger will activate after a unit moves. If a unit loses a battle it's move trigger will not activate.
+    <h3>Attack</h3>
+    <p>Attack triggers activate before a unit attacks. Attack triggers may change how a unit does battle, or prevent battle from happening entirely.
+    <h3>Death</h3>
+    <p>Death triggers happen immediately after a unit dies. In a battle if the opponent dies, the death trigger will happen before the attacker's move trigger.
+  </section>
+  <a class="top" href="#top">top</a>
+  <section id="board-features">
+    <h2>Board</h2>
+    <p>The board size varies from 5x5 up to 8x8. Boards also have water or block squares that affect gameplay
+    <h3>Water</h3>
+    <img src="img/howto/water.png" class="feature"/>
+    <p>Units cannot cross water, but some special abilities can cross over the top of water, such as Maycorn's spark or Howloo's horseshoe.
+    <p>Water squares can only be moved by Busybody's special ability.
+    <h3>Block</h3>
+    <img src="img/howto/block.png" class="feature"/>
+    <p>A block can be pushed by a unit if the square on the other side is empty. Otherwise a block will block movement.
+    Blocks are moved by special abilities the same as units.
+    <p>If you are trying to push a block but it will not move, there is likely an invisible unit on the other side.
+  </section>
+  <a class="top" href="#top">top</a>
+  <section id="game-types">
+    <h2>Game Types</h2>
+    <p>Different game types have different units, board, phases and win conditions
+    <h3>Fivers</h3>
+    <img src="img/howto/fivers.png" class="board"/>
+    <p>Recruit 8 units to protect your monarch. Can win by killing your opponent's monarch or moving your monarch to the opposite side of the board
+    <h3>Iceslide</h3>
+    <img src="img/howto/iceslide.png" class="board"/>
+    <p>Recruit 12 units to protect your monarch.
+    Kill your opponent's monarch to win.
+    All units will slide until they encounter an obstacle.
+    <h3>Strat</h3>
+    <img src="img/howto/strat.png" class="board"/>
+    <p>Capture the opponent's flag. Unlike monarchs, flags cannot move.
+  </section>
+  <a class="top" href="#top">top</a>
+</body>

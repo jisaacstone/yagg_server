@@ -2,7 +2,14 @@ import { _name_ } from './urlvars.js';
 import { post, request } from './request.js';
 import * as Dialog from './dialog.js';
 import * as Element from './element.js';
+const state = {
+    waiting: false
+};
 function create() {
+    if (state.waiting) {
+        return Promise.reject('already waiting');
+    }
+    state.waiting = true;
     return Dialog
         .prompt('enter your name', _name_())
         .then((name) => {
@@ -12,6 +19,9 @@ function create() {
         localStorage.setItem('playerData.id', id);
         localStorage.setItem('playerData.name', name);
         return { id, name };
+    })
+        .finally(() => {
+        state.waiting = false;
     });
 }
 export function check() {
@@ -49,8 +59,7 @@ export function avatar({ id, name }) {
         nameToNum += +name.charCodeAt(i);
     }
     const el = Element.create({ className: 'avatar', tag: 'img' });
-    console.log({ id, mod: +id % 5, nameToNum });
-    el.setAttribute('src', `img/avatar_${+id % 5}.png`);
+    el.setAttribute('src', `img/avatar_${+id % 8}.png`);
     el.style.filter = `hue-rotate(${nameToNum % 36}0deg)`;
     return el;
 }

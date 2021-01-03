@@ -1,0 +1,64 @@
+html {
+  background-image: url("img/paper_bg_transparent.png");
+  background: repeating-linear-gradient(
+  40deg,
+  var(--ui-alt-desaturated-transparent),      var(--ui-alt-desaturated-transparent)  2em,
+  var(--white-transparent-med)           2em, var(--white-transparent-med)           4em,
+  var(--ui-main-desaturated-transparent) 4em, var(--ui-main-desaturated-transparent) 6em,
+  var(--grey-transparent-med)            6em, var(--grey-transparent-med)            8em);
+}
+
+body {
+  overflow-y: scroll;
+  padding: 0.4em;
+  background: none;
+  color: var(--ui-main-dark-dark);
+}
+
+section {
+  border-top: 2px solid var(--ui-main-saturated);
+  border-bottom: 2px solid var(--ui-main-desaturated);
+  margin-bottom: 1.5em;
+  margin-right: 0.7em;
+  background-color: var(--white-transparent-med);
+  padding: 0.2em;
+  border-radius: 0.2em;
+}
+
+h2 {
+  margin: 0.5em 0.2em;
+  padding-right: 1em;
+  color: var(--ui-main-dark-desaturated);
+  text-shadow: 2px 2px 2px var(--ui-main-dark-transparent);
+}
+
+h3 {
+  margin: 0.3em 1em;
+  padding-right: 1em;
+  border-bottom: 2px solid var(--ui-alt-saturated);
+  color: var(--ui-alt-dark);
+  text-shadow: 1px 1px 2px var(--ui-main-dark-transparent);
+  display: inline-block;
+}
+
+h4 {
+  margin: 0 2em;
+  color: var(--ui-main-dark);
+  padding-right: 1em;
+  border-bottom: 2px solid var(--ui-alt-desaturated);
+  text-shadow: 1px 1px 1px var(--ui-main-dark-transparent);
+  display: inline-block;
+}
+
+img {
+  display: block;
+}
+
+a {
+  color: var(--ui-main-saturated);
+}
+
+.top {
+  float: right;
+  padding-right: 1em;
+}
