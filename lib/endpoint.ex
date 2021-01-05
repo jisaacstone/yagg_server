@@ -24,8 +24,12 @@ defmodule Yagg.Endpoint do
 
   post "/player/guest" do
     {:ok, body, conn} = Conn.read_body(conn)
-    %{name: name} = Poison.Parser.parse!(body, %{keys: :atoms!})
-    player = Table.Player.new(name)
+    data = Poison.Parser.parse!(body, %{keys: :atoms!})
+    name = data.name
+    player = case Map.get(data, :id) do
+      :nil -> Table.Player.new(name)
+      id -> Table.Player.renew(name, id)
+    end
     respond(conn, 200, player)
   end
 

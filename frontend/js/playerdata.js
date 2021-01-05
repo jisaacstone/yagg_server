@@ -13,7 +13,7 @@ function create() {
     return Dialog
         .prompt('enter your name', _name_())
         .then((name) => {
-        return post('player/guest', { name: name });
+        return post('player/guest', { name });
     })
         .then(({ id, name }) => {
         localStorage.setItem('playerData.id', id);
@@ -33,10 +33,17 @@ export function check() {
                 localStorage.setItem('playerData.name', resp.name);
             }
         }).catch(() => {
-            console.log({ "localstorage": "removePlayerData", id, name });
-            localStorage.removeItem('playerData.id');
-            localStorage.removeItem('playerData.name');
-            return create();
+            return post('player/guest', { id, name })
+                .catch((err) => {
+                console.error({ message: 'error recreating guest account', err });
+                console.log({ "localstorage": "removePlayerData", id, name });
+                localStorage.removeItem('playerData.id');
+                localStorage.removeItem('playerData.name');
+                return create();
+            })
+                .finally(() => {
+                state.waiting = false;
+            });
         });
     }
     return create();

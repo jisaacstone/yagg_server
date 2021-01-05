@@ -23,6 +23,15 @@ defmodule Table.Player do
     player
   end
 
+  def renew(name, id) when is_binary(id) do
+    renew(name, String.to_integer(id))
+  end
+  def renew(name, id) do
+    player = %Player{id: id, name: name}
+    :true = :ets.insert_new(:players, {id, player})
+    player
+  end
+
   @spec fetch(non_neg_integer) :: {:ok, t} | {:err, :notfound}
   def fetch(id) do
     case :ets.lookup(:players, id) do

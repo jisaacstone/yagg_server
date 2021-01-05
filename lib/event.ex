@@ -217,6 +217,16 @@ defmodule Yagg.Event do
     end
   end
 
+  defmodule Timer do
+    @spec new([
+      player: Player.position | :all,
+      timer: non_neg_integer
+    ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :timer, params)
+    end
+  end
+
   defmodule ConfigChange do
     @spec new([config: String.t]) :: Event.t
     def new(params) do

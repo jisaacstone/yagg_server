@@ -1,4 +1,5 @@
 import * as Instructions from './instructions.js';
+import * as LeaveButton from './leaveButton.js';
 export const gmeta = {
     position: null,
     name: null,
@@ -29,22 +30,23 @@ export function gamestatechange(newstate) {
     Array.prototype.forEach.call(document.getElementsByClassName('playername'), el => {
         el.dataset.ready = null;
     });
+    LeaveButton.ensureCreated();
 }
 export function turnchange(player) {
     gmeta.turn = player;
     if (player == null) {
         document.getElementsByTagName('body')[0].dataset.turn = null;
         document.querySelector('#player .playername').dataset.turn = 'false';
-        document.querySelector('#gameinfo .playername').dataset.turn = 'false';
+        document.querySelector('#opponent .playername').dataset.turn = 'false';
     }
     else if (player === gmeta.position) {
         document.getElementsByTagName('body')[0].dataset.turn = 'player';
         document.querySelector('#player .playername').dataset.turn = 'true';
-        document.querySelector('#gameinfo .playername').dataset.turn = 'false';
+        document.querySelector('#opponent .playername').dataset.turn = 'false';
     }
     else {
         document.getElementsByTagName('body')[0].dataset.turn = 'opponent';
         document.querySelector('#player .playername').dataset.turn = 'false';
-        document.querySelector('#gameinfo .playername').dataset.turn = 'true';
+        document.querySelector('#opponent .playername').dataset.turn = 'true';
     }
 }

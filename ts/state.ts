@@ -1,4 +1,5 @@
 import * as Instructions from './instructions.js';
+import * as LeaveButton from './leaveButton.js';
 
 export const gmeta = {
   position: null,
@@ -38,6 +39,7 @@ export function gamestatechange(newstate: string): void {
       el.dataset.ready = null;
     }
   );
+  LeaveButton.ensureCreated();
 }
 
 export function turnchange(player) {
@@ -45,14 +47,14 @@ export function turnchange(player) {
   if (player == null) {
     document.getElementsByTagName('body')[0].dataset.turn = null;
     (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'false';
-    (document.querySelector('#gameinfo .playername') as HTMLElement).dataset.turn = 'false';
+    (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'false';
   } else if (player === gmeta.position) {
     document.getElementsByTagName('body')[0].dataset.turn = 'player';
     (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'true';
-    (document.querySelector('#gameinfo .playername') as HTMLElement).dataset.turn = 'false';
+    (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'false';
   } else {
     document.getElementsByTagName('body')[0].dataset.turn = 'opponent';
     (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'false';
-    (document.querySelector('#gameinfo .playername') as HTMLElement).dataset.turn = 'true';
+    (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'true';
   }
 }

@@ -8,6 +8,8 @@ import * as Event from './event.js';
 import * as Jobfair from './jobfair.js';
 import * as Board from './board.js';
 import * as Dialog from './dialog.js';
+import * as Element from './element.js';
+import * as LeaveButton from './leaveButton.js';
 
 function render_board(board, players: number) {
   if (players !== 2) {
@@ -92,7 +94,7 @@ function waitingforplayers() {
 
   leav.innerHTML = 'exit';
   leav.className = 'exitbutton uibutton';
-  leav.onclick = leave;
+  leav.onclick = LeaveButton.leave;
   over.appendChild(leav);
 }
 
@@ -112,18 +114,13 @@ function fetchgamestate() {
 }
 
 window.onload = function() {
-  const errbutton = document.getElementById('errbutton'),
-    leavebutton = document.getElementById('leavebutton');
+  const errbutton = document.getElementById('errbutton');
   if (errbutton) {
     errbutton.onclick = () => {
       reporterr();
     }
   }
-  if (leavebutton) {
-    leavebutton.onclick = () => {
-      leave();
-    }
-  }
+
   Player.check();
   Request.gameaction('join', {}, 'table')
     .then(() => {
@@ -135,15 +132,6 @@ window.onload = function() {
       listen();
     });
 };
-
-function leave() {
-  Request.gameaction('leave', {}, 'table').then(() => {
-    window.location.href = 'index.html';
-  }).catch((e) => {
-    console.log({error: e});
-    window.location.href = 'index.html';
-  });
-}
 
 function setstate(gamedata, phase) {
   console.log({gamedata, phase});

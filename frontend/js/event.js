@@ -12,6 +12,7 @@ import * as Feature from './feature.js';
 import * as Hand from './hand.js';
 import * as AbilityEvent from './abilty_event.js';
 import * as Element from './element.js';
+import * as Timer from './timer.js';
 const unitsbyindex = {};
 export function multi({ events }) {
     let squares = [];
@@ -51,15 +52,18 @@ export function game_started(event) {
         }
         gamestatechange(state || 'placement');
         if (state === 'placement' || state === 'gameover') {
-            Ready.display(state === 'placement' ? 'READY' : 'REMATCH');
+            Ready.display(state === 'placement' ? 'ready' : 'rematch');
         }
     }
+}
+export function timer(event) {
+    Timer.set(event.timer, event.player);
 }
 export function battle_started() {
     gamestatechange('battle');
 }
 export function player_joined({ player, position }) {
-    const nameEl = Element.create({ className: 'playername', innerHTML: player.name }), thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'gameinfo', container = document.getElementById(whois), avatarEl = Player.avatar(player), playerDetailsEl = Element.create({ className: 'playerdetails', children: [avatarEl, nameEl] });
+    const nameEl = Element.create({ className: 'playername', innerHTML: player.name }), thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois), avatarEl = Player.avatar(player), playerDetailsEl = Element.create({ className: 'playerdetails', children: [avatarEl, nameEl] });
     if (container.firstElementChild && container.firstElementChild.className === 'playername') {
         return;
     }
@@ -110,7 +114,7 @@ export function player_ready(event) {
         Ready.hide();
     }
     else {
-        document.querySelector('#gameinfo .playername').dataset.ready = 'true';
+        document.querySelector('#opponent .playername').dataset.ready = 'true';
     }
 }
 export function feature(event) {
@@ -219,6 +223,7 @@ export function thing_gone(event) {
 }
 export function gameover({ winner }) {
     gamestatechange('gameover');
+    Timer.stop();
     turnchange(null);
     if (winner === gmeta.position) {
         Dialog.displayMessage('you win!');
@@ -229,7 +234,7 @@ export function gameover({ winner }) {
     else {
         Dialog.displayMessage('you lose');
     }
-    Ready.display('REMATCH');
+    Ready.display('rematch');
 }
 export function turn({ player }) {
     turnchange(player);

@@ -1,6 +1,5 @@
 alias Yagg.Unit
 alias Yagg.Board
-alias Yagg.Board.Action.Ability
 import Helper.Board
 
 defmodule YaggTest.Action.Move do

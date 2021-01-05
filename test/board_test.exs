@@ -74,6 +74,18 @@ defmodule YaggTest.Board do
     assert table.board.state == %Board.State.Gameover{winner: :draw, ready: :north}
   end 
 
+  test "concede" do
+    board = new_board()
+    player = Table.Player.new("north")
+    table = %Table{id: :test, turn: :north, board: board, history: [], players: [north: player], configuration: %{}, subscribors: []}
+    assert {:reply, :ok, table} = Table.handle_call(
+      {:board_action, player, %Board.Action.Concede{}},
+      self(),
+      table
+    )
+    assert table.board.state == %Board.State.Gameover{winner: :south, ready: :nil}
+  end
+
   test "endgame" do
     board = %Board{
       configuration: %Board.Configuration{army_size: 12, dimensions: {6, 6}, initial_module: Board, monarch: nil, name: "strat", terrain: [], units: %{}},

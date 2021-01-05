@@ -12,15 +12,22 @@ body {
 @media (orientation: landscape) {
   #table {
     grid-template-columns: minmax(0, 1fr) min(60vw, 100vh) minmax(0, 1fr);
-    grid-template-rows: 30% 40% 30%;
+    grid-template-rows: 15% 45% 25% 15%;
     grid-template-areas:
       "opponent board  hand"
       "infobox  board  hand"
+      "buttons  board  hand"
       "player   board  hand";
   }
   #board {
     width: min(60vw, 95vh);
     height: min(60vw, 95vh);
+    grid-auto-flow: row;
+    grid-auto-rows: minmax(0, 1fr);
+  }
+  .boardrow {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
   }
   #hand {
     overflow-y: scroll;
@@ -30,16 +37,16 @@ body {
     flex-direction: column;
   }
   #infobox {
-    justify-self: end;
+    justify-self: center;
     align-self: center;
-    height: max(80%, min(38vh, 18vw));
+    height: max(80%, min(44vh, 22vw));
   }
   #infobox .info {
-    width: min(38vh, 18vw);
+    width: min(43vh, 19vw);
   }
   #jobfair {
     grid-column: 2 / span 2;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     border-left: 2px inset #325;
     margin-right: 2px;
@@ -51,56 +58,68 @@ body {
   .dropdown .dismiss {
     right: 1px;
   }
+  #buttons {
+    grid-auto-flow: row;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    padding: 0 0.5em;
+  }
 }
 
 @media (orientation: portrait) {
   #table {
-    grid-template-columns: 30% 40% 30%;
-    grid-template-rows: minmax(0, 1fr) min(60vh, 100vw) minmax(0, 1fr);
+    grid-template-columns: 35% 30% 35%;
+    grid-template-rows: minmax(0, 1fr) min(60vh, 100vw) minmax(0, 1fr) minmax(0, 2fr);
     grid-template-areas:
-      "player   infobox  opponent"
+      "opponent .        player"
       "board    board    board"
-      "hand     hand     hand";
+      "buttons  buttons  infobox"
+      "hand     hand     infobox";
   }
   #board {
     width: min(60vh, 95vw);
     height: min(60vh, 95vw);
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+  .boardrow {
+    grid-auto-flow: row;
+    grid-auto-rows: minmax(0, 1fr);
   }
   #hand {
     overflow-x: scroll;
     overflow-y: hidden;
-    margin-top: 1vh;
     flex-direction: row;
     padding-bottom: 4vh;
   }
   #infobox {
-    align-self: end;
+    align-self: center;
     justify-self: center;
   }
   #infobox .info {
-    width: min(39vw, 19vh);
-    height: min(39vw, 19vh);
+    width: min(34vw, 26vh);
+    height: min(37vw, 28vh);
   }
   #jobfair {
     grid-column: 1 / span 3;
-    grid-row: 2 / span 2;
+    grid-row: 2 / span 1;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     height: 100%;
-    border-top: 2px inset #325;
+    border-top: 2px inset var(--ui-alt-dark);
+    border-bottom: 2px inset var(--ui-alt-dark);
+    margin-bottom: -0.5em;
   }
   #jobfair .candidate {
     min-height: 33vw;
     max-height: 37vw;
   }
-  #player .uibutton {
-    padding: 14px 4px;
-    margin-bottom: 8px;
-  }
-  #readybutton.uibutton {
-    grid-row: 2;
-  }
   .dropdown .dismiss {
     left: 1px;
+  }
+  #buttons {
+    grid-auto-flow: column;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    place-content: center;
+    padding: 0.7em 0 0.5em;
   }
 }
 
@@ -114,6 +133,10 @@ body[data-gamestate=placement] {
 
 body[data-gamestate=jobfair] {
   background-image: url("img/paper_bg_grn.png");
+}
+
+body[data-gamestate=jobfair] #board {
+  display: none;
 }
 
 body[data-gamestate=battle] {
@@ -170,9 +193,7 @@ body[data-gamestate=gameover] {
   background-color: var(--ui-main-desaturated);
   box-shadow: 1vh 2vh 1vh var(--ui-main-dark-transparent);
   display: grid;
-  grid-auto-flow: row;
   align-content: stretch;
-  grid-auto-rows: minmax(0, 1fr);
   background-image: url("img/oygrad.png");
   background-size: cover;
   border: 0.1em inset var(--ui-main-dark);
@@ -180,9 +201,7 @@ body[data-gamestate=gameover] {
 
 .boardrow {
   display: grid;
-  grid-auto-flow: column;
   background-color: var(--white-transparent-med);
-  grid-auto-columns: minmax(0, 1fr);
   overflow: hidden;
 }
 
@@ -219,11 +238,11 @@ body[data-gamestate=gameover] {
 #hand {
   grid-area: hand;
   display: flex;
-  background-color: var(--ui-alt-desaturated-transparent);
+  background-color: var(--ui-alt-dark);
   background-image: url("img/paper_bg_transparent_med.png");
-  border-top: 0.1em solid var(--ui-alt-dark);
-  border-left: 0.1em solid var(--ui-alt-dark);
-  padding-left: 0.1em;
+  border: 0.15em inset var(--ui-alt-dark);
+  padding: 0 0.1em;
+  box-shadow: inset -0.2em 0.2em 0.7em var(--ui-main-dark-dark);
 }
 
 .card {
@@ -577,7 +596,20 @@ body[data-gamestate=gameover] {
 
 /* Left */
 
-#gameinfo, #player {
+.timer {
+  display: grid;
+  place-content: center;
+  color: var(--ui-main-dark);
+  text-shadow: 0.2em 0.1em 0.1em var(--ui-main-dark-transparent);
+}
+
+.timer.alltimer {
+  color: var(--ui-main-saturated);
+  font-weight: bold;
+  font-size: 110%;
+}
+
+#opponent, #player {
   margin: 5%;
   border-radius: 5%;
   align-content: stretch;
@@ -591,7 +623,7 @@ body[data-gamestate=gameover] {
   grid-area: player;
 }
 
-#gameinfo {
+#opponent {
   grid-area: opponent;
 }
 
@@ -607,14 +639,14 @@ body[data-gamestate=gameover] {
   box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px var(--ui-main-dark-transparent);
 }
 
-[data-turn="opponent"] #gameinfo .playername,
+[data-turn="opponent"] #opponent .playername,
 [data-turn="player"] #player .playername {
   background-color: var(--ui-main-desaturated-transparent);
   border: 0.25em inset var(--ui-alt-saturated);
   color: var(--ui-alt-dark);
 }
 
-.playerdetails, #gamestate, .uibutton {
+.playerdetails, .uibutton {
   padding: 7px 3px;
   margin: 3px;
   border-radius: 0.4em;
@@ -624,16 +656,22 @@ body[data-gamestate=gameover] {
   align-items: center;
 }
 
-#gamestate {
-  display: none;
+#buttons {
+  display: grid;
+  grid-area: buttons;
+  justify-content: space-around;
+  place-content: stretch;
+  place-self: stretch;
+}
+
+#buttons .uibutton, #buttons div {
+  padding: 0.5em;
+  min-width: 60%;
+  margin: 0.5em;
 }
 
 #opponent {
-  display: none;
-}
-
-#counter, #buttons, #leavebutton, .playerdetails {
-  max-height: 3em;
+  grid-area: opponent;
 }
 
 .playername[data-ready='true'] {
@@ -654,17 +692,6 @@ body[data-gamestate=gameover] {
   background-color: var(--white-transparent-high);
   border: 0.15em inset var(--ui-main-light);
   width: 100%;
-}
-
-#buttons {
-  display: grid;
-}
-
-#returnbutton {
-  position: absolute;
-  right: 1vw;
-  bottom: 1vh;
-  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 0.2vh var(--ui-main-dark-transparent);
 }
 
 .dropdown {
@@ -728,7 +755,6 @@ body[data-gamestate=gameover] {
   background-color: var(--white-transparent-high);
   font-weight: bold;
   font-size: 150%;
-  grid-row: 3;
   text-shadow: 0.2em 0.1em 0.2em 0.2em var(--ui-alt-desaturated);
   display: grid;
   align-content: center;

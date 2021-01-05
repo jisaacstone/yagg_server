@@ -1,7 +1,7 @@
 import { gameaction } from './request.js';
 import { displayerror } from './err.js';
 
-export function display(label = 'READY', onclick = null) {
+export function display(label = 'ready', onclick = null) {
   const readyButton = document.createElement('button');
   readyButton.id = 'readybutton';
   readyButton.className = 'uibutton';
@@ -24,7 +24,7 @@ export function display(label = 'READY', onclick = null) {
   document.getElementById('buttons').appendChild(readyButton);
 }
 
-export function ensureDisplayed(label='READY', onclick=null) {
+export function ensureDisplayed(label='ready', onclick=null) {
   if (! document.getElementById('readybutton')) {
     display(label, onclick);
   }

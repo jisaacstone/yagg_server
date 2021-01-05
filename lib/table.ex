@@ -10,7 +10,7 @@ defmodule Yagg.Table do
 
   @enforce_keys [:id, :players, :board, :turn, :configuration, :history]
   @derive {Poison.Encoder, only: [:players, :board, :turn, :configuration]}
-  defstruct [:subscribors | @enforce_keys]
+  defstruct [:subscribors, :timer | @enforce_keys]
 
   @opaque history :: [Board.t]
 
@@ -22,6 +22,7 @@ defmodule Yagg.Table do
     turn: :nil | Player.position,
     configuration: Configuration.t,
     history: history,
+    timer: :nil | reference
   }
 
   def start_link([table]) do
@@ -54,6 +55,7 @@ defmodule Yagg.Table do
       turn: :nil,
       configuration: config,
       history: [],
+      timer: nil,
     }
     DynamicSupervisor.start_child(
       Yagg.TableSupervisor,
@@ -178,6 +180,13 @@ defmodule Yagg.Table do
         {:noreply, %{table | subscribors: subs}}
     end
   end
+  def handle_info(:timeout, table) do
+    IO.inspect("TIMEOUT")
+    {table, events} = Table.Timer.timeout(table)
+    notify(table, IO.inspect(events))
+    IO.inspect(Map.get(table.board, :state))
+    {:noreply, table}
+  end
   def handle_info(other, table) do
     IO.inspect([unexpected_info: other])
     {:noreply, table}
@@ -230,7 +239,8 @@ defmodule Yagg.Table do
         {board, events} ->
           events = handle_gameover(Map.get(table.board, :state), Map.get(board, :state), events)
           {board, events} = check_all_immobile(board, events)
-          table = add_history(table, board, action)
+          newtable = add_history(table, board, action)
+          {table, events} = handle_timer(table.board, newtable, events)
           {table, events} = handle_turn(table, events)
           notify(table, events)
           {:ok, table}
@@ -244,6 +254,23 @@ defmodule Yagg.Table do
   end
   defp handle_gameover(_, _, events) do
     events
+  end
+
+  defp handle_timer(%Jobfair{}, %{board: %{state: %State.Placement{}}} = table, events) do
+    Table.Timer.start_timed_phase(table, events)
+  end
+  defp handle_timer(%{state: %State.Placement{}}, %{board: %{state: :battle}} = table, events) do
+    Table.Timer.start_timed_phase(table, events)
+  end
+  defp handle_timer(%{state: :battle}, %{board: %{state: %State.Gameover{}}} = table, events) do
+    _ = if table.timer do
+      Process.cancel_timer(table.timer)
+    end
+    {table, events}
+  end
+  defp handle_timer(x, table, events) do
+    IO.inspect([:notimer, x, table.board])
+    {table, events}
   end
 
   defp check_all_immobile(%{state: :battle, hands: %{north: n, south: s}} = board, events) when map_size(n) > 0 and map_size(s) > 0, do: {board, events}
@@ -276,7 +303,8 @@ defmodule Yagg.Table do
 
   defp handle_turn(%{board: %{state: :battle}} = table, events) do
     table = nxtrn(table)
-    {table, [Event.Turn.new(player: table.turn) | events]}
+    events = [Event.Turn.new(player: table.turn) | events]
+    Table.Timer.turn_timer(table, table.turn, events)
   end
   defp handle_turn(table, events), do: {table, events}
 

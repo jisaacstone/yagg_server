@@ -52,7 +52,7 @@ function getCounter(): HTMLElement {
   }
   const c = document.createElement('div');
   c.id = 'counter';
-  document.getElementById('player').appendChild(c);
+  document.getElementById('buttons').appendChild(c);
   return c;
 }
 
@@ -61,7 +61,7 @@ function countDown() {
   counter.innerHTML = `${state.armySize - state.selected.size}`;
   if (state.selected.size == state.armySize) {
     readyButton.display(
-      'RECRUIT',
+      'recruit',
       () => {
         state.ready = 'READY';
         counter.remove();

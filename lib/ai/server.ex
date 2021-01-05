@@ -104,7 +104,7 @@ defmodule Yagg.AI.Server do
 
   defp take_your_turn(board, state) do
     action = Choices.move(board, state.position)
-    {:ok, _} = :timer.apply_after(500, Table, :board_action, [state.pid, state.robot, action])
+    {:ok, _} = :timer.apply_after(1500, Table, :board_action, [state.pid, state.robot, action])
     :ok
   end
 

@@ -5,6 +5,7 @@ import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
 import * as Unit from './unit.js';
 import * as Infobox from './infobox.js';
+import * as Element from './element.js';
 const global = { selected: null };
 function action(actType, args, cb = null) {
     gameaction(actType, args, 'board')
@@ -75,14 +76,16 @@ function moveOrPlace(selected, target) {
     deselect();
 }
 function displayReturnButton(el, meta) {
-    const hand = document.getElementById('hand'), button = document.createElement('button');
-    button.className = 'uibutton';
-    button.id = 'returnbutton';
-    button.innerHTML = 'RETURN TO HAND';
+    const buttons = document.getElementById('buttons'), button = Element.create({
+        tag: 'button',
+        className: 'uibutton',
+        id: 'returnbutton',
+        innerHTML: 'return to hand'
+    });
     button.onclick = () => {
         action('return', { index: Unit.indexOf(el) }, deselect);
     };
-    hand.appendChild(button);
+    buttons.appendChild(button);
 }
 function handleSomethingAlreadySelected(el, meta) {
     // return "true" if select event was handled, false if logic should continue

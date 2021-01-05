@@ -1,21 +1,28 @@
 import * as Overlay from './overlay.js';
+import * as Element from './element.js';
 export function displayMessage(message, cls = 'info') {
-    const messageEl = document.createElement('div');
-    messageEl.innerHTML = message;
-    messageEl.className = `message ${cls}`;
+    const messageEl = Element.create({
+        innerHTML: message,
+        className: `message ${cls}`
+    });
     Overlay.dismissable(messageEl);
 }
 export function prompt(message, defaultv = '', confirm = 'ok') {
-    const promptEl = document.createElement('div'), msgEl = document.createElement('div'), inputEl = document.createElement('input'), okEl = document.createElement('button'), clearOverlay = Overlay.clearable(promptEl);
-    promptEl.className = 'message prompt';
-    msgEl.innerHTML = message;
-    promptEl.appendChild(msgEl);
+    const okEl = Element.create({
+        className: 'uibutton',
+        innerHTML: confirm
+    }), inputEl = Element.create({
+        tag: 'input'
+    }), promptEl = Element.create({
+        className: 'message prompt',
+        children: [
+            Element.create({ innerHTML: message }),
+            inputEl,
+            okEl
+        ]
+    }), clearOverlay = Overlay.clearable(promptEl);
     inputEl.setAttribute('type', 'text');
     inputEl.setAttribute('default', defaultv);
-    promptEl.appendChild(inputEl);
-    okEl.className = 'uibutton';
-    okEl.innerHTML = confirm;
-    promptEl.appendChild(okEl);
     return new Promise((resolve) => {
         okEl.onclick = () => {
             const value = inputEl.value;
@@ -30,16 +37,20 @@ export function prompt(message, defaultv = '', confirm = 'ok') {
     });
 }
 export function confirm(message, confirm = 'ok', cancel = 'cancel') {
-    const promptEl = document.createElement('div'), msgEl = document.createElement('div'), okEl = document.createElement('button'), cancelEl = document.createElement('button'), clearOverlay = Overlay.clearable(promptEl);
-    promptEl.className = 'message confirm';
-    msgEl.innerHTML = message;
-    promptEl.appendChild(msgEl);
-    okEl.className = 'uibutton';
-    okEl.innerHTML = confirm;
-    promptEl.appendChild(okEl);
-    cancelEl.className = 'uibutton';
-    cancelEl.innerHTML = cancel;
-    promptEl.appendChild(cancelEl);
+    const okEl = Element.create({
+        className: 'uibutton',
+        innerHTML: confirm
+    }), cancelEl = Element.create({
+        className: 'uibutton',
+        innerHTML: cancel
+    }), promptEl = Element.create({
+        className: 'message confirm',
+        children: [
+            Element.create({ innerHTML: message }),
+            okEl,
+            cancelEl
+        ]
+    }), clearOverlay = Overlay.clearable(promptEl);
     return new Promise((resolve) => {
         okEl.onclick = () => {
             clearOverlay();
@@ -50,4 +61,24 @@ export function confirm(message, confirm = 'ok', cancel = 'cancel') {
             resolve(false);
         };
     });
+}
+export function choices(message, choices) {
+    const promptEl = Element.create({
+        className: 'message choices',
+        children: [
+            Element.create({ innerHTML: message }),
+        ]
+    }), clearOverlay = Overlay.clearable(promptEl);
+    for (let [choice, effect] of Object.entries(choices)) {
+        const choiceEl = Element.create({
+            tag: 'button',
+            className: 'uibutton',
+            innerHTML: choice,
+        });
+        choiceEl.onclick = () => {
+            clearOverlay();
+            effect();
+        };
+        promptEl.appendChild(choiceEl);
+    }
 }

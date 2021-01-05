@@ -42,14 +42,14 @@ function getCounter() {
     }
     const c = document.createElement('div');
     c.id = 'counter';
-    document.getElementById('player').appendChild(c);
+    document.getElementById('buttons').appendChild(c);
     return c;
 }
 function countDown() {
     const counter = document.getElementById('counter');
     counter.innerHTML = `${state.armySize - state.selected.size}`;
     if (state.selected.size == state.armySize) {
-        readyButton.display('RECRUIT', () => {
+        readyButton.display('recruit', () => {
             state.ready = 'READY';
             counter.remove();
             gameaction('recruit', { units: Array.from(state.selected) }, 'table').then(() => {
