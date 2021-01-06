@@ -1,5 +1,5 @@
 import { request, post, gameaction } from './request.js';
-import * as Player from './playerdata.js';
+import * as Player from './player.js';
 import * as Element from './element.js';
 import * as Err from './err.js';
 

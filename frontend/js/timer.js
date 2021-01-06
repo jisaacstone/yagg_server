@@ -1,13 +1,13 @@
 import { gmeta } from './state.js';
-import * as Element from './element.js';
 const state = {
     timeout: null,
     el: null,
     interval: null,
 };
 export function set(time_in_ms, kind) {
+    console.log({ timer: kind });
     if (state.el) {
-        state.el.remove();
+        state.el.innerHTML = '';
     }
     state.el = getTimerEl(kind);
     state.timeout = Date.now() + time_in_ms;
@@ -17,7 +17,7 @@ export function set(time_in_ms, kind) {
 }
 export function stop() {
     if (state.el) {
-        state.el.remove();
+        state.el.innerHTML = '';
     }
     if (state.interval) {
         window.clearTimeout(state.interval);
@@ -27,18 +27,15 @@ export function stop() {
     state.interval = null;
 }
 function getTimerEl(kind) {
-    const el = Element.create({ className: 'timer' });
     if (kind === gmeta.position) {
-        document.getElementById('player').appendChild(el);
+        return document.querySelector('#player .timer');
     }
     else if (kind === 'north' || kind === 'south') {
-        document.getElementById('opponent').appendChild(el);
+        return document.querySelector('#opponent .timer');
     }
     else {
-        el.className = `${el.className} ${kind}timer`;
-        document.getElementById('table').appendChild(el);
+        return document.querySelector('#timer');
     }
-    return el;
 }
 function createInterval() {
     return window.setInterval(() => {
@@ -47,10 +44,20 @@ function createInterval() {
         }
         const now = Date.now(), diff = state.timeout - now;
         if (diff > 0) {
-            state.el.innerHTML = `${Math.round(diff / 1000)}`;
+            const sec_rem = Math.round(diff / 1000);
+            if (sec_rem < 20) {
+                state.el.className = 'timer urgent';
+            }
+            else if (sec_rem > 100) {
+                state.el.className = 'timer relaxed';
+            }
+            else {
+                state.el.className = 'timer';
+            }
+            state.el.innerHTML = `${sec_rem}`;
         }
         else {
-            state.el.remove();
+            state.el.innerHTML = '';
             state.el = null;
         }
     }, 1000);

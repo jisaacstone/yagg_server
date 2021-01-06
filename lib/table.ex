@@ -183,8 +183,7 @@ defmodule Yagg.Table do
   def handle_info(:timeout, table) do
     IO.inspect("TIMEOUT")
     {table, events} = Table.Timer.timeout(table)
-    notify(table, IO.inspect(events))
-    IO.inspect(Map.get(table.board, :state))
+    notify(table, events)
     {:noreply, table}
   end
   def handle_info(other, table) do
@@ -218,7 +217,8 @@ defmodule Yagg.Table do
     case Yagg.Table.Action.resolve(action, table, player) do
       {:err, _} = err -> err
       :shutdown_table -> :shutdown_table
-      {table, events} ->
+      {newtable, events} ->
+        {table, events} = handle_timer(table.board, newtable, events)
         notify(table, events)
         {:ok, table}
     end
@@ -256,10 +256,16 @@ defmodule Yagg.Table do
     events
   end
 
-  defp handle_timer(%Jobfair{}, %{board: %{state: %State.Placement{}}} = table, events) do
+  defp handle_timer(:nil, %{board: %{}} = table, events) do
     Table.Timer.start_timed_phase(table, events)
   end
-  defp handle_timer(%{state: %State.Placement{}}, %{board: %{state: :battle}} = table, events) do
+  defp handle_timer(%State.Gameover{}, %{board: %Jobfair{}} = table, events) do
+    Table.Timer.start_timed_phase(table, events)
+  end
+  defp handle_timer(%State.Gameover{}, %{board: %{state: %State.Placement{}}} = table, events) do
+    Table.Timer.start_timed_phase(table, events)
+  end
+  defp handle_timer(%Jobfair{}, %{board: %{state: %State.Placement{}}} = table, events) do
     Table.Timer.start_timed_phase(table, events)
   end
   defp handle_timer(%{state: :battle}, %{board: %{state: %State.Gameover{}}} = table, events) do
@@ -268,8 +274,7 @@ defmodule Yagg.Table do
     end
     {table, events}
   end
-  defp handle_timer(x, table, events) do
-    IO.inspect([:notimer, x, table.board])
+  defp handle_timer(_, table, events) do
     {table, events}
   end
 

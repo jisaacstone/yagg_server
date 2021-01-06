@@ -135,7 +135,7 @@ defmodule YaggTest.Action.Ability do
   end
 
   test "spark" do
-    sparkle = %{Unit.Maycorn.new(:south) | ability: Unit.Maycorn.Spark.Front}
+    sparkle = %{Unit.Maycorn.new(:south) | ability: Unit.Maycorn.Spark.Spark}
     tink = Unit.Tinker.new(:north)
     board = set_board([
       {{4, 2}, sparkle},

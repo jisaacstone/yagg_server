@@ -7,7 +7,7 @@ import * as Ready from './ready.js';
 import * as Dialog from './dialog.js';
 import * as Jobfair from './jobfair.js';
 import * as Overlay from './overlay.js';
-import * as Player from './playerdata.js';
+import * as Player from './player.js';
 import * as Feature from './feature.js';
 import * as Hand from './hand.js';
 import * as AbilityEvent from './abilty_event.js';
@@ -63,7 +63,7 @@ export function battle_started() {
     gamestatechange('battle');
 }
 export function player_joined({ player, position }) {
-    const nameEl = Element.create({ className: 'playername', innerHTML: player.name }), thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois), avatarEl = Player.avatar(player), playerDetailsEl = Element.create({ className: 'playerdetails', children: [avatarEl, nameEl] });
+    const thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois), playerDetailsEl = Player.render(player);
     if (container.firstElementChild && container.firstElementChild.className === 'playername') {
         return;
     }

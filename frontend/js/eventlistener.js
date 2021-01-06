@@ -1,5 +1,5 @@
 import { tableid, hostname } from './urlvars.js';
-import * as Player from './playerdata.js';
+import * as Player from './player.js';
 import * as Event from './event.js';
 const state = {
     eventListener: null,

@@ -1,4 +1,5 @@
 alias Yagg.{Endpoint, Event, Table}
+alias Yagg.Board.Configuration
 alias Yagg.Table.Player
 alias Yagg.Table.Action.Join
 
@@ -65,6 +66,19 @@ defmodule YaggTest.Endpoint do
     assert event_type == :player_joined
   end
 
+  test "timer" do
+    %{id: bob_id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
+    %{status: status, resp_body: body} = send_json("/table/new", ~s({"configuration": "fivers"}), bob_id)
+    assert status == 200
+    assert %{"id" => gid} = Poison.decode!(body)
+    :ok = Table.table_action(gid, Player.new("player1"), %Join{})
+    {:ok, _pid} = Table.subscribe(gid, "bob")
+    :ok = Table.table_action(gid, bob_id, %Join{})
+    %{kind: :timer} = recieve_event()
+    %{kind: :player_joined} = recieve_event()
+    %{kind: :game_started} = recieve_event()
+  end
+
   test "game configurations" do
     %{status: 200, resp_body: body} = conn(:get, "/configurations") |> Endpoint.call(@opts)
     configurations = Poison.decode!(body)
@@ -74,7 +88,7 @@ defmodule YaggTest.Endpoint do
   test "start game" do
     %{id: id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
     %{id: p2id} = call_200("/player/guest", %{"name" => "jame"})
-    %{id: table_id} = call_200("/table/new", %{}, id)
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "strat"}, id)
     call_204("/table/#{table_id}/a/join", %{}, id)
     call_204("/table/#{table_id}/a/join", %{}, p2id)
     table = get_200("/table/#{table_id}/state")

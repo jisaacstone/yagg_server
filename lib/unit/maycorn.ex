@@ -14,7 +14,7 @@ defmodule Unit.Maycorn do
       :maycorn,
       3,
       4,
-      Maycorn.Spark.Front,
+      Maycorn.Spark.Spark,
       %{
         death: Maycorn.Spark.All
       }
@@ -46,7 +46,7 @@ end
 
 defmodule Unit.Maycorn.Spark do
   alias Unit.Maycorn
-  defmodule Front do
+  defmodule Spark do
     @moduledoc """
     Fire a spark forward that kills units having defense less than this unit's attack
     """

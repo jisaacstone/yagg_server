@@ -84,3 +84,14 @@ export function avatar({ id, name }): HTMLElement {
   el.style.filter = `hue-rotate(${nameToNum % 36}0deg)`;
   return el;
 }
+
+export function render(player: PlayerData): HTMLElement {
+  return Element.create({
+    className: 'playerdetails',
+    children: [
+      Element.create({ className: 'playername', innerHTML: player.name }),
+      avatar(player),
+      Element.create({ className: 'timer' })
+    ]
+  });
+}

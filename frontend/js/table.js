@@ -1,7 +1,7 @@
 import { tableid } from './urlvars.js';
 import { gmeta } from './state.js';
 import { listen } from './eventlistener.js';
-import * as Player from './playerdata.js';
+import * as Player from './player.js';
 import * as Request from './request.js';
 import * as Overlay from './overlay.js';
 import * as Event from './event.js';

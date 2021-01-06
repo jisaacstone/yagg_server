@@ -1,5 +1,5 @@
 import { hostname, getname, tableid } from './urlvars.js';
-import * as Player from './playerdata.js';
+import * as Player from './player.js';
 import * as Infobox from './infobox.js';
 const dn = { name: null };
 function _name_() {
