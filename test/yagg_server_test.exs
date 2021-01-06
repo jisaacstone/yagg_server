@@ -1,5 +1,4 @@
 alias Yagg.{Endpoint, Event, Table}
-alias Yagg.Board.Configuration
 alias Yagg.Table.Player
 alias Yagg.Table.Action.Join
 

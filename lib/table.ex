@@ -259,10 +259,10 @@ defmodule Yagg.Table do
   defp handle_timer(:nil, %{board: %{}} = table, events) do
     Table.Timer.start_timed_phase(table, events)
   end
-  defp handle_timer(%State.Gameover{}, %{board: %Jobfair{}} = table, events) do
+  defp handle_timer(%{state: %State.Gameover{}}, %{board: %Jobfair{}} = table, events) do
     Table.Timer.start_timed_phase(table, events)
   end
-  defp handle_timer(%State.Gameover{}, %{board: %{state: %State.Placement{}}} = table, events) do
+  defp handle_timer(%{state: %State.Gameover{}}, %{board: %{state: %State.Placement{}}} = table, events) do
     Table.Timer.start_timed_phase(table, events)
   end
   defp handle_timer(%Jobfair{}, %{board: %{state: %State.Placement{}}} = table, events) do
