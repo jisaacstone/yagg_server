@@ -9,7 +9,7 @@ defmodule Unit.Shenamouse do
     Unit.new(
       position: position,
       name: :shenamouse,
-      attack: 1,
+      attack: 3,
       defense: 6,
       ability: Unit.Shenamouse.Spy,
       triggers: %{

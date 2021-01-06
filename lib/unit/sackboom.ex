@@ -11,8 +11,8 @@ defmodule Unit.Sackboom do
     Unit.new(
       position,
       :sackboom,
-      3,
-      6,
+      7,
+      4,
       :nil,
       %{move: Unit.Sackboom.Move.Zero}
     )
