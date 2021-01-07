@@ -88,5 +88,6 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   display: grid;
-  place-content: start;
+  align-content: center;
+  justify-content: start;
 }

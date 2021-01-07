@@ -55,11 +55,16 @@ defmodule Yagg.Endpoint do
       fn (pid) ->
         id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
         {:ok, table} = Table.get_state(pid)
-        %{id: id, players: table.players, config: table.configuration}
+        %{id: id, players: table.players, config: table.configuration, state: state(table.board)}
       end
     )
     respond(conn, 200, %{tables: tables})
   end
+
+  def state(%Yagg.Jobfair{}), do: :jobfair
+  def state(%{state: :battle}), do: :battle
+  def state(%{state: %{__struct__: stst}}), do: Module.split(stst) |> Enum.reverse() |> hd() |> String.downcase()
+  def state(other), do: other
 
   post "/board/:table_id/a/:action" do
     case prep_action(Board.Action, action, conn) do

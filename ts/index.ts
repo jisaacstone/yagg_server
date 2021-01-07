@@ -34,7 +34,6 @@ function displayTableData(tablesEl, data) {
 }
 
 function renderTable({ config }, child): HTMLElement {
-  console.log(config);
   return Element.create({
     className: 'table',
     children: [
@@ -60,7 +59,7 @@ function displayTables(tablesEl, tables, currentId) {
       };
       tablesEl.prepend(el);
       displayedTables[table.id] = el;
-    } else if (table.players.length === 1) {
+    } else if (table.players.length === 1 && !table.state) {
       if (toRemove.has(table.id)) {
         toRemove.delete(table.id);
         continue;
