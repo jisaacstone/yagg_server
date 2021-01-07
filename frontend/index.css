@@ -65,24 +65,44 @@ body > div, body > form {
 .table {
   border: 0.2em inset var(--ui-main-saturated);
   border-radius: 5px;
-  padding: 5px 2px;
   margin: 2px;
   background-color: var(--ui-alt-light);
   text-align: center;
   cursor: pointer;
   color: var(--ui-alt-dark);
   text-shadow: -0.05em -0.05em 0.05em var(--white-transparent-med);
-  display: flex;
-  flex-flow: row wrap;
-  place-content: space-around;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  place-content: stretch;
 }
 
 .table div {
-  margin: 2px max(1vh, 1vw);
+  padding: 0.3em;
+}
+
+.config-name {
+  color: var(--ui-main-dark);
+  border-right: 2px inset var(--ui-main-dark);
+  display: grid;
+  place-content: center;
+  background-color: var(--ui-main-desaturated-transparent);
 }
 
 .table:hover {
   border-style: outset;
+}
+
+.table .playerdetails {
+  grid-template-columns: 1.5em 1fr;
+}
+
+.table .avatar {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.table .playername {
+  font-weight: normal;
 }
 
 #player {
@@ -103,7 +123,11 @@ body > div, body > form {
   align-items: center;
 }
 
-.avatar {
+#player .playerdetails {
+  grid-template-columns: 4em 1fr;
+}
+
+#player .avatar {
   width: 4em;
   height: 4em;
 }

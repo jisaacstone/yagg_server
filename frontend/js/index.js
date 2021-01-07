@@ -20,11 +20,12 @@ function displayTableData(tablesEl, data) {
     if (!data.tables || !data.tables.length) {
         tablesEl.innerHTML = '<p>No open tables right now';
     }
-    Player.get().then(({ name }) => {
-        displayTables(tablesEl, data.tables, name);
+    Player.get().then(({ id }) => {
+        displayTables(tablesEl, data.tables, +id);
     });
 }
-function renderTable({ config }, text) {
+function renderTable({ config }, child) {
+    console.log(config);
     return Element.create({
         className: 'table',
         children: [
@@ -32,41 +33,31 @@ function renderTable({ config }, text) {
                 className: 'config-name',
                 innerHTML: config.name
             }),
-            Element.create({
-                className: 'dimensions',
-                innerHTML: `${config.dimensions.x}x${config.dimensions.y}`
-            }),
-            Element.create({
-                className: 'tabletxt',
-                innerHTML: text
-            })
+            child
         ]
     });
 }
-function displayTables(tablesEl, tables, currentName) {
+function displayTables(tablesEl, tables, currentId) {
     const toRemove = new Set(Object.keys(displayedTables));
     for (const table of tables) {
-        if (currentName && table.players.some(({ name }) => name === currentName)) {
+        if (currentId && table.players.some(({ player }) => player.id === currentId)) {
             if (toRemove.has(table.id)) {
                 toRemove.delete(table.id);
                 continue;
             }
-            const el = renderTable(table, 'REJOIN');
+            const el = renderTable(table, Element.create({ innerHTML: 'REJOIN' }));
             el.onclick = () => {
                 window.location.href = `board.html?table=${table.id}`;
             };
             tablesEl.prepend(el);
             displayedTables[table.id] = el;
         }
-        else if (table.players.length < 2) {
+        else if (table.players.length === 1) {
             if (toRemove.has(table.id)) {
                 toRemove.delete(table.id);
                 continue;
             }
-            const el = renderTable(table, 'JOIN');
-            table.players.forEach(({ name }) => {
-                el.appendChild(Element.create({ className: 'playername', innerHTML: name }));
-            });
+            const el = renderTable(table, renderPlayer(table.players[0].player));
             el.onclick = () => {
                 gameaction('join', {}, 'table', table.id).then(() => {
                     window.location.href = `board.html?table=${table.id}`;
@@ -87,9 +78,9 @@ function fetchTableData() {
         displayTableData(tables, tabledata);
     }).catch((e) => console.log({ e }));
 }
-function showPlayer({ id, name }) {
-    const container = document.getElementById('player'), nameEl = Element.create({ className: 'playername', innerHTML: name }), avatarEl = Player.avatar({ id, name }), playerDetailsEl = Element.create({ className: 'playerdetails', children: [avatarEl, nameEl] });
-    container.appendChild(playerDetailsEl);
+function renderPlayer({ id, name }) {
+    const nameEl = Element.create({ className: 'playername', innerHTML: name }), avatarEl = Player.avatar({ id, name }), playerDetailsEl = Element.create({ className: 'playerdetails', children: [avatarEl, nameEl] });
+    return playerDetailsEl;
 }
 window.onload = function () {
     const ct = document.getElementById('createtable'), sel_el = document.getElementById('config');
@@ -106,7 +97,7 @@ window.onload = function () {
         fetchConfigs(sel_el);
         fetchTableData();
         window.setInterval(fetchTableData, 2000);
-        showPlayer(player);
+        document.getElementById('player').appendChild(renderPlayer(player));
         ct.onclick = () => {
             const conf = sel_el.value;
             if (!conf) {

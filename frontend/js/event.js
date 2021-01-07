@@ -34,6 +34,7 @@ export function multi({ events }) {
 export function game_started(event) {
     const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
     Hand.clear();
+    Ready.hide();
     if (event.army_size || gmeta.phase === 'jobfair') {
         if (gmeta.boardstate === 'gameover') {
             Board.clear();

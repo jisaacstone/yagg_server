@@ -43,6 +43,9 @@ body {
   #infobox .info {
     width: min(43vh, 19vw);
   }
+  .dropdown .dismiss {
+    right: 1px;
+  }
   #jobfair {
     grid-column: 2 / span 2;
     grid-row: 1 / span 5;
@@ -53,9 +56,6 @@ body {
   #jobfair .candidate {
     min-height: 20vw;
     max-height: 23vw;
-  }
-  .dropdown .dismiss {
-    right: 1px;
   }
 }
 
@@ -71,7 +71,7 @@ body {
       "hand     hand     hand";
   }
   #table {
-    padding-top: 0.5em;
+    padding-top: 0.13em;
   }
   #board {
     width: min(60vh, 95vw);
@@ -92,12 +92,23 @@ body {
     justify-self: center;
   }
   #infobox .info {
-    width: min(38vw, 23vh);
-    height: min(39vw, 23vh);
+    width: min(38vw, 24vh);
+    height: min(39vw, 24vh);
+  }
+  .dropdown .dismiss {
+    left: 1px;
+  }
+  body[data-gamestate=jobfair] #table {
+    grid-template-columns: 26% 48% 26%;
+    grid-template-rows: 70vh minmax(0, 5fr) minmax(0, 3fr) minmax(0, 5fr);
+    grid-template-areas:
+      "jobfair  jobfair  jobfair"
+      "buttons  infobox  opponent"
+      "buttons  infobox  timer"
+      "buttons  infobox  player";
   }
   #jobfair {
-    grid-column: 1 / span 3;
-    grid-row: 2 / span 1;
+    grid-area: jobfair;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     height: 100%;
     border-top: 2px inset var(--ui-alt-dark);
@@ -107,9 +118,6 @@ body {
   #jobfair .candidate {
     min-height: 33vw;
     max-height: 37vw;
-  }
-  .dropdown .dismiss {
-    left: 1px;
   }
 }
 
@@ -125,7 +133,11 @@ body[data-gamestate=jobfair] {
   background-image: url("img/paper_bg_grn.png");
 }
 
-body[data-gamestate=jobfair] #board {
+body:not([data-gamestate]) #table {
+  display: none;
+}
+body[data-gamestate=jobfair] #board,
+body[data-gamestate=jobfair] #hand {
   display: none;
 }
 
