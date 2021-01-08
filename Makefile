@@ -6,3 +6,6 @@ betest:
 
 server:
 	tsc && iex -S mix
+
+built:
+	./febuild && docker build . -t yagg

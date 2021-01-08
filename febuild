@@ -13,15 +13,14 @@ cp -r frontend/icons build/
 tsc
 cp -r frontend/js build
 
-mkdir build/img
+mkdir -p build/img/howto
 
 # delete metadata
-exiftool -All= frontend/img/*.png
+exiftool -All= -r -overwrite_original_in_place frontend/img/*.png
 
 # optimize images
 while IFS= read -r -d $'\0' path; do
-  file=$( basename "$path" )
-  cat "${path}" | pngquant - > "build/img/${file}"
-done < <(find frontend/img -name "*.png" -print0)
+  cat "frontend/img/${path}" | pngquant - > "build/img/${path}"
+done < <(cd frontend/img && find . -name "*.png" -print0)
 
 ( cd build && zip -r ../yagg ./* )

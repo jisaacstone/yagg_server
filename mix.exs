@@ -6,7 +6,7 @@ defmodule YaggServer.MixProject do
       app: :yagg_server,
       version: "0.1.0",
       elixir: "~> 1.10",
-      start_permanent: Mix.env() == :prod,
+      start_permanent: :true,
       deps: deps(),
       elixirc_paths: compiler_paths(Mix.env()),
       dialyzer: [
