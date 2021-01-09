@@ -1,6 +1,11 @@
+import { external_backend } from './exthost.js';
 export function hostname() {
-    const host = window.location.hostname, port = window.location.port, hostname = port ? `${host}:${port}` : host;
-    return hostname;
+    const remote = external_backend();
+    if (remote) {
+        return remote;
+    }
+    const host = window.location.hostname, port = window.location.port, local = port ? `${host}:${port}` : host;
+    return local;
 }
 export function getname() {
     const urlParams = new URLSearchParams(window.location.search);

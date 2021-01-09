@@ -12,6 +12,12 @@ defmodule YaggServer.MixProject do
       dialyzer: [
         flags: [:unmatched_returns, :error_handling, :race_conditions, :unknown],
       ],
+      releases: [
+        prod: [
+          include_executables_for: [:unix],
+          applications: [runtime_tools: :permanent]
+        ],
+      ]
     ]
   end
 
