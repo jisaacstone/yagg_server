@@ -1,0 +1,11 @@
+[Unit]
+Description=Yagg Server
+
+[Service]
+Restart=on-failure
+Environment=PORT=80
+WorkingDirectory=/yagg
+ExecStart=/yagg/_build/prod/rel/yagg/bin/yagg start
+
+[Install]
+WantedBy=multi-user.target

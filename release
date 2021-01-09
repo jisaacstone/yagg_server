@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -ex
+
+if [ -z "$1" ]; then
+  echo 'hostname required'
+  exit 1
+fi
+
+release=${2:-full}
+hostname="$1"
+host="root@${hostname}"
+
+if [[ "${release}" =~ full ]]; then
+  ssh ${host} "mkdir -p /yagg"
+  scp mix.* ${host}:/yagg
+  ssh ${host} "cd /yagg && mix do local.hex --force, local.rebar --force, deps.get, deps.compile"
+  scp yagg.service ${host}:/etc/systemd/system/
+  ssh ${host} "systemctl enable yagg"
+fi
+
+if [[ "${release}" =~ back|full ]]; then
+  scp -r lib ${host}:/yagg
+  ssh ${host} "cd /yagg && systemctl stop yagg && rm -rf ./build_ && MIX_ENV=prod mix release yagg"
+  ssh ${host} "semanage fcontext -a -t bin_t /yagg/_build/prod/rel/yagg/bin/yagg && chcon -Rv -u system_u -t bin_t /yagg/_build/prod/rel/yagg/bin/yagg && systemctl start yagg"
+fi
+
+if [[ "${release}" =~ front|full ]]; then
+  sed -ie "s/''/${hostname}/" build/js/exthost.js
+  scp -r build ${host}:/yagg/frontend
+fi

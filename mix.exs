@@ -13,7 +13,7 @@ defmodule YaggServer.MixProject do
         flags: [:unmatched_returns, :error_handling, :race_conditions, :unknown],
       ],
       releases: [
-        prod: [
+        yagg: [
           include_executables_for: [:unix],
           applications: [runtime_tools: :permanent]
         ],
