@@ -43,7 +43,7 @@ defmodule Table.Timer do
     {grid, events} = Grid.reveal_units(table.board.grid)
     winner = case ready do
       :nil -> :draw
-      position -> Table.Player.opposite(position)
+      position -> position
     end
     board = %{table.board | state: %State.Gameover{winner: winner}, grid: grid}
     {%{table | board: board}, [Event.Gameover.new(winner: winner) | events]}

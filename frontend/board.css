@@ -347,6 +347,10 @@ body[data-gamestate=gameover] {
   width: 33%;
 }
 
+.unit.monarch.immobile::before {
+  visibility: hidden;
+}
+
 .unit-attack {
   color: var(--ui-main-dark);
   border-color: rgba(199, 45, 46, 0.4);

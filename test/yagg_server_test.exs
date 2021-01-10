@@ -1,6 +1,8 @@
 alias Yagg.{Endpoint, Event, Table}
 alias Yagg.Table.Player
 alias Yagg.Table.Action.Join
+alias Yagg.Board
+import Helper.Board
 
 defmodule YaggTest.Endpoint do
   use ExUnit.Case
@@ -73,9 +75,27 @@ defmodule YaggTest.Endpoint do
     :ok = Table.table_action(gid, Player.new("player1"), %Join{})
     {:ok, _pid} = Table.subscribe(gid, "bob")
     :ok = Table.table_action(gid, bob_id, %Join{})
-    %{kind: :timer} = recieve_event()
-    %{kind: :player_joined} = recieve_event()
-    %{kind: :game_started} = recieve_event()
+    assert %{kind: :timer} = recieve_event()
+    assert %{kind: :player_joined} = recieve_event()
+    assert %{kind: :game_started} = recieve_event()
+  end
+
+  test "ready timeout" do
+    player1 = Table.Player.new("north")
+    player2 = Table.Player.new("south")
+    board = new_board() |> Map.put(:state, %Board.State.Placement{ready: :north})
+    table = %Table{
+      id: :test, turn: :nil, board: board,
+      history: [], players: [north: player1, south: player2],
+      timer: Process.send_after(self(), :timeout, 0),
+      configuration: %{}, subscribors: []}
+    {:ok, pid} = Table.start_link([table])
+    tid = Table.pid_to_id(pid)
+
+    {:ok, pid} = Table.subscribe(tid, "south")
+    Process.sleep(1)
+    send(pid, :timeout)
+    assert %{kind: :gameover, data: %{winner: :north}} = recieve_event()
   end
 
   test "game configurations" do
