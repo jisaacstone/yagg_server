@@ -57,7 +57,7 @@ defmodule Yagg.Table do
       history: [],
       timer: nil,
     }
-    DynamicSupervisor.start_child(
+    {:ok, pid} = DynamicSupervisor.start_child(
       Yagg.TableSupervisor,
       %{
         id: Yagg.Table,
@@ -65,6 +65,8 @@ defmodule Yagg.Table do
         restart: :transient
       }
     )
+    IO.inspect(table: pid, config: configuration)
+    {:ok, pid}
   end
 
   # API
