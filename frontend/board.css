@@ -328,19 +328,23 @@ body[data-gamestate=gameover] {
   position: relative;
   left: 0;
   top: 0;
-  width: 67%;
+  width: 64%;
   height: 46%;
   margin: 0 auto;
   background: center / contain no-repeat url("img/crowns.png");
   display: block;
   content: "";
-  transform: rotate(-13deg);
+  transform: rotate(-9deg);
   grid-row: 1 / span 3;
   grid-column: 1 / span 3;
 }
 
 .unit.monarch.north::before {
   background-image: url("img/crownn.png");
+}
+
+.unit.monarch.details::before {
+  width: 33%;
 }
 
 .unit-attack {
@@ -582,7 +586,10 @@ body[data-gamestate=gameover] {
   text-align: center;
   padding-top: 10px;
   flex-grow: 1;
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: grid;
 }
 
 .feature.block {
@@ -598,6 +605,18 @@ body[data-gamestate=gameover] {
   border: 0.2em inset var(--water-alt);
   background-image: url("img/water.png");
   background-color: var(--water-main);
+}
+
+.feature .text {
+  color: var(--ui-main-dark-dark);
+  font-size: 130%;
+  width: 100%;
+  place-self: end;
+  padding: 0.3em;
+}
+
+.feature.water .text {
+  height: 38%;
 }
 
 /* UIState */

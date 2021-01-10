@@ -7,6 +7,9 @@ import * as Unit from './unit.js';
 import * as Infobox from './infobox.js';
 import * as Element from './element.js';
 const global = { selected: null };
+export function selected() {
+    return global.selected !== null;
+}
 function action(actType, args, cb = null) {
     gameaction(actType, args, 'board')
         .then(() => {

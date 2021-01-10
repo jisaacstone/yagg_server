@@ -9,6 +9,10 @@ import * as Element from './element.js';
 
 const global = { selected: null };
 
+export function selected(): boolean {
+  return global.selected !== null;
+}
+
 function action(actType, args, cb=null) {
   gameaction(actType, args, 'board')
     .then(() => {
