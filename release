@@ -22,10 +22,10 @@ fi
 if [[ "${release}" =~ back|full ]]; then
   scp -r lib ${host}:/yagg
   ssh ${host} "cd /yagg && systemctl stop yagg && rm -rf ./build_ && MIX_ENV=prod mix release yagg"
-  ssh ${host} "semanage fcontext -a -t bin_t /yagg/_build/prod/rel/yagg/bin/yagg && chcon -Rv -u system_u -t bin_t /yagg/_build/prod/rel/yagg/bin/yagg && systemctl start yagg"
+  ssh ${host} "chcon -Rv -u system_u -t bin_t /yagg/_build/prod/rel/yagg/bin/yagg && systemctl start yagg"
 fi
 
 if [[ "${release}" =~ front|full ]]; then
-  sed -ie "s/''/${hostname}/" build/js/exthost.js
+  ./febuild
   scp -r build ${host}:/yagg/frontend
 fi

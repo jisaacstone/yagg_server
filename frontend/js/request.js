@@ -16,7 +16,7 @@ function add_auth(request, method, url) {
 }
 export function gameaction(action, data, scope = 'table', id = null) {
     const tableId = id || tableid();
-    const host = hostname(), url = `http://${host}/${scope}/${tableId}/a/${action}`;
+    const host = hostname(), url = `${host}/${scope}/${tableId}/a/${action}`;
     return Player.get().then(({ id }) => {
         Infobox.clear();
         return new Promise(function (resolve, reject) {
@@ -40,7 +40,7 @@ export function gameaction(action, data, scope = 'table', id = null) {
     });
 }
 export function request(path, auth = true) {
-    const host = hostname(), url = `http://${host}/${path}`, idfn = auth ? Player.get : () => Promise.resolve({ id: null });
+    const host = hostname(), url = `${host}/${path}`, idfn = auth ? Player.get : () => Promise.resolve({ id: null });
     return idfn().then(({ id }) => {
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
@@ -69,7 +69,7 @@ export function request(path, auth = true) {
     });
 }
 export function post(path, body) {
-    const host = hostname(), url = `http://${host}/${path}`;
+    const host = hostname(), url = `${host}/${path}`;
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function () {

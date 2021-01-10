@@ -7,8 +7,9 @@ export function hostname() {
   }
   const host = window.location.hostname,
     port = window.location.port,
+    proto = window.location.protocol,
     local = port ? `${host}:${port}` : host;
-  return local;
+  return `${proto}//${local}`;
 }
 
 export function getname() {

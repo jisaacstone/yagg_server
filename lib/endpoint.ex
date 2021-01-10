@@ -5,7 +5,11 @@ alias Yagg.Board.Configuration
 defmodule Yagg.Endpoint do
   use Plug.Router
 
-  plug(CORSPlug)
+  plug(
+    CORSPlug,
+    origin: ["https://jisaacstone.itch.io", "https://yagg-game.com", "http://jelly.jisaacstone.com", ~r"https://\w+\.ssl\.hwcdn\.net"],
+    headers: ["x-userid" | CORSPlug.defaults()[:headers]]
+  )
   plug(Plug.Static, at: "/fe", from: "./frontend")
 
   plug :match

@@ -4,8 +4,8 @@ export function hostname() {
     if (remote) {
         return remote;
     }
-    const host = window.location.hostname, port = window.location.port, local = port ? `${host}:${port}` : host;
-    return local;
+    const host = window.location.hostname, port = window.location.port, proto = window.location.protocol, local = port ? `${host}:${port}` : host;
+    return `${proto}//${local}`;
 }
 export function getname() {
     const urlParams = new URLSearchParams(window.location.search);

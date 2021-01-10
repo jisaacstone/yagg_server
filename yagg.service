@@ -4,6 +4,7 @@ Description=Yagg Server
 [Service]
 Restart=on-failure
 Environment=PORT=80
+Environment=MIX_ENV=prod
 WorkingDirectory=/yagg
 ExecStart=/yagg/_build/prod/rel/yagg/bin/yagg start
 

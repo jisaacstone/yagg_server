@@ -1,10 +1,27 @@
 defmodule Yagg.Application do
   use Application
 
-  def start(_type, _args) do
-    port = System.get_env("PORT", "8000") |> String.to_integer()
-    secure_port = System.get_env("SECURE_PORT", "443") |> String.to_integer()
-    children = [
+  def server_spec() do
+    if System.get_env("MIX_ENV") == "prod" do
+      Plug.Cowboy.child_spec(
+        scheme: :https,
+        ip: {0, 0, 0, 0},
+        plug: Yagg.Endpoint,
+        protocol_options: [idle_timeout: :infinity],
+        options: [
+          port: 443,
+          cipher_suite: :strong,
+          otp_app: :secure_app,
+          keyfile: "/etc/letsencrypt/live/yagg-game.com/privkey.pem",
+          certfile: "/etc/letsencrypt/live/yagg-game.com/fullchain.pem",
+          dispatch: [{:_,[
+            {"/ws/[...]", Yagg.Websocket, []},
+            {:_, Plug.Cowboy.Handler, {Yagg.Endpoint, []}}
+          ]}]
+        ]
+      )
+    else 
+      port = System.get_env("PORT", "8000") |> String.to_integer()
       Plug.Cowboy.child_spec(
         scheme: :http,
         ip: {0, 0, 0, 0},
@@ -17,23 +34,13 @@ defmodule Yagg.Application do
             {:_, Plug.Cowboy.Handler, {Yagg.Endpoint, []}}
           ]}]
         ]
-      ),
-      Plug.Cowboy.child_spec(
-        scheme: :https,
-        ip: {0, 0, 0, 0},
-        plug: Yagg.Endpoint,
-        protocol_options: [idle_timeout: :infinity],
-        options: [
-          port: secure_port,
-          otp_app: :secure_app,
-          keyfile: "/etc/letsencrypt/live/yagg-game.com/fullchain.pem",
-          certfile: "/etc/letsencrypt/live/yagg-game.com/cert.pem",
-          dispatch: [{:_,[
-            {"/ws/[...]", Yagg.Websocket, []},
-            {:_, Plug.Cowboy.Handler, {Yagg.Endpoint, []}}
-          ]}]
-        ]
-      ),
+      )
+    end
+  end
+
+  def start(_type, _args) do
+    children = [
+      server_spec(),
       {DynamicSupervisor, name: Yagg.TableSupervisor, strategy: :one_for_one},
       {DynamicSupervisor, name: Yagg.AISupervisor, strategy: :one_for_one},
     ]

@@ -72,9 +72,10 @@ function readEventQueu(delay = 50) {
 }
 
 function createWSEventListener() {
-  const host = hostname();
+  const host = hostname(),
+    wshost = host.replace('http', 'ws');
   Player.get().then(({ id }) => {
-    state.eventListener = new WebSocket(`ws://${host}/ws/${tableid()}/${id}`);
+    state.eventListener = new WebSocket(`${wshost}/ws/${tableid()}/${id}`);
 
     state.eventListener.onmessage = (event) => {
       const evt = JSON.parse(event.data);
