@@ -1,11 +1,11 @@
 import { gameaction } from './request.js';
-import * as Constants from './constants.js';
 import { gmeta, isYourTurn } from './state.js';
 import { displayerror } from './err.js';
 import { dismissable, clear } from './overlay.js';
 import * as Select from './select.js';
 import * as Dialog from './dialog.js';
 import * as Element from './element.js';
+import * as Triggers from './triggers.js';
 function bindAbility(abilityButton, square, unit, cb = null) {
     abilityButton.onclick = (e) => {
         if (gmeta.boardstate !== 'battle' ||
@@ -109,30 +109,17 @@ function infoview(unit, el, squareEl) {
         for (const [name, trigger] of Object.entries(unit.triggers)) {
             triggers.appendChild(Element.create({
                 className: 'trigger-symbol',
-                innerHTML: symbolFor(name),
+                innerHTML: Triggers.symbolFor(name),
                 children: [
                     Element.create({
                         className: 'tooltip',
-                        innerHTML: trigger.description
+                        innerHTML: `${Triggers.timingOf(name)}: ${trigger.description}`
                     })
                 ]
             }));
         }
         el.appendChild(triggers);
     }
-}
-function symbolFor(trigger) {
-    if (trigger === 'move') {
-        return Constants.MOVE;
-    }
-    if (trigger === 'death') {
-        return Constants.SKULL;
-    }
-    if (trigger === 'attack') {
-        return Constants.ATTACK;
-    }
-    console.log({ warn: 'unknown trigger', trigger });
-    return '?';
 }
 const fakeDescriptions = [
     'Listens to smooth jazz',
@@ -188,11 +175,11 @@ function describe(unit, square = null) {
                 children: [
                     Element.create({
                         className: 'trigger-symbol',
-                        innerHTML: symbolFor(name),
+                        innerHTML: Triggers.symbolFor(name),
                         children: [
                             Element.create({
                                 className: 'tooltip',
-                                innerHTML: `On ${name}`
+                                innerHTML: Triggers.timingOf(name)
                             })
                         ]
                     }),

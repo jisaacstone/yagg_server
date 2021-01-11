@@ -43,12 +43,14 @@ export function gamestatechange(newstate: string): void {
 }
 
 export function turnchange(player) {
+  (document.querySelector('#table') as HTMLElement).dataset.yourturn = '';
   gmeta.turn = player;
   if (player == null) {
     document.getElementsByTagName('body')[0].dataset.turn = null;
     (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'false';
     (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'false';
   } else if (player === gmeta.position) {
+    (document.querySelector('#table') as HTMLElement).dataset.yourturn = 'yes';
     document.getElementsByTagName('body')[0].dataset.turn = 'player';
     (document.querySelector('#player .playername') as HTMLElement).dataset.turn = 'true';
     (document.querySelector('#opponent .playername') as HTMLElement).dataset.turn = 'false';

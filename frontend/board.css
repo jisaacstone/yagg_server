@@ -12,7 +12,7 @@ body {
 @media (orientation: landscape) {
   #table {
     grid-template-columns: minmax(0, 1fr) min(60vw, 100vh) minmax(0, 1fr);
-    grid-template-rows: 12% 45% 10% 21% 12%;
+    grid-template-rows: 11% 45% 10% 23% 11%;
     grid-template-areas:
       "opponent board  hand"
       "infobox  board  hand"
@@ -290,16 +290,6 @@ body[data-gamestate=gameover] {
   cursor: pointer;
 }
 
-.unit.north .uibutton,
-.unit.north button {
-  border-color: var(--north-saturated);
-}
-
-.unit.south .uibutton,
-.unit.south button {
-  border-color: var(--south-saturated);
-}
-
 .unit.north {
   background-color: var(--north-main);
   border-color: var(--south-saturated);
@@ -437,6 +427,12 @@ body[data-gamestate=gameover] {
   line-height: 1.5;
   text-align: center;
   width: 2em;
+  text-shadow: 0 0 0.3em white;
+  font-size: 130%;
+}
+
+.info .trigger-symbol {
+  animation: glow 4s linear infinite;
 }
 
 .unit-trigger {
@@ -462,6 +458,17 @@ body[data-gamestate=gameover] {
   margin-top: 20px;
   font-size: 200%;
   text-align: center;
+}
+
+#table[data-yourturn=yes] #board .unit.owned.immobile,
+#table[data-yourturn=yes] #infobox .unit.owned.info {
+  animation: none;
+}
+#table[data-yourturn=yes] .unit.south.owned {
+  animation: southglow 2s linear infinite;
+}
+#table[data-yourturn=yes] .unit.north.owned {
+  animation: northglow 2s linear infinite;
 }
 
 /* details */
@@ -642,7 +649,7 @@ body[data-gamestate=gameover] {
   border-width: 0.4em
 }
 
-/* Left */
+/* UI - timer */
 
 .timer {
   display: grid;
@@ -665,6 +672,8 @@ body[data-gamestate=gameover] {
   color: var(--ui-main-dark-transparent);
 }
 
+/* UI - players */
+
 #opponent, #player {
   margin: 5%;
   border-radius: 5%;
@@ -681,50 +690,11 @@ body[data-gamestate=gameover] {
   grid-area: opponent;
 }
 
-#infobox {
-  grid-area: infobox;
-  margin-left: 5%;
-  margin-right: 5%;
-  display: grid;
-}
-
-#infobox .unit {
-  margin: 0;
-  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px var(--ui-main-dark-transparent);
-}
-
 [data-turn="opponent"] #opponent .playername,
 [data-turn="player"] #player .playername {
   background-color: var(--ui-main-desaturated-transparent);
   border: 0.15em inset var(--ui-alt-saturated);
   color: var(--ui-alt-dark);
-}
-
-.playerdetails, .uibutton {
-  padding: 7px 3px;
-  margin: 3px;
-  border-radius: 0.4em;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#buttons {
-  grid-auto-flow: row;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-  display: grid;
-  grid-area: buttons;
-  justify-content: space-around;
-  place-content: stretch;
-  place-self: stretch;
-  padding: 0 0.5em;
-}
-
-#buttons .uibutton, #buttons div {
-  padding: 0.5em;
-  min-width: 60%;
-  margin: 0.5em;
 }
 
 #opponent {
@@ -757,6 +727,80 @@ body[data-gamestate=gameover] {
   grid-area: name;
   height: 1.8em;
 }
+
+/* UI - buttons */
+
+#readybutton {
+  background-image: url('img/shimmer.png');
+  animation: shimmer 8s linear infinite;
+}
+
+#leavebutton {
+  opacity: 0.6;
+}
+
+#leavebutton:hover {
+  opacity: 1;
+}
+
+.playerdetails, .uibutton {
+  padding: 7px 3px;
+  margin: 3px;
+  border-radius: 0.4em;
+}
+
+.uibutton {
+  place-content: center;
+  display: grid;
+}
+
+#table[data-yourturn=yes] .unit.info .unit-ability {
+  background-image: url('img/shimmer.png');
+  animation: shimmer 7s linear infinite;
+}
+
+.unit.north .uibutton,
+.unit.north button {
+  border-color: var(--north-saturated);
+}
+
+.unit.south .uibutton,
+.unit.south button {
+  border-color: var(--south-saturated);
+}
+
+#buttons {
+  grid-auto-flow: row;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  display: grid;
+  grid-area: buttons;
+  justify-content: space-around;
+  place-content: stretch;
+  place-self: stretch;
+  padding: 0 0.5em;
+}
+
+#buttons .uibutton, #buttons div {
+  padding: 0.5em;
+  min-width: 60%;
+  margin: 0.5em;
+}
+
+/* UI - infobox */
+
+#infobox {
+  grid-area: infobox;
+  margin-left: 5%;
+  margin-right: 5%;
+  display: grid;
+}
+
+#infobox .unit {
+  margin: 0;
+  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px var(--ui-main-dark-transparent);
+}
+
+/* UI - dropdown */
 
 .dropdown {
   width: 76%;

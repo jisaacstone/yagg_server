@@ -33,6 +33,7 @@ export function gamestatechange(newstate) {
     LeaveButton.ensureCreated();
 }
 export function turnchange(player) {
+    document.querySelector('#table').dataset.yourturn = '';
     gmeta.turn = player;
     if (player == null) {
         document.getElementsByTagName('body')[0].dataset.turn = null;
@@ -40,6 +41,7 @@ export function turnchange(player) {
         document.querySelector('#opponent .playername').dataset.turn = 'false';
     }
     else if (player === gmeta.position) {
+        document.querySelector('#table').dataset.yourturn = 'yes';
         document.getElementsByTagName('body')[0].dataset.turn = 'player';
         document.querySelector('#player .playername').dataset.turn = 'true';
         document.querySelector('#opponent .playername').dataset.turn = 'false';

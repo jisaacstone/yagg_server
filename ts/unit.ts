@@ -6,6 +6,7 @@ import { dismissable, clear } from './overlay.js';
 import * as Select from './select.js';
 import * as Dialog from './dialog.js';
 import * as Element from './element.js';
+import * as Triggers from './triggers.js';
 
 interface Ability {
   name: string;
@@ -137,31 +138,17 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
     for (const [name, trigger] of Object.entries(unit.triggers)) {
       triggers.appendChild(Element.create({
         className: 'trigger-symbol',
-        innerHTML: symbolFor(name),
+        innerHTML: Triggers.symbolFor(name),
         children: [
           Element.create({
             className: 'tooltip',
-            innerHTML: trigger.description
+            innerHTML: `${Triggers.timingOf(name)}: ${trigger.description}`
           })
         ]})
       );
     }
     el.appendChild(triggers);
   }
-}
-
-function symbolFor(trigger: string): string {
-  if (trigger === 'move') {
-    return Constants.MOVE;
-  }
-  if (trigger === 'death') {
-    return Constants.SKULL;
-  }
-  if (trigger === 'attack') {
-    return Constants.ATTACK;
-  }
-  console.log({warn: 'unknown trigger', trigger});
-  return '?';
 }
 
 const fakeDescriptions = [
@@ -222,11 +209,11 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
         children: [
           Element.create({
             className: 'trigger-symbol',
-            innerHTML: symbolFor(name),
+            innerHTML: Triggers.symbolFor(name),
             children: [
               Element.create({
                 className: 'tooltip',
-                innerHTML: `On ${name}`
+                innerHTML: Triggers.timingOf(name)
               })
             ]
           }),
