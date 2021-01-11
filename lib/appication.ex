@@ -41,6 +41,7 @@ defmodule Yagg.Application do
   def start(_type, _args) do
     children = [
       server_spec(),
+      {Registry, keys: :unique, name: Registry.TableNames},
       {DynamicSupervisor, name: Yagg.TableSupervisor, strategy: :one_for_one},
       {DynamicSupervisor, name: Yagg.AISupervisor, strategy: :one_for_one},
     ]

@@ -177,6 +177,16 @@ defmodule Yagg.Event do
     end
   end
 
+  defmodule Battle do
+    @spec new([
+      from: Board.Grid.coord,
+      to: Board.Grid.coord
+    ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :battle, params)
+    end
+  end
+
   defmodule ThingMoved do
     @spec new([
       from: Board.Grid.coord,

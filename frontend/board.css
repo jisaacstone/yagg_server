@@ -352,12 +352,14 @@ body[data-gamestate=gameover] {
 }
 
 .unit-attack {
-  color: var(--ui-main-dark);
+  color: var(--ui-main-dark-dark);
+  text-shadow: 1px 1px 1px var(--ui-main-desaturated), 0 0 1px var(--white-transparent-low);
   border-color: rgba(199, 45, 46, 0.4);
   grid-area: attack;
 }
 .unit-defense {
-  color: var(--ui-alt-dark);
+  color: var(--ui-alt-dark-dark);
+  text-shadow: 1px 1px 1px var(--ui-alt-desaturated), 0 0 1px var(--white-transparent-low);
   border-color: rgba(82, 189, 6, 0.4);
   grid-area: defense;
 }
@@ -370,8 +372,6 @@ body[data-gamestate=gameover] {
   height: 85%;
   place-self: center;
   text-align: center;
-  text-shadow: 1px 1px 1px var(--grey-transparent-med), 0 0 1px var(--white-transparent-low);
-  -webkit-text-stroke: 1px var(--black-transparent-med);
 }
 
 /* attack/defense tooltips */
@@ -524,6 +524,7 @@ body[data-gamestate=gameover] {
 .unit.details .unit-attack,
 .unit.details .unit-defense {
   font-size: max(5vw, 5vh);
+  -webkit-text-stroke: 1px var(--black-transparent-med);
 }
 
 .unit.details .unit-attack::after,

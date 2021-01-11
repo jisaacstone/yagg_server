@@ -15,7 +15,8 @@ defmodule YaggServer.MixProject do
       releases: [
         yagg: [
           include_executables_for: [:unix],
-          applications: [runtime_tools: :permanent]
+          applications: [runtime_tools: :permanent, yagg_server: :permanent],
+          cookie: "maycorn"
         ],
       ]
     ]

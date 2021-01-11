@@ -84,13 +84,13 @@ defmodule YaggTest.Endpoint do
     player1 = Table.Player.new("north")
     player2 = Table.Player.new("south")
     board = new_board() |> Map.put(:state, %Board.State.Placement{ready: :north})
+    tid = "test_table"
     table = %Table{
-      id: :test, turn: :nil, board: board,
+      id: tid, turn: :nil, board: board,
       history: [], players: [north: player1, south: player2],
       timer: Process.send_after(self(), :timeout, 0),
       configuration: %{}, subscribors: []}
-    {:ok, pid} = Table.start_link([table])
-    tid = Table.pid_to_id(pid)
+    {:ok, pid} = Table.start_link(table, [name: {:via, Registry, {Registry.TableNames, tid}}])
 
     {:ok, pid} = Table.subscribe(tid, "south")
     Process.sleep(1)

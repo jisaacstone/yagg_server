@@ -13,7 +13,7 @@ defmodule Table.Timer do
   end
 
   def start_timed_phase(table, events \\ []) do
-    milliseconds = 5 * 60 * 1000
+    milliseconds = 6 * 60 * 1000
     table = set(table, milliseconds)
     {table, [Event.Timer.new(player: :all, timer: milliseconds) | events]}
   end

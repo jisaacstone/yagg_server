@@ -25,30 +25,29 @@ defmodule Yagg.Table do
     timer: :nil | reference
   }
 
-  def start_link([table]) do
-    GenServer.start_link(__MODULE__, table)
+  def start_link(table, args \\ []) do
+    GenServer.start_link(__MODULE__, table, args)
   end
 
   def get(table_id) do
-    # will be a lookup by id eventually
-    pid = id_to_pid(table_id)
-    case Process.alive?(pid) do
-      :true -> {:ok, pid}
-      :false -> {:err, :process_ended}
+    case Registry.lookup(Registry.TableNames, table_id) do
+      [] -> {:err, :id_not_found}
+      [{pid, :nil}] -> {:ok, pid}
     end
   end
 
-  @spec list() :: [pid]
+  @spec list() :: [id]
   def list() do
-    Supervisor.which_children(Yagg.TableSupervisor)
-      |> Enum.map(fn ({_, pid, _, _}) -> pid end)
+    # get all keys (copied from the documentation)
+    Registry.select(Registry.TableNames, [{{:"$1", :_, :_}, [], [:"$1"]}])
   end
 
-  @spec new(module) :: {:ok, pid}
+  @spec new(module) :: {:ok, t}
   def new(configuration \\ Board.Configuration.Random) do
     config = configuration.new()
+    id = "#{:erlang.unique_integer([:positive])}"
     table = %Table{
-      id: :nil,
+      id: id,
       players: [],
       subscribors: [],
       board: :nil,
@@ -61,12 +60,16 @@ defmodule Yagg.Table do
       Yagg.TableSupervisor,
       %{
         id: Yagg.Table,
-        start: {Yagg.Table, :start_link, [[table]]}, 
+        start: {
+          Yagg.Table,
+          :start_link,
+          [table, [name: {:via, Registry, {Registry.TableNames, id}}]]
+        }, 
         restart: :transient
       }
     )
     IO.inspect(table: pid, config: configuration)
-    {:ok, pid}
+    {:ok, table}
   end
 
   # API
@@ -132,19 +135,10 @@ defmodule Yagg.Table do
     board_action(pid, player, action)
   end
 
-  def pid_to_id(pid) do
-    pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
-  end
-
-  def id_to_pid(id) do
-    "<0.#{id}.0>" |> to_charlist() |> :erlang.list_to_pid
-  end
-
   # Callbacks
 
   def init(%Table{} = table) do
-    id = self() |> pid_to_id()
-    {:ok, %{table | id: id}}
+    {:ok, table}
   end
 
   def handle_call(:get_state, _from, table) do
@@ -228,7 +222,7 @@ defmodule Yagg.Table do
 
   defp handle_board_action(%{id: id}, action, table) do
     case Player.by_id(table, id) do
-      :notfound -> {:err, :notfound}
+      :notfound -> {:err, :playernotfound}
       {position, _} -> handle_board_action_2(position, action, table)
     end
   end
@@ -252,7 +246,7 @@ defmodule Yagg.Table do
 
   defp handle_gameover(%State.Gameover{}, %State.Gameover{}, events), do: events
   defp handle_gameover(_, %{winner: winner}, events) do
-    [Event.Gameover.new(winner: winner) | events]
+    events ++ [Event.Gameover.new(winner: winner)]
   end
   defp handle_gameover(_, _, events) do
     events

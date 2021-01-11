@@ -46,34 +46,33 @@ defmodule YaggTest.Jobfair do
   use ExUnit.Case
 
   def start(conf \\ Board.Configuration.AlphaTest) do
-    {:ok, pid} = Table.new(conf)
-    table_id = Table.pid_to_id(pid)
-    :ok = Table.table_action(table_id, Player.new("p1"), %Action.Join{})
-    :ok = Table.table_action(table_id, Player.new("p2"), %Action.Join{})
-    {:ok, table} = Table.get_state(table_id)
-    {table_id, table}
+    {:ok, table} = Table.new(conf)
+    :ok = Table.table_action(table.id, Player.new("p1"), %Action.Join{})
+    :ok = Table.table_action(table.id, Player.new("p2"), %Action.Join{})
+    {:ok, table} = Table.get_state(table.id)
+    table
   end
 
   test "recruit" do
-    {table_id, table} = start()
+    table = start()
     {position, p1} = hd(table.players)
     choices = [0,2,4]
     action = %Action.Recruit{units: choices}
-    :ok = Table.table_action(table_id, p1, action)
-    {:ok, table} = Table.get_state(table_id)
+    :ok = Table.table_action(table.id, p1, action)
+    {:ok, table} = Table.get_state(table.id)
     fair = Map.get(table.board, position)
     assert fair.ready == :true
   end
 
   test "gamestart" do
-    {table_id, table} = start()
+    table = start()
     [{p1pos, p1}, {p2pos, p2}] = table.players
     u1 = Map.get(table.board, p1pos).choices
     u2 = Map.get(table.board, p2pos).choices
     {c1, c2} = {[0,2,4], [1,3,4]}
-    :ok = Table.table_action(table_id, p1, %Action.Recruit{units: c1})
-    :ok = Table.table_action(table_id, p2, %Action.Recruit{units: c2})
-    {:ok, table} = Table.get_state(table_id)
+    :ok = Table.table_action(table.id, p1, %Action.Recruit{units: c1})
+    :ok = Table.table_action(table.id, p2, %Action.Recruit{units: c2})
+    {:ok, table} = Table.get_state(table.id)
     assert %Board{} = table.board
     h1 = table.board.hands[p1pos]
     hu1 = Enum.map(h1, fn({_, {v, _}}) -> v end) |> MapSet.new()
@@ -135,11 +134,11 @@ defmodule YaggTest.Jobfair do
 
   end
   test 'indices' do
-    {table_id, table} = start(IndiciesTestConfig)
+    table = start(IndiciesTestConfig)
     {_, north} = Enum.find(table.players, fn({pos, _}) -> pos == :north end)
     action = %Action.Recruit{units: [10, 15, 11, 7, 6, 5, 1, 0]}
-    :ok = Table.table_action(table_id, north, action)
-    {:ok, table} = Table.get_state(table_id)
+    :ok = Table.table_action(table.id, north, action)
+    {:ok, table} = Table.get_state(table.id)
     assert %Board{} = table.board
   end
 end

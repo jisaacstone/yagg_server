@@ -213,7 +213,6 @@ export function thing_gone(event) {
     }
     else {
         const animation = () => {
-            console.log({ thing, a: thing.animate });
             const a = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
             return a.finished.then(() => {
                 thing.remove();
@@ -221,6 +220,40 @@ export function thing_gone(event) {
         };
         return { animation, squares: [`${event.x},${event.y}`] };
     }
+}
+export function battle({ from, to }) {
+    // animation only, no lasting chages
+    const attacker = Board.thingAt(from.x, from.y), defender = Board.thingAt(to.x, to.y), animation = () => {
+        const arect = attacker.getBoundingClientRect(), drect = defender.getBoundingClientRect(), xpos = arect.left, ypos = arect.top;
+        let xdiff = 0, ydiff = 0;
+        if (from.x !== to.x) {
+            xdiff = (drect.left > arect.left ? drect.left - arect.right : drect.right - arect.left) * 1.8;
+        }
+        if (from.y !== to.y) {
+            ydiff = (drect.top > arect.top ? drect.top - arect.bottom : drect.bottom - arect.top) * 1.8;
+        }
+        Object.assign(attacker.style, {
+            position: 'fixed',
+            width: arect.width + 'px',
+            height: arect.height + 'px',
+        });
+        console.log({ xdiff, ydiff, arect, drect });
+        return attacker.animate({
+            top: [ypos + 'px', ypos + ydiff + 'px'],
+            left: [xpos + 'px', xpos + xdiff + 'px']
+        }, { duration: 100, easing: 'ease-in' }).finished.then(() => {
+            defender.animate({ opacity: [1, 0.5, 1] }, { duration: 80 });
+            return attacker.animate({
+                top: [ypos + ydiff + 'px', ypos + 'px'],
+                left: [xpos + xdiff + 'px', xpos + 'px']
+            }, { duration: 80, easing: 'ease-out' }).finished;
+        }).then(() => {
+            attacker.style.position = '';
+            attacker.style.width = '';
+            attacker.style.height = '';
+        });
+    };
+    return { animation, squares: [`${to.x},${to.y}`, `${from.x},${from.y}`] };
 }
 export function gameover({ winner }) {
     gamestatechange('gameover');

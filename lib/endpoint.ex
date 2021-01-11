@@ -49,16 +49,14 @@ defmodule Yagg.Endpoint do
     else
       Configuration.Random
     end
-    {:ok, pid} = Table.new(config)
-    table_id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
+    {:ok, %{id: table_id}} = Table.new(config)
     respond(conn, 200, %{id: table_id})
   end
 
   get "/table" do
     tables = Table.list() |> Enum.map(
-      fn (pid) ->
-        id = pid |> :erlang.pid_to_list() |> to_string() |> String.split(".") |> tl |> hd
-        {:ok, table} = Table.get_state(pid)
+      fn (id) ->
+        {:ok, table} = Table.get_state(id)
         %{id: id, players: table.players, config: table.configuration, state: state(table.board)}
       end
     )
