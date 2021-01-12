@@ -58,7 +58,17 @@ a {
   color: var(--ui-main-saturated);
 }
 
+p {
+  max-width: 33em;
+  margin: 0.5em auto;
+}
+
 .top {
   float: right;
   padding-right: 1em;
+}
+
+.featuredemo {
+  width: 8em;
+  height: 8em;
 }

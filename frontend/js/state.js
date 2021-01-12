@@ -24,7 +24,7 @@ export function isYourTurn() {
         && gmeta.position === gmeta.turn;
 }
 export function gamestatechange(newstate) {
-    document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
+    document.getElementById('table').dataset.gamestate = newstate;
     gmeta.boardstate = newstate;
     instructions(newstate);
     Array.prototype.forEach.call(document.getElementsByClassName('playername'), el => {

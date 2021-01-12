@@ -33,18 +33,123 @@
   <a href="#game-types">game types</a>
   </nav>
   <p>YAGG is a turn-based strategy game.
+
   <section id="phases">
     <h2>Phases</h2>
     <p>A game of YAGG has 2-3 phases, depending on the game type.
     <h3>Recruitment</h3>
+    <!-- example recruitment table -->
+    <div id="table" data-gamestate="jobfair">
+      <div id="player">
+        <div class="playerdetails">
+          <div class="playername">cool player</div><img class="avatar" src="img/avatar_1.png"><div class="timer"></div>
+        </div>
+      </div>
+      <div id="opponent">
+        <div class="playerdetails">
+          <div class="playername">opponent</div><img class="avatar" src="img/avatar_4.png"><div class="timer"></div>
+        </div>
+      </div>
+      <div id="timer" class="timer">30</div>
+      <div id="infobox">
+        <div class="unit north owned info" style="background-image: url(&quot;img/electromouse.png&quot;);">
+          <div class="unit-name">electromouse</div>
+          <div class="unit-attack">3</div>
+          <div class="unit-defense">4</div>
+          <button class="unit-ability">mousetrap<div class="tooltip">Set an invisible trap in the current square that captures units</div></button>
+        </div>
+      </div>
+      <div id="buttons">
+        <button class="uibutton" id="leavebutton">leave</button>
+        <div id="counter">0</div>
+        <button id="readybutton" class="uibutton">recruit</button>
+      </div>
+      <div id="board"></div>
+      <div id="hand"></div>
+      <div id="jobfair">
+        <div class="candidate" id="candidate-0" data-uistate="selected"><span data-index="0" class="unit north owned invisible" style="background-image: url(&quot;img/antente.png&quot;);"><div class="unit-name">antente</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-1"><span data-index="1" class="unit north owned" style="background-image: url(&quot;img/burninator.png&quot;);"><div class="unit-name">burninator</div><div class="unit-attack">3</div><div class="unit-defense">2</div></span></div>
+        <div class="candidate" id="candidate-2"><span data-index="2" class="unit north owned" style="background-image: url(&quot;img/busybody.png&quot;);"><div class="unit-name">busybody</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></div>
+        <div class="candidate" id="candidate-3"><span data-index="3" class="unit north owned" style="background-image: url(&quot;img/catmover.png&quot;);"><div class="unit-name">catmover</div><div class="unit-attack">1</div><div class="unit-defense">6</div></span></div>
+        <div class="candidate" id="candidate-4"><span data-index="4" class="unit north owned" style="background-image: url(&quot;img/dogatron.png&quot;);"><div class="unit-name">dogatron</div><div class="unit-attack">1</div><div class="unit-defense">0</div></span></div>
+        <div class="candidate" id="candidate-5" data-uistate="selected"><span data-index="5" class="unit north owned" style="background-image: url(&quot;img/electromouse.png&quot;);"><div class="unit-name">electromouse</div><div class="unit-attack">3</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-6" data-uistate="selected"><span data-index="6" class="unit north owned" style="background-image: url(&quot;img/explody.png&quot;);"><div class="unit-name">explody</div><div class="unit-attack">5</div><div class="unit-defense">2</div></span></div>
+        <div class="candidate" id="candidate-7"><span data-index="7" class="unit north owned" style="background-image: url(&quot;img/howloo.png&quot;);"><div class="unit-name">howloo</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-8"><span data-index="8" class="unit north owned" style="background-image: url(&quot;img/maycorn.png&quot;);"><div class="unit-name">maycorn</div><div class="unit-attack">3</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-9" data-uistate="selected"><span data-index="9" class="unit north owned" style="background-image: url(&quot;img/mediacreep.png&quot;);"><div class="unit-name">mediacreep</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-10"><span data-index="10" class="unit north owned" style="background-image: url(&quot;img/poisonblade.png&quot;);"><div class="unit-name">poisonblade</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-11"><span data-index="11" class="unit north owned" style="background-image: url(&quot;img/pushie.png&quot;);"><div class="unit-name">pushie</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-12" data-uistate="selected"><span data-index="12" class="unit north owned" style="background-image: url(&quot;img/sackboom.png&quot;);"><div class="unit-name">sackboom</div><div class="unit-attack">7</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-13" data-uistate="selected"><span data-index="13" class="unit north owned" style="background-image: url(&quot;img/shenamouse.png&quot;);"><div class="unit-name">shenamouse</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></div>
+        <div class="candidate" id="candidate-14" data-uistate="selected"><span data-index="14" class="unit north owned" style="background-image: url(&quot;img/sparky.png&quot;);"><div class="unit-name">sparky</div><div class="unit-attack">1</div><div class="unit-defense">2</div></span></div>
+        <div class="candidate" id="candidate-15"><span data-index="15" class="unit north owned" style="background-image: url(&quot;img/spikeder.png&quot;);"><div class="unit-name">spikeder</div><div class="unit-attack">3</div><div class="unit-defense">2</div></span></div>
+        <div class="candidate" id="candidate-16"><span data-index="16" class="unit north owned" style="background-image: url(&quot;img/tactician.png&quot;);"><div class="unit-name">tactician</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div>
+        <div class="candidate" id="candidate-17"><span data-index="17" class="unit north owned" style="background-image: url(&quot;img/tinker.png&quot;);"><div class="unit-name">tinker</div><div class="unit-attack">3</div><div class="unit-defense">2</div></span></div>
+        <div class="candidate" id="candidate-18" data-uistate="selected"><span data-index="18" class="unit north owned" style="background-image: url(&quot;img/bezerker.png&quot;);"><div class="unit-name">bezerker</div><div class="unit-attack">9</div><div class="unit-defense">2</div></span></div>
+        <div class="candidate" id="candidate-19"><span data-index="19" class="unit north owned" style="background-image: url(&quot;img/tim.png&quot;);"><div class="unit-name">tim</div><div class="unit-attack">1</div><div class="unit-defense">8</div></span></div></div>
+      </div>
+    </div>
+
     <p>Some game types begin with a recruitment phase.
     Both players select desired units and then press "RECRUIT".
     <h3>Placement</h3>
+    <!-- example placement table -->
+    <div id="table" data-gamestate="placement">
+      <div id="player">
+        <div class="playerdetails">
+          <div class="playername">cool player</div><img class="avatar" src="img/avatar_1.png"><div class="timer"></div>
+        </div>
+      </div>
+      <div id="opponent">
+        <div class="playerdetails">
+          <div class="playername">opponent</div><img class="avatar" src="img/avatar_4.png"><div class="timer"></div>
+        </div>
+      </div>
+      <div id="timer" class="timer relaxed">323</div>
+      <div id="infobox"></div>
+      <div id="buttons"><button class="uibutton" id="leavebutton">concede</button><button id="readybutton" class="uibutton">ready</button></div>
+      <div id="board"><div class="boardrow southrow startrow"><div class="boardsquare" id="c5-0"></div><div class="boardsquare" id="c4-0"></div><div class="boardsquare" id="c3-0"></div><div class="boardsquare" id="c2-0"></div><div class="boardsquare" id="c1-0"></div><div class="boardsquare" id="c0-0"></div></div><div class="boardrow southrow startrow"><div class="boardsquare" id="c5-1"></div><div class="boardsquare" id="c4-1"></div><div class="boardsquare" id="c3-1"></div><div class="boardsquare" id="c2-1"></div><div class="boardsquare" id="c1-1"></div><div class="boardsquare" id="c0-1"></div></div><div class="boardrow"><div class="boardsquare" id="c5-2"></div><div class="boardsquare" id="c4-2"><div class="feature block"></div></div><div class="boardsquare" id="c3-2"></div><div class="boardsquare" id="c2-2"></div><div class="boardsquare" id="c1-2"><div class="feature water"></div></div><div class="boardsquare" id="c0-2"></div></div><div class="boardrow"><div class="boardsquare" id="c5-3"></div><div class="boardsquare" id="c4-3"><div class="feature block"></div></div><div class="boardsquare" id="c3-3"></div><div class="boardsquare" id="c2-3"></div><div class="boardsquare" id="c1-3"><div class="feature water"></div></div><div class="boardsquare" id="c0-3"></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c5-4" data-uistate=""><span data-index="2" class="unit north owned immobile" style="background-image: url(&quot;img/bomb.png&quot;);"><div class="unit-name">bomb</div><div class="unit-attack">-</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c4-4" data-uistate=""><span data-index="0" class="unit north owned immobile monarch" style="background-image: url(&quot;img/northern colors.png&quot;);"><div class="unit-name">northern colors</div><div class="unit-attack">-</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c3-4" data-uistate=""><span data-index="10" class="unit north owned" style="background-image: url(&quot;img/major.png&quot;);"><div class="unit-name">major</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></div><div class="boardsquare" id="c2-4" data-uistate=""><span data-index="3" class="unit north owned" style="background-image: url(&quot;img/spy.png&quot;);"><div class="unit-name">spy</div><div class="unit-attack">9</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c1-4" data-uistate=""></div><div class="boardsquare" id="c0-4" data-uistate=""><span data-index="5" class="unit north owned" style="background-image: url(&quot;img/scout.png&quot;);"><div class="unit-name">scout</div><div class="unit-attack">1</div><div class="unit-defense">6</div></span></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c5-5" data-uistate=""></div><div class="boardsquare" id="c4-5" data-uistate=""></div><div class="boardsquare" id="c3-5" data-uistate=""><span data-index="9" class="unit north owned" style="background-image: url(&quot;img/general.png&quot;);"><div class="unit-name">general</div><div class="unit-attack">7</div><div class="unit-defense">8</div></span></div><div class="boardsquare" id="c2-5" data-uistate=""><span data-index="4" class="unit north owned" style="background-image: url(&quot;img/miner.png&quot;);"><div class="unit-name">miner</div><div class="unit-attack">1</div><div class="unit-defense">6</div></span></div><div class="boardsquare" id="c1-5" data-uistate=""><span data-index="6" class="unit north owned" style="background-image: url(&quot;img/marshal.png&quot;);"><div class="unit-name">marshal</div><div class="unit-attack">9</div><div class="unit-defense">6</div></span></div><div class="boardsquare" id="c0-5" data-uistate=""><span data-index="1" class="unit north owned immobile" style="background-image: url(&quot;img/bomb.png&quot;);"><div class="unit-name">bomb</div><div class="unit-attack">-</div><div class="unit-defense">0</div></span></div></div></div>
+      <div id="hand"><span data-index="11" class="card"><span data-index="11" class="unit north owned" style="background-image: url(&quot;img/major.png&quot;);"><div class="unit-name">major</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></span><span data-index="10" class="card" data-uistate=""></span><span data-index="9" class="card" data-uistate=""></span><span data-index="8" class="card"><span data-index="8" class="unit north owned" style="background-image: url(&quot;img/sergeant.png&quot;);"><div class="unit-name">sergeant</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></span><span data-index="7" class="card"><span data-index="7" class="unit north owned" style="background-image: url(&quot;img/sergeant.png&quot;);"><div class="unit-name">sergeant</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></span><span data-index="6" class="card" data-uistate=""></span><span data-index="5" class="card" data-uistate=""></span><span data-index="4" class="card" data-uistate=""></span><span data-index="3" class="card" data-uistate=""></span><span data-index="2" class="card" data-uistate=""></span><span data-index="1" class="card" data-uistate=""></span><span data-index="0" class="card" data-uistate=""></span></div>
+    </div>
     <p>Select the starting position of your units.
     The only unit you must place is your Monarch or Flag,
     All other units may be left in your hand to be placed later.
     After placing your units press "READY" to start battle.
     <h3>Battle</h3>
+
+    <!-- example battle table -->
+    <div id="table" data-gamestate="battle">
+      <div id="player">
+        <div class="playerdetails">
+          <div class="playername">cool player</div><img class="avatar" src="img/avatar_1.png"><div class="timer"></div>
+        </div>
+      </div>
+      <div id="opponent">
+        <div class="playerdetails">
+          <div class="playername">opponent</div><img class="avatar" src="img/avatar_4.png"><div class="timer"></div>
+        </div>
+      </div>
+      <div id="timer" class="timer"></div>
+      <div id="infobox">
+        <div class="unit north owned info" style="background-image: url(&quot;img/maycorn.png&quot;);">
+          <div class="unit-name">maycorn</div>
+          <div class="unit-attack">3</div>
+          <div class="unit-defense">4</div>
+          <button class="unit-ability">spark<div class="tooltip">Fire a spark forward that kills units having defense less than this unit's attack</div></button>
+          <div class="triggers">
+            <div class="trigger-symbol">
+            &#x1F480;&#xFE0E;
+            <div class="tooltip">After death: Fire a spark in all directions that kills units having 0 defense </div></div>
+          </div>
+        </div>
+      </div>
+      <div id="buttons">
+        <button class="uibutton" id="leavebutton">leave</button>
+      </div>
+      <div id="board"><div class="boardrow southrow startrow"><div class="boardsquare" id="c4-0"></div><div class="boardsquare" id="c3-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/sparky.png&quot;);"><div class="unit-name">sparky</div></span></div><div class="boardsquare" id="c2-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c1-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c0-0"></div></div><div class="boardrow southrow startrow"><div class="boardsquare" id="c4-1"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c3-1"></div><div class="boardsquare" id="c2-1"></div><div class="boardsquare" id="c1-1"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c0-1" data-uistate=""><span data-index="6" class="unit north owned" style="background-image: url(&quot;img/busybody.png&quot;);"><div class="unit-name">busybody</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></div></div><div class="boardrow"><div class="boardsquare" id="c4-2"><div class="feature water"></div></div><div class="boardsquare" id="c3-2" data-uistate=""><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c2-2" data-uistate=""><div class="feature block" style=""></div></div><div class="boardsquare" id="c1-2" data-uistate=""><span data-index="4" class="unit north owned" style="background-image: url(&quot;img/sparky.png&quot;);"><div class="unit-name">sparky</div><div class="unit-attack">1</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c0-2" data-uistate=""></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c4-3" data-uistate=""><span data-index="0" class="unit north owned" style="background-image: url(&quot;img/maycorn.png&quot;);"><div class="unit-name">maycorn</div><div class="unit-attack">3</div><div class="unit-defense">4</div></span></div><div class="boardsquare" id="c3-3" data-uistate=""><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c2-3" data-uistate=""><span data-index="3" class="unit north owned" style="background-image: url(&quot;img/tinker.png&quot;);"><div class="unit-name">tinker</div><div class="unit-attack">3</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c1-3" data-uistate=""><span data-index="5" class="unit north owned" style="background-image: url(&quot;img/pushie.png&quot;);"><div class="unit-name">pushie</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div><div class="boardsquare" id="c0-3" data-uistate=""></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c4-4" data-uistate=""><span data-index="8" class="monarch unit north owned monarch" style="background-image: url(&quot;img/monarch.png&quot;);"><div class="unit-name">monarch</div><div class="unit-attack">1</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c3-4" data-uistate=""></div><div class="boardsquare" id="c2-4" data-uistate=""><span data-index="2" class="unit north owned" style="background-image: url(&quot;img/bezerker.png&quot;);"><div class="unit-name">bezerker</div><div class="unit-attack">9</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c1-4" data-uistate=""></div><div class="boardsquare" id="c0-4" data-uistate=""></div></div></div>
+      <div id="hand"><span data-index="8" class="card" data-uistate=""></span><span data-index="7" class="card" data-uistate=""><span data-index="7" class="unit north owned" style="background-image: url(&quot;img/howloo.png&quot;);"><div class="unit-name">howloo</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></span><span data-index="6" class="card" data-uistate=""></span><span data-index="5" class="card" data-uistate=""></span><span data-index="4" class="card" data-uistate=""></span><span data-index="3" class="card" data-uistate=""></span><span data-index="2" class="card" data-uistate=""></span><span data-index="1" class="card" data-uistate=""></span><span data-index="0" class="card" data-uistate=""></span></div>
+    </div>
+
     <p>On your turn you must do one of the following
       <h4>Move</h4>
       <p>Units move one square at a time.
@@ -79,11 +184,11 @@
     <p>The board size varies from 5x5 up to 8x8.
     Boards also have water or block squares that affect gameplay
     <h3>Water</h3>
-    <img src="img/howto/water.png" class="feature"/>
+    <div class="boardsquare featuredemo"><div class="feature water"></div></div>
     <p>Units cannot cross water, but some special abilities can cross over the top of water, such as Maycorn's spark or Howloo's horseshoe.
     <p>Water squares can only be moved by Busybody's special ability.
     <h3>Block</h3>
-    <img src="img/howto/block.png" class="feature"/>
+    <div class="boardsquare featuredemo"><div class="feature block"></div></div>
     <p>A block can be pushed by a unit if the square on the other side is empty. Otherwise a block will block movement.
     Blocks are moved by special abilities the same as units.
     <p>If you are trying to push a block but it will not move, there is likely an invisible unit on the other side.

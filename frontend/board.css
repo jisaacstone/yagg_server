@@ -1,12 +1,12 @@
 body {
   flex-direction: column;
   background-color: var(--grey-transparent-med);
+  background-image: url("img/paper_bg_transparent.png");
 }
 
 #table {
   display: grid;
   height: 100vh;
-  background-image: url("img/paper_bg_transparent.png");
 }
 
 @media (orientation: landscape) {
@@ -98,7 +98,7 @@ body {
   .dropdown .dismiss {
     left: 1px;
   }
-  body[data-gamestate=jobfair] #table {
+  #table[data-gamestate=jobfair] {
     grid-template-columns: 26% 48% 26%;
     grid-template-rows: 70vh minmax(0, 5fr) minmax(0, 3fr) minmax(0, 5fr);
     grid-template-areas:
@@ -121,7 +121,7 @@ body {
   }
 }
 
-body[data-gamestate=placement] {
+#table[data-gamestate=placement] {
   background: repeating-linear-gradient(
   40deg,
   var(--ui-alt-desaturated), var(--ui-alt-desaturated) 2em,
@@ -129,19 +129,19 @@ body[data-gamestate=placement] {
   var(--grey-transparent-med) 4em, var(--grey-transparent-med) 6em);
 }
 
-body[data-gamestate=jobfair] {
+#table[data-gamestate=jobfair] {
   background-image: url("img/paper_bg_grn.png");
 }
 
-body:not([data-gamestate]) #table {
+#table:not([data-gamestate]) {
   display: none;
 }
-body[data-gamestate=jobfair] #board,
-body[data-gamestate=jobfair] #hand {
+#table[data-gamestate=jobfair] #board,
+#table[data-gamestate=jobfair] #hand {
   display: none;
 }
 
-body[data-gamestate=battle] {
+#table[data-gamestate=battle] {
   background: repeating-radial-gradient(
     circle at -10% 120%,
     var(--south-muted), var(--south-muted) 2em,
@@ -153,7 +153,7 @@ body[data-gamestate=battle] {
   );
 }
 
-body[data-gamestate=gameover] {
+#table[data-gamestate=gameover] {
   background: repeating-radial-gradient(
   circle at 50% 102%,
   var(--ui-main-desaturated-transparent), var(--ui-main-desaturated-transparent) 2em,

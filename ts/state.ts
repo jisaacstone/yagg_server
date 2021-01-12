@@ -30,7 +30,7 @@ export function isYourTurn(): boolean {
 }
 
 export function gamestatechange(newstate: string): void {
-  document.getElementsByTagName('body')[0].dataset.gamestate = newstate;
+  document.getElementById('table').dataset.gamestate = newstate;
   gmeta.boardstate = newstate;
   instructions(newstate);
   Array.prototype.forEach.call(
