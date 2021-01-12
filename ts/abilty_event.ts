@@ -12,7 +12,7 @@ export function projectile(event) {
       const pRect = projectile.getBoundingClientRect(),
         xoffset = (fromRect.width - pRect.width) / 2,
         yoffset = (fromRect.height - pRect.height) / 2,
-        duration = Math.abs(fromRect.top - toRect.top) + Math.abs(fromRect.left - toRect.left),
+        duration = Math.abs(fromRect.top - toRect.top) + Math.abs(fromRect.left - toRect.left) + 100,
         a = projectile.animate({ 
           top: [fromRect.top + yoffset + 'px', toRect.top + yoffset + 'px'],
           left: [fromRect.left + xoffset + 'px', toRect.left + xoffset + 'px'],
@@ -22,8 +22,8 @@ export function projectile(event) {
         projectile.remove();
         if (child) {
           return child.animate(
-            { opacity: [1, 0.5, 1] }, 
-            { duration: 100 }
+            onHit(event.subtype),
+            { duration: 140 }
           ).finished;
         }
       });
@@ -34,12 +34,18 @@ export function projectile(event) {
 function createProjectile(subtype: string): HTMLElement {
   const projectileEl = document.createElement('div');
   projectileEl.className = `projectile ${subtype}`
-  if (subtype === 'horseshoe') { // @ts-ignore
-    projectileEl.innerHTML = String.fromCodePoint(0x03A9);
-  } else if (subtype === 'spark') { // @ts-ignore
-    projectileEl.innerHTML = String.fromCodePoint(0x1F4A5);
-  }
   return projectileEl
+}
+
+function onHit(subtype: string): any {
+  if (subtype === 'spark') {
+    return {
+      backgroundColor: ['', 'pink', '']
+    };
+  }
+  return {
+    opacity: [1, 0.5, 1]
+  };
 }
 
 export function scan({ x, y }) {

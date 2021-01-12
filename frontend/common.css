@@ -25,7 +25,7 @@ body {
 /* overlay */
 
 .overlaycontainer {
-  position: absolute;
+  position: fixed;
   background-color: var(--white-transparent-high);
   background: repeating-linear-gradient(40deg,
     rgba(240, 230, 221, 0.3),

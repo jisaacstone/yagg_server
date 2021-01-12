@@ -24,16 +24,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
+  <header>
   <a href="index.html">back to game</a>
-  <h1>How to play YAGG</h1>
   <nav>
   <a href="#phases">phases</a>
   <a href="#triggers">triggers</a>
   <a href="#board-features">features</a>
   <a href="#game-types">game types</a>
+  <a href="#unit-types">units</a>
   </nav>
-  <p>YAGG is a turn-based strategy game.
-
+  </header>
+  <div id="content">
   <section id="phases">
     <h2>Phases</h2>
     <p>A game of YAGG has 2-3 phases, depending on the game type.
@@ -86,7 +87,7 @@
         <div class="candidate" id="candidate-16"><span data-index="16" class="unit north owned" style="background-image: url(&quot;img/tactician.png&quot;);"><div class="unit-name">tactician</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div>
         <div class="candidate" id="candidate-17"><span data-index="17" class="unit north owned" style="background-image: url(&quot;img/tinker.png&quot;);"><div class="unit-name">tinker</div><div class="unit-attack">3</div><div class="unit-defense">2</div></span></div>
         <div class="candidate" id="candidate-18" data-uistate="selected"><span data-index="18" class="unit north owned" style="background-image: url(&quot;img/bezerker.png&quot;);"><div class="unit-name">bezerker</div><div class="unit-attack">9</div><div class="unit-defense">2</div></span></div>
-        <div class="candidate" id="candidate-19"><span data-index="19" class="unit north owned" style="background-image: url(&quot;img/tim.png&quot;);"><div class="unit-name">tim</div><div class="unit-attack">1</div><div class="unit-defense">8</div></span></div></div>
+        <div class="candidate" id="candidate-19"><span data-index="19" class="unit north owned" style="background-image: url(&quot;img/tim.png&quot;);"><div class="unit-name">tim</div><div class="unit-attack">1</div><div class="unit-defense">8</div></span></div>
       </div>
     </div>
 
@@ -210,4 +211,11 @@
     <p>Capture the opponent's flag. Unlike monarchs, flags cannot move.
   </section>
   <a class="top" href="#top">top</a>
+  <section id="unit-types">
+    <h2>Units</h2>
+    <p>Different game types have different available units. Click any unit below to get more information on it
+    <div id="units"></div>
+  </section>
+  <a class="top" href="#top">top</a>
+  </div>
 </body>

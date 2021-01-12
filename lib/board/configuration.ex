@@ -47,6 +47,23 @@ defmodule Yagg.Board.Configuration do
     mod.new(configuration)
   end
 
+  def units() do 
+    [
+      Unit.Monarch.new(:unowned) | Board.Configuration.Alpha.new().units.south
+    ] ++ [
+      Unit.Flag.new(:north),
+      Unit.Flag.new(:south),
+      Unit.Bomb.new(:unowned),
+      Unit.Spy.new(:unowned),
+      Unit.Miner.new(:unowned),
+      Unit.Scout.new(:unowned),
+      Unit.new(:unowned, :marshal, 9, 6),
+      Unit.new(:unowned, :sergeant, 5, 4),
+      Unit.new(:unowned, :general, 7, 8),
+      Unit.new(:unowned, :major, 3, 6),
+    ]
+  end
+
   def all() do
     configs = [
       Board.Configuration.Random,

@@ -13,6 +13,26 @@ body {
   padding: 0.4em;
   background: none;
   color: var(--ui-main-dark-dark);
+  display: grid;
+  overflow: hidden;
+}
+
+header {
+  height: 7vh;
+  display: grid;
+  align-content: space-around;
+  padding: 1em;
+}
+
+nav {
+  display: grid;
+  grid-auto-flow: column;
+  place-content: stretch;
+}
+
+#content {
+  height: 93vh;
+  overflow-y: scroll;
 }
 
 section {
@@ -71,4 +91,15 @@ p {
 .featuredemo {
   width: 8em;
   height: 8em;
+}
+
+#units .unit {
+  max-width: 25em;
+  min-height: 5em;
+  margin: 0.2em auto;
+  cursor: pointer;
+}
+
+.unit {
+  background-color: var(--ui-main-desaturated);
 }

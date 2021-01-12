@@ -193,7 +193,7 @@ function describe(unit, square = null) {
         descriptions.push(triggers);
     }
     if (descriptions.length === 0) {
-        const seed = unit.name.charCodeAt(0) + unit.name.charCodeAt(1) + unit.name.charCodeAt(2) + gmeta.position.charCodeAt(0), desc = fakeDescriptions[seed % fakeDescriptions.length];
+        const seed = unit.name.charCodeAt(0) + unit.name.charCodeAt(1) + unit.name.charCodeAt(2) + (gmeta.position || 'e').charCodeAt(0), desc = fakeDescriptions[seed % fakeDescriptions.length];
         descriptions.push(Element.create({ className: 'bio', innerHTML: desc }));
     }
     return Element.create({
@@ -202,6 +202,7 @@ function describe(unit, square = null) {
     });
 }
 export function detailViewFn(unit, className, square = null) {
+    console.log('dvf');
     const descriptions = describe(unit, square), portrait = Element.create({ className: 'unit-portrait' }), details = Element.create({
         className: `${className} details`,
         children: [descriptions, portrait]
@@ -209,6 +210,7 @@ export function detailViewFn(unit, className, square = null) {
     renderAttrs(unit, details);
     portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
     return (e) => {
+        console.log('deets');
         e.preventDefault();
         e.stopPropagation();
         dismissable(details);
@@ -263,7 +265,7 @@ export function render_into(unit, el, attrs = false) {
     return renderTile(unit, el, attrs);
 }
 export function render(unit, index, attrs = false) {
-    const unitEl = document.createElement('span');
+    const unitEl = document.createElement('div');
     unitEl.dataset.index = index;
     render_into(unit, unitEl, attrs);
     return unitEl;

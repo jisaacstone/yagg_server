@@ -909,12 +909,18 @@ body {
 
 .projectile {
   position: fixed;
-  width: 1.7em;
-  height: 1.7em;
+  width: 2.7em;
+  height: 2.7em;
   background-color: var(--white-transparent-high);
-  border: 0.3em solid var(--ui-main-saturated);
-  border-radius: 0.6em;
-  box-shadow: 0.4em 0.2em 0.2em 0.2em var(--ui-main-dark-transparent);
   display: grid;
   place-content: center;
+}
+
+.spark {
+  background: center / contain no-repeat url("img/spark.png");
+  animation: huerotate 1s linear infinite;
+}
+
+.horseshoe {
+  background: center / contain no-repeat url("img/horseshoe.png");
 }

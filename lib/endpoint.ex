@@ -110,6 +110,10 @@ defmodule Yagg.Endpoint do
     respond(conn, 200, Board.Configuration.all())
   end
 
+  get "/units" do
+    respond(conn, 200, Board.Configuration.units())
+  end
+
   get "sse/table/:table_id/events" do
     conn =
       conn
