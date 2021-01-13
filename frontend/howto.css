@@ -40,7 +40,7 @@ section {
   border-bottom: 2px solid var(--ui-main-desaturated);
   margin-bottom: 1.5em;
   margin-right: 0.7em;
-  background-color: var(--white-transparent-med);
+  background-color: var(--white-transparent-low);
   padding: 0.2em;
   border-radius: 0.2em;
 }
@@ -102,4 +102,35 @@ p {
 
 .unit {
   background-color: var(--ui-main-desaturated);
+}
+
+.description {
+  place-self: center;
+  padding: 0.3em;
+  border: 0.3em inset var(--ui-main-dark);
+  border-radius: 0.6em;
+  display: grid;
+  place-content: center;
+  background-color: var(--white-transparent-low);
+  z-index: 100;
+}
+
+.player_ { grid-area: player }
+.opponent_ { grid-area: opponent }
+.infobox_ { grid-area: infobox }
+.jobfair_ { grid-area: board }
+.timer_  { grid-area: timer }
+.hand_ { grid-area: hand }
+.buttons_ { grid-area: buttons }
+
+.northrow_ {
+  grid-area: board;
+  align-self: start;
+  margin-top: 4em;
+}
+
+.southrow_ {
+  grid-area: board;
+  align-self: end;
+  margin-bottom: 4em;
 }
