@@ -245,8 +245,8 @@ defmodule Yagg.Table do
   end
 
   defp handle_gameover(%State.Gameover{}, %State.Gameover{}, events), do: events
-  defp handle_gameover(_, %{winner: winner}, events) do
-    events ++ [Event.Gameover.new(winner: winner)]
+  defp handle_gameover(_, %{winner: winner, reason: reason}, events) do
+    events ++ [Event.Gameover.new(winner: winner, reason: reason)]
   end
   defp handle_gameover(_, _, events) do
     events
@@ -286,10 +286,16 @@ defmodule Yagg.Table do
         {%{board | grid: grid, state: %State.Gameover{winner: :draw}}, [Event.Gameover.new(winner: :draw) | events]}
       {:true, :false} ->
         {grid, events} = Grid.reveal_units(grid)
-        {%{board | grid: grid, state: %State.Gameover{winner: :south}}, [Event.Gameover.new(winner: :south) | events]}
+        {
+          %{board | grid: grid, state: %State.Gameover{winner: :south, reason: "cannot move"}},
+          [Event.Gameover.new(winner: :south, reason: "cannot move") | events]
+        }
       {:false, :true} ->
         {grid, events} = Grid.reveal_units(grid)
-        {%{board | grid: grid, state: %State.Gameover{winner: :north}}, [Event.Gameover.new(winner: :north) | events]}
+        {
+          %{board | grid: grid, state: %State.Gameover{winner: :north, reason: "cannot move"}},
+          [Event.Gameover.new(winner: :north, reason: "cannot move") | events]
+        }
     end
   end
   defp check_all_immobile(board, events), do: {board, events}

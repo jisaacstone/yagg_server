@@ -35,8 +35,8 @@ defmodule Table.Timer do
   defp end_game(%{board: %{state: :battle}, turn: position} = table) do
     {grid, events} = Grid.reveal_units(table.board.grid)
     winner = Table.Player.opposite(position)
-    board = %{table.board | state: %State.Gameover{winner: winner}, grid: grid}
-    {%{table | board: board}, [Event.Gameover.new(winner: winner) | events]}
+    board = %{table.board | state: %State.Gameover{winner: winner, reason: :timeout}, grid: grid}
+    {%{table | board: board}, [Event.Gameover.new(winner: winner, reason: "time's up") | events]}
   end
 
   defp end_game(%{board: %Board{state: %State.Placement{ready: ready}}} = table) do
@@ -45,8 +45,8 @@ defmodule Table.Timer do
       :nil -> :draw
       position -> position
     end
-    board = %{table.board | state: %State.Gameover{winner: winner}, grid: grid}
-    {%{table | board: board}, [Event.Gameover.new(winner: winner) | events]}
+    board = %{table.board | state: %State.Gameover{winner: winner, reason: :timeout}, grid: grid}
+    {%{table | board: board}, [Event.Gameover.new(winner: winner, reason: "time's up") | events]}
   end
   defp end_game(table) do
     # TODO: handle jobfair timeout

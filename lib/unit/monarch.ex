@@ -29,7 +29,7 @@ defmodule Unit.Monarch do
     def after_move(board, data) do
       if accross(board.dimensions, data.unit.position, data.to) do
         {grid, events} = Grid.reveal_units(board.grid)
-        board = %{board | state: %Gameover{winner: data.unit.position}, grid: grid}
+        board = %{board | state: %Gameover{winner: data.unit.position, reason: "crossed the board"}, grid: grid}
         {board, events}
       else
         {board, []}

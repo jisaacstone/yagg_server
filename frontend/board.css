@@ -12,7 +12,7 @@ body {
 @media (orientation: landscape) {
   #table {
     grid-template-columns: minmax(0, 1fr) min(60vw, 100vh) minmax(0, 1fr);
-    grid-template-rows: 11% 45% 10% 23% 11%;
+    grid-template-rows: 11fr 45fr 10fr 23fr 11fr;
     grid-template-areas:
       "opponent board  hand"
       "infobox  board  hand"
@@ -718,6 +718,9 @@ body {
   grid-template-areas: 
     "avatar name"
     "timer timer";
+  padding: 7px 3px;
+  margin: 3px;
+  border-radius: 0.4em;
 }
 
 .playername {
@@ -743,15 +746,10 @@ body {
   opacity: 1;
 }
 
-.playerdetails, .uibutton {
-  padding: 7px 3px;
-  margin: 3px;
-  border-radius: 0.4em;
-}
-
 .uibutton {
-  place-content: center;
   display: grid;
+  place-content: center;
+  margin: 0.2em 0.5em;
 }
 
 #table[data-yourturn=yes] .unit.info .unit-ability {
@@ -774,16 +772,9 @@ body {
   grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   display: grid;
   grid-area: buttons;
-  justify-content: space-around;
   place-content: stretch;
   place-self: stretch;
   padding: 0 0.5em;
-}
-
-#buttons .uibutton, #buttons div {
-  padding: 0.5em;
-  min-width: 60%;
-  margin: 0.5em;
 }
 
 /* UI - infobox */

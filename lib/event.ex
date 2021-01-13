@@ -110,7 +110,10 @@ defmodule Yagg.Event do
   end
 
   defmodule Gameover do
-    @spec new([winner: Player.position() | :draw]) :: Event.t
+    @spec new([
+        winner: Player.position() | :draw,
+        reason: String.t
+    ]) :: Event.t
     def new(params) do
       Event.new(:global, :gameover, params)
     end

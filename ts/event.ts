@@ -313,17 +313,22 @@ export function battle({ from, to }) {
   return { animation, squares: [`${to.x},${to.y}`, `${from.x},${from.y}`] };
 }
 
-export function gameover({ winner }) {
+export function gameover({ winner, reason }) {
+  let message;
   gamestatechange('gameover');
   Timer.stop();
   turnchange(null);
   if (winner === gmeta.position) {
-    Dialog.displayMessage('you win!');
+    message = 'you win!';
   } else if (winner === 'draw') {
-    Dialog.displayMessage('draw game');
+    message = 'draw game';
   } else {
-    Dialog.displayMessage('you lose');
+    message = 'you lose';
   }
+  if ( reason) {
+    message = `<p>${reason}<p>${message}`;
+  }
+  Dialog.displayMessage(message);
   Ready.display('rematch');
 }
 

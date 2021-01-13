@@ -27,7 +27,7 @@ defmodule Table.Action.Leave do
 
   defp maybe_set_state(%{board: %{state: s}} = table, position) when s != :gameover do
     {grid, events} = Grid.reveal_units(table.board.grid)
-    board = %{table.board | state: %Gameover{winner: Player.opposite(position)}, grid: grid}
+    board = %{table.board | state: %Gameover{winner: Player.opposite(position), reason: "opponent left"}, grid: grid}
     {%{table | board: board}, events}
   end
   defp maybe_set_state(table, _), do: {table, []}

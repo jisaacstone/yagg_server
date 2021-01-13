@@ -13,7 +13,7 @@ defmodule Board.Action.Concede do
   end
   def resolve(_, %Board{} = board, position) do
     {grid, events} = Board.Grid.reveal_units(board.grid)
-    board = %{board | state: %Gameover{winner: Player.opposite(position)}, grid: grid}
+    board = %{board | state: %Gameover{winner: Player.opposite(position), reason: "conceded"}, grid: grid}
     {board, events}
   end
   def resolve(_, _, _) do

@@ -58,7 +58,7 @@ defmodule YaggTest.Board do
       table
     )
     assert :nil == table.board.grid[{1, 1}]
-    assert table.board.state == %Board.State.Gameover{winner: :south, ready: nil}
+    assert table.board.state == %Board.State.Gameover{winner: :south, ready: nil, reason: "cannot move"}
   end
 
   test "rematch" do
@@ -83,7 +83,7 @@ defmodule YaggTest.Board do
       self(),
       table
     )
-    assert table.board.state == %Board.State.Gameover{winner: :south, ready: :nil}
+    assert table.board.state == %Board.State.Gameover{winner: :south, ready: :nil, reason: "conceded"}
   end
 
   test "endgame" do
