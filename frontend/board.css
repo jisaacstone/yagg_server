@@ -742,6 +742,10 @@ body {
   opacity: 0.6;
 }
 
+#table[data-gamestate=gameover] #leavebutton {
+  opacity: 1;
+}
+
 #leavebutton:hover {
   opacity: 1;
 }
