@@ -283,7 +283,7 @@ export function candidate(event) {
     if (existing) {
         return;
     }
-    const unitEl = Unit.render(event.unit, event.index, true), cdd = Element.create({
+    const unitEl = Unit.render(event.unit, event.index, true, true), cdd = Element.create({
         className: 'candidate',
         id: `candidate-${event.index}`,
         children: [unitEl]

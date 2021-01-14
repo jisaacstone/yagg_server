@@ -422,17 +422,24 @@ body {
 }
 
 .trigger-symbol {
-  margin: auto;
-  width: 100%;
   line-height: 1.5;
   text-align: center;
-  width: 2em;
-  text-shadow: 0 0 0.3em white;
-  font-size: 130%;
+  width: 1.5em;
+  height: 1.5em;
+  margin: 0.3em;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
-.info .trigger-symbol {
-  animation: glow 4s linear infinite;
+.move-t {
+  background-image: url("img/move_t.png");
+}
+.attack-t {
+  background-image: url("img/attack_t.png");
+}
+.death-t {
+  background-image: url("img/death_t.png");
 }
 
 .unit-trigger {

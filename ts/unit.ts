@@ -57,7 +57,7 @@ function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit
   };
 }
 
-function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = null) {
+function abilityButton(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = null) {
   const abilbut = Element.create({
     tag: 'button',
     className: 'unit-ability',
@@ -71,6 +71,21 @@ function ability_button(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = n
 
   bindAbility(abilbut, square, unit);
   el.appendChild(abilbut);
+}
+
+function abilityIcon(unit: Unit, el: HTMLElement) {
+  if ( unit.ability ) {
+    const abil = Element.create({
+      className: 'unit-ability',
+      innerHTML: unit.ability.name,
+      children: [
+        Element.create({
+          className: 'tooltip',
+          innerHTML: unit.ability.description})
+      ]});
+
+    el.appendChild(abil);
+  }
 }
 
 function convertAttr(att, value) {
@@ -87,18 +102,20 @@ function renderAttrs(unit: Unit, el: HTMLElement) {
         className: `unit-${att}`,
         innerHTML: convertAttr(att, unit[att])
       }));
-    } else {
-      console.error({ att, val: unit[att]});
-    }
+    } 
   }
   if (unit.name === 'monarch') {
     el.className = `monarch ${el.className}`;
   }
 }
 
-function renderTile(unit: Unit, el: HTMLElement, attrs=false) {
+function renderTile(unit: Unit, el: HTMLElement, attrs=false, icons=false) {
   if (attrs) {
     renderAttrs(unit, el);
+  }
+  if (icons) {
+    shortTriggers(unit, el);
+    abilityIcon(unit, el);
   }
   el.style.backgroundImage = `url("img/${unit.name}.png")`;
   // @ts-ignore
@@ -126,19 +143,12 @@ function anyDetails(unit) {
   return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
 
-function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
-  renderAttrs(unit, el);
-  el.style.backgroundImage = `url("img/${unit.name}.png")`;
-  el.onclick = detailViewFn(unit, el.className, squareEl);
-  if (unit.ability) {
-    ability_button(unit, el, squareEl);
-  }
+function shortTriggers(unit: Unit, el: HTMLElement) {
   if (unit.triggers && Object.keys(unit.triggers).length !== 0) {
     const triggers = Element.create({ className: 'triggers' });
     for (const [name, trigger] of Object.entries(unit.triggers)) {
       triggers.appendChild(Element.create({
-        className: 'trigger-symbol',
-        innerHTML: Triggers.symbolFor(name),
+        className: `trigger-symbol ${name}-t`,
         children: [
           Element.create({
             className: 'tooltip',
@@ -149,6 +159,16 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
     }
     el.appendChild(triggers);
   }
+}
+
+function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
+  renderAttrs(unit, el);
+  el.style.backgroundImage = `url("img/${unit.name}.png")`;
+  el.onclick = detailViewFn(unit, el.className, squareEl);
+  if (unit.ability) {
+    abilityButton(unit, el, squareEl);
+  }
+  shortTriggers(unit, el);
 }
 
 const fakeDescriptions = [
@@ -208,8 +228,7 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
         className: `unit-trigger ${name}-trigger`,
         children: [
           Element.create({
-            className: 'trigger-symbol',
-            innerHTML: Triggers.symbolFor(name),
+            className: `trigger-symbol ${name}-t`,
             children: [
               Element.create({
                 className: 'tooltip',
@@ -227,7 +246,7 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
     descriptions.push(triggers);
   }
 
-  if (descriptions.length === 0) {
+  if (descriptions.length === 0 && unit.name) {
     const seed = unit.name.charCodeAt(0) + unit.name.charCodeAt(1) + unit.name.charCodeAt(2) + (gmeta.position || 'e').charCodeAt(0),
       desc = fakeDescriptions[seed % fakeDescriptions.length];
     descriptions.push(Element.create({ className: 'bio', innerHTML: desc }));
@@ -240,7 +259,6 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
 }
 
 export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
-  console.log('dvf');
   const descriptions = describe(unit, square),
     portrait = Element.create({ className: 'unit-portrait' }),
     details = Element.create({
@@ -310,15 +328,15 @@ function setClassName(unit: Unit, el: HTMLElement) {
   el.className = className;
 }
 
-export function render_into(unit: Unit, el: HTMLElement, attrs=false): void {
+export function render_into(unit: Unit, el: HTMLElement, attrs=false, icons=false): void {
   bindDetailsEvenet(unit, el);
   setClassName(unit, el);
-  return renderTile(unit, el, attrs);
+  return renderTile(unit, el, attrs, icons);
 }
 
-export function render(unit: Unit, index, attrs=false): HTMLElement {
+export function render(unit: Unit, index, attrs=false, icons=false): HTMLElement {
   const unitEl = document.createElement('div');
   unitEl.dataset.index = index;
-  render_into(unit, unitEl, attrs);
+  render_into(unit, unitEl, attrs, icons);
   return unitEl
 }

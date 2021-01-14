@@ -27,5 +27,6 @@ fi
 
 if [[ "${release}" =~ front|full ]]; then
   ./febuild
-  scp -r build ${host}:/yagg/frontend
+  echo '#errbutton { display: none }' >> build/board.css
+  rsync -az -e ssh build/* ${host}:/yagg/frontend
 fi

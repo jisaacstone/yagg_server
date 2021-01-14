@@ -20,7 +20,7 @@ function renderWater() {
 }
 function renderBlock() {
     const blockEl = Element.create({ className: 'feature block' });
-    blockEl.addEventListener('click', sidebar(blockEl, 'block'));
+    blockEl.addEventListener('sidebar', sidebar(blockEl, 'block'));
     blockEl.addEventListener('dblclick', details(`Block:
   Can be pushed if nothing is on the other side.`));
     return blockEl;
