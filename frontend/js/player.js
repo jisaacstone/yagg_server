@@ -26,12 +26,14 @@ function create() {
 }
 export function check() {
     const id = localStorage.getItem('playerData.id'), name = localStorage.getItem('playerData.name');
+    console.log({ we: 'check', id, name });
     if (id && name) {
         return request(`player/${id}`, false).then((resp) => {
             if (resp.name !== name) {
                 console.log('warning: name mismatch');
                 localStorage.setItem('playerData.name', resp.name);
             }
+            return { id, name: resp.name };
         }).catch(() => {
             return post('player/guest', { id, name })
                 .catch((err) => {
@@ -44,6 +46,8 @@ export function check() {
                 .finally(() => {
                 state.waiting = false;
             });
+        }).then(({ id, name }) => {
+            return { id, name };
         });
     }
     return create();

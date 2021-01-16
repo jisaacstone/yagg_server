@@ -92,7 +92,7 @@ window.onload = function () {
             sel_el.style.display = 'hidden';
         }
     };
-    Player.get().then((player) => {
+    Player.check().then((player) => {
         fetchConfigs(sel_el);
         fetchTableData();
         window.setInterval(fetchTableData, 2000);

@@ -108,7 +108,7 @@ window.onload = function() {
     }
   }
 
-  Player.get().then((player) => {
+  Player.check().then((player) => {
     fetchConfigs(sel_el);
     fetchTableData();
     window.setInterval(fetchTableData, 2000);

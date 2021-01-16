@@ -1,8 +1,9 @@
 alias Yagg.Table
 alias Yagg.Event
 alias Yagg.Table.Player
+alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.State.Gameover
+alias Yagg.Jobfair
 
 defmodule Table.Action.Leave do
   defstruct []
@@ -27,8 +28,12 @@ defmodule Table.Action.Leave do
 
   defp maybe_set_state(%{board: %{state: s}} = table, position) when s != :gameover do
     {grid, events} = Grid.reveal_units(table.board.grid)
-    board = %{table.board | state: %Gameover{winner: Player.opposite(position), reason: "opponent left"}, grid: grid}
-    {%{table | board: board}, events}
+    Table.gameover(table, %{table.board | grid: grid}, Player.opposite(position), "opponent left", events)
+  end
+  defp maybe_set_state(%{board: %Jobfair{}} = table, position) do
+    board = Board.new(table.configuration)
+    Table.gameover(table, board, Player.opposite(position), "opponent left")
   end
   defp maybe_set_state(table, _), do: {table, []}
+
 end

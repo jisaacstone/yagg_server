@@ -2,6 +2,7 @@ alias Yagg.Table
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.{State, Grid}
+alias Yagg.Jobfair
 
 defmodule Table.Timer do
   def set(table, milliseconds) do
@@ -35,21 +36,28 @@ defmodule Table.Timer do
   defp end_game(%{board: %{state: :battle}, turn: position} = table) do
     {grid, events} = Grid.reveal_units(table.board.grid)
     winner = Table.Player.opposite(position)
-    board = %{table.board | state: %State.Gameover{winner: winner, reason: :timeout}, grid: grid}
-    {%{table | board: board}, [Event.Gameover.new(winner: winner, reason: "time's up") | events]}
+    Table.gameover(table, %{table.board | grid: grid}, winner, "time's up", events)
   end
 
   defp end_game(%{board: %Board{state: %State.Placement{ready: ready}}} = table) do
     {grid, events} = Grid.reveal_units(table.board.grid)
-    winner = case ready do
-      :nil -> :draw
-      position -> position
-    end
-    board = %{table.board | state: %State.Gameover{winner: winner, reason: :timeout}, grid: grid}
-    {%{table | board: board}, [Event.Gameover.new(winner: winner, reason: "time's up") | events]}
+    winner = whoisready(ready)
+    board = %{table.board | grid: grid}
+    Table.gameover(table, board, winner, "time's up", events)
   end
+
+  defp end_game(%{board: %Jobfair{}} = table) do
+    board = Board.new(table.configuration)
+    Table.gameover(table, board, whoisready(table.board), "time's up")
+  end
+
   defp end_game(table) do
-    # TODO: handle jobfair timeout
     {table, []}
   end
+
+  defp whoisready(%{north: %{ready: :true}}), do: :north
+  defp whoisready(%{south: %{ready: :true}}), do: :south
+  defp whoisready(%{}), do: :draw
+  defp whoisready(:nil), do: :draw
+  defp whoisready(position), do: position
 end

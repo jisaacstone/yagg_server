@@ -72,6 +72,13 @@ defmodule Yagg.Table do
     {:ok, table}
   end
 
+  @spec gameover(t, Board.t, Player.position, String.t, [Event.t]) :: {t, [Event.t]}
+  def gameover(table, board, winner, reason, events \\ []) do
+    board = %{board | state: %State.Gameover{winner: winner, reason: reason}}
+    gameover_event = Event.Gameover.new(winner: winner, reason: reason)
+    {%{table | board: board, turn: :nil}, [gameover_event | events]}
+  end
+
   # API
 
   @spec get_state(pid | id) :: {:ok, t}
@@ -233,7 +240,7 @@ defmodule Yagg.Table do
       case Board.Action.resolve(action, table.board, position) do
         {:err, _} = err -> err
         {board, events} ->
-          events = handle_gameover(Map.get(table.board, :state), Map.get(board, :state), events)
+          {table, events} = handle_gameover(table, Map.get(board, :state), events)
           {board, events} = check_all_immobile(board, events)
           newtable = add_history(table, board, action)
           {table, events} = handle_timer(table.board, newtable, events)
@@ -244,12 +251,17 @@ defmodule Yagg.Table do
     end
   end
 
-  defp handle_gameover(%State.Gameover{}, %State.Gameover{}, events), do: events
-  defp handle_gameover(_, %{winner: winner, reason: reason}, events) do
-    events ++ [Event.Gameover.new(winner: winner, reason: reason)]
+  defp handle_gameover(%{board: %{state: %State.Gameover{}}} = table, %State.Gameover{}, events) do
+    {table, events}
   end
-  defp handle_gameover(_, _, events) do
-    events
+  defp handle_gameover(table, %{winner: winner, reason: reason}, events) do
+    {
+      %{table | turn: :nil},
+      events ++ [Event.Gameover.new(winner: winner, reason: reason)]
+    }
+  end
+  defp handle_gameover(table, _, events) do
+    {table,events}
   end
 
   defp handle_timer(:nil, %{board: %{}} = table, events) do

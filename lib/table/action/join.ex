@@ -19,8 +19,9 @@ defmodule Yagg.Table.Action.Join do
   end
 
   defp join(%{players: []} = table, player, :notfound) do
+    position = Enum.random([:north, :south])
     {
-      %{table | players: [{:north, player}]},
+      %{table | players: [{position, player}]},
       [Event.PlayerJoined.new(player: player, position: :north)]
     }
   end

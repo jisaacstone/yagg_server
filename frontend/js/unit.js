@@ -116,13 +116,20 @@ function anyDetails(unit) {
 function shortTriggers(unit, el) {
     if (unit.triggers && Object.keys(unit.triggers).length !== 0) {
         const triggers = Element.create({ className: 'triggers' });
+        let tttext;
         for (const [name, trigger] of Object.entries(unit.triggers)) {
+            if (name === 'move' && unit.attributes.includes('immobile')) {
+                tttext = 'Immobile';
+            }
+            else {
+                tttext = `${Triggers.timingOf(name)}: ${trigger.description}`;
+            }
             triggers.appendChild(Element.create({
                 className: `trigger-symbol ${name}-t`,
                 children: [
                     Element.create({
                         className: 'tooltip',
-                        innerHTML: `${Triggers.timingOf(name)}: ${trigger.description}`
+                        innerHTML: tttext
                     })
                 ]
             }));

@@ -1,6 +1,6 @@
 alias Yagg.{Endpoint, Event, Table}
 alias Yagg.Table.Player
-alias Yagg.Table.Action.Join
+alias Yagg.Table.Action.{Join,Leave}
 alias Yagg.Board
 import Helper.Board
 
@@ -90,12 +90,38 @@ defmodule YaggTest.Endpoint do
       history: [], players: [north: player1, south: player2],
       timer: Process.send_after(self(), :timeout, 0),
       configuration: %{}, subscribors: []}
-    {:ok, pid} = Table.start_link(table, [name: {:via, Registry, {Registry.TableNames, tid}}])
+    {:ok, _} = Table.start_link(table, [name: {:via, Registry, {Registry.TableNames, tid}}])
 
     {:ok, pid} = Table.subscribe(tid, "south")
     Process.sleep(1)
     send(pid, :timeout)
     assert %{kind: :gameover, data: %{winner: :north}} = recieve_event()
+  end
+
+  test "leave" do
+    %{id: bob_id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
+    %{status: status, resp_body: body} = send_json("/table/new", ~s({"configuration": "strat"}), bob_id)
+    assert status == 200
+    assert %{"id" => gid} = Poison.decode!(body)
+    :ok = Table.table_action(gid, Player.new("player1"), %Join{})
+    :ok = Table.table_action(gid, bob_id, %Join{})
+    {:ok, _pid} = Table.subscribe(gid, "bob")
+    :ok = Table.table_action(gid, bob_id, %Leave{})
+    assert %{kind: :player_left} = recieve_event()
+    assert %{kind: :gameover} = recieve_event()
+  end
+
+  test "leave jobfair" do
+    %{id: bob_id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
+    %{status: status, resp_body: body} = send_json("/table/new", ~s({"configuration": "fivers"}), bob_id)
+    assert status == 200
+    assert %{"id" => gid} = Poison.decode!(body)
+    :ok = Table.table_action(gid, Player.new("player1"), %Join{})
+    :ok = Table.table_action(gid, bob_id, %Join{})
+    {:ok, _pid} = Table.subscribe(gid, "bob")
+    :ok = Table.table_action(gid, bob_id, %Leave{})
+    assert %{kind: :player_left} = recieve_event()
+    assert %{kind: :gameover} = recieve_event()
   end
 
   test "game configurations" do
