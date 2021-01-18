@@ -258,7 +258,7 @@ export function battle({ from, to }) {
 }
 export function gameover({ winner, reason }) {
     let message;
-    const showRematch = !reason.toLowerCase().includes('opponent left'), choices = {
+    const showRematch = !reason || !reason.toLowerCase().includes('opponent left'), choices = {
         ok: () => { if (showRematch) {
             Ready.display('rematch');
         } },

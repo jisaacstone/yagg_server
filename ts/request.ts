@@ -18,7 +18,7 @@ function add_auth(request, method, url) {
   return request;
 }
 
-export function gameaction(action, data, scope = 'table', id = null) {
+export function gameaction(action, data, scope = 'table', id = null, retries = 1) {
   const tableId = id || tableid();
   const host = hostname(),
     url = `${host}/${scope}/${tableId}/a/${action}`;
@@ -34,7 +34,18 @@ export function gameaction(action, data, scope = 'table', id = null) {
         }
       });
       xhr.onerror = function () {
-        reject({request: xhr});
+        if ( retries ) {
+          console.warn({ retries, action, scope });
+          setTimeout(() => {
+            gameaction(action, data, scope, id, retries - 1).then((r) => {
+              resolve(r);
+            }).catch((e) => {
+              reject(e);
+            });
+          }, 500);
+        } else {
+          reject({request: xhr});
+        }
       };
       xhr.open('POST', url);
       xhr.setRequestHeader('Content-Type', 'application/json');

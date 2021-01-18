@@ -220,18 +220,12 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
   if (triggers.length > 0) {
     const triggersEl = Element.create({ className: 'triggers' });
     for ( const { name, description, timing } of triggers ) {
+      const ts = Element.create({ className: `trigger-symbol ${name}-t` });
+      Tooltip.addTooltip(ts, timing ? timing : name);
       triggersEl.appendChild(Element.create({
         className: `unit-trigger ${name}-trigger`,
         children: [
-          Element.create({
-            className: `trigger-symbol ${name}-t`,
-            children: [
-              Element.create({
-                className: 'tooltip',
-                innerHTML: timing ? timing : name
-              })
-            ]
-          }),
+          ts,
           Element.create({
             className: 'trigger-description',
             innerHTML: `${description}`

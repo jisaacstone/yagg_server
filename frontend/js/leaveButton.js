@@ -55,7 +55,9 @@ function clear() {
 }
 export function rematch() {
     return Request.gameaction('concede', {}, 'board').then(() => {
-        return Request.gameaction('ready', {}, 'board');
+        return Request.gameaction('ready', {}, 'board').then(() => {
+            window.location.reload();
+        });
     }).then(() => {
         Ready.hide();
     });

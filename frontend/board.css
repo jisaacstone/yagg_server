@@ -411,10 +411,11 @@ body {
   cursor: pointer;
   background-color: var(--ui-main-light);
 }
+
 .hover .tooltip,
 .unit-ability:hover .tooltip ,
 .trigger-symbol:hover .tooltip {
-  display: block;
+  visibility: visible;
 }
 
 .candidate .unit-ability {
@@ -464,7 +465,25 @@ body {
 }
 
 .tooltip {
-  display: none;
+  position: absolute;
+  visibility: hidden;
+}
+
+.trigger-symbol .tttext {
+  top: 1.8em;
+  left: 0;
+}
+
+.unit-ability .tttext {
+  top: 0.2em;
+  left: 0.2em;
+}
+
+.unit-ability .tttext:after {
+  left: 3em;
+}
+
+.tttext {
   position: relative;
   margin-left: 0.4em;
   min-width: 5em;
@@ -475,6 +494,18 @@ body {
   color: var(--ui-main-dark-dark);
   background-color: var(--ui-main-light);
   border: 2px solid var(--ui-main-dark);
+}
+.tttext:after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0.7em;
+  margin-left: -8px;
+  width: 0;
+  height: 0;
+  border-bottom: 8px solid var(--ui-main-dark);
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
 }
 
 .death {
@@ -847,6 +878,7 @@ body {
 /* jobfair */
 
 #jobfair {
+  position: relative;
   overflow-y: scroll;
   overflow-x: hidden;
   display: grid;

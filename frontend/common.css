@@ -51,18 +51,29 @@ body {
 }
 
 .overlaycontainer .message {
-  background-image: url("img/r_c_tran.png");
+  position: relative;
+  top: -0.5em;
+  left: -0.3em;
+  background-image: url("img/paper4.png");
   color: var(--ui-main-dark);
-  background-color: var(--ui-alt-light);
+  background-size: 100% 100%;
   font-size: 120%;
   padding: 1.2em;
-  border: 0.3em inset var(--ui-main-desaturated);
-  border-radius: 0.4em;
-  box-shadow: 0.8em 1.2em 1.3em var(--ui-main-dark-transparent);
   display: grid;
   row-gap: 0.6em;
   column-gap: 0.5em;
   grid-auto-columns: minmax(0, 1fr);
+}
+
+.msg-wrapper {
+  position: relative;
+  top: 0.5em;
+  left: 0.3em;
+  background-color: var(--ui-main-dark-transparent);
+  border-radius: 2px;
+  box-shadow:
+    0 0 0.5em var(--ui-main-dark-transparent),
+    0.1em 0.1em 1.3em var(--ui-main-dark-transparent);
 }
 
 .message .uibutton {

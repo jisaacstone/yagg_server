@@ -1,23 +1,22 @@
 import * as Overlay from './overlay.js';
 import * as Element from './element.js';
-export function displayMessage(message, cls = 'info') {
-    const messageEl = Element.create({
-        innerHTML: message,
-        className: `message ${cls}`
+function createDialog(cls, ...children) {
+    // wrap so we can get drop-shadow effect
+    const msgEl = Element.create({ className: `message ${cls}`, children });
+    return Element.create({
+        className: 'msg-wrapper',
+        children: [msgEl]
     });
+}
+export function displayMessage(message, cls = 'info') {
+    const messageEl = createDialog(cls, Element.create({ innerHTML: message }));
     Overlay.dismissable(messageEl);
 }
 export function alert(message, confirm = 'ok') {
     const okEl = Element.create({
         className: 'uibutton',
         innerHTML: confirm
-    }), alertEl = Element.create({
-        className: 'message alert',
-        children: [
-            Element.create({ innerHTML: message }),
-            okEl
-        ]
-    }), clearOverlay = Overlay.clearable(alertEl);
+    }), alertEl = createDialog('alert', Element.create({ innerHTML: message }), okEl), clearOverlay = Overlay.clearable(alertEl);
     return new Promise((resolve) => {
         okEl.onclick = () => {
             clearOverlay();
@@ -31,14 +30,7 @@ export function prompt(message, defaultv = '', confirm = 'ok') {
         innerHTML: confirm
     }), inputEl = Element.create({
         tag: 'input'
-    }), promptEl = Element.create({
-        className: 'message prompt',
-        children: [
-            Element.create({ innerHTML: message }),
-            inputEl,
-            okEl
-        ]
-    }), clearOverlay = Overlay.clearable(promptEl);
+    }), promptEl = createDialog('prompt', Element.create({ innerHTML: message }), inputEl, okEl), clearOverlay = Overlay.clearable(promptEl);
     inputEl.setAttribute('type', 'text');
     inputEl.setAttribute('default', defaultv);
     return new Promise((resolve) => {
@@ -61,14 +53,7 @@ export function confirm(message, confirm = 'ok', cancel = 'cancel') {
     }), cancelEl = Element.create({
         className: 'uibutton',
         innerHTML: cancel
-    }), promptEl = Element.create({
-        className: 'message confirm',
-        children: [
-            Element.create({ innerHTML: message }),
-            okEl,
-            cancelEl
-        ]
-    }), clearOverlay = Overlay.clearable(promptEl);
+    }), promptEl = createDialog('confirm', Element.create({ innerHTML: message }), okEl, cancelEl), clearOverlay = Overlay.clearable(promptEl);
     return new Promise((resolve) => {
         okEl.onclick = () => {
             clearOverlay();
@@ -81,22 +66,21 @@ export function confirm(message, confirm = 'ok', cancel = 'cancel') {
     });
 }
 export function choices(message, choices) {
-    const promptEl = Element.create({
-        className: 'message choices',
-        children: [
-            Element.create({ innerHTML: message }),
-        ]
-    }), clearOverlay = Overlay.clearable(promptEl);
+    const children = [Element.create({ innerHTML: message })], choiceEls = [];
     for (let [choice, effect] of Object.entries(choices)) {
         const choiceEl = Element.create({
             tag: 'button',
             className: 'uibutton',
             innerHTML: choice,
         });
-        choiceEl.onclick = () => {
+        choiceEls.push({ el: choiceEl, effect });
+        children.push(choiceEl);
+    }
+    const promptEl = createDialog('choices', ...children), clearOverlay = Overlay.clearable(promptEl);
+    for (const { el, effect } of choiceEls) {
+        el.onclick = () => {
             clearOverlay();
             effect();
         };
-        promptEl.appendChild(choiceEl);
     }
 }
