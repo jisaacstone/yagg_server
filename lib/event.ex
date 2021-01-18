@@ -267,4 +267,10 @@ defmodule Yagg.Event do
       Event.new(position, :ability_used, params)
     end
   end
+
+  defmodule TableShutdown do
+    def new() do
+      Event.new(:global, :table_shutdown)
+    end
+  end
 end

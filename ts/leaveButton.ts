@@ -60,7 +60,7 @@ function clear() {
   }
 }
 
-function rematch() {
+export function rematch() {
   return Request.gameaction('concede', {}, 'board').then(() => {
     return Request.gameaction('ready', {}, 'board');
   }).then(() => {

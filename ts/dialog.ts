@@ -9,6 +9,27 @@ export function displayMessage(message: string, cls='info') {
   Overlay.dismissable(messageEl);
 }
 
+export function alert(message: string, confirm='ok'): Promise<boolean> {
+  const okEl = Element.create({
+      className: 'uibutton',
+      innerHTML: confirm
+    }), 
+    alertEl = Element.create({
+      className: 'message alert',
+      children: [
+        Element.create({ innerHTML: message }),
+        okEl
+      ]
+    }),
+    clearOverlay = Overlay.clearable(alertEl);
+  return new Promise((resolve) => {
+    okEl.onclick = () => {
+      clearOverlay();
+      resolve(true);
+    };
+  });
+}
+
 export function prompt(message: string, defaultv='', confirm='ok'): Promise<string> {
   const okEl = Element.create({
       className: 'uibutton',

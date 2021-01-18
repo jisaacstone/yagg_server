@@ -13,6 +13,7 @@ import * as Hand from './hand.js';
 import * as AbilityEvent from './abilty_event.js';
 import * as Element from './element.js';
 import * as Timer from './timer.js';
+import { leave, rematch } from './leaveButton.js';
 
 const unitsbyindex = {};
 
@@ -315,9 +316,16 @@ export function battle({ from, to }) {
 
 export function gameover({ winner, reason }) {
   let message;
+  const showRematch = ! reason.toLowerCase().includes('opponent left'),
+    choices = {
+      ok: () => { if (showRematch) { Ready.display('rematch'); } },
+      leave,
+    };
+
   gamestatechange('gameover');
   Timer.stop();
   turnchange(null);
+
   if (winner === gmeta.position) {
     message = 'you win!';
   } else if (winner === 'draw') {
@@ -325,11 +333,14 @@ export function gameover({ winner, reason }) {
   } else {
     message = 'you lose';
   }
-  if ( reason) {
+  if (reason) {
     message = `<p>${reason}<p>${message}`;
   }
-  Dialog.displayMessage(message);
-  Ready.display('rematch');
+
+  if ( showRematch ) {
+    choices['rematch'] = rematch;
+  }
+  Dialog.choices(message, choices);
 }
 
 export function turn({ player }) {
@@ -358,4 +369,10 @@ export function ability_used(event): null | animData {
     return null;
   }
   return AbilityEvent[event.type](event);
+}
+
+export function table_shutdown() {
+  Dialog.alert('table closed').then(() => {
+    window.location.href = 'index.html';
+  });
 }

@@ -7,6 +7,7 @@ import * as Select from './select.js';
 import * as Dialog from './dialog.js';
 import * as Element from './element.js';
 import * as Triggers from './triggers.js';
+import * as Tooltip from './tooltip.js';
 
 interface Ability {
   name: string;
@@ -59,16 +60,13 @@ function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit
 
 function abilityButton(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = null) {
   const abilbut = Element.create({
-    tag: 'button',
-    className: 'unit-ability',
-    innerHTML: unit.ability.name,
-    children: [
-      Element.create({
-        className: 'tooltip',
-        innerHTML: unit.ability.description})
-    ]}),
+      tag: 'button',
+      className: 'unit-ability',
+      innerHTML: unit.ability.name,
+    }),
     square = unitSquare ? unitSquare : el.parentNode as HTMLElement;
 
+  // Tooltip.addTooltip(abilbut, unit.ability.description);
   bindAbility(abilbut, square, unit);
   el.appendChild(abilbut);
 }
@@ -78,12 +76,9 @@ function abilityIcon(unit: Unit, el: HTMLElement) {
     const abil = Element.create({
       className: 'unit-ability',
       innerHTML: unit.ability.name,
-      children: [
-        Element.create({
-          className: 'tooltip',
-          innerHTML: unit.ability.description})
-      ]});
+    });
 
+    Tooltip.addTooltip(abil, unit.ability.description);
     el.appendChild(abil);
   }
 }
@@ -150,16 +145,10 @@ function shortTriggers(unit: Unit, el: HTMLElement) {
     return;
   }
   for ( const { name, description, timing } of triggers ) {
-    const tttext = timing ? `${timing}: ${description}` : description;
-    triggerEls.push(Element.create({
-      className: `trigger-symbol ${name}-t`,
-      children: [
-        Element.create({
-          className: 'tooltip',
-          innerHTML: tttext
-        })
-      ]})
-    );
+    const tttext = timing ? `${timing}: ${description}` : description,
+      ts = Element.create({className: `trigger-symbol ${name}-t`});
+    Tooltip.addTooltip(ts, tttext);
+    triggerEls.push(ts);
   }
   el.appendChild(Element.create({
     className: 'triggers',

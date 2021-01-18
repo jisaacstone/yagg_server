@@ -68,7 +68,6 @@ defmodule Yagg.Table do
         restart: :transient
       }
     )
-    IO.inspect(table: pid, config: configuration)
     {:ok, table}
   end
 
@@ -184,10 +183,14 @@ defmodule Yagg.Table do
     end
   end
   def handle_info(:timeout, table) do
-    IO.inspect("TIMEOUT")
-    {table, events} = Table.Timer.timeout(table)
-    notify(table, events)
-    {:noreply, table}
+    case Table.Timer.timeout(table) do
+      {:shutdown_table, events} ->
+        notify(table, events)
+        {:stop, :normal, table}
+      {table, events} ->
+        notify(table, events)
+        {:noreply, table}
+    end
   end
   def handle_info(other, table) do
     IO.inspect([unexpected_info: other])
@@ -219,7 +222,9 @@ defmodule Yagg.Table do
   defp handle_table_action(player, action, table) do
     case Yagg.Table.Action.resolve(action, table, player) do
       {:err, _} = err -> err
-      :shutdown_table -> :shutdown_table
+      :shutdown_table ->
+        notify(table, [Event.TableShutdown.new()])
+        :shutdown_table
       {newtable, events} ->
         {table, events} = handle_timer(table.board, newtable, events)
         notify(table, events)

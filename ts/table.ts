@@ -113,26 +113,6 @@ function fetchgamestate() {
   });
 }
 
-window.onload = function() {
-  const errbutton = document.getElementById('errbutton');
-  if (errbutton) {
-    errbutton.onclick = () => {
-      reporterr();
-    }
-  }
-
-  Player.check();
-  Request.gameaction('join', {}, 'table')
-    .then(() => {
-      fetchgamestate();
-      listen();
-    }).catch((err) => {
-      console.log({ joinerror: err });
-      fetchgamestate();
-      listen();
-    });
-};
-
 function setstate(gamedata, phase) {
   console.log({gamedata, phase});
   let players = 0;
@@ -154,3 +134,30 @@ function reporterr() {
   const reporttext = prompt("Report an error with game state", "describe the problem");
   Request.post(`table/${tableid()}/report`, { report: reporttext, meta: gmeta });
 }
+
+window.onload = function() {
+  const errbutton = document.getElementById('errbutton');
+  if (errbutton) {
+    errbutton.onclick = () => {
+      reporterr();
+    }
+  }
+
+  document.addEventListener('touchend', () => {
+    const hovered = document.querySelectorAll('.hover');
+    for ( const el of hovered ) {
+      el.classList.remove('hover');
+    }
+  }, false);
+
+  Player.check();
+  Request.gameaction('join', {}, 'table')
+    .then(() => {
+      fetchgamestate();
+      listen();
+    }).catch((err) => {
+      console.log({ joinerror: err });
+      fetchgamestate();
+      listen();
+    });
+};

@@ -8,7 +8,13 @@ import * as Infobox from './infobox.js';
 import * as Element from './element.js';
 const global = { selected: null };
 export function selected() {
-    return global.selected !== null;
+    if (global.selected === null) {
+        return false;
+    }
+    if (Object.keys(global.selected).length === 0) {
+        return false;
+    }
+    return true;
 }
 function action(actType, args, cb = null) {
     gameaction(actType, args, 'board')
@@ -132,6 +138,7 @@ function maybeSidebar(el) {
 function handleSelect(el, meta) {
     const options = [];
     maybeSidebar(el);
+    console.log('sidebard');
     if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
         Array.prototype.forEach.call(document.querySelectorAll(`.${gmeta.position}row .boardsquare`), el => {
             if (!el.firstChild) {
@@ -164,7 +171,7 @@ export function select(thisEl, meta) {
         if ((gmeta.boardstate === 'gameover') ||
             (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) || // not your turn
             (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile'))) {
-            thisEl.firstChild && thisEl.firstChild.dispatchEvent(new Event('sidebar'));
+            maybeSidebar(thisEl);
             return;
         }
         if (handleSomethingAlreadySelected(thisEl, meta)) {

@@ -10,7 +10,9 @@ import * as Element from './element.js';
 const global = { selected: null };
 
 export function selected(): boolean {
-  return global.selected !== null;
+  if (global.selected === null) { return false }
+  if (Object.keys(global.selected).length === 0) { return false }
+  return true;
 }
 
 function action(actType, args, cb=null) {
@@ -146,6 +148,7 @@ function maybeSidebar(el: HTMLElement) {
 function handleSelect(el: HTMLElement, meta) {
   const options = [];
   maybeSidebar(el);
+  console.log('sidebard');
   if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
     Array.prototype.forEach.call(
       document.querySelectorAll(`.${gmeta.position}row .boardsquare`),
@@ -183,7 +186,7 @@ export function select(thisEl, meta) {
       (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) ||  // not your turn
       (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile'))
     ){
-      thisEl.firstChild && thisEl.firstChild.dispatchEvent(new Event('sidebar'));
+      maybeSidebar(thisEl);
       return;
     }
     if (handleSomethingAlreadySelected(thisEl, meta)) {

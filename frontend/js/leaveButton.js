@@ -53,7 +53,7 @@ function clear() {
         existing.remove();
     }
 }
-function rematch() {
+export function rematch() {
     return Request.gameaction('concede', {}, 'board').then(() => {
         return Request.gameaction('ready', {}, 'board');
     }).then(() => {

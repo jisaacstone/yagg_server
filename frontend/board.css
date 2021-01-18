@@ -223,7 +223,8 @@ body {
   font-size: 50%;
 }
 
-.boardsquare .unit .unit-name {
+.boardsquare .unit .unit-name,
+.boardsquare .unit .unit-ability {
   display: none;
 }
 
@@ -398,19 +399,29 @@ body {
   border-color: var(--ui-alt-dark);
   text-shadow: var(--ui-alt-desaturated-transparent) -1px -1px 0;
   text-overflow: ellipsis;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   grid-area: ability;
   border-width: 0.1em;
   cursor: pointer;
   box-shadow: inset 0.2em 0.2em 0.3em rgba(240, 241, 242, 0.5);
+  min-height: 1.1em;
 }
 .unit-ability:hover {
   cursor: pointer;
   background-color: var(--ui-main-light);
 }
+.hover .tooltip,
 .unit-ability:hover .tooltip ,
 .trigger-symbol:hover .tooltip {
   display: block;
+}
+
+.candidate .unit-ability {
+  overflow: visible;
+  text-align: center;
+  margin: 0.3em;
+  background-color: var(--white-transparent-med);
 }
 
 .triggers {
@@ -454,10 +465,10 @@ body {
 
 .tooltip {
   display: none;
-  position: absolute;
-  margin-left: 0.4em
-  min-width: 10%;
-  max-width: 20%;
+  position: relative;
+  margin-left: 0.4em;
+  min-width: 5em;
+  max-width: 20em;
   padding: 0.3em;
   border-radius: 0.6em;
   font-size: 80%;

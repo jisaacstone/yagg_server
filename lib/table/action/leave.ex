@@ -23,6 +23,7 @@ defmodule Table.Action.Leave do
   defp leave(table, {position, player}) do
     {table, events} = Player.remove(table, player) |> maybe_set_state(position)
     events = [Event.new(:player_left, player: position, name: player.name) | events]
+    table = Table.Timer.kill_table_timer(table)
     {table, events}
   end
 

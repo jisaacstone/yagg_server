@@ -25,10 +25,18 @@ defmodule Table.Timer do
     {table, [Event.Timer.new(player: position, timer: milliseconds) | events]}
   end
 
+  def kill_table_timer(table) do
+    milliseconds = 20 * 1000
+    table = set(table, milliseconds)
+    IO.inspect(mils: milliseconds, timer: table.timer)
+    table
+  end
+    
+
   def timeout(table) do
     # check for race conditions
     case Process.read_timer(table.timer) do
-      :false -> end_game(table)
+      :false -> end_game(table) |> check_players()
       _ -> {table, []}
     end
   end
@@ -53,6 +61,13 @@ defmodule Table.Timer do
 
   defp end_game(table) do
     {table, []}
+  end
+
+  defp check_players({%{players: [_, _]} = table, events}) do
+    {table, events}
+  end
+  defp check_players({_table, events}) do
+    {:shutdown_table, [Event.TableShutdown.new() | events]}
   end
 
   defp whoisready(%{north: %{ready: :true}}), do: :north

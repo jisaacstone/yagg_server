@@ -13,14 +13,18 @@ export function render(type) {
 }
 function renderWater() {
     const waterEl = Element.create({ className: 'feature water' });
-    waterEl.addEventListener('click', sidebar(waterEl, 'water'));
+    for (const evt of ['click', 'sidebar']) {
+        waterEl.addEventListener(evt, sidebar(waterEl, 'water'));
+    }
     waterEl.addEventListener('dblclick', details(`Water:
   blocks movement. Some special abilities can pass over it`));
     return waterEl;
 }
 function renderBlock() {
     const blockEl = Element.create({ className: 'feature block' });
-    blockEl.addEventListener('sidebar', sidebar(blockEl, 'block'));
+    for (const evt of ['click', 'sidebar']) {
+        blockEl.addEventListener(evt, sidebar(blockEl, 'block'));
+    }
     blockEl.addEventListener('dblclick', details(`Block:
   Can be pushed if nothing is on the other side.`));
     return blockEl;
