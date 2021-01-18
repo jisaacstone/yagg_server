@@ -114,28 +114,26 @@ function anyDetails(unit) {
     return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
 function shortTriggers(unit, el) {
-    if (unit.triggers && Object.keys(unit.triggers).length !== 0) {
-        const triggers = Element.create({ className: 'triggers' });
-        let tttext;
-        for (const [name, trigger] of Object.entries(unit.triggers)) {
-            if (name === 'move' && unit.attributes.includes('immobile')) {
-                tttext = 'Immobile';
-            }
-            else {
-                tttext = `${Triggers.timingOf(name)}: ${trigger.description}`;
-            }
-            triggers.appendChild(Element.create({
-                className: `trigger-symbol ${name}-t`,
-                children: [
-                    Element.create({
-                        className: 'tooltip',
-                        innerHTML: tttext
-                    })
-                ]
-            }));
-        }
-        el.appendChild(triggers);
+    const triggers = Triggers.get(unit), triggerEls = [];
+    if (triggers.length === 0) {
+        return;
     }
+    for (const { name, description, timing } of triggers) {
+        const tttext = timing ? `${timing}: ${description}` : description;
+        triggerEls.push(Element.create({
+            className: `trigger-symbol ${name}-t`,
+            children: [
+                Element.create({
+                    className: 'tooltip',
+                    innerHTML: tttext
+                })
+            ]
+        }));
+    }
+    el.appendChild(Element.create({
+        className: 'triggers',
+        children: triggerEls
+    }));
 }
 function infoview(unit, el, squareEl) {
     renderAttrs(unit, el);
@@ -175,7 +173,7 @@ const fakeDescriptions = [
     'Whistles off key',
 ];
 function describe(unit, square = null) {
-    const descriptions = [];
+    const descriptions = [], triggers = Triggers.get(unit);
     if (unit.ability) {
         const abilname = Element.create({
             className: 'ability-name uibutton',
@@ -192,10 +190,10 @@ function describe(unit, square = null) {
         }
         descriptions.push(ability);
     }
-    if (unit.triggers && Object.keys(unit.triggers).length > 0) {
-        const triggers = Element.create({ className: 'triggers' });
-        for (const [name, trigger] of Object.entries(unit.triggers)) {
-            triggers.appendChild(Element.create({
+    if (triggers.length > 0) {
+        const triggersEl = Element.create({ className: 'triggers' });
+        for (const { name, description, timing } of triggers) {
+            triggersEl.appendChild(Element.create({
                 className: `unit-trigger ${name}-trigger`,
                 children: [
                     Element.create({
@@ -203,18 +201,18 @@ function describe(unit, square = null) {
                         children: [
                             Element.create({
                                 className: 'tooltip',
-                                innerHTML: Triggers.timingOf(name)
+                                innerHTML: timing ? timing : name
                             })
                         ]
                     }),
                     Element.create({
                         className: 'trigger-description',
-                        innerHTML: `${trigger.description}`
+                        innerHTML: `${description}`
                     })
                 ]
             }));
         }
-        descriptions.push(triggers);
+        descriptions.push(triggersEl);
     }
     if (descriptions.length === 0 && unit.name) {
         const seed = unit.name.charCodeAt(0) + unit.name.charCodeAt(1) + unit.name.charCodeAt(2) + (gmeta.position || 'e').charCodeAt(0), desc = fakeDescriptions[seed % fakeDescriptions.length];

@@ -435,8 +435,11 @@ body {
 .move-t {
   background-image: url("img/move_t.png");
 }
-.immobile .move-t {
+.immobile-t {
   background-image: url("img/immobile_t.png");
+}
+.invisible-t {
+  background-image: url("img/invisible_t.png");
 }
 .attack-t {
   background-image: url("img/attack_t.png");

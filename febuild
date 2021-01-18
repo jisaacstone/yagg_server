@@ -23,6 +23,8 @@ while IFS= read -r -d $'\0' path; do
   cat "frontend/img/${path}" | pngquant - > "build/img/${path}"
 done < <(cd frontend/img && find . -name "*.png" -print0)
 
+find build -type f -exec brotli {} \;
+
 sed -ie "s|''|'https://yagg-game.com'|" build/js/exthost.js
 
 ( cd build && zip -r ../yagg ./* )
