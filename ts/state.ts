@@ -1,5 +1,6 @@
 import * as Instructions from './instructions.js';
 import * as LeaveButton from './leaveButton.js';
+import * as SFX from './sfx.js';
 
 export const gmeta = {
   position: null,

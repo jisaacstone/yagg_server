@@ -788,6 +788,22 @@ body {
 
 /* UI - buttons */
 
+#buttons {
+  grid-auto-flow: row;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  display: grid;
+  grid-area: buttons;
+  place-content: stretch;
+  place-self: stretch;
+  padding: 0 0.5em;
+}
+
+#readybutton,
+#returnbutton {
+  grid-column: 1 / span 2;
+}
+
 #readybutton {
   background-image: url('img/shimmer.png');
   animation: shimmer 8s linear infinite;
@@ -795,13 +811,20 @@ body {
 
 #leavebutton {
   opacity: 0.6;
+  margin-left: 1px;
+}
+
+#settingsbutton {
+  opacity: 0.6;
+  margin-right: 1px;
 }
 
 #table[data-gamestate=gameover] #leavebutton {
   opacity: 1;
 }
 
-#leavebutton:hover {
+#leavebutton:hover,
+#settingsbutton:hover {
   opacity: 1;
 }
 
@@ -824,16 +847,6 @@ body {
 .unit.south .uibutton,
 .unit.south button {
   border-color: var(--south-saturated);
-}
-
-#buttons {
-  grid-auto-flow: row;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-  display: grid;
-  grid-area: buttons;
-  place-content: stretch;
-  place-self: stretch;
-  padding: 0 0.5em;
 }
 
 /* UI - infobox */

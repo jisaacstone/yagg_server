@@ -13,7 +13,9 @@ import * as Hand from './hand.js';
 import * as AbilityEvent from './abilty_event.js';
 import * as Element from './element.js';
 import * as Timer from './timer.js';
-import { leave, rematch } from './leaveButton.js';
+import { leave } from './leaveButton.js';
+import * as SFX from './sfx.js';
+import * as Request from './request.js';
 
 const unitsbyindex = {};
 
@@ -126,6 +128,7 @@ export function unit_changed(event) {
 
 export function unit_placed(event) {
   const square = Board.square(event.x, event.y);
+  SFX.play('place');
   if (! square.firstChild) {
     const unit = Unit.render(event, null)
     square.appendChild(unit);
@@ -139,6 +142,7 @@ export function player_ready(event) {
     (document.querySelector('#player .playername') as HTMLElement).dataset.ready = 'true';
     Ready.hide();
   } else {
+    SFX.play('playerready');
     (document.querySelector('#opponent .playername') as HTMLElement).dataset.ready = 'true';
   }
 }
@@ -158,84 +162,88 @@ export function unit_died(event): animData {
       }
       unit.innerHTML = `<div class="death">${SKULL}</div>`;
       unit.dataset.dead = 'true';
-      return unit.animate(
-        { opacity: [1, 0] },
-        { duration: 500, easing: "ease-in" }
-      ).finished.then(() => {
-        unit.remove();
+      return SFX.play('death').then(() => {
+        return unit.animate(
+          { opacity: [1, 0] },
+          { duration: 500, easing: "ease-in" }
+        ).finished.then(() => {
+          unit.remove();
+        });
       });
     };
   return { animation, squares: [`${event.x},${event.y}`] };
 }
 
 export function thing_moved(event): animData {
-  const from = Board.square(event.from.x, event.from.y),
-    thing = from.firstChild as HTMLElement;
+  const from = Board.square(event.from.x, event.from.y);
   if (event.to.x !== undefined && event.to.y !== undefined) {
     const to = Board.square(event.to.x, event.to.y),
       fromRect = from.getBoundingClientRect(),
       toRect = to.getBoundingClientRect(),
       animation = () => {
-        const thingRect = thing.getBoundingClientRect(),
-          xoffset = thingRect.left - fromRect.left,
-          yoffset = thingRect.top - fromRect.top;
-        const a = thing.animate({ 
-          top: [fromRect.top + yoffset + 'px', toRect.top + yoffset + 'px'],
-          left: [fromRect.left + xoffset + 'px', toRect.left + xoffset + 'px'],
-        }, { duration: 200, easing: 'ease-in-out' });
-        Object.assign(thing.style, {
-          position: 'fixed',
-          width: thingRect.width + 'px',
-          height: thingRect.height + 'px',
-        });
-        if (! thing.dataset.dead) {
-          to.appendChild(thing);
-        }
-        return a.finished.then(() => {
-          thing.style.position = '';
-          thing.style.width = '';
-          thing.style.height = '';
-        });
-      };
-    return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
-  } else {
-    if (thing) {
-      thing.className = thing.className.replace(' owned', '');
-    }
-    if (event.direction) {
-      // moved offscreen
-      const animation = () => {
+        const thing = from.firstChild as HTMLElement;
+        return SFX.play('move').then(() => {
           const thingRect = thing.getBoundingClientRect(),
-            xpos = thingRect.left,
-            ypos = thingRect.top,
-            { x, y } = Board.in_direction(event.direction, thingRect.width);
-          const a = thing.animate([
-            { 
-              top: ypos + 'px',
-              left: xpos + 'px',
-              opacity: 1
-            },
-            {
-              top: ypos + y + 'px',
-              left: xpos + x + 'px',
-              opacity: 0.9
-            },
-            {
-              top: ypos + y + 'px',
-              left: xpos + x + 'px',
-              opacity: 0
-            },
-            ],
-            { duration: 400, easing: 'ease-in-out' });
+            xoffset = thingRect.left - fromRect.left,
+            yoffset = thingRect.top - fromRect.top;
+          const a = thing.animate({ 
+            top: [fromRect.top + yoffset + 'px', toRect.top + yoffset + 'px'],
+            left: [fromRect.left + xoffset + 'px', toRect.left + xoffset + 'px'],
+          }, { duration: 200, easing: 'ease-in-out' });
           Object.assign(thing.style, {
             position: 'fixed',
             width: thingRect.width + 'px',
             height: thingRect.height + 'px',
           });
+          if (! thing.dataset.dead) {
+            to.appendChild(thing);
+          }
           return a.finished.then(() => {
-            thing.remove();
+            thing.style.position = '';
+            thing.style.width = '';
+            thing.style.height = '';
           });
-        };
+        });
+      };
+    return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+  } else {
+    if (event.direction) {
+      console.log(event);
+      // moved offscreen
+      const animation = () => {
+        const thing = from.firstChild as HTMLElement,
+          thingRect = thing.getBoundingClientRect(),
+          xpos = thingRect.left,
+          ypos = thingRect.top,
+          { x, y } = Board.in_direction(event.direction, thingRect.width);
+        console.log({ xpos, ypos, x, y });
+        const a = thing.animate([
+          { 
+            top: ypos + 'px',
+            left: xpos + 'px',
+            opacity: 1
+          },
+          {
+            top: ypos + y + 'px',
+            left: xpos + x + 'px',
+            opacity: 0.9
+          },
+          {
+            top: ypos + y + 'px',
+            left: xpos + x + 'px',
+            opacity: 0
+          },
+          ],
+          { duration: 400, easing: 'ease-in-out' });
+        Object.assign(thing.style, {
+          position: 'fixed',
+          width: thingRect.width + 'px',
+          height: thingRect.height + 'px',
+        });
+        return a.finished.then(() => {
+          thing.remove();
+        });
+      };
       return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
     } else {
       return thing_gone(event.from);
@@ -267,48 +275,50 @@ export function battle({ from, to }) {
   const attacker = Board.thingAt(from.x, from.y),
     defender = Board.thingAt(to.x, to.y),
     animation = () => {
-      const arect = attacker.getBoundingClientRect(),
-        drect = defender.getBoundingClientRect(),
-        xpos = arect.left,
-        ypos = arect.top;
-      let xdiff = 0, ydiff = 0;
+      return SFX.play('battle').then(() => {
+        const arect = attacker.getBoundingClientRect(),
+          drect = defender.getBoundingClientRect(),
+          xpos = arect.left,
+          ypos = arect.top;
+        let xdiff = 0, ydiff = 0;
 
-      if (from.x !== to.x) {
-        xdiff = (drect.left > arect.left ? drect.left - arect.right : drect.right - arect.left) * 1.8;
-      }
+        if (from.x !== to.x) {
+          xdiff = (drect.left > arect.left ? drect.left - arect.right : drect.right - arect.left) * 1.8;
+        }
 
-      if (from.y !== to.y) {
-        ydiff = (drect.top > arect.top ? drect.top - arect.bottom : drect.bottom - arect.top) * 1.8;
-      }
+        if (from.y !== to.y) {
+          ydiff = (drect.top > arect.top ? drect.top - arect.bottom : drect.bottom - arect.top) * 1.8;
+        }
 
-      Object.assign(attacker.style, {
-        position: 'fixed',
-        width: arect.width + 'px',
-        height: arect.height + 'px',
-      });
-      console.log({ xdiff, ydiff, arect, drect });
-      return attacker.animate(
-        { 
-          top: [ypos + 'px', ypos + ydiff + 'px'],
-          left: [xpos + 'px', xpos + xdiff + 'px']
-        },
-        { duration: 100, easing: 'ease-in' }
-      ).finished.then(() => {
-        defender.animate(
-          { opacity: [1, 0.5, 1] },
-          { duration: 80 }
-        );
+        Object.assign(attacker.style, {
+          position: 'fixed',
+          width: arect.width + 'px',
+          height: arect.height + 'px',
+        });
+        console.log({ xdiff, ydiff, arect, drect });
         return attacker.animate(
           { 
-            top: [ypos + ydiff + 'px', ypos + 'px'],
-            left: [xpos + xdiff + 'px', xpos + 'px']
+            top: [ypos + 'px', ypos + ydiff + 'px'],
+            left: [xpos + 'px', xpos + xdiff + 'px']
           },
-          { duration: 80, easing: 'ease-out' }
-        ).finished;
-      }).then(() => {
-        attacker.style.position = '';
-        attacker.style.width = '';
-        attacker.style.height = '';
+          { duration: 100, easing: 'ease-in' }
+        ).finished.then(() => {
+          defender.animate(
+            { opacity: [1, 0.5, 1] },
+            { duration: 80 }
+          );
+          return attacker.animate(
+            { 
+              top: [ypos + ydiff + 'px', ypos + 'px'],
+              left: [xpos + xdiff + 'px', xpos + 'px']
+            },
+            { duration: 80, easing: 'ease-out' }
+          ).finished;
+        }).then(() => {
+          attacker.style.position = '';
+          attacker.style.width = '';
+          attacker.style.height = '';
+        });
       });
     };
   return { animation, squares: [`${to.x},${to.y}`, `${from.x},${from.y}`] };
@@ -327,10 +337,13 @@ export function gameover({ winner, reason }) {
   turnchange(null);
 
   if (winner === gmeta.position) {
+    SFX.play('go_win');
     message = 'you win!';
   } else if (winner === 'draw') {
+    SFX.play('go_draw');
     message = 'draw game';
   } else {
+    SFX.play('go_lose');
     message = 'you lose';
   }
   if (reason) {
@@ -338,7 +351,11 @@ export function gameover({ winner, reason }) {
   }
 
   if ( showRematch ) {
-    choices['rematch'] = rematch;
+    choices['rematch'] = () => {
+      return Request.gameaction('ready', {}, 'board').then(() => {
+        window.location.reload();
+      });
+    };
   }
   Dialog.choices(message, choices);
 }

@@ -6,6 +6,7 @@ import * as Jobfair from './jobfair.js';
 import * as Unit from './unit.js';
 import * as Infobox from './infobox.js';
 import * as Element from './element.js';
+import * as SFX from './sfx.js';
 
 const global = { selected: null };
 
@@ -148,8 +149,8 @@ function maybeSidebar(el: HTMLElement) {
 function handleSelect(el: HTMLElement, meta) {
   const options = [];
   maybeSidebar(el);
-  console.log('sidebard');
   if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
+    SFX.play('select');
     Array.prototype.forEach.call(
       document.querySelectorAll(`.${gmeta.position}row .boardsquare`),
       el => {

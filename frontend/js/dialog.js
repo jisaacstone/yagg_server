@@ -1,6 +1,6 @@
 import * as Overlay from './overlay.js';
 import * as Element from './element.js';
-function createDialog(cls, ...children) {
+export function createDialog(cls, ...children) {
     // wrap so we can get drop-shadow effect
     const msgEl = Element.create({ className: `message ${cls}`, children });
     return Element.create({

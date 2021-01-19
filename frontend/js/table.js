@@ -8,7 +8,10 @@ import * as Event from './event.js';
 import * as Jobfair from './jobfair.js';
 import * as Board from './board.js';
 import * as Dialog from './dialog.js';
+import * as Element from './element.js';
 import * as LeaveButton from './leaveButton.js';
+import * as SFX from './sfx.js';
+import * as Settings from './settings.js';
 function render_board(board, players) {
     if (players !== 2) {
         return;
@@ -145,4 +148,13 @@ window.onload = function () {
         fetchgamestate();
         listen();
     });
+    const settingsEl = Element.create({
+        id: 'settingsbutton',
+        tag: 'button',
+        className: 'uibutton',
+        innerHTML: 'optons'
+    });
+    settingsEl.onclick = Settings.show;
+    document.getElementById('buttons').appendChild(settingsEl);
+    SFX.play('select');
 };
