@@ -210,6 +210,7 @@ export function thing_moved(event): animData {
     console.log(event);
     // moved offscreen
     const animation = () => {
+      console.log({ from, child: from.firstChild });
       const thing = from.firstChild as HTMLElement,
         thingRect = thing.getBoundingClientRect(),
         xpos = thingRect.left,

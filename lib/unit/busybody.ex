@@ -42,7 +42,7 @@ defmodule Unit.Busybody do
     end
 
     defp place(board, [], effects, events) do
-      {board, events ++ [Event.Multi.new(events: effects)]}
+      {board, [Event.Multi.new(events: effects) | events]}
     end
     defp place(board, [{from, to, thing} | things], effects, events) do
       case Grid.thing_at(board, to) do
