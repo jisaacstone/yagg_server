@@ -5,10 +5,10 @@ function fetchUnits() {
     const unitsEl = document.getElementById('units');
     return Request.request('units').then((units) => {
         units.sort((a, b) => {
-          if (a.name < b.name) {
-            return -1;
-          }
-          return 1;
+            if (a.name < b.name) {
+                return -1;
+            }
+            return 1;
         });
         for (const unit of units) {
             unit.player = "unowned";

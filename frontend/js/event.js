@@ -171,44 +171,62 @@ export function thing_moved(event) {
         };
         return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
     }
+    else if (event.direction) {
+        console.log(event);
+        // moved offscreen
+        const animation = () => {
+            const thing = from.firstChild, thingRect = thing.getBoundingClientRect(), xpos = thingRect.left, ypos = thingRect.top, { x, y } = Board.in_direction(event.direction, thingRect.width);
+            console.log({ xpos, ypos, x, y });
+            const a = thing.animate([
+                {
+                    top: ypos + 'px',
+                    left: xpos + 'px',
+                    opacity: 1
+                },
+                {
+                    top: ypos + y + 'px',
+                    left: xpos + x + 'px',
+                    opacity: 0.9
+                },
+                {
+                    top: ypos + y + 'px',
+                    left: xpos + x + 'px',
+                    opacity: 0
+                },
+            ], { duration: 400, easing: 'ease-in-out' });
+            Object.assign(thing.style, {
+                position: 'fixed',
+                width: thingRect.width + 'px',
+                height: thingRect.height + 'px',
+            });
+            return a.finished.then(() => {
+                thing.remove();
+            });
+        };
+        return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+    }
+    else if (event.to === 'hand') {
+        const animation = () => {
+            const thing = from.firstChild, thingRect = thing.getBoundingClientRect(), handRect = document.getElementById('hand').getBoundingClientRect(), xpos = thingRect.left, ypos = thingRect.top, to_x = (handRect.left + handRect.right - thingRect.width) / 2, to_y = (handRect.top + handRect.bottom - thingRect.height) / 2, a = thing.animate({
+                top: [ypos + 'px', to_y + 'px'],
+                left: [xpos + 'px', to_x + 'px'],
+                opacity: [1, 0]
+            }, {
+                duration: 500, easing: 'ease-out'
+            });
+            Object.assign(thing.style, {
+                position: 'fixed',
+                width: thingRect.width + 'px',
+                height: thingRect.height + 'px',
+            });
+            return a.finished.then(() => {
+                thing.remove();
+            });
+        };
+        return { animation, squares: [`${event.from.x},${event.from.y}`] };
+    }
     else {
-        if (event.direction) {
-            console.log(event);
-            // moved offscreen
-            const animation = () => {
-                const thing = from.firstChild, thingRect = thing.getBoundingClientRect(), xpos = thingRect.left, ypos = thingRect.top, { x, y } = Board.in_direction(event.direction, thingRect.width);
-                console.log({ xpos, ypos, x, y });
-                const a = thing.animate([
-                    {
-                        top: ypos + 'px',
-                        left: xpos + 'px',
-                        opacity: 1
-                    },
-                    {
-                        top: ypos + y + 'px',
-                        left: xpos + x + 'px',
-                        opacity: 0.9
-                    },
-                    {
-                        top: ypos + y + 'px',
-                        left: xpos + x + 'px',
-                        opacity: 0
-                    },
-                ], { duration: 400, easing: 'ease-in-out' });
-                Object.assign(thing.style, {
-                    position: 'fixed',
-                    width: thingRect.width + 'px',
-                    height: thingRect.height + 'px',
-                });
-                return a.finished.then(() => {
-                    thing.remove();
-                });
-            };
-            return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
-        }
-        else {
-            return thing_gone(event.from);
-        }
+        console.error({ err: 'unrecognized move', event });
     }
 }
 export function thing_gone(event) {
