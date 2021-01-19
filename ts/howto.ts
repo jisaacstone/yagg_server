@@ -6,9 +6,15 @@ function fetchUnits() {
   const unitsEl = document.getElementById('units');
   return Request.request('units').then(
     (units: Unit.Unit[]) => {
+      units.sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        return 1;
+      });
       for (const unit of units) {
         unit.player = "unowned";
-        const unitEl = Unit.render(unit, 0, true);
+        const unitEl = Unit.render(unit, 0, true, true);
         unitEl.onclick = Unit.detailViewFn(unit, unitEl.className);
         unitsEl.appendChild(
           Element.create({

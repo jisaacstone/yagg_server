@@ -166,7 +166,7 @@ window.onload = function() {
     id: 'settingsbutton',
     tag: 'button',
     className: 'uibutton',
-    innerHTML: 'optons'
+    innerHTML: 'options'
   });
   settingsEl.onclick = Settings.show;
   document.getElementById('buttons').appendChild(settingsEl);

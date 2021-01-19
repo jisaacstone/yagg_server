@@ -41,33 +41,34 @@ section {
   margin-bottom: 1.5em;
   margin-right: 0.7em;
   background-color: var(--white-transparent-low);
-  padding: 0.2em;
+  padding: 0.8em 0.2em;
   border-radius: 0.2em;
 }
 
 h2 {
-  margin: 0.5em 0.2em;
+  margin: 0.5em auto;
   padding-right: 1em;
   color: var(--ui-main-dark-desaturated);
   text-shadow: 2px 2px 2px var(--ui-main-dark-transparent);
+  max-width: 35em;
 }
 
 h3 {
-  margin: 0.3em 1em;
+  margin: 0.3em auto;
   padding-right: 1em;
-  border-bottom: 2px solid var(--ui-alt-saturated);
   color: var(--ui-alt-dark);
   text-shadow: 1px 1px 2px var(--ui-main-dark-transparent);
-  display: inline-block;
 }
 
 h4 {
-  margin: 0 2em;
+  margin: 0 auto;
   color: var(--ui-main-dark);
   padding-right: 1em;
-  border-bottom: 2px solid var(--ui-alt-desaturated);
   text-shadow: 1px 1px 1px var(--ui-main-dark-transparent);
-  display: inline-block;
+}
+
+body h1, body h2, body h3, body h4 {
+  text-align: center;
 }
 
 img {
@@ -93,10 +94,18 @@ p {
   height: 8em;
 }
 
+#units {
+  display: grid;
+  width: 30em;
+  margin: auto;
+  grid-template-columns: 10em 10em 10em;
+}
+
 #units .unit {
-  max-width: 25em;
-  min-height: 5em;
-  margin: 0.2em auto;
+  height: 8em;
+  width: 8em;
+  margin: 1em auto;
+  place-self: center;
   cursor: pointer;
 }
 
@@ -104,15 +113,56 @@ p {
   background-color: var(--ui-main-desaturated);
 }
 
+.grid {
+  display: grid;
+  grid-auto-flow: column;
+  max-width: 35em;
+  margin: 0.2em auto;
+}
+
+.grid div {
+  margin: 0.5em;
+}
+
+#table {
+  filter: saturate(50%) sepia(15%) contrast(80%);
+}
+
 .description {
+  color: black;
   place-self: center;
   padding: 0.3em;
-  border: 0.3em inset var(--ui-main-dark);
+  border: 0.3em inset red;
   border-radius: 0.6em;
   display: grid;
   place-content: center;
   background-color: var(--white-transparent-low);
   z-index: 100;
+  font-size: 80%;
+  filter: drop-shadow(1em 1em 1em black);
+}
+
+.uparrow::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 46%;
+  width: 0;
+  height: 0;
+  border-bottom: 2em solid red;
+  border-right: 0.6em solid transparent;
+  border-left: 0.6em solid transparent;
+}
+.downarrow::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 46%;
+  width: 0;
+  height: 0;
+  border-top: 2em solid red;
+  border-right: 0.6em solid transparent;
+  border-left: 0.6em solid transparent;
 }
 
 .player_ { grid-area: player }
@@ -133,4 +183,10 @@ p {
   grid-area: board;
   align-self: end;
   margin-bottom: 4em;
+}
+
+a.uibutton {
+  width: 10em;
+  padding: 0.5em 0;
+  text-decoration: none;
 }

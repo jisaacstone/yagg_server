@@ -25,11 +25,13 @@
 </head>
 <body>
   <header>
-  <a href="index.html">back to game</a>
+  <!-- TODO: icon? -->
+  <a class="uibutton" href="index.html">back to game</a>
+  <!-- space here -->
   <nav>
   <a href="#phases">phases</a>
   <a href="#triggers">triggers</a>
-  <a href="#board-features">features</a>
+  <a href="#board-features">board</a>
   <a href="#game-types">game types</a>
   <a href="#unit-types">units</a>
   </nav>
@@ -38,6 +40,7 @@
   <section id="phases">
     <h2>Phases</h2>
     <p>A game of YAGG has 2-3 phases, depending on the game type.
+
     <h3>Recruitment</h3>
     <!-- example recruitment table -->
     <div id="table" data-gamestate="jobfair">
@@ -51,7 +54,7 @@
         <p>timer
       </div>
       <div class="description infobox_">
-        <p>click for more detailed description
+        <p>click here for a detailed description
       </div>
       <div class="description jobfair_">
         <p>select your starting units
@@ -73,11 +76,12 @@
           <div class="unit-name">electromouse</div>
           <div class="unit-attack">3</div>
           <div class="unit-defense">4</div>
-          <button class="unit-ability">mousetrap<div class="tooltip">Set an invisible trap in the current square that captures units</div></button>
+          <button class="unit-ability">mousetrap</button>
         </div>
       </div>
       <div id="buttons">
         <button class="uibutton" id="leavebutton">leave</button>
+        <button class="uibutton" id="settingsbutton">options</button>
         <div id="counter">0</div>
         <button id="readybutton" class="uibutton">recruit</button>
       </div>
@@ -115,10 +119,10 @@
       <div class="description hand_">
         <p>Your hand. Place units from here onto the starting row
       </div>
-      <div class="description southrow_">
+      <div class="description southrow_ uparrow">
         <p>Your starting units will be on these first two rows
       </div>
-      <div class="description northrow_">
+      <div class="description northrow_ downarrow">
         <p>Your opponent's units will be here. You will not see them until after you both press "ready"
       </div>
       <div class="description buttons_">
@@ -126,12 +130,12 @@
       </div>
       <div id="player">
         <div class="playerdetails">
-          <div class="playername">cool player</div><img class="avatar" src="img/avatar_1.png"><div class="timer"></div>
+          <div class="playername">cool player</div><img class="avatar" src="img/avatar_2.png"><div class="timer"></div>
         </div>
       </div>
       <div id="opponent">
         <div class="playerdetails">
-          <div class="playername">opponent</div><img class="avatar" src="img/avatar_4.png"><div class="timer"></div>
+          <div class="playername">opponent</div><img class="avatar" src="img/avatar_5.png"><div class="timer"></div>
         </div>
       </div>
       <div id="timer" class="timer relaxed">323</div>
@@ -154,17 +158,17 @@
       <div class="description southrow_">
         <p>Move your units to attack
       </div>
-      <div class="description infobox_">
+      <div class="description infobox_ downarrow">
         <p>press this button to use the unit's special ability
       </div>
       <div id="player">
         <div class="playerdetails">
-          <div class="playername">cool player</div><img class="avatar" src="img/avatar_1.png"><div class="timer"></div>
+          <div class="playername">cool player</div><img class="avatar" src="img/avatar_7.png"><div class="timer"></div>
         </div>
       </div>
       <div id="opponent">
         <div class="playerdetails">
-          <div class="playername">opponent</div><img class="avatar" src="img/avatar_4.png"><div class="timer"></div>
+          <div class="playername">opponent</div><img class="avatar" src="img/avatar_6.png"><div class="timer"></div>
         </div>
       </div>
       <div id="timer" class="timer"></div>
@@ -173,16 +177,15 @@
           <div class="unit-name">maycorn</div>
           <div class="unit-attack">3</div>
           <div class="unit-defense">4</div>
-          <button class="unit-ability">spark<div class="tooltip">Fire a spark forward that kills units having defense less than this unit's attack</div></button>
+          <button class="unit-ability">spark</button>
           <div class="triggers">
-            <div class="trigger-symbol">
-            &#x1F480;&#xFE0E;
-            <div class="tooltip">After death: Fire a spark in all directions that kills units having 0 defense </div></div>
+            <div class="trigger-symbol death-t"> </div>
           </div>
         </div>
       </div>
       <div id="buttons">
         <button class="uibutton" id="leavebutton">leave</button>
+        <button class="uibutton" id="settingsbutton">options</button>
       </div>
       <div id="board"><div class="boardrow southrow startrow"><div class="boardsquare" id="c4-0"></div><div class="boardsquare" id="c3-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/sparky.png&quot;);"><div class="unit-name">sparky</div></span></div><div class="boardsquare" id="c2-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c1-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c0-0"></div></div><div class="boardrow southrow startrow"><div class="boardsquare" id="c4-1"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c3-1"></div><div class="boardsquare" id="c2-1"></div><div class="boardsquare" id="c1-1"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c0-1" data-uistate=""><span data-index="6" class="unit north owned" style="background-image: url(&quot;img/busybody.png&quot;);"><div class="unit-name">busybody</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></div></div><div class="boardrow"><div class="boardsquare" id="c4-2"><div class="feature water"></div></div><div class="boardsquare" id="c3-2" data-uistate=""><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c2-2" data-uistate=""><div class="feature block" style=""></div></div><div class="boardsquare" id="c1-2" data-uistate=""><span data-index="4" class="unit north owned" style="background-image: url(&quot;img/sparky.png&quot;);"><div class="unit-name">sparky</div><div class="unit-attack">1</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c0-2" data-uistate=""></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c4-3" data-uistate=""><span data-index="0" class="unit north owned" style="background-image: url(&quot;img/maycorn.png&quot;);"><div class="unit-name">maycorn</div><div class="unit-attack">3</div><div class="unit-defense">4</div></span></div><div class="boardsquare" id="c3-3" data-uistate=""><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c2-3" data-uistate=""><span data-index="3" class="unit north owned" style="background-image: url(&quot;img/tinker.png&quot;);"><div class="unit-name">tinker</div><div class="unit-attack">3</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c1-3" data-uistate=""><span data-index="5" class="unit north owned" style="background-image: url(&quot;img/pushie.png&quot;);"><div class="unit-name">pushie</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div><div class="boardsquare" id="c0-3" data-uistate=""></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c4-4" data-uistate=""><span data-index="8" class="monarch unit north owned monarch" style="background-image: url(&quot;img/monarch.png&quot;);"><div class="unit-name">monarch</div><div class="unit-attack">1</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c3-4" data-uistate=""></div><div class="boardsquare" id="c2-4" data-uistate=""><span data-index="2" class="unit north owned" style="background-image: url(&quot;img/bezerker.png&quot;);"><div class="unit-name">bezerker</div><div class="unit-attack">9</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c1-4" data-uistate=""></div><div class="boardsquare" id="c0-4" data-uistate=""></div></div></div>
       <div id="hand"><span data-index="8" class="card" data-uistate=""></span><span data-index="7" class="card" data-uistate=""><span data-index="7" class="unit north owned" style="background-image: url(&quot;img/howloo.png&quot;);"><div class="unit-name">howloo</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></span><span data-index="6" class="card" data-uistate=""></span><span data-index="5" class="card" data-uistate=""></span><span data-index="4" class="card" data-uistate=""></span><span data-index="3" class="card" data-uistate=""></span><span data-index="2" class="card" data-uistate=""></span><span data-index="1" class="card" data-uistate=""></span><span data-index="0" class="card" data-uistate=""></span></div>
@@ -202,39 +205,51 @@
       <h4>Ability</h4>
       <p>Some units have special abilities. Using any ability will end your turn
   </section>
+
   <a class="top" href="#top">top</a>
   <section id="triggers">
     <h2>Triggers</h2>
-    <p>Some units have abilities that trigger under certain conditions
+    <p>Triggers are abilities that activate under certain conditions.
     <h3>Move</h3>
-    <p>A move trigger will activate after a unit moves.
-    If a unit loses a battle it's move trigger will not activate.
+    <p>This trigger activates after a unit moves.
+    If a unit attacks and is killed, its move trigger doesn't activate.
     <h3>Attack</h3>
-    <p>Attack triggers activate before a unit attacks.
-    Attack triggers may change how a unit does battle, or prevent battle from happening entirely.
+    <p>This trigger activates before a unit attacks.
+    Attack triggers can change how a unit battles, or prevent it from battling.
     <h3>Death</h3>
-    <p>Death triggers happen immediately after a unit dies.
-    In a battle if the opponent dies, the death trigger will happen before the attacker's move trigger.
+    <p>This trigger activates after a unit dies.
+    If a unit dies in battle, its death trigger activates before the attacker's move trigger.
   </section>
   <a class="top" href="#top">top</a>
+
   <section id="board-features">
     <h2>Board</h2>
     <p>The board size varies from 5x5 up to 8x8.
-    Boards also have water or block squares that affect gameplay
+    <p>Boards have water and block squares.
+    The position of each depends on game type.
     <h3>Water</h3>
-    <div class="boardsquare featuredemo"><div class="feature water"></div></div>
-    <p>Units cannot cross water, but some special abilities can cross over the top of water, such as Maycorn's spark or Howloo's horseshoe.
-    <p>Water squares can only be moved by Busybody's special ability.
+    <div class="grid">
+      <div class="boardsquare featuredemo"><div class="feature water"></div></div>
+      <div>
+        <p>Units cannot enter water. Projectiles such as Maycorn's spark or Howloo's horseshoe can pass over water.
+        <p>Water can only be moved by Busybody's special ability.
+      </div>
+    </div>
     <h3>Block</h3>
-    <div class="boardsquare featuredemo"><div class="feature block"></div></div>
-    <p>A block can be pushed by a unit if the square on the other side is empty. Otherwise a block will block movement.
-    Blocks are moved by special abilities the same as units.
-    <p>If you are trying to push a block but it will not move, there is likely an invisible unit on the other side.
+    <div class="grid">
+      <div class="boardsquare featuredemo"><div class="feature block"></div></div>
+      <div>
+        <p>A unit can push a block provided there is an empty square on the opposite side.
+        <p>Blocks can be moved by units' special abilites.
+      </div>
+    </div>
   </section>
   <a class="top" href="#top">top</a>
+
   <section id="game-types">
     <h2>Game Types</h2>
-    <p>Different game types have different units, board, phases and win conditions
+    <p>Game types have differing units, board, phases and win conditions.
+    <!-- nav here -->
     <h3>Fivers</h3>
     <div class="tabledesc">
       <div id="board">
@@ -244,7 +259,8 @@
         <div class="boardrow northrow startrow"><div class="boardsquare" id="c4-3"></div><div class="boardsquare" id="c3-3"></div><div class="boardsquare" id="c2-3"></div><div class="boardsquare" id="c1-3"></div><div class="boardsquare" id="c0-3"></div></div>
         <div class="boardrow northrow startrow"><div class="boardsquare" id="c4-4"></div><div class="boardsquare" id="c3-4"></div><div class="boardsquare" id="c2-4"></div><div class="boardsquare" id="c1-4"></div><div class="boardsquare" id="c0-4"></div></div>
       </div>
-      <p>Recruit 8 units to protect your monarch. Can win by killing your opponent's monarch or moving your monarch to the opposite side of the board
+      <p>Recruit 8 units to protect your monarch.
+      <p>Kill your opponent's monarch or move your monarch to the opposite side of the board to win.
     </div>
     <h3>Iceslide</h3>
     <div class="tabledesc">
@@ -259,8 +275,8 @@
         <div class="boardrow northrow startrow"><div class="boardsquare" id="c7-7"><div class="feature water"></div></div><div class="boardsquare" id="c6-7"></div><div class="boardsquare" id="c5-7"></div><div class="boardsquare" id="c4-7"></div><div class="boardsquare" id="c3-7"></div><div class="boardsquare" id="c2-7"></div><div class="boardsquare" id="c1-7"></div><div class="boardsquare" id="c0-7"></div></div>
       </div>
       <p>Recruit 12 units to protect your monarch.
-      Kill your opponent's monarch to win.
-      All units will slide until they encounter an obstacle.
+      <p>Kill your opponent's monarch to win.
+      <p>All units will slide until they encounter an obstacle.
     </div>
     <h3>Strat</h3>
     <div class="tabledec">
@@ -272,13 +288,14 @@
         <div class="boardrow northrow startrow"><div class="boardsquare" id="c5-4"></div><div class="boardsquare" id="c4-4"></div><div class="boardsquare" id="c3-4"></div><div class="boardsquare" id="c2-4"></div><div class="boardsquare" id="c1-4"></div><div class="boardsquare" id="c0-4"></div></div>
         <div class="boardrow northrow startrow"><div class="boardsquare" id="c5-5"></div><div class="boardsquare" id="c4-5"></div><div class="boardsquare" id="c3-5"></div><div class="boardsquare" id="c2-5"></div><div class="boardsquare" id="c1-5"></div><div class="boardsquare" id="c0-5"></div></div>
       </div>
-      <p>Capture the opponent's flag. Unlike monarchs, flags cannot move.
+      <p>No recruitment.
+      <p>Capture the opponent's flag to win.
     </div>
   </section>
   <a class="top" href="#top">top</a>
   <section id="unit-types">
     <h2>Units</h2>
-    <p>Different game types have different available units. Click any unit below to get more information on it
+    <p>Click any unit below for detailed information.
     <div id="units"></div>
   </section>
   <a class="top" href="#top">top</a>

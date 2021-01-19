@@ -800,6 +800,7 @@ body {
 }
 
 #readybutton,
+#counter,
 #returnbutton {
   grid-column: 1 / span 2;
 }
@@ -809,13 +810,10 @@ body {
   animation: shimmer 8s linear infinite;
 }
 
-#leavebutton {
-  opacity: 0.6;
-  margin-left: 1px;
-}
-
+#leavebutton,
 #settingsbutton {
   opacity: 0.6;
+  margin-left: 1px;
   margin-right: 1px;
 }
 
@@ -848,6 +846,19 @@ body {
 .unit.south button {
   border-color: var(--south-saturated);
 }
+
+#counter {
+  text-align: center;
+  color: var(--ui-main-saturated);
+  background-color: var(--white-transparent-high);
+  font-weight: bold;
+  font-size: 150%;
+  text-shadow: 0.2em 0.1em 0.2em 0.2em var(--ui-alt-desaturated);
+  display: grid;
+  align-content: center;
+  -webkit-text-stroke: 1px var(--ui-main-dark);
+}
+
 
 /* UI - infobox */
 
@@ -919,18 +930,6 @@ body {
 
 .candidate[data-uistate='selected'] .unit {
   background-color: var(--ui-alt-desaturated);
-}
-
-#counter {
-  text-align: center;
-  color: var(--ui-main-saturated);
-  background-color: var(--white-transparent-high);
-  font-weight: bold;
-  font-size: 150%;
-  text-shadow: 0.2em 0.1em 0.2em 0.2em var(--ui-alt-desaturated);
-  display: grid;
-  align-content: center;
-  -webkit-text-stroke: 1px var(--ui-main-dark);
 }
 
 /* overlay */
