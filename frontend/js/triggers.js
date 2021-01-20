@@ -27,6 +27,9 @@ export function timingOf(trigger) {
 }
 export function get(unit) {
     const triggers = [];
+    if (!unit.attributes) {
+        unit.attributes = [];
+    }
     if (unit.triggers && Object.keys(unit.triggers).length !== 0) {
         let tttext;
         for (const [name, trigger] of Object.entries(unit.triggers)) {

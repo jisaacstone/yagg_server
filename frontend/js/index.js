@@ -39,6 +39,9 @@ function renderTable({ config }, child) {
 function displayTables(tablesEl, tables, currentId) {
     const toRemove = new Set(Object.keys(displayedTables));
     for (const table of tables) {
+        if (table.state === "gameover") {
+            continue;
+        }
         if (currentId && table.players.some(({ player }) => player.id === currentId)) {
             if (toRemove.has(table.id)) {
                 toRemove.delete(table.id);

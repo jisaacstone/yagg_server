@@ -81,7 +81,9 @@ function renderTile(unit, el, attrs = false, icons = false) {
         shortTriggers(unit, el);
         abilityIcon(unit, el);
     }
-    el.style.backgroundImage = `url("img/${unit.name}.png")`;
+    if (unit.name) {
+        el.style.backgroundImage = `url("img/${unit.name}.png")`;
+    }
     // @ts-ignore
     if (el.sidebar) { // @ts-ignore
         el.removeEventListener('sidebar', el.sidebar, false);
@@ -121,7 +123,9 @@ function shortTriggers(unit, el) {
 }
 function infoview(unit, el, squareEl) {
     renderAttrs(unit, el);
-    el.style.backgroundImage = `url("img/${unit.name}.png")`;
+    if (unit.name) {
+        el.style.backgroundImage = `url("img/${unit.name}.png")`;
+    }
     el.onclick = detailViewFn(unit, el.className, squareEl);
     if (unit.ability) {
         abilityButton(unit, el, squareEl);
