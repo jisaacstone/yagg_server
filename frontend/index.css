@@ -2,13 +2,9 @@ body {
   display: flex;
   align-content: center;
   flex-wrap: wrap;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--south-muted),                 var(--north-muted)           1em,
-    var(--grey-transparent-med)  1em,   var(--north-main)            2.5em,
-    var(--black-transparent-med) 2.5em, var(--black-transparent-med) 4.5em,
-    var(--south-main)            4.5em, var(--grey-transparent-med)  6em,
-    var(--north-muted)           6em,   var(--south-muted)           7em);
+  background-color: var(--north-main);
+  background-image: url('img/paper3.png');
+  background-size: 100% 100%;
 }
 
 html {
@@ -16,7 +12,7 @@ html {
 }
 
 body > div, body > form {
-  box-shadow: 5px 10px 7px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0.2em 0.4em 0.4em var(--ui-main-dark-transparent));
   background-image: url("img/paper_bg_transparent_med.png");
 }
 
@@ -24,22 +20,36 @@ body > div, body > form {
   padding: 0.4em 0.2em 0.6em;
 }
 
+#tables,
 #createdialog {
-  min-width: 40%;
-  max-width: 80%;
-  border: 0.2em solid var(--ui-alt-saturated);
-  background-color: var(--ui-alt-desaturated);
-  color: var(--ui-main-dark);
-  border-radius: 10px;
+  background-image: url('img/paper1_col.png');
+  background-size: 98% 98%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#createdialog {
+  min-width: 45%;
+  max-width: 90%;
+  /*border: 0.2em solid var(--ui-alt-saturated);*/
   padding: 1em;
   margin: 1em;
   display: grid;
-  color: var(ui-alt-dark);
+  color: var(--ui-alt-dark-dark);
   row-gap: 0.5em;
+  text-shadow: 1px 1px 1px var(--white-transparent-low);
+}
+
+#createdialog label {
+  color: var(--ui-main-dark);
+  font-size: 120%;
+  text-align: center;
 }
 
 #createtable {
   padding: 0.4em;
+  max-width: 14em;
+  margin: auto;
 }
 #createtable:hover {
   box-shadow: inset -2px -2px 2px rgba(0, 12, 16, 0.3);
@@ -50,9 +60,6 @@ body > div, body > form {
   text-align: center;
   padding: 1em;
   margin: 1em;
-  border-radius: 10px;
-  border: 0.2em solid var(--ui-alt-saturated);
-  background-color: var(--ui-alt-desaturated);
   color: var(--ui-main-dark);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -123,6 +130,13 @@ body > div, body > form {
   align-items: center;
 }
 
+#player,
+#howto {
+  color: var(--ui-main-dark-dark);
+  border: 0.2em inset var(--ui-main-saturated);
+  background-color: var(--white-transparent-low);
+}
+
 #player .playerdetails {
   grid-template-columns: 4em 1fr;
 }
@@ -144,5 +158,4 @@ body > div, body > form {
 #howto a.uibutton {
   text-decoration: none;
   padding: 0.5em 1em;
-  background-color: var(--ui-main-desaturated-transparent);
 }

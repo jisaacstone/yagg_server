@@ -106,24 +106,32 @@ export function add_to_hand({ unit, index }) {
 export function unit_assigned({ x, y, index }) {
   const square = Board.square(x, y),
     unit = unitsbyindex[index];
+  SFX.play('place');
   square.appendChild(unit);
 }
 
 export function new_unit({ x, y, unit }) {
-  const exist = Board.thingAt(x, y);
-  if (!exist) {
-    const newunit = Unit.render(unit, 0),
-      square = Board.square(x, y);
-    square.appendChild(newunit);
-  } else {
-    // don't overwrite existing data
-    exist.innerHTML = '';
-    Unit.render_into(unit, exist, true);
-  }
+  const animation = () => {
+    const exist = Board.thingAt(x, y);
+    let unitEl;
+    if (!exist) {
+      const square = Board.square(x, y);
+      unitEl = Unit.render(unit, 0);
+      square.appendChild(unitEl);
+    } else {
+      // don't overwrite existing data
+      exist.innerHTML = '';
+      Unit.render_into(unit, exist, true);
+      unitEl = exist;
+    }
+    const a = unitEl.animate({ opacity: [0.5, 0.9, 1] }, { duration: 100 });
+    return a.finished;
+  };
+  return { animation, squares: [`${x},${y}`] }
 }
 
 export function unit_changed(event) {
-  new_unit(event);  // for now
+  return new_unit(event);  // for now
 }
 
 export function unit_placed(event) {
@@ -297,11 +305,11 @@ export function thing_gone(event) {
 
 export function battle({ from, to }) {
   // animation only, no lasting chages
-  const attacker = Board.thingAt(from.x, from.y),
-    defender = Board.thingAt(to.x, to.y),
-    animation = () => {
+  const animation = () => {
       return SFX.play('battle').then(() => {
-        const arect = attacker.getBoundingClientRect(),
+        const attacker = Board.thingAt(from.x, from.y),
+          defender = Board.thingAt(to.x, to.y),
+          arect = attacker.getBoundingClientRect(),
           drect = defender.getBoundingClientRect(),
           xpos = arect.left,
           ypos = arect.top;
@@ -320,7 +328,6 @@ export function battle({ from, to }) {
           width: arect.width + 'px',
           height: arect.height + 'px',
         });
-        console.log({ xdiff, ydiff, arect, drect });
         return attacker.animate(
           { 
             top: [ypos + 'px', ypos + ydiff + 'px'],

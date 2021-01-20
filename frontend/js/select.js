@@ -137,10 +137,9 @@ function maybeSidebar(el) {
     }
 }
 function handleSelect(el, meta) {
-    const options = [];
+    const options = [], audio = (el.firstChild && el.firstElementChild.className.includes('monarch')) ? 'monarch' : 'select';
     maybeSidebar(el);
     if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
-        SFX.play('select');
         Array.prototype.forEach.call(document.querySelectorAll(`.${gmeta.position}row .boardsquare`), el => {
             if (!el.firstChild) {
                 el.dataset.uistate = 'moveoption';
@@ -164,6 +163,7 @@ function handleSelect(el, meta) {
             }
         }
     }
+    SFX.play(audio);
     el.dataset.uistate = 'selected';
     global.selected = { element: el, meta: meta, options: options };
 }
@@ -187,7 +187,7 @@ export function bind_hand(card, index, player, attributes) {
 }
 export function bind_candidate(candidate, index) {
     candidate.onclick = (e) => {
-        const childEl = candidate.firstElementChild;
+        const childEl = candidate.firstElementChild, audio = childEl.className.includes('monarch') ? 'monarch' : 'select';
         Infobox.clear();
         if (candidate.dataset.uistate === 'selected') {
             if (Jobfair.deselect(index)) {
@@ -196,6 +196,7 @@ export function bind_candidate(candidate, index) {
         }
         else {
             if (Jobfair.select(index)) {
+                SFX.play(audio);
                 childEl && childEl.dispatchEvent(new Event('sidebar'));
                 candidate.dataset.uistate = 'selected';
             }

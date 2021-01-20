@@ -170,5 +170,4 @@ window.onload = function() {
   });
   settingsEl.onclick = Settings.show;
   document.getElementById('buttons').appendChild(settingsEl);
-  SFX.play('select');
 };

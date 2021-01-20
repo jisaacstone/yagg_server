@@ -21,24 +21,30 @@ function awaitAnimations(result) {
     if (!result || !result.squares) {
         return Promise.resolve(true);
     }
+    const runAnimation = () => {
+        const aniPromise = result.animation();
+        for (const k of result.squares) {
+            state.animations[k] = aniPromise;
+        }
+    };
     if (result.squares.some((k) => state.animations[k])) {
+        // animations already happening in some squares, wait
         const promises = [];
         for (const [k, v] of Object.entries(state.animations)) {
             promises.push(v);
         }
         return Promise.all(promises).then(() => {
-            const aniPromise = result.animation();
             state.animations = {};
-            for (const k of result.squares) {
-                state.animations[k] = aniPromise;
-            }
+            runAnimation();
+        }).catch((e) => {
+            console.error(e);
+            state.animations = {};
+            runAnimation();
         });
     }
     else {
-        const aniPromise = result.animation();
-        for (const k of result.squares) {
-            state.animations[k] = aniPromise;
-        }
+        // no animation conflicts, start animations and read next event
+        runAnimation();
         return Promise.resolve(true);
     }
 }

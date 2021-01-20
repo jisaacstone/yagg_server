@@ -93,7 +93,7 @@ export function in_direction(direction, distance) {
 // simulate events from unit state
 export function unitdata({ grid, hand }) {
     for (const ob of grid) {
-        Event.new_unit(ob);
+        Event.new_unit(ob).animation();
     }
     Array.prototype.forEach.call(Object.entries(hand), ([index, card]) => {
         Event.add_to_hand({ index: +index, unit: card.unit });

@@ -147,10 +147,10 @@ function maybeSidebar(el: HTMLElement) {
 }
 
 function handleSelect(el: HTMLElement, meta) {
-  const options = [];
+  const options = [],
+    audio = (el.firstChild && el.firstElementChild.className.includes('monarch')) ? 'monarch' : 'select';
   maybeSidebar(el);
   if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
-    SFX.play('select');
     Array.prototype.forEach.call(
       document.querySelectorAll(`.${gmeta.position}row .boardsquare`),
       el => {
@@ -176,6 +176,7 @@ function handleSelect(el: HTMLElement, meta) {
       }
     }
   }
+  SFX.play(audio);
   el.dataset.uistate = 'selected';
   global.selected = {element: el, meta: meta, options: options};
 }
@@ -204,7 +205,8 @@ export function bind_hand(card: HTMLElement, index: number, player: string, attr
 
 export function bind_candidate(candidate: HTMLElement, index: number) {
   candidate.onclick = (e) => {
-    const childEl = candidate.firstElementChild;
+    const childEl = candidate.firstElementChild,
+      audio = childEl.className.includes('monarch') ? 'monarch' : 'select';
     Infobox.clear();
     if (candidate.dataset.uistate === 'selected') {
       if (Jobfair.deselect(index)) {
@@ -212,6 +214,7 @@ export function bind_candidate(candidate: HTMLElement, index: number) {
       }
     } else {
       if (Jobfair.select(index)) {
+        SFX.play(audio);
         childEl && childEl.dispatchEvent(new Event('sidebar'));
         candidate.dataset.uistate = 'selected';
       }

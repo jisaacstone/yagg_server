@@ -10,7 +10,6 @@ import * as Board from './board.js';
 import * as Dialog from './dialog.js';
 import * as Element from './element.js';
 import * as LeaveButton from './leaveButton.js';
-import * as SFX from './sfx.js';
 import * as Settings from './settings.js';
 function render_board(board, players) {
     if (players !== 2) {
@@ -156,5 +155,4 @@ window.onload = function () {
     });
     settingsEl.onclick = Settings.show;
     document.getElementById('buttons').appendChild(settingsEl);
-    SFX.play('select');
 };

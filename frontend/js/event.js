@@ -85,22 +85,31 @@ export function add_to_hand({ unit, index }) {
 }
 export function unit_assigned({ x, y, index }) {
     const square = Board.square(x, y), unit = unitsbyindex[index];
+    SFX.play('place');
     square.appendChild(unit);
 }
 export function new_unit({ x, y, unit }) {
-    const exist = Board.thingAt(x, y);
-    if (!exist) {
-        const newunit = Unit.render(unit, 0), square = Board.square(x, y);
-        square.appendChild(newunit);
-    }
-    else {
-        // don't overwrite existing data
-        exist.innerHTML = '';
-        Unit.render_into(unit, exist, true);
-    }
+    const animation = () => {
+        const exist = Board.thingAt(x, y);
+        let unitEl;
+        if (!exist) {
+            const square = Board.square(x, y);
+            unitEl = Unit.render(unit, 0);
+            square.appendChild(unitEl);
+        }
+        else {
+            // don't overwrite existing data
+            exist.innerHTML = '';
+            Unit.render_into(unit, exist, true);
+            unitEl = exist;
+        }
+        const a = unitEl.animate({ opacity: [0.5, 0.9, 1] }, { duration: 100 });
+        return a.finished;
+    };
+    return { animation, squares: [`${x},${y}`] };
 }
 export function unit_changed(event) {
-    new_unit(event); // for now
+    return new_unit(event); // for now
 }
 export function unit_placed(event) {
     const square = Board.square(event.x, event.y);
@@ -251,9 +260,9 @@ export function thing_gone(event) {
 }
 export function battle({ from, to }) {
     // animation only, no lasting chages
-    const attacker = Board.thingAt(from.x, from.y), defender = Board.thingAt(to.x, to.y), animation = () => {
+    const animation = () => {
         return SFX.play('battle').then(() => {
-            const arect = attacker.getBoundingClientRect(), drect = defender.getBoundingClientRect(), xpos = arect.left, ypos = arect.top;
+            const attacker = Board.thingAt(from.x, from.y), defender = Board.thingAt(to.x, to.y), arect = attacker.getBoundingClientRect(), drect = defender.getBoundingClientRect(), xpos = arect.left, ypos = arect.top;
             let xdiff = 0, ydiff = 0;
             if (from.x !== to.x) {
                 xdiff = (drect.left > arect.left ? drect.left - arect.right : drect.right - arect.left) * 1.8;
