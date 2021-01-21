@@ -15,11 +15,40 @@ const mapping = {
   spark: new Audio('sfx/ssssshop.wav'),
   horseshoe: new Audio('sfx/throw.wav'),
   monarch: new Audio('sfx/Bells_1.wav'),
+  click: new Audio('sfx/click.wav'),
+  tink: new Audio('sfx/tink.wav'),
+  ability: new Audio('sfx/chocho.wav'),
 }
 
+export const soundtrack = (() => {
+  const audio = new Audio('sfx/smugglesnore.wav'),
+    rv: any = {
+      playing: false
+    };
+  audio.loop = true;
+  rv.play = () => {
+    if (!rv.playing) {
+      console.log({l: 'starting audio', audio});
+      audio.play();
+      rv.playing = true;
+    }
+  };
+  rv.setVolume = (volume: number) => {
+    audio.volume = settings.musicvolume;
+  };
+  rv.audio = audio;
+  return rv;
+})();
+
 export const settings = {
-  volume: 0.9,
+  fxvolume: 0.9,
+  musicvolume: 0,
   mute: false,
+}
+
+export function startMusic() {
+  return; // disabling music...
+  //soundtrack.play();
 }
 
 export function play(name: string) {
@@ -31,7 +60,7 @@ export function play(name: string) {
     console.error({ err: 'unmapped audio file', name });
     return;
   }
-  audio.volume = settings.volume;
+  audio.volume = settings.fxvolume;
   return audio.play().catch((e) => {
     console.error(e);
     return false;

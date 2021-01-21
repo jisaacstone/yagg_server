@@ -3,6 +3,7 @@ import * as Element from './element.js';
 import * as Request from './request.js';
 import * as State from './state.js';
 import * as Ready from './ready.js';
+import * as SFX from './sfx.js';
 export function ensureCreated() {
     clear();
     if (State.gmeta.boardstate === 'jobfair') {
@@ -13,6 +14,7 @@ export function ensureCreated() {
             className: 'uibutton'
         });
         leavebutton.onclick = () => {
+            SFX.play('click');
             Dialog.choices('You will lose this game. Return to lobby?', {
                 leave,
                 cancel: () => null
@@ -28,6 +30,7 @@ export function ensureCreated() {
             className: 'uibutton',
         });
         leavebutton.onclick = () => {
+            SFX.play('click');
             Dialog.choices('You will lose this game. Return to lobby or propose rematch?', {
                 leave,
                 rematch,
@@ -43,7 +46,10 @@ export function ensureCreated() {
             innerHTML: 'leave',
             className: 'uibutton'
         });
-        leavebutton.onclick = leave;
+        leavebutton.onclick = () => {
+            SFX.play('click');
+            leave();
+        };
         document.getElementById('buttons').appendChild(leavebutton);
     }
 }

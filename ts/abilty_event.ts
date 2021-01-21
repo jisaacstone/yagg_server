@@ -52,6 +52,7 @@ function onHit(subtype: string): any {
 }
 
 export function scan({ x, y }) {
+  SFX.play('tink');
   const child = Board.thingAt(x, y);
   if (child) {
     const animation = () => {
@@ -74,33 +75,34 @@ export function fire(event) {
   var animation;
   if (child) {
     animation = () => {
-      return SFX.play('fire').then(() => {
-        const bg = window.getComputedStyle(child).backgroundColor,
-          a = child.animate(
-            { backgroundColor: [bg, 'var(--ui-main-saturated)', bg] },
-            { duration: 500 }
-          );
-        return a.finished;
-      });
+      burn(child);
     };
   } else {
     animation = () => {
-      return SFX.play('fire').then(() => {
-        const contents = square.innerHTML,
-          bg = window.getComputedStyle(square).backgroundColor,
-          fire = createContents(String.fromCodePoint(0x1f525)),
-          a = square.animate(
-            { backgroundColor: [bg, 'var(--ui-main-saturated)', bg] },
-            { duration: 500 }
-          ); 
-        square.appendChild(fire);
-        return a.finished.then(() => {
-          square.innerHTML = contents;
-        });
-      });
+      burn(square);
     };
   }
   return { animation, squares: [`${event.x},${event.y}`] };
+}
+
+function burn(el: HTMLElement) {
+  return SFX.play('fire').then(() => {
+    const style = window.getComputedStyle(el),
+      bg = style.backgroundColor,
+      bgimg = style.backgroundImage,
+      firebg = bgimg ? `${bgimg}, url('img/fire.png')` : 'url("img/fire.png")',
+      a = el.animate(
+        {
+          backgroundColor: [bg, 'var(--ui-main-saturated)', bg],
+        },
+        { duration: 500 }
+      );
+    
+    el.style.backgroundImage = firebg;
+    return a.finished.then(() => {
+      el.style.backgroundImage = bgimg;
+    });
+  });
 }
 
 function createContents(text: string) {

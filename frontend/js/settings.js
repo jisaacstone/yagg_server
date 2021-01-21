@@ -9,21 +9,31 @@ export function show() {
     }), cancelEl = Element.create({
         className: 'uibutton',
         innerHTML: 'cancel',
-    }), volume = Element.create({ tag: 'input' }), mute = Element.create({ tag: 'input' }), optionsEl = Dialog.createDialog('options', Element.create({
+    }), fxvolume = Element.create({ tag: 'input' }), musicvolume = Element.create({ tag: 'input' }), mute = Element.create({ tag: 'input' }), optionsEl = Dialog.createDialog('options', Element.create({
         children: [
-            Element.create({ innerHTML: 'volume' }),
-            volume
+            Element.create({ innerHTML: 'sfx volume' }),
+            fxvolume
         ]
-    }), Element.create({
+    }), 
+    //      Element.create({
+    //        children: [
+    //          Element.create({ innerHTML: 'music volume' }),
+    //          musicvolume
+    //        ]
+    //      }),
+    Element.create({
         children: [
             Element.create({ innerHTML: 'mute' }),
             mute
         ]
     }), okEl, cancelEl), clearOverlay = Overlay.clearable(optionsEl);
-    volume.setAttribute('type', 'range');
-    volume.setAttribute('min', '0');
-    volume.setAttribute('max', '10');
-    volume.setAttribute('value', '' + Math.round(SFX.settings.volume * 10));
+    for (const volume of [fxvolume, musicvolume]) {
+        volume.setAttribute('type', 'range');
+        volume.setAttribute('min', '0');
+        volume.setAttribute('max', '10');
+    }
+    fxvolume.setAttribute('value', '' + Math.round(SFX.settings.fxvolume * 10));
+    //musicvolume.setAttribute('value', '' + Math.round(SFX.settings.musicvolume * 10));
     mute.setAttribute('type', 'checkbox');
     if (SFX.settings.mute) {
         mute.setAttribute('checked', 'true');
@@ -37,11 +47,15 @@ export function show() {
             clearOverlay();
             if (mute.checked) {
                 SFX.settings.mute = true;
+                //SFX.soundtrack.audio.mute = true;
             }
             else {
                 SFX.settings.mute = false;
+                //SFX.soundtrack.audio.mute = false;
             }
-            SFX.settings.volume = +volume.value / 10;
+            SFX.settings.fxvolume = +fxvolume.value / 10;
+            //SFX.settings.musicvolume = +musicvolume.value / 10;
+            SFX.soundtrack.setVolume();
             resolve(true);
         };
     });

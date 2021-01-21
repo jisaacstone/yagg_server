@@ -93,6 +93,7 @@ function displayReturnButton(el, meta) {
         innerHTML: 'return to hand'
     });
     button.onclick = () => {
+        SFX.play('click');
         action('return', { index: Unit.indexOf(el) }, deselect);
     };
     buttons.appendChild(button);
@@ -169,6 +170,7 @@ function handleSelect(el, meta) {
 }
 export function select(thisEl, meta) {
     function select() {
+        SFX.startMusic();
         if ((gmeta.boardstate === 'gameover') ||
             (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) || // not your turn
             (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile'))) {
@@ -187,6 +189,7 @@ export function bind_hand(card, index, player, attributes) {
 }
 export function bind_candidate(candidate, index) {
     candidate.onclick = (e) => {
+        SFX.startMusic();
         const childEl = candidate.firstElementChild, audio = childEl.className.includes('monarch') ? 'monarch' : 'select';
         Infobox.clear();
         if (candidate.dataset.uistate === 'selected') {

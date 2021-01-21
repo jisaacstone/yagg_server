@@ -414,6 +414,7 @@ export function candidate(event) {
 
 export function ability_used(event): null | animData {
   if (!AbilityEvent[event.type]) {
+    SFX.play('ability');
     console.error({error: 'no ability handler', event});
     return null;
   }

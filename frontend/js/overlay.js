@@ -1,3 +1,4 @@
+import * as SFX from './sfx.js';
 export function create() {
     const overlay = document.createElement('div'), container = document.createElement('div');
     overlay.className = 'overlay';
@@ -15,6 +16,7 @@ export function dismissable(el) {
     const overlay = create(), container = overlay.parentNode;
     overlay.appendChild(el);
     container.onclick = () => {
+        SFX.play('click');
         container.remove();
     };
 }
@@ -22,6 +24,7 @@ export function clearable(el) {
     const overlay = create(), container = overlay.parentNode;
     overlay.appendChild(el);
     return () => {
+        SFX.play('click');
         container.remove();
     };
 }

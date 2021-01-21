@@ -8,6 +8,7 @@ import * as Dialog from './dialog.js';
 import * as Element from './element.js';
 import * as Triggers from './triggers.js';
 import * as Tooltip from './tooltip.js';
+import * as SFX from './sfx.js';
 
 interface Ability {
   name: string;
@@ -29,6 +30,7 @@ export interface Unit {
 
 function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit, cb = null) {
   abilityButton.onclick = (e) => {
+    SFX.play('ability');
     if (
       gmeta.boardstate !== 'battle' ||
       !isYourTurn() ||
@@ -253,6 +255,7 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
 }
 
 export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
+  SFX.play('click');
   const descriptions = describe(unit, square),
     portrait = Element.create({ className: 'unit-portrait' }),
     details = Element.create({
