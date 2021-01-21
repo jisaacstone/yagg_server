@@ -275,7 +275,6 @@ export function battle({ from, to }) {
                 width: arect.width + 'px',
                 height: arect.height + 'px',
             });
-            console.log({ xdiff, ydiff, arect, drect });
             return attacker.animate({
                 top: [ypos + 'px', ypos + ydiff + 'px'],
                 left: [xpos + 'px', xpos + xdiff + 'px']
@@ -348,6 +347,7 @@ export function candidate(event) {
 }
 export function ability_used(event) {
     if (!AbilityEvent[event.type]) {
+        SFX.play('ability');
         console.error({ error: 'no ability handler', event });
         return null;
     }

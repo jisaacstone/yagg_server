@@ -7,8 +7,10 @@ import * as Dialog from './dialog.js';
 import * as Element from './element.js';
 import * as Triggers from './triggers.js';
 import * as Tooltip from './tooltip.js';
+import * as SFX from './sfx.js';
 function bindAbility(abilityButton, square, unit, cb = null) {
     abilityButton.onclick = (e) => {
+        SFX.play('ability');
         if (gmeta.boardstate !== 'battle' ||
             !isYourTurn() ||
             !square ||
@@ -206,6 +208,7 @@ function describe(unit, square = null) {
     });
 }
 export function detailViewFn(unit, className, square = null) {
+    SFX.play('click');
     const descriptions = describe(unit, square), portrait = Element.create({ className: 'unit-portrait' }), details = Element.create({
         className: `${className} details`,
         children: [descriptions, portrait]

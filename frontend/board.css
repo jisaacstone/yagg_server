@@ -214,7 +214,7 @@ body {
 .boardsquare {
   border: 0.1em inset var(--ui-main-desaturated-transparent);
   box-sizing: border-box;
-  background-color: var(--white-transparent-high);
+  background: var(--white-transparent-high) center / contain no-repeat;
   display: flex;
   overflow: hidden;
 }
@@ -348,6 +348,7 @@ body {
   border-color: rgba(199, 45, 46, 0.4);
   grid-area: attack;
 }
+
 .unit-defense {
   color: var(--ui-alt-dark-dark);
   text-shadow: 1px 1px 1px var(--ui-alt-desaturated), 0 0 1px var(--white-transparent-low);
@@ -812,9 +813,19 @@ body {
 
 #leavebutton,
 #settingsbutton {
-  opacity: 0.6;
-  margin-left: 1px;
-  margin-right: 1px;
+  grid-row: 1;
+  color: transparent;
+  background: var(--white-transparent-med) center / contain no-repeat;
+}
+
+#leavebutton {
+  margin-left: 0.2em;
+  background-image: url('img/leave.png')
+}
+
+#settingsbutton {
+  margin-right: 0.2em;
+  background-image: url('img/sound.png');
 }
 
 #table[data-gamestate=gameover] #leavebutton {

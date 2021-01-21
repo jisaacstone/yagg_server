@@ -141,6 +141,7 @@ window.onload = function() {
   const errbutton = document.getElementById('errbutton');
   if (errbutton) {
     errbutton.onclick = () => {
+      SFX.play('click');
       reporterr();
     }
   }
@@ -168,6 +169,9 @@ window.onload = function() {
     className: 'uibutton',
     innerHTML: 'options'
   });
-  settingsEl.onclick = Settings.show;
+  settingsEl.onclick = () => {
+    SFX.play('click');
+    Settings.show();
+  }
   document.getElementById('buttons').appendChild(settingsEl);
 };
