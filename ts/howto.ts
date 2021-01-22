@@ -14,7 +14,7 @@ function fetchUnits() {
       });
       for (const unit of units) {
         unit.player = "unowned";
-        const unitEl = Unit.render(unit, 0, true, true);
+        const unitEl = Unit.render(unit, 0);
         unitEl.onclick = Unit.detailViewFn(unit, unitEl.className);
         unitsEl.appendChild(
           Element.create({

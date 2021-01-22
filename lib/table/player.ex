@@ -34,7 +34,7 @@ defmodule Table.Player do
 
   @spec fetch(non_neg_integer) :: {:ok, t} | {:err, :notfound}
   def fetch(id) do
-    case IO.inspect(:ets.lookup(:players, id)) do
+    case :ets.lookup(:players, id) do
       [{^id, player}] -> {:ok, player}
       _ -> {:err, :notfound}
     end
@@ -46,7 +46,6 @@ defmodule Table.Player do
 
   @spec by_id(Table.t, non_neg_integer) :: {position, t} | :notfound
   def by_id(game, id) do
-    IO.inspect(id, game.players)
     case game.players do
       [{_, %Player{id: ^id}} = player | _] -> player
       [_, {_, %Player{id: ^id}} = player | _] -> player

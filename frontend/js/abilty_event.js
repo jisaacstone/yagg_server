@@ -67,7 +67,6 @@ function burn(el) {
     return SFX.play('fire').then(() => {
         const style = window.getComputedStyle(el), bg = style.backgroundColor, bgimg = style.backgroundImage, firebg = bgimg ? `${bgimg}, url('img/fire.png')` : 'url("img/fire.png")', a = el.animate({
             backgroundColor: [bg, 'var(--ui-main-saturated)', bg],
-            filter: ['contrast(100%)', 'contrast(200%)', 'contrast(100%)']
         }, { duration: 1500 });
         el.style.backgroundImage = firebg;
         return a.finished.then(() => {

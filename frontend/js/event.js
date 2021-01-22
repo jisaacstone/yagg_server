@@ -100,7 +100,7 @@ export function new_unit({ x, y, unit }) {
         else {
             // don't overwrite existing data
             exist.innerHTML = '';
-            Unit.render_into(unit, exist, true);
+            Unit.render_into(unit, exist);
             unitEl = exist;
         }
         const a = unitEl.animate({ opacity: [0.5, 0.9, 1] }, { duration: 100 });
@@ -336,7 +336,7 @@ export function candidate(event) {
     if (existing) {
         return;
     }
-    const unitEl = Unit.render(event.unit, event.index, true, true), cdd = Element.create({
+    const unitEl = Unit.render(event.unit, event.index), cdd = Element.create({
         className: 'candidate',
         id: `candidate-${event.index}`,
         children: [unitEl]

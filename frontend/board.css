@@ -419,11 +419,19 @@ body {
   visibility: visible;
 }
 
-.candidate .unit-ability {
+.unowned .unit-ability,
+.candidate .unit-ability,
+.card .unit-ability {
   overflow: visible;
   text-align: center;
-  margin: 0.3em;
-  background-color: var(--white-transparent-med);
+  padding: 0.2em;
+  background-color: var(--white-transparent-high);
+  border-radius: 0;
+  border-color: inherit;
+  border-width: 0.1em;
+  border-style: outset;
+  place-self: center;
+  font-size: 80%;
 }
 
 .triggers {

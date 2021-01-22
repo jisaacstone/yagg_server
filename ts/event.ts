@@ -85,8 +85,12 @@ export function player_joined({ player, position }) {
     container = document.getElementById(whois),
     playerDetailsEl = Player.render(player);
 
-  if (container.firstElementChild && container.firstElementChild.className === 'playername') {
-    return;
+  if (container.firstElementChild) {
+    if (container.firstElementChild.className === 'playername') {
+      return;
+    } else {
+      container.innerHTML = '';
+    }
   }
   container.appendChild(playerDetailsEl);
   if (whois === 'player') {
@@ -95,7 +99,11 @@ export function player_joined({ player, position }) {
 }
 
 export function player_left({ player }) {
-  document.getElementById(`${player}name`).innerHTML = '';
+  const thisPlayer = Player.getLocal(),
+    whois = thisPlayer.id == player.id ? 'player' : 'opponent',
+    container = document.getElementById(whois);
+  container.innerHTML = '';
+  container.appendChild(Element.create({className: 'invisible'}));
 }
 
 export function add_to_hand({ unit, index }) {
@@ -121,7 +129,7 @@ export function new_unit({ x, y, unit }) {
     } else {
       // don't overwrite existing data
       exist.innerHTML = '';
-      Unit.render_into(unit, exist, true);
+      Unit.render_into(unit, exist);
       unitEl = exist;
     }
     const a = unitEl.animate({ opacity: [0.5, 0.9, 1] }, { duration: 100 });
@@ -402,7 +410,7 @@ export function candidate(event) {
   if (existing) {
     return;
   }
-  const unitEl = Unit.render(event.unit, event.index, true, true),
+  const unitEl = Unit.render(event.unit, event.index),
     cdd = Element.create({
       className: 'candidate',
       id: `candidate-${event.index}`,

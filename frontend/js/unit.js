@@ -75,15 +75,12 @@ function renderAttrs(unit, el) {
         el.className = `monarch ${el.className}`;
     }
 }
-function renderTile(unit, el, attrs = false, icons = false) {
-    if (attrs) {
+function renderTile(unit, el) {
+    // if we have no name we have nothing else
+    if (unit.name) {
         renderAttrs(unit, el);
-    }
-    if (icons) {
         shortTriggers(unit, el);
         abilityIcon(unit, el);
-    }
-    if (unit.name) {
         el.style.backgroundImage = `url("img/${unit.name}.png")`;
     }
     // @ts-ignore
@@ -265,14 +262,14 @@ function setClassName(unit, el) {
     }
     el.className = className;
 }
-export function render_into(unit, el, attrs = false, icons = false) {
+export function render_into(unit, el) {
     bindDetailsEvenet(unit, el);
     setClassName(unit, el);
-    return renderTile(unit, el, attrs, icons);
+    return renderTile(unit, el);
 }
-export function render(unit, index, attrs = false, icons = false) {
+export function render(unit, index) {
     const unitEl = document.createElement('div');
     unitEl.dataset.index = index;
-    render_into(unit, unitEl, attrs, icons);
+    render_into(unit, unitEl);
     return unitEl;
 }
