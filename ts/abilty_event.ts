@@ -95,7 +95,7 @@ function burn(el: HTMLElement) {
         {
           backgroundColor: [bg, 'var(--ui-main-saturated)', bg],
         },
-        { duration: 1500 }
+        { duration: 500 }
       );
     
     el.style.backgroundImage = firebg;
