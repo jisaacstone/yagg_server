@@ -35,7 +35,6 @@ function create(): Promise<PlayerData> {
 export function check(): Promise<PlayerData> {
   const id = localStorage.getItem('playerData.id'),
     name = localStorage.getItem('playerData.name');
-  console.log({ we: 'check', id, name });
   if (id && name) {
     return request(`player/${id}`, false).then((resp: any) => {
       if (resp.name !== name) {

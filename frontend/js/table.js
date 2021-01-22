@@ -126,6 +126,7 @@ function reporterr() {
     Request.post(`table/${tableid()}/report`, { report: reporttext, meta: gmeta });
 }
 window.onload = function () {
+    SFX.loadSettings();
     const errbutton = document.getElementById('errbutton');
     if (errbutton) {
         errbutton.onclick = () => {

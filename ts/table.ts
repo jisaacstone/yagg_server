@@ -138,6 +138,7 @@ function reporterr() {
 }
 
 window.onload = function() {
+  SFX.loadSettings();
   const errbutton = document.getElementById('errbutton');
   if (errbutton) {
     errbutton.onclick = () => {

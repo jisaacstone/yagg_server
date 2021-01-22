@@ -46,16 +46,14 @@ export function show() {
         okEl.onclick = () => {
             clearOverlay();
             if (mute.checked) {
-                SFX.settings.mute = true;
-                //SFX.soundtrack.audio.mute = true;
+                SFX.mute();
             }
             else {
-                SFX.settings.mute = false;
-                //SFX.soundtrack.audio.mute = false;
+                SFX.unmute();
             }
-            SFX.settings.fxvolume = +fxvolume.value / 10;
+            SFX.setVolume(+fxvolume.value / 10);
             //SFX.settings.musicvolume = +musicvolume.value / 10;
-            SFX.soundtrack.setVolume();
+            //SFX.soundtrack.setVolume();
             resolve(true);
         };
     });

@@ -46,6 +46,32 @@ export const settings = {
   mute: false,
 }
 
+export function loadSettings() {
+  const lsv = localStorage.getItem('fxvolume'),
+    lsm = localStorage.getItem('mute');
+  if (lsv) {
+    settings.fxvolume = +lsv;
+  }
+  if (lsm) {
+    settings.mute = (lsm === 'true');
+  }
+}
+
+export function setVolume(value: number) {
+  settings.fxvolume = value;
+  localStorage.setItem('fxvolume', '' + value);
+}
+
+export function mute() {
+  settings.mute = true;
+  localStorage.setItem('mute', 'true');
+}
+
+export function unmute() {
+  settings.mute = false;
+  localStorage.setItem('mute', 'false');
+}
+
 export function startMusic() {
   return; // disabling music...
   //soundtrack.play();
