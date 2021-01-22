@@ -288,4 +288,16 @@ defmodule YaggTest.Action.Ability do
     assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :north)
     assert %{name: :miner, position: :north} = newboard.grid[{2, 0}]
   end
+
+  test "sparkle skipped" do
+    board = set_board([
+      {{2, 2}, %Unit{attack: :immobile, defense: 0, monarch: false, name: :electromousetrap, position: :south, triggers: %{death: Unit.Electromousetrap.Trap, move: Board.Action.Ability.Immobile}, visible: :none}}, 
+      {{2, 3}, %Unit{attack: :immobile, defense: 0, monarch: false, name: :electromousetrap, position: :south, triggers: %{death: Unit.Electromousetrap.Trap, move: Board.Action.Ability.Immobile}, visible: :none}}, 
+      {{2, 4}, Unit.Maycorn.new(:north)}
+    ])
+    action = %Board.Action.Ability{x: 2, y: 4}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :north)
+    assert %{name: :electromousetrap} = newboard.grid[{2, 2}]
+    assert :nil == newboard.grid[{2, 3}]
+  end
 end

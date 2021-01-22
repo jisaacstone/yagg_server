@@ -22,7 +22,7 @@ defmodule Unit.Maycorn do
   end
 
   def spark(board, attack, from, direction) do
-    case Grid.projectile(board, Grid.next(direction, from), direction) do
+    case Grid.projectile(board, from, direction) do
       {coord, %Unit{defense: a}} when a < attack ->
         ability_event = Event.AbilityUsed.new(
           type: :projectile,

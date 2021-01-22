@@ -68,8 +68,13 @@ export function battle_started() {
 }
 export function player_joined({ player, position }) {
     const thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois), playerDetailsEl = Player.render(player);
-    if (container.firstElementChild && container.firstElementChild.className === 'playername') {
-        return;
+    if (container.firstElementChild) {
+        if (container.firstElementChild.className === 'playername') {
+            return;
+        }
+        else {
+            container.innerHTML = '';
+        }
     }
     container.appendChild(playerDetailsEl);
     if (whois === 'player') {
@@ -77,7 +82,9 @@ export function player_joined({ player, position }) {
     }
 }
 export function player_left({ player }) {
-    document.getElementById(`${player}name`).innerHTML = '';
+    const thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois);
+    container.innerHTML = '';
+    container.appendChild(Element.create({ className: 'invisible' }));
 }
 export function add_to_hand({ unit, index }) {
     const unitEl = Hand.createCard(unit, index);
