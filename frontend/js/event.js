@@ -79,6 +79,7 @@ export function player_joined({ player, position }) {
     container.appendChild(playerDetailsEl);
     if (whois === 'player') {
         gmeta.position = position;
+        document.getElementById('table').dataset.position = position;
     }
 }
 export function player_left({ player }) {

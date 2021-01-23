@@ -3,8 +3,10 @@ body {
   align-content: center;
   flex-wrap: wrap;
   background-color: var(--north-main);
-  background-image: url('img/paper3.png');
-  background-size: 100% 100%;
+  background-image: url('img/paper3.png'), url('img/yagg.png');
+  background-size: 100% 100%, 32%;
+  background-repeat: no-repeat;
+  background-position: center, top 5% center;
 }
 
 html {
@@ -13,7 +15,6 @@ html {
 
 body > div, body > form {
   filter: drop-shadow(0.2em 0.4em 0.4em var(--ui-main-dark-transparent));
-  background-image: url("img/paper_bg_transparent_med.png");
 }
 
 #config {
@@ -101,6 +102,7 @@ body > div, body > form {
 
 .table .playerdetails {
   grid-template-columns: 1.5em 1fr;
+  background: none;
 }
 
 .table .avatar {
@@ -118,19 +120,15 @@ body > div, body > form {
   right: 1em;
   display: grid;
   min-width: 30%;
-  margin: 0.5em;
-  border-radius: 0.5em;
-  border: 0.2em inset var(--ui-main-dark);
-  background-color: var(--ui-main-desaturated-transparent);
 }
 
 .playerdetails {
   grid-template-columns: 4em 1fr;
   justify-content: center;
   align-items: center;
+  background-image: url('img/nametag_s.png');
 }
 
-#player,
 #howto {
   color: var(--ui-main-dark-dark);
   border: 0.2em inset var(--ui-main-saturated);

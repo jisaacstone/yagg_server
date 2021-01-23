@@ -96,18 +96,20 @@ body {
 
 /* player */
 
-
 .playerdetails {
   display: grid;
+  background: center / 100% 100% no-repeat url('img/nametag1.png');
+  padding: 0.2em;
 }
 
 .playername {
   font-weight: bold;
   color: var(--ui-main-dark);
-  text-shadow: rgba(200, 255, 220, 0.5) -1px -1px 0;
+  text-shadow: 1px 1px 1px var(--white-transparent-low);
   border-radius: 0.5em;
   overflow: hidden;
   text-overflow: ellipsis;
+  overflow-x: hidden;
   display: grid;
   align-content: center;
   justify-content: start;

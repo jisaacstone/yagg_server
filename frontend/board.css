@@ -2,11 +2,14 @@ body {
   flex-direction: column;
   background-color: var(--grey-transparent-med);
   background-image: url("img/paper_bg_transparent.png");
+  position: fixed;
+  overflow: hidden;
 }
 
 #table {
   display: grid;
   height: 100vh;
+  overflow: hidden;
 }
 
 @media (orientation: landscape) {
@@ -495,7 +498,6 @@ body {
 .tttext {
   position: relative;
   margin-left: 0.4em;
-  min-width: 5em;
   max-width: 20em;
   padding: 0.3em;
   border-radius: 0.6em;
@@ -648,7 +650,7 @@ body {
 .unit.details .triggers:first-child::before {
   content: 'Triggers:';
   position: relative;
-  min-width: 80%;
+  width: 80%;
 }
 
 .unit.invisible {
@@ -719,7 +721,6 @@ body {
   display: grid;
   place-content: center;
   color: var(--ui-alt-dark-dark);
-  height: 1.5em;
   grid-area: timer;
 }
 
@@ -734,6 +735,11 @@ body {
 
 .timer.relaxed {
   color: var(--ui-main-dark-transparent);
+}
+
+.playerdetails .timer {
+  font-size: 90%;
+  align-content: start;
 }
 
 /* UI - players */
@@ -754,45 +760,31 @@ body {
   grid-area: opponent;
 }
 
-[data-turn="opponent"] #opponent .playername,
-[data-turn="player"] #player .playername {
-  background-color: var(--ui-main-desaturated-transparent);
-  border: 0.15em inset var(--ui-alt-saturated);
-  color: var(--ui-alt-dark);
-}
-
 #opponent {
   grid-area: opponent;
-}
-
-.playername[data-ready='true'] {
-  background-color: var(--ui-alt-desaturated);
 }
 
 .avatar {
   width: 2em;
   height: 2em;
-  grid-area: avatar
+  grid-area: avatar;
+  place-self: center;
 }
 
 .playerdetails {
   display: grid;
   grid-template-columns: 2em minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) 1.4em;
+  grid-template-rows: minmax(0, 1fr) max(1.4em, 25%);
   grid-template-areas: 
     "avatar name"
     "timer timer";
-  padding: 7px 3px;
-  margin: 3px;
-  border-radius: 0.4em;
 }
 
 .playername {
-  background-color: var(--white-transparent-high);
-  border: 0.15em inset var(--ui-main-light);
   width: 100%;
   grid-area: name;
-  height: 1.8em;
+  font-size: 90%;
+  align-content: end;
 }
 
 /* UI - buttons */
@@ -854,6 +846,15 @@ body {
 #table[data-yourturn=yes] .unit.info .unit-ability {
   background-image: url('img/shimmer.png');
   animation: shimmer 7s linear infinite;
+}
+
+#table[data-position=north] #player .playerdetails,
+#table[data-position=south] #opponent .playerdetails {
+  background-image: url('img/nametag_n.png');
+}
+#table[data-position=south] #player .playerdetails,
+#table[data-position=north] #opponent .playerdetails {
+  background-image: url('img/nametag_s.png');
 }
 
 .unit.north .uibutton,
