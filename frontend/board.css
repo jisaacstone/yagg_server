@@ -34,6 +34,11 @@ body {
     padding-right: 4vw;
     flex-direction: column;
   }
+  .playerdetails {
+    height: min(11vh, 7vw);
+    width: min(33vh, 17vw);
+    grid-template-columns: min(10vh, 6.6vw) minmax(0, 1fr);
+  }
   .card {
     height: max(18vh, 18vw);
     width: max(16vh, 16vw);
@@ -85,6 +90,11 @@ body {
     overflow-y: hidden;
     flex-direction: row;
     padding-bottom: 4vh;
+  }
+  .playerdetails {
+    height: min(9vw, 10vh);
+    width: min(26vw, 30vh);
+    grid-template-columns: min(8vw, 9vh) minmax(0, 1fr);
   }
   .card {
     height:15vh;
@@ -745,10 +755,8 @@ body {
 /* UI - players */
 
 #opponent, #player {
-  margin: 5%;
-  border-radius: 5%;
-  align-content: stretch;
-  justify-content: stretch;
+  margin: 0.2em;
+  place-content: center;
   display: grid;
 }
 
@@ -765,19 +773,18 @@ body {
 }
 
 .avatar {
-  width: 2em;
-  height: 2em;
   grid-area: avatar;
   place-self: center;
+  width: 100%;
+  height: 100%;
 }
 
 .playerdetails {
   display: grid;
-  grid-template-columns: 2em minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) max(1.4em, 25%);
+  grid-template-rows: 2em 1.4em;
   grid-template-areas: 
     "avatar name"
-    "timer timer";
+    "avatar timer";
 }
 
 .playername {

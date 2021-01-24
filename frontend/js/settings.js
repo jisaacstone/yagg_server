@@ -2,7 +2,23 @@ import * as Dialog from './dialog.js';
 import * as Element from './element.js';
 import * as SFX from './sfx.js';
 import * as Overlay from './overlay.js';
-export function show() {
+export function button() {
+    const settingsEl = Element.create({
+        id: 'settingsbutton',
+        tag: 'button',
+        className: 'uibutton',
+        innerHTML: 'settings'
+    });
+    settingsEl.onclick = () => {
+        SFX.play('click');
+        show();
+    };
+    if (SFX.settings.fxvolume === 0 || SFX.mute) {
+        settingsEl.style.backgroundImage = 'url("img/muted.png")';
+    }
+    return settingsEl;
+}
+function show() {
     const okEl = Element.create({
         className: 'uibutton',
         innerHTML: 'ok',
@@ -54,7 +70,20 @@ export function show() {
             SFX.setVolume(+fxvolume.value / 10);
             //SFX.settings.musicvolume = +musicvolume.value / 10;
             //SFX.soundtrack.setVolume();
+            setbg();
             resolve(true);
         };
     });
+}
+export function setbg() {
+    const settingsEl = document.getElementById('settingsbutton');
+    if (!settingsEl) {
+        return;
+    }
+    if (SFX.settings.fxvolume === 0 || SFX.settings.mute) {
+        settingsEl.style.backgroundImage = 'url("img/muted.png")';
+    }
+    else {
+        settingsEl.style.backgroundImage = '';
+    }
 }

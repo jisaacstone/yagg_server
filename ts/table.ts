@@ -164,15 +164,6 @@ window.onload = function() {
       fetchgamestate();
       listen();
     });
-  const settingsEl = Element.create({
-    id: 'settingsbutton',
-    tag: 'button',
-    className: 'uibutton',
-    innerHTML: 'options'
-  });
-  settingsEl.onclick = () => {
-    SFX.play('click');
-    Settings.show();
-  }
+  const settingsEl = Settings.button();
   document.getElementById('buttons').appendChild(settingsEl);
 };

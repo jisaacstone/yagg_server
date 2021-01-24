@@ -2,6 +2,7 @@ import { request, post, gameaction } from './request.js';
 import * as Player from './player.js';
 import * as Element from './element.js';
 import * as Err from './err.js';
+import * as Settings from './settings.js';
 
 const displayedTables = {};
 const configurations = {};
@@ -110,6 +111,8 @@ window.onload = function() {
       sel_el.style.display = 'hidden';
     }
   }
+
+  document.getElementById('settings').appendChild(Settings.button());
 
   Player.check().then((player) => {
     fetchConfigs(sel_el);

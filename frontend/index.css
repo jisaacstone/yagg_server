@@ -116,27 +116,18 @@ body > div, body > form {
 
 #player {
   position: absolute;
-  top: 1em;
-  right: 1em;
+  top: 1.2em;
+  right: 1.2em;
   display: grid;
   min-width: 30%;
-}
-
-.playerdetails {
-  grid-template-columns: 4em 1fr;
-  justify-content: center;
-  align-items: center;
-  background-image: url('img/nametag_s.png');
-}
-
-#howto {
-  color: var(--ui-main-dark-dark);
-  border: 0.2em inset var(--ui-main-saturated);
-  background-color: var(--white-transparent-low);
+  filter: none;
 }
 
 #player .playerdetails {
   grid-template-columns: 4em 1fr;
+  justify-content: center;
+  align-items: center;
+  background-image: url('img/nametag_empty.png');
 }
 
 #player .avatar {
@@ -144,16 +135,33 @@ body > div, body > form {
   height: 4em;
 }
 
+#settings,
 #howto {
+  color: var(--ui-main-dark-dark);
+  border: 0.2em inset var(--ui-main-saturated);
+  background: var(--white-transparent-low) left center / contain no-repeat;
+  padding-left: 2em;
   position: absolute;
-  top: 1em;
   left: 1em;
   margin: 0.5em;
   display: grid;
   border-radius: 0.5em;
+  width: 18vw;
 }
 
-#howto a.uibutton {
+#settings {
+  background-image: url('img/sound.png');
+  top: 3.7em;
+}
+
+#howto {
+  background-image: url('img/question mark.png');
+  top: 0.8em;
+}
+
+#howto a.uibutton,
+#settings button.uibutton {
   text-decoration: none;
+  border: none;
   padding: 0.5em 1em;
 }

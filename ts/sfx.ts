@@ -1,27 +1,29 @@
+import * as Settings from './settings.js';
+
 const mapping = {
-  select: new Audio('sfx/lego_click.wav'),
-  move: new Audio('sfx/slide.wav'),
-  death: new Audio('sfx/breath intake.wav'),
-  hand: new Audio('sfx/buzz.wav'),
-  hit: new Audio('sfx/drum_2.wav'),
+  select: new Audio('sfx/lego_click.mp3'),
+  move: new Audio('sfx/slide.mp3'),
+  death: new Audio('sfx/breath intake.mp3'),
+  hand: new Audio('sfx/buzz.mp3'),
+  hit: new Audio('sfx/drum_2.mp3'),
   playerready: new Audio('sfx/banjo_C3_very-long.mp3'),
-  go_lose: new Audio('sfx/Ooopsie.wav'),
-  go_win: new Audio('sfx/wheeep.wav'),
-  go_draw: new Audio('sfx/zenlaugh.wav'),
-  place: new Audio('sfx/place.wav'),
-  jump: new Audio('sfx/schlomp.wav'),
-  fire: new Audio('sfx/ffffummmm.wav'),
-  battle: new Audio('sfx/trashlid_openclose.wav'),
-  spark: new Audio('sfx/ssssshop.wav'),
-  horseshoe: new Audio('sfx/throw.wav'),
-  monarch: new Audio('sfx/Bells_1.wav'),
-  click: new Audio('sfx/click.wav'),
-  tink: new Audio('sfx/tink.wav'),
-  ability: new Audio('sfx/chocho.wav'),
+  go_lose: new Audio('sfx/Ooopsie.mp3'),
+  go_win: new Audio('sfx/wheeep.mp3'),
+  go_draw: new Audio('sfx/zenlaugh.mp3'),
+  place: new Audio('sfx/place.mp3'),
+  jump: new Audio('sfx/schlomp.mp3'),
+  fire: new Audio('sfx/ffffummmm.mp3'),
+  battle: new Audio('sfx/trashlid_openclose.mp3'),
+  spark: new Audio('sfx/ssssshop.mp3'),
+  horseshoe: new Audio('sfx/throw.mp3'),
+  monarch: new Audio('sfx/Bells_1.mp3'),
+  click: new Audio('sfx/click.mp3'),
+  tink: new Audio('sfx/tink.mp3'),
+  ability: new Audio('sfx/chocho.mp3'),
 }
 
 export const soundtrack = (() => {
-  const audio = new Audio('sfx/smugglesnore.wav'),
+  const audio = new Audio('sfx/smugglesnore.mp3'),
     rv: any = {
       playing: false
     };

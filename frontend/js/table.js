@@ -8,7 +8,6 @@ import * as Event from './event.js';
 import * as Jobfair from './jobfair.js';
 import * as Board from './board.js';
 import * as Dialog from './dialog.js';
-import * as Element from './element.js';
 import * as LeaveButton from './leaveButton.js';
 import * as SFX from './sfx.js';
 import * as Settings from './settings.js';
@@ -150,15 +149,6 @@ window.onload = function () {
         fetchgamestate();
         listen();
     });
-    const settingsEl = Element.create({
-        id: 'settingsbutton',
-        tag: 'button',
-        className: 'uibutton',
-        innerHTML: 'options'
-    });
-    settingsEl.onclick = () => {
-        SFX.play('click');
-        Settings.show();
-    };
+    const settingsEl = Settings.button();
     document.getElementById('buttons').appendChild(settingsEl);
 };

@@ -99,7 +99,7 @@ body {
 .playerdetails {
   display: grid;
   background: center / 100% 100% no-repeat url('img/nametag1.png');
-  padding: 0.2em;
+  padding: 0.3em 0.6em;
 }
 
 .playername {
