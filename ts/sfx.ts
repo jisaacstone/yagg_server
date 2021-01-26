@@ -20,6 +20,7 @@ const mapping = {
   click: new Audio('sfx/click.mp3'),
   tink: new Audio('sfx/tink.mp3'),
   ability: new Audio('sfx/chocho.mp3'),
+  undefined: new Audio('sfx/buzz.mp3'),
 }
 
 export const soundtrack = (() => {
@@ -80,13 +81,15 @@ export function startMusic() {
 }
 
 export function play(name: string) {
-  if (settings.mute) {
+  if (settings.mute || settings.fxvolume === 0) {
     return Promise.resolve(true);
   }
-  const audio = mapping[name];
+  let audio = mapping[name];
   if (!audio) {
-    console.error({ err: 'unmapped audio file', name });
-    return;
+    audio = new Audio(`sfx/${name}.mp3`);
+    mapping[name] = audio;
+    //console.error({ err: 'unmapped audio file', name });
+    //return;
   }
   audio.volume = settings.fxvolume;
   return audio.play().catch((e) => {

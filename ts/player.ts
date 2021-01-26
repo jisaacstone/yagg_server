@@ -83,7 +83,7 @@ export function avatar({ id, name }): HTMLElement {
     nameToNum += +name.charCodeAt(i);
   }
   const el = Element.create({ className: 'avatar', tag: 'img' });
-  el.setAttribute('src', `img/avatar_${+id % 8}.png`);
+  el.setAttribute('src', `img/avatar_${+id % 9}.png`);
   el.style.filter = `hue-rotate(${nameToNum % 36}0deg)`;
   return el;
 }

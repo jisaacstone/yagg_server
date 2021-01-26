@@ -264,7 +264,6 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
   portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
 
   return (e) => {
-    console.log('deets');
     e.preventDefault();
     e.stopPropagation();
     dismissable(details);

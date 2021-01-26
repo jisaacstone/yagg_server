@@ -73,7 +73,7 @@ function moveOrPlace(selected, target) {
       action(
         'place',
         {index: selected.meta.index, x: target.meta.x, y: target.meta.y},
-        selected.meta.attributes.includes('monarch') ? Ready.ensureDisplayed() : null,
+        selected.meta.unit.attributes.includes('monarch') ? Ready.ensureDisplayed() : null,
       );
     } else {
       // clickd on a board square
@@ -149,7 +149,7 @@ function maybeSidebar(el: HTMLElement) {
 
 function handleSelect(el: HTMLElement, meta) {
   const options = [],
-    audio = (el.firstChild && el.firstElementChild.className.includes('monarch')) ? 'monarch' : 'select';
+    audio = (el.firstChild && el.firstElementChild.className.includes('unit')) ? meta.unit.name : 'select';
   maybeSidebar(el);
   if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
     Array.prototype.forEach.call(
@@ -201,26 +201,49 @@ export function select(thisEl, meta) {
   return select;
 }
 
-export function bind_hand(card: HTMLElement, index: number, player: string, attributes: string[]) {
-  card.onclick = select(card, { inhand: true, index, player, attributes });
+export function bind_hand(card: HTMLElement, index: number, unit: Unit.Unit) {
+  card.onclick = select(card, { inhand: true, index, unit });
 }
 
-export function bind_candidate(candidate: HTMLElement, index: number) {
+export function bind_candidate(candidate: HTMLElement, index: number, unit: Unit.Unit) {
   candidate.onclick = (e) => {
     SFX.startMusic();
-    const childEl = candidate.firstElementChild,
-      audio = childEl.className.includes('monarch') ? 'monarch' : 'select';
+    const childEl = candidate.firstElementChild as HTMLElement,
+      audio = unit.name;
     Infobox.clear();
     if (candidate.dataset.uistate === 'selected') {
       if (Jobfair.deselect(index)) {
+        SFX.play('deselect');
         candidate.dataset.uistate = '';
       }
     } else {
       if (Jobfair.select(index)) {
-        SFX.play(audio);
-        childEl && childEl.dispatchEvent(new Event('sidebar'));
-        candidate.dataset.uistate = 'selected';
+        if (childEl) {
+          SFX.play(audio);
+          childEl.dispatchEvent(new Event('sidebar'));
+          candidate.dataset.uistate = 'selected';
+          candidateAnimate(childEl, unit.name);
+        }
       }
     }
   };
+}
+
+function candidateAnimate(el: HTMLElement, seed: string) {
+  // fun little animation for selected candidates
+  const rs = `${seed} *-();%#`,
+    biglittle = 6 + rs.charCodeAt(0) % 5 + rs.charCodeAt(1) % 6,
+    topbottom = 2 + rs.charCodeAt(2) % 7,
+    leftright = 34 + (rs.charCodeAt(3) % 10) + (rs.charCodeAt(4) % 10) + (rs.charCodeAt(5) % 10),
+    dur = 300 + (rs.charCodeAt(6) % 9) * 17 + (rs.charCodeAt(7) % 9) * 13,
+    size = biglittle === 10 ? '90% 95%' : `${biglittle}0% ${biglittle}0%`,
+    pos = `${leftright}% ${topbottom}0%`;
+  console.log({ biglittle, topbottom, leftright, dur, size, pos, rs});
+  el.animate({
+    backgroundSize: ['100% 100%', '99% 99%', size, '100% 100%'],
+    backgroundPosition: ['50% 50%', pos, '50% 50%']
+  }, {
+    duration: dur,
+    easing: 'ease-in-out'
+  });
 }

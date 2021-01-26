@@ -12,6 +12,7 @@ cp -r frontend/icons build/
 
 tsc
 cp -r frontend/js build
+cp -r frontend/sfx build
 
 mkdir -p build/img/howto
 
