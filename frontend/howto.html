@@ -38,27 +38,39 @@
   </header>
   <div id="content">
   <section id="phases">
+    <p>YAGG is a two-player turn-based strategy game.
+
     <h2>Phases</h2>
-    <p>A game of YAGG has 2-3 phases, depending on the game type.
+    <p>Phases are the sequential stages of each game.
+    They dictate what actions a player can perform.
+    <p>Some <a href="#game-types">game types</a> start with the Recruitment phase, others start with the Placement phase.
+    All game types end with a Battle phase.
 
     <h3>Recruitment</h3>
+
+    <p>During recruitment phase both players select their units and press "recruit".
+    The next phase is Placement.
+
     <!-- example recruitment table -->
     <div id="table" data-gamestate="jobfair">
       <div class="description player_">
-        <p>your name
+        <p>you
       </div>
       <div class="description opponent_">
-        <p>your opponent
+        <p>opponent
       </div>
-      <div class="description timer_">
-        <p>timer
+      <div class="description timer_ downarrow">
+        <p>time remaining
+      </div>
+      <div class="description buttons_ downarrow">
+        <p>units remaining
       </div>
       <div class="description infobox_">
-        <p>click here for a detailed description
+        <p>click for detailed description
       </div>
       <div class="description jobfair_">
-        <p>select your starting units
-        <p>after you select enough press the recruit button
+        <p>select your units
+        <p>after you select the required number of units press recruit
       </div>
       <div id="player">
         <div class="playerdetails">
@@ -111,9 +123,15 @@
       </div>
     </div>
 
-    <p>Some game types begin with a recruitment phase.
-    Both players select desired units and then press "RECRUIT".
     <h3>Placement</h3>
+
+    <p>Select starting positions for your units
+    <p>Actions during placement phase: place units on your starting rows.
+    The only unit you must place is your Monarch or Flag,
+    All other units may be left in your hand to be placed later.
+    <p>Placement ends when both players have placed their units and pressed the "ready" button.
+    The next phase is Battle.
+
     <!-- example placement table -->
     <div id="table" data-gamestate="placement">
       <div class="description hand_">
@@ -144,11 +162,22 @@
       <div id="board"><div class="boardrow southrow startrow"><div class="boardsquare" id="c5-0"></div><div class="boardsquare" id="c4-0"></div><div class="boardsquare" id="c3-0"></div><div class="boardsquare" id="c2-0"></div><div class="boardsquare" id="c1-0"></div><div class="boardsquare" id="c0-0"></div></div><div class="boardrow southrow startrow"><div class="boardsquare" id="c5-1"></div><div class="boardsquare" id="c4-1"></div><div class="boardsquare" id="c3-1"></div><div class="boardsquare" id="c2-1"></div><div class="boardsquare" id="c1-1"></div><div class="boardsquare" id="c0-1"></div></div><div class="boardrow"><div class="boardsquare" id="c5-2"></div><div class="boardsquare" id="c4-2"><div class="feature block"></div></div><div class="boardsquare" id="c3-2"></div><div class="boardsquare" id="c2-2"></div><div class="boardsquare" id="c1-2"><div class="feature water"></div></div><div class="boardsquare" id="c0-2"></div></div><div class="boardrow"><div class="boardsquare" id="c5-3"></div><div class="boardsquare" id="c4-3"><div class="feature block"></div></div><div class="boardsquare" id="c3-3"></div><div class="boardsquare" id="c2-3"></div><div class="boardsquare" id="c1-3"><div class="feature water"></div></div><div class="boardsquare" id="c0-3"></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c5-4" data-uistate=""><span data-index="2" class="unit north owned immobile" style="background-image: url(&quot;img/bomb.png&quot;);"><div class="unit-name">bomb</div><div class="unit-attack">-</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c4-4" data-uistate=""><span data-index="0" class="unit north owned immobile monarch" style="background-image: url(&quot;img/northern colors.png&quot;);"><div class="unit-name">northern colors</div><div class="unit-attack">-</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c3-4" data-uistate=""><span data-index="10" class="unit north owned" style="background-image: url(&quot;img/major.png&quot;);"><div class="unit-name">major</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></div><div class="boardsquare" id="c2-4" data-uistate=""><span data-index="3" class="unit north owned" style="background-image: url(&quot;img/spy.png&quot;);"><div class="unit-name">spy</div><div class="unit-attack">9</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c1-4" data-uistate=""></div><div class="boardsquare" id="c0-4" data-uistate=""><span data-index="5" class="unit north owned" style="background-image: url(&quot;img/scout.png&quot;);"><div class="unit-name">scout</div><div class="unit-attack">1</div><div class="unit-defense">6</div></span></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c5-5" data-uistate=""></div><div class="boardsquare" id="c4-5" data-uistate=""></div><div class="boardsquare" id="c3-5" data-uistate=""><span data-index="9" class="unit north owned" style="background-image: url(&quot;img/general.png&quot;);"><div class="unit-name">general</div><div class="unit-attack">7</div><div class="unit-defense">8</div></span></div><div class="boardsquare" id="c2-5" data-uistate=""><span data-index="4" class="unit north owned" style="background-image: url(&quot;img/miner.png&quot;);"><div class="unit-name">miner</div><div class="unit-attack">1</div><div class="unit-defense">6</div></span></div><div class="boardsquare" id="c1-5" data-uistate=""><span data-index="6" class="unit north owned" style="background-image: url(&quot;img/marshal.png&quot;);"><div class="unit-name">marshal</div><div class="unit-attack">9</div><div class="unit-defense">6</div></span></div><div class="boardsquare" id="c0-5" data-uistate=""><span data-index="1" class="unit north owned immobile" style="background-image: url(&quot;img/bomb.png&quot;);"><div class="unit-name">bomb</div><div class="unit-attack">-</div><div class="unit-defense">0</div></span></div></div></div>
       <div id="hand"><span data-index="11" class="card"><span data-index="11" class="unit north owned" style="background-image: url(&quot;img/major.png&quot;);"><div class="unit-name">major</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></span><span data-index="10" class="card" data-uistate=""></span><span data-index="9" class="card" data-uistate=""></span><span data-index="8" class="card"><span data-index="8" class="unit north owned" style="background-image: url(&quot;img/sergeant.png&quot;);"><div class="unit-name">sergeant</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></span><span data-index="7" class="card"><span data-index="7" class="unit north owned" style="background-image: url(&quot;img/sergeant.png&quot;);"><div class="unit-name">sergeant</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></span><span data-index="6" class="card" data-uistate=""></span><span data-index="5" class="card" data-uistate=""></span><span data-index="4" class="card" data-uistate=""></span><span data-index="3" class="card" data-uistate=""></span><span data-index="2" class="card" data-uistate=""></span><span data-index="1" class="card" data-uistate=""></span><span data-index="0" class="card" data-uistate=""></span></div>
     </div>
-    <p>Select the starting position of your units.
-    The only unit you must place is your Monarch or Flag,
-    All other units may be left in your hand to be placed later.
-    After placing your units press "READY" to start battle.
+
     <h3>Battle</h3>
+
+    <p>Battle phase is turned-place. On your turn you must do one of the following
+      <h4>Move</h4>
+      <p>Units move one square at a time.
+      Units cannot move diagonally. Some units are immobile.
+      They can neither move nor attack.
+      <h4>Attack</h4>
+      <p>Moving your unit into a square that has an enemy unit is an attack.
+      If the attacker's Attack is greater than the opponent's Defense
+      the opponent is destroyed and the attacker will move into the defender's square. Otherwise the attacker is destroyed.
+      <h4>Place</h4>
+      <p>Units can be placed in the battle phase the same as the placement phase.
+      <h4>Ability</h4>
+      <p>Some units have special abilities. Using any ability will end your turn.
 
     <!-- example battle table -->
     <div id="table" data-gamestate="battle">
@@ -190,20 +219,6 @@
       <div id="board"><div class="boardrow southrow startrow"><div class="boardsquare" id="c4-0"></div><div class="boardsquare" id="c3-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/sparky.png&quot;);"><div class="unit-name">sparky</div></span></div><div class="boardsquare" id="c2-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c1-0"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c0-0"></div></div><div class="boardrow southrow startrow"><div class="boardsquare" id="c4-1"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c3-1"></div><div class="boardsquare" id="c2-1"></div><div class="boardsquare" id="c1-1"><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c0-1" data-uistate=""><span data-index="6" class="unit north owned" style="background-image: url(&quot;img/busybody.png&quot;);"><div class="unit-name">busybody</div><div class="unit-attack">3</div><div class="unit-defense">6</div></span></div></div><div class="boardrow"><div class="boardsquare" id="c4-2"><div class="feature water"></div></div><div class="boardsquare" id="c3-2" data-uistate=""><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c2-2" data-uistate=""><div class="feature block" style=""></div></div><div class="boardsquare" id="c1-2" data-uistate=""><span data-index="4" class="unit north owned" style="background-image: url(&quot;img/sparky.png&quot;);"><div class="unit-name">sparky</div><div class="unit-attack">1</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c0-2" data-uistate=""></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c4-3" data-uistate=""><span data-index="0" class="unit north owned" style="background-image: url(&quot;img/maycorn.png&quot;);"><div class="unit-name">maycorn</div><div class="unit-attack">3</div><div class="unit-defense">4</div></span></div><div class="boardsquare" id="c3-3" data-uistate=""><span data-index="null" class="unit south" style="background-image: url(&quot;img/undefined.png&quot;);"></span></div><div class="boardsquare" id="c2-3" data-uistate=""><span data-index="3" class="unit north owned" style="background-image: url(&quot;img/tinker.png&quot;);"><div class="unit-name">tinker</div><div class="unit-attack">3</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c1-3" data-uistate=""><span data-index="5" class="unit north owned" style="background-image: url(&quot;img/pushie.png&quot;);"><div class="unit-name">pushie</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></div><div class="boardsquare" id="c0-3" data-uistate=""></div></div><div class="boardrow northrow startrow"><div class="boardsquare" id="c4-4" data-uistate=""><span data-index="8" class="monarch unit north owned monarch" style="background-image: url(&quot;img/monarch.png&quot;);"><div class="unit-name">monarch</div><div class="unit-attack">1</div><div class="unit-defense">0</div></span></div><div class="boardsquare" id="c3-4" data-uistate=""></div><div class="boardsquare" id="c2-4" data-uistate=""><span data-index="2" class="unit north owned" style="background-image: url(&quot;img/bezerker.png&quot;);"><div class="unit-name">bezerker</div><div class="unit-attack">9</div><div class="unit-defense">2</div></span></div><div class="boardsquare" id="c1-4" data-uistate=""></div><div class="boardsquare" id="c0-4" data-uistate=""></div></div></div>
       <div id="hand"><span data-index="8" class="card" data-uistate=""></span><span data-index="7" class="card" data-uistate=""><span data-index="7" class="unit north owned" style="background-image: url(&quot;img/howloo.png&quot;);"><div class="unit-name">howloo</div><div class="unit-attack">5</div><div class="unit-defense">4</div></span></span><span data-index="6" class="card" data-uistate=""></span><span data-index="5" class="card" data-uistate=""></span><span data-index="4" class="card" data-uistate=""></span><span data-index="3" class="card" data-uistate=""></span><span data-index="2" class="card" data-uistate=""></span><span data-index="1" class="card" data-uistate=""></span><span data-index="0" class="card" data-uistate=""></span></div>
     </div>
-
-    <p>On your turn you must do one of the following
-      <h4>Move</h4>
-      <p>Units move one square at a time.
-      Units cannot move diagonally. Some units are immobile.
-      They can neither move nor attack.
-      <h4>Attack</h4>
-      <p>Moving your unit into a square that has an enemy unit is an attack.
-      If the attacker's Attack is greater than the opponent's Defense
-      the opponent is destroyed and the attacker will move into the defender's square. Otherwise the attacker is destroyed.
-      <h4>Place</h4>
-      <p>Units can be placed in the battle phase the same as the placement phase.
-      <h4>Ability</h4>
-      <p>Some units have special abilities. Using any ability will end your turn
   </section>
 
   <a class="top" href="#top">top</a>

@@ -1,18 +1,17 @@
 html {
   background-image: url("img/paper_bg_transparent.png");
+}
+
+body {
+  color: #111;
+  overflow-y: scroll;
+  padding: 0 0.4em;
   background: repeating-linear-gradient(
   40deg,
   var(--ui-alt-desaturated-transparent),      var(--ui-alt-desaturated-transparent)  2em,
   var(--white-transparent-med)           2em, var(--white-transparent-med)           4em,
   var(--ui-main-desaturated-transparent) 4em, var(--ui-main-desaturated-transparent) 6em,
   var(--grey-transparent-med)            6em, var(--grey-transparent-med)            8em);
-}
-
-body {
-  overflow-y: scroll;
-  padding: 0 0.4em;
-  background: none;
-  color: var(--ui-main-dark-dark);
   display: grid;
   overflow: hidden;
 }
@@ -46,7 +45,7 @@ section {
 }
 
 h2 {
-  margin: 0.5em auto;
+  margin: 1.5em auto 0.5em;
   padding-right: 1em;
   color: var(--ui-main-dark-desaturated);
   text-shadow: 2px 2px 2px var(--ui-main-dark-transparent);
@@ -54,7 +53,7 @@ h2 {
 }
 
 h3 {
-  margin: 0.3em auto;
+  margin: 1.3em auto 0.3em;
   padding-right: 1em;
   color: var(--ui-alt-dark);
   text-shadow: 1px 1px 2px var(--ui-main-dark-transparent);
@@ -82,6 +81,7 @@ a {
 p {
   max-width: 33em;
   margin: 0.5em auto;
+  text-align: justify;
 }
 
 .top {
@@ -125,25 +125,33 @@ p {
 }
 
 #table {
-  filter: saturate(50%) sepia(15%) contrast(80%);
+  transform: scale(0.77);
+  margin: -3em auto;
 }
 
-#table #jobfair {
+#table > div:not(.description) {
+  filter: saturate(50%) sepia(15%) contrast(80%) blur(1px);
+}
+
+#table #jobfair, #table #hand {
   overflow-y: clip;
 }
 
 .description {
-  color: black;
   place-self: center;
-  padding: 0.3em;
-  border: 0.3em inset red;
+  padding: 0 0.3em;
+  border: 0.3em inset var(--ui-main-saturated);
   border-radius: 0.6em;
   display: grid;
   place-content: center;
   background-color: var(--white-transparent-low);
   z-index: 100;
-  font-size: 80%;
+  /*font-size: 80%;*/
   filter: drop-shadow(1em 1em 1em black);
+}
+
+.description p {
+  text-align: center;
 }
 
 .uparrow::after {
@@ -153,7 +161,7 @@ p {
   left: 46%;
   width: 0;
   height: 0;
-  border-bottom: 2em solid red;
+  border-bottom: 1em solid #8c4a1e;
   border-right: 0.6em solid transparent;
   border-left: 0.6em solid transparent;
 }
@@ -164,7 +172,7 @@ p {
   left: 46%;
   width: 0;
   height: 0;
-  border-top: 2em solid red;
+  border-top: 1em solid var(--ui-main-saturated);
   border-right: 0.6em solid transparent;
   border-left: 0.6em solid transparent;
 }
@@ -173,9 +181,17 @@ p {
 .opponent_ { grid-area: opponent }
 .infobox_ { grid-area: infobox }
 .jobfair_ { grid-area: board }
-.timer_  { grid-area: timer }
 .hand_ { grid-area: hand }
-.buttons_ { grid-area: buttons }
+.buttons_ { 
+  grid-area: buttons;
+  align-self: start;
+  maring-top: -1em;
+}
+.timer_  {
+  grid-area: timer;
+  align-self: start;
+  margin-top: -2em;
+}
 
 .northrow_ {
   grid-area: board;
