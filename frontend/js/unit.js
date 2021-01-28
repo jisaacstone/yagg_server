@@ -260,6 +260,9 @@ function setClassName(unit, el) {
         className += ` ${attr}`;
     }
     el.className = className;
+    if (unit.name) {
+        el.dataset.name = unit.name;
+    }
 }
 export function render_into(unit, el) {
     bindDetailsEvenet(unit, el);

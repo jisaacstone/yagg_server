@@ -100,6 +100,7 @@ export function in_direction(direction: string, distance: number): {x: number, y
 // simulate events from unit state
 export function unitdata({ grid, hand }) {
   for (const ob of grid) {
+    console.log(ob);
     Event.new_unit(ob).animation();
   }
   Array.prototype.forEach.call(

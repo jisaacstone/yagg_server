@@ -137,8 +137,18 @@ function maybeSidebar(el) {
         childEl.dispatchEvent(new Event('sidebar'));
     }
 }
+function audioFor(el) {
+    if (!el) {
+        return 'buzz';
+    }
+    if (!el.dataset.name) {
+        return 'select';
+    }
+    return el.dataset.name;
+}
 function handleSelect(el, meta) {
-    const options = [], audio = (el.firstChild && el.firstElementChild.className.includes('unit')) ? meta.unit.name : 'select';
+    console.log(meta);
+    const options = [], audio = audioFor(el.firstElementChild);
     maybeSidebar(el);
     if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
         Array.prototype.forEach.call(document.querySelectorAll(`.${gmeta.position}row .boardsquare`), el => {
@@ -211,8 +221,9 @@ export function bind_candidate(candidate, index, unit) {
     };
 }
 function candidateAnimate(el, seed) {
+    // fun little animation for selected candidates
     const rs = `${seed} *-();%#`, biglittle = 6 + rs.charCodeAt(0) % 5 + rs.charCodeAt(1) % 6, topbottom = 2 + rs.charCodeAt(2) % 7, leftright = 34 + (rs.charCodeAt(3) % 10) + (rs.charCodeAt(4) % 10) + (rs.charCodeAt(5) % 10), dur = 300 + (rs.charCodeAt(6) % 9) * 17 + (rs.charCodeAt(7) % 9) * 13, size = biglittle === 10 ? '90% 95%' : `${biglittle}0% ${biglittle}0%`, pos = `${leftright}% ${topbottom}0%`;
-    console.log({ biglittle, topbottom, leftright, dur, size, pos, rs });
+    return;
     el.animate({
         backgroundSize: ['100% 100%', '99% 99%', size, '100% 100%'],
         backgroundPosition: ['50% 50%', pos, '50% 50%']

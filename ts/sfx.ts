@@ -16,7 +16,7 @@ const mapping = {
   battle: new Audio('sfx/trashlid_openclose.mp3'),
   spark: new Audio('sfx/ssssshop.mp3'),
   horseshoe: new Audio('sfx/throw.mp3'),
-  monarch: new Audio('sfx/Bells_1.mp3'),
+  bells: new Audio('sfx/Bells_1.mp3'),
   click: new Audio('sfx/click.mp3'),
   tink: new Audio('sfx/tink.mp3'),
   ability: new Audio('sfx/chocho.mp3'),

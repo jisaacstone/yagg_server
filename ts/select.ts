@@ -147,9 +147,19 @@ function maybeSidebar(el: HTMLElement) {
   }
 }
 
+function audioFor(el: HTMLElement) {
+  if (!el) {
+    return 'buzz';
+  }
+  if (!el.dataset.name) {
+    return 'select';
+  }
+  return el.dataset.name;
+}
+
 function handleSelect(el: HTMLElement, meta) {
-  const options = [],
-    audio = (el.firstChild && el.firstElementChild.className.includes('unit')) ? meta.unit.name : 'select';
+  console.log(meta);
+  const options = [], audio = audioFor(el.firstElementChild as HTMLElement);
   maybeSidebar(el);
   if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
     Array.prototype.forEach.call(
@@ -238,7 +248,7 @@ function candidateAnimate(el: HTMLElement, seed: string) {
     dur = 300 + (rs.charCodeAt(6) % 9) * 17 + (rs.charCodeAt(7) % 9) * 13,
     size = biglittle === 10 ? '90% 95%' : `${biglittle}0% ${biglittle}0%`,
     pos = `${leftright}% ${topbottom}0%`;
-  console.log({ biglittle, topbottom, leftright, dur, size, pos, rs});
+  return;
   el.animate({
     backgroundSize: ['100% 100%', '99% 99%', size, '100% 100%'],
     backgroundPosition: ['50% 50%', pos, '50% 50%']

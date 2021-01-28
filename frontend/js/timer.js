@@ -1,4 +1,5 @@
 import { gmeta } from './state.js';
+import * as SFX from './sfx.js';
 const state = {
     timeout: null,
     el: null,
@@ -47,11 +48,13 @@ function createInterval() {
             const sec_rem = Math.round(diff / 1000);
             if (sec_rem < 20) {
                 state.el.className = 'timer urgent';
+                SFX.play('tick');
             }
-            else if (sec_rem > 100) {
+            else if (sec_rem > 60) {
                 state.el.className = 'timer relaxed';
             }
             else {
+                SFX.play('tock');
                 state.el.className = 'timer';
             }
             state.el.innerHTML = `${sec_rem}`;

@@ -319,6 +319,9 @@ function setClassName(unit: Unit, el: HTMLElement) {
     className += ` ${attr}`;
   }
   el.className = className;
+  if (unit.name) {
+    el.dataset.name = unit.name;
+  }
 }
 
 export function render_into(unit: Unit, el: HTMLElement): void {

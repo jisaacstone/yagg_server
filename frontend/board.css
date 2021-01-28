@@ -113,7 +113,7 @@ body {
   }
   #table[data-gamestate=jobfair] {
     grid-template-columns: 26% 48% 26%;
-    grid-template-rows: 70vh minmax(0, 5fr) minmax(0, 3fr) minmax(0, 5fr);
+    grid-template-rows: 70vh 11vh 8vh 11vh;
     grid-template-areas:
       "jobfair  jobfair  jobfair"
       "buttons  infobox  opponent"
@@ -729,9 +729,12 @@ body {
 
 .timer {
   display: grid;
-  place-content: center;
+  place-content: start;
+  padding-top: 0.1em;
+  padding-left: 0.2em;
   color: var(--ui-alt-dark-dark);
   grid-area: timer;
+  text-shadow: 1px 1px 1px var(--white-transparent-med);
 }
 
 #timer.timer {
@@ -745,6 +748,7 @@ body {
 
 .timer.relaxed {
   color: var(--ui-main-dark-transparent);
+  text-shadow: 1px 1px 1px var(--white-transparent-high);
 }
 
 .playerdetails .timer {
