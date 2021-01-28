@@ -1,5 +1,6 @@
 import * as Unit from './unit.js';
 import * as Select from './select.js';
+import * as Element from './element.js';
 
 export function createCard(unit: Unit.Unit, index: number): HTMLElement {
   const hand = document.getElementById('hand'),

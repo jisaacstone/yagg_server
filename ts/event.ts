@@ -415,9 +415,16 @@ export function candidate(event) {
     cdd = Element.create({
       className: 'candidate',
       id: `candidate-${event.index}`,
-      children: [unitEl]})
+      children: [unitEl]
+    }),
+    qbutton = Element.create({
+      tag: 'button',
+      className: 'detailsButton uibutton',
+    });
   Select.bind_candidate(cdd, event.index, event.unit);
   unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
+  qbutton.addEventListener('click', Unit.detailViewFn(event.unit, unitEl.className));
+  unitEl.appendChild(qbutton);
   jf.appendChild(cdd);
 }
 

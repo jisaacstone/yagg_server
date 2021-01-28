@@ -40,7 +40,7 @@ export const soundtrack = (() => {
 })();
 export const settings = {
     fxvolume: 0.9,
-    musicvolume: 0,
+    musicvolume: 0.6,
     mute: false,
 };
 export function loadSettings() {
@@ -66,7 +66,7 @@ export function unmute() {
 }
 export function startMusic() {
     return; // disabling music...
-    //soundtrack.play();
+    soundtrack.play();
 }
 export function play(name) {
     if (settings.mute || settings.fxvolume === 0) {

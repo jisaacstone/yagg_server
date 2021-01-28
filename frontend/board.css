@@ -112,7 +112,7 @@ body {
     left: 1px;
   }
   #table[data-gamestate=jobfair] {
-    grid-template-columns: 26% 48% 26%;
+    grid-template-columns: 30% 40% 30%;
     grid-template-rows: 70vh 11vh 8vh 11vh;
     grid-template-areas:
       "jobfair  jobfair  jobfair"
@@ -150,6 +150,7 @@ body {
   display: none;
 }
 #table[data-gamestate=jobfair] #board,
+#table[data-gamestate=jobfair] #infobox,
 #table[data-gamestate=jobfair] #hand {
   display: none;
 }
@@ -296,7 +297,7 @@ body {
   grid-template-columns: 15% 70% 15%;
   grid-template-areas:
     "attack name defense"
-    "info . ."
+    "info . details"
     ". ability .";
 }
 
@@ -439,7 +440,7 @@ body {
   text-align: center;
   padding: 0.2em;
   background-color: var(--white-transparent-high);
-  border-radius: 0;
+  border-radius: 0.3em;
   border-color: inherit;
   border-width: 0.1em;
   border-style: outset;
@@ -534,6 +535,22 @@ body {
   margin-top: 20px;
   font-size: 200%;
   text-align: center;
+}
+
+.detailsButton {
+  display: none;
+}
+
+.candidate .unit button.detailsButton {
+  grid-area: details;
+  display: grid;
+  margin: 0;
+  height: 20%;
+  width: 75%;
+  justify-self: center;
+  background: center / contain no-repeat url('img/question mark.png');
+  border: 1px outset var(--ui-main-saturated);
+  border-radius: 0.3em;
 }
 
 #table[data-yourturn=yes] #board .unit.owned.immobile,
@@ -731,7 +748,7 @@ body {
   display: grid;
   place-content: start;
   padding-top: 0.1em;
-  padding-left: 0.2em;
+  padding-left: 0.5em;
   color: var(--ui-alt-dark-dark);
   grid-area: timer;
   text-shadow: 1px 1px 1px var(--white-transparent-med);
@@ -739,6 +756,7 @@ body {
 
 #timer.timer {
   font-size: 123%;
+  align-self: center;
 }
 
 .timer.urgent {
