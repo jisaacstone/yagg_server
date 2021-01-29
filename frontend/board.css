@@ -716,6 +716,7 @@ body {
   position: absolute;
   top: 5%;
   left: 5%;
+  animation: slight_wiggle 5s linear infinite;
 }
 [data-uistate='moveoption'] {
   position: relative;
@@ -723,6 +724,18 @@ body {
 }
 [data-uistate='moveoption']:hover::before {
   background-image: url("img/heart_grn.png");
+}
+[data-uistate='moveoption']:nth-child(5n)::before {
+  animation-duration: 4s;
+}
+[data-uistate='moveoption']:nth-child(3n)::before {
+  animation-duration: 7s;
+}
+[data-uistate='moveoption']:nth-child(odd)::before {
+  animation-delay: 0.3s;
+}
+[data-uistate='moveoption']:nth-child(even)::before {
+  animation-delay: 0.4s;
 }
 
 /* UI - timer */

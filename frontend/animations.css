@@ -8,15 +8,39 @@
   }
 }
 
+@keyframes slight_wiggle {
+  0%, 33%, 66%, 100% {
+    background-position: 0 0;
+  }
+  20% {
+    background-position: 0.1 0.2em;
+  }
+  42% {
+    background-position: 0.1em -0.1em;
+  }
+  75% {
+    background-position: -0.1em 0.05em;
+  }
+  88% {
+    background-position: 0.1em -0.05em;
+  }
+}
+
 @keyframes wiggle {
-  0%, 20%, 40%, 80%, 100% {
-    background-position: 50% 50%;
+  0%, 33%, 66%, 100% {
+    background-position: 0 0;
   }
-  10%, 50% {
-    background-position: 1em 50%;
+  20% {
+    background-position: 0 0.5em;
   }
-  30%, 90% {
-    background-position: -1em 50%;
+  42% {
+    background-position: 0.1em 0.3em;
+  }
+  75% {
+    background-position: -0.1em 0.1em;
+  }
+  88% {
+    background-position: 0.1em 0.3em;
   }
 }
 
@@ -33,6 +57,11 @@
 }
 
 /* UNIT ANIMATIONS */
+
+/* default */
+[data-uistate=selected] .owned {
+  animation: zoom 0.5s linear 1;
+}
 
 @keyframes antente {
   0%, 100% {
@@ -166,25 +195,8 @@
   animation: mediacreep 2.2s linear;
 }
 
-@keyframes shenamouse {
-  0%, 33%, 66%, 100% {
-    background-position: 0 0;
-  }
-  20% {
-    background-position: 0 0.5em;
-  }
-  42% {
-    background-position: 0.1em 0.3em;
-  }
-  75% {
-    background-position: -0.1em 0.1em;
-  }
-  88% {
-    background-position: 0.1em 0.3em;
-  }
-}
 [data-uistate=selected] [data-name=shenamouse] {
-  animation: shenamouse 2.2s linear;
+  animation: wiggle 2.2s linear;
 }
 
 @keyframes sparky {
@@ -200,7 +212,7 @@
 }
 
 [data-uistate=selected] [data-name=spikeder] {
-  animation: shenamouse 2.2s linear;
+  animation: wiggle 2.2s linear;
 }
 
 [data-uistate=selected] [data-name=tactician] {
@@ -223,3 +235,53 @@
 [data-uistate=selected] [data-name=tim] {
   animation: rush 0.35s ease-in-out 3;
 }
+
+[data-uistate=selected] [data-name=scout] {
+  animation: rush 0.35s ease-in-out 1.5;
+}
+
+[data-uistate=selected] [data-name=rollander] {
+  animation: rush 1.35s linear 1.5;
+}
+
+[data-uistate=selected] [data-name=pushie] {
+  animation: zoom 0.4s linear 3;
+}
+
+@keyframes poisonblade {
+  0% {
+    filter: brightness(1);
+  }
+  50%, 100% {
+    filter: brightness(0);
+  }
+}
+[data-uistate=selected] [data-name=poisonblade] {
+  animation: poisonblade 0.6s linear 1;
+}
+
+[data-uistate=selected] [data-name=sackboom] {
+  animation: explody 1.3s ease-out 1;
+}
+
+[data-uistate=selected] [data-name=chopper] {
+  animation: wiggle 1.2s linear 1.5;
+}
+
+[data-uistate=selected] [data-name=spy] {
+  animation: wiggle 1.5s linear 1;
+}
+
+[data-uistate=selected] [data-name=miner] {
+  animation: wiggle 1.2s linear 1,
+    zoom 1.3s linear 1;
+}
+
+[data-uistate=selected] [data-name=sergeant] {
+  animation: zoom 0.5s linear 2;
+}
+
+[data-uistate=selected] [data-name=major] {
+  animation: zoom 0.3s linear 3;
+}
+
