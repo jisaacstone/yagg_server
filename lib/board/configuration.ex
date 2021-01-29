@@ -96,7 +96,7 @@ defmodule Board.Configuration.Random do
   def new() do
     nor_units = ten_random_units(:north)
     sou_units = Enum.map(nor_units, fn(u) -> %{u | position: :south} end)
-    dimensions = Enum.random({5, 5}, {6, 6}, {8, 8})
+    dimensions = Enum.random([{5, 5}, {6, 6}, {8, 8}])
     terrain = random_terrain(dimensions)
     %Board.Configuration{
       name: name(),
