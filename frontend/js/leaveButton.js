@@ -13,6 +13,7 @@ export function ensureCreated() {
             innerHTML: 'leave',
             className: 'uibutton'
         });
+        leavebutton.setAttribute('title', 'leave');
         leavebutton.onclick = () => {
             SFX.play('click');
             Dialog.choices('You will lose this game. Return to lobby?', {
@@ -29,6 +30,7 @@ export function ensureCreated() {
             innerHTML: 'concede',
             className: 'uibutton',
         });
+        leavebutton.setAttribute('title', 'concede');
         leavebutton.onclick = () => {
             SFX.play('click');
             Dialog.choices('You will lose this game. Return to lobby or propose rematch?', {
@@ -46,6 +48,7 @@ export function ensureCreated() {
             innerHTML: 'leave',
             className: 'uibutton'
         });
+        leavebutton.setAttribute('title', 'leave');
         leavebutton.onclick = () => {
             SFX.play('click');
             leave();

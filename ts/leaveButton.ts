@@ -14,6 +14,7 @@ export function ensureCreated() {
       innerHTML: 'leave',
       className: 'uibutton'
     });
+    leavebutton.setAttribute('title', 'leave');
     leavebutton.onclick = () => {
       SFX.play('click');
       Dialog.choices(
@@ -32,6 +33,7 @@ export function ensureCreated() {
       innerHTML: 'concede',
       className: 'uibutton',
     });
+    leavebutton.setAttribute('title', 'concede');
     leavebutton.onclick = () => {
       SFX.play('click');
       Dialog.choices(
@@ -51,6 +53,7 @@ export function ensureCreated() {
       innerHTML: 'leave',
       className: 'uibutton'
     });
+    leavebutton.setAttribute('title', 'leave');
     leavebutton.onclick = () => {
       SFX.play('click');
       leave();

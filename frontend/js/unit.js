@@ -121,6 +121,12 @@ function shortTriggers(unit, el) {
     }));
 }
 function infoview(unit, el, squareEl) {
+    const qbutton = Element.create({
+        tag: 'button',
+        className: 'detailsButton uibutton',
+    });
+    qbutton.setAttribute('title', 'details');
+    el.appendChild(qbutton);
     renderAttrs(unit, el);
     if (unit.name) {
         el.style.backgroundImage = `url("img/${unit.name}.png")`;

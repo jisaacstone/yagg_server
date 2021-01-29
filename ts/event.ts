@@ -421,6 +421,7 @@ export function candidate(event) {
       tag: 'button',
       className: 'detailsButton uibutton',
     });
+  qbutton.setAttribute('title', 'details');
   Select.bind_candidate(cdd, event.index, event.unit);
   unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
   qbutton.addEventListener('click', Unit.detailViewFn(event.unit, unitEl.className));

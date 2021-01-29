@@ -518,17 +518,22 @@ body {
 
 .detailsButton {
   display: none;
-}
-
-.candidate .unit button.detailsButton {
   grid-area: details;
-  display: grid;
   margin: 0;
   height: 20%;
   width: 75%;
   justify-self: center;
   background: center / contain no-repeat url('img/question mark.png');
+}
+
+.candidate .unit button.detailsButton {
+  display: grid;
   border: 1px outset var(--ui-main-saturated);
+  border-radius: 0.3em;
+}
+#infobox .unit button.detailsButton {
+  display: grid;
+  border: 1px outset inherit;
   border-radius: 0.3em;
 }
 

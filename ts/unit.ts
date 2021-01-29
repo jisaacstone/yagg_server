@@ -158,6 +158,12 @@ function shortTriggers(unit: Unit, el: HTMLElement) {
 }
 
 function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
+  const qbutton = Element.create({
+      tag: 'button',
+      className: 'detailsButton uibutton',
+    });
+  qbutton.setAttribute('title', 'details');
+  el.appendChild(qbutton);
   renderAttrs(unit, el);
   if (unit.name) {
     el.style.backgroundImage = `url("img/${unit.name}.png")`;

@@ -10,6 +10,7 @@ export function button(): HTMLElement {
     className: 'uibutton',
     innerHTML: 'settings'
   });
+  settingsEl.setAttribute('title', 'settings');
   settingsEl.onclick = () => {
     SFX.play('click');
     show();
