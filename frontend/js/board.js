@@ -42,6 +42,8 @@ export function render(el, width = 5, height = 5) {
             makerow(y);
         }
     }
+    el.style.backgroundImage = `url(img/grid_${width}x${height}_${gmeta.position}.png)`;
+    console.log(el.style);
 }
 export function square(x, y) {
     const el = document.getElementById(`c${x}-${y}`);

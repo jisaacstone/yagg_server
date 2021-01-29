@@ -137,6 +137,13 @@ p {
   overflow-y: clip;
 }
 
+#board.n6x6 {
+  background-image: url('img/grid_6x6_north.png');
+}
+#board.n5x5 {
+  background-image: url('img/grid_5x5_north.png');
+}
+
 .description {
   place-self: center;
   padding: 0 0.3em;
