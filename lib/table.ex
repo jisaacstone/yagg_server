@@ -332,8 +332,11 @@ defmodule Yagg.Table do
   end
   defp handle_turn(table, events), do: {table, events}
 
-  defp notify(_game, []) do
+  defp notify(_, []) do
     :ok
+  end
+  defp notify(table, [:nil | events]) do
+    notify(table, events)
   end
   defp notify(table, [event | events]) do
     notify(table, event)

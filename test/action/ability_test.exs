@@ -21,7 +21,7 @@ defmodule YaggTest.Action.Ability do
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{4, 4}] == :nil
     assert newboard.grid[{4, 3}] == :nil
-    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
+    assert Enum.find(events, fn(e) -> e != :nil and e.kind == :unit_died end)
   end
 
   test "secondwind" do
@@ -34,8 +34,8 @@ defmodule YaggTest.Action.Ability do
         ])
     action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
-    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-    assert Enum.find(events, fn(e) -> e.kind == :add_to_hand end)
+    assert Enum.find(events, fn(e) -> e != :nil and e.kind == :unit_died end)
+    assert Enum.find(events, fn(e) -> e != :nil and e.kind == :add_to_hand end)
   end
 
   test "tactician" do
@@ -99,8 +99,8 @@ defmodule YaggTest.Action.Ability do
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{0, 2}].name == busybody.name
     assert newboard.grid[{0, 1}] == :water
-    assert Enum.find(events, fn(e) -> e.kind == :unit_died end)
-    assert Enum.find(events, fn(e) -> e.kind == :multi end)
+    assert Enum.find(events, fn(e) -> e != :nil and e.kind == :unit_died end)
+    assert Enum.find(events, fn(e) -> e != :nil and e.kind == :multi end)
   end
 
   test "illegal square" do
@@ -154,7 +154,7 @@ defmodule YaggTest.Action.Ability do
     action = %Board.Action.Ability{x: 2, y: 6}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
     assert newboard.grid[{3, 6}] == :nil
-    assert Enum.any?(events, fn(e) -> e.kind == :unit_died end)
+    assert Enum.any?(events, fn(e) -> e != :nil and e.kind == :unit_died end)
     assert %State.Gameover{} = newboard.state
   end
 
@@ -167,7 +167,7 @@ defmodule YaggTest.Action.Ability do
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{2, 2}] == :nil
     assert %Unit{name: :catmover} = newboard.grid[{3, 2}]
-    assert event = Enum.find(events, fn(e) -> e.kind == :thing_moved end)
+    assert event = Enum.find(events, fn(e) -> e != :nil and e.kind == :thing_moved end)
     assert %{from: {1, 2}, to: {3, 2}} = event.data
   end
 
@@ -178,7 +178,7 @@ defmodule YaggTest.Action.Ability do
     ])
     action = %Board.Action.Move{from_x: 3, from_y: 2, to_x: 4, to_y: 2}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
-    assert event = Enum.find(events, fn(e) -> e.kind == :unit_died end)
+    assert event = Enum.find(events, fn(e) -> e != :nil and e.kind == :unit_died end)
     assert %{name: :tinker} = newboard.grid[{4, 2}]
   end
 
@@ -191,14 +191,14 @@ defmodule YaggTest.Action.Ability do
     action = %Board.Action.Move{from_x: 1, from_y: 2, to_x: 2, to_y: 2}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
     assert %{name: :antente, ability: Unit.Antente.Invisible} = newboard.grid[{2, 2}]
-    plc_idx = Enum.find_index(events, fn(e) -> e.kind == :unit_placed end)
-    mv_idx = Enum.find_index(events, fn(e) -> e.kind == :thing_moved end)
+    plc_idx = Enum.find_index(events, fn(e) -> e != :nil and e.kind == :unit_placed end)
+    mv_idx = Enum.find_index(events, fn(e) -> e != :nil and e.kind == :thing_moved end)
     assert plc_idx < mv_idx
     assert %{stream: :global} = Enum.at(events, mv_idx)
 
     action = %Board.Action.Ability{x: 2, y: 2}
     assert {board, events} = Board.Action.resolve(action, newboard, :south)
-    assert Enum.any?(events, fn(e) -> e.kind == :thing_gone end)
+    assert Enum.any?(events, fn(e) ->e != :nil and  e.kind == :thing_gone end)
     assert %{ability: :nil} = board.grid[{2, 2}]
   end
 
@@ -235,7 +235,7 @@ defmodule YaggTest.Action.Ability do
     action = %Board.Action.Move{from_x: 4, from_y: 2, to_x: 4, to_y: 3}
     assert {%Board{} = board, events} = Board.Action.resolve(action, board, :south)
     assert %{name: :electromouse, triggers: %{}} = board.grid[{4, 3}]
-    assert Enum.find(events, fn(e) -> e.kind == :new_unit end)
+    assert Enum.find(events, fn(e) -> e != :nil and e.kind == :new_unit end)
     assert %{name: :electromousetrap} = board.grid[{4, 2}]
     action = %Board.Action.Move{from_x: 3, from_y: 2, to_x: 4, to_y: 2}
     assert {%Board{} = board, _events} = Board.Action.resolve(action, board, :north)

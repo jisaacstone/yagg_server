@@ -84,6 +84,7 @@ defmodule Yagg.Event do
     @moduledoc """
     Unit on board has attribute changed
     """
+
     @spec new(
       :global | Player.position(),
       [
@@ -92,7 +93,19 @@ defmodule Yagg.Event do
         unit: Unit.t
       ]) :: Event.t
     def new(position, params) do
-      Event.new(position, :unit_changed, params)
+      if visible?(params[:unit]) do
+        Event.new(position, :unit_changed, params)
+      end
+    end
+
+    defp visible?(%Unit{} = unit) do
+      Unit.visible?(unit, :name)
+    end
+    defp visible?(%{name: _}) do
+      :true
+    end
+    defp visible?(_) do
+      :false
     end
   end
 
