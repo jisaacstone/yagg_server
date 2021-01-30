@@ -3,6 +3,7 @@ import * as Player from './player.js';
 import * as Element from './element.js';
 import * as Err from './err.js';
 import * as Settings from './settings.js';
+import * as Dialog from './dialog.js';
 const displayedTables = {};
 const configurations = {};
 function fetchConfigs(sel_el) {
@@ -64,6 +65,11 @@ function displayTables(tablesEl, tables, currentId) {
             el.onclick = () => {
                 gameaction('join', {}, 'table', table.id).then(() => {
                     window.location.href = `board.html?table=${table.id}`;
+                }).catch((e) => {
+                    Dialog.alert('join failed, unknown error, please try again').then(() => {
+                        //reload
+                        window.location = window.location;
+                    });
                 });
             };
             tablesEl.appendChild(el);

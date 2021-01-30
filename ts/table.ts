@@ -94,7 +94,7 @@ function waitingforplayers() {
   }
   over.appendChild(comp);
 
-  leav.innerHTML = 'exit';
+  leav.innerHTML = 'cancel';
   leav.className = 'exitbutton uibutton';
   leav.onclick = LeaveButton.leave;
   over.appendChild(leav);

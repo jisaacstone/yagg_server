@@ -285,3 +285,11 @@
   animation: zoom 0.3s linear 3;
 }
 
+@keyframes monarch {
+  30%, 80% {
+    background-color: gold;
+  }
+}
+[data-uistate=selected] [data-name=monarch] {
+  animation: monarch 1.6s linear 1;
+}
