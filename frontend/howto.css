@@ -134,7 +134,7 @@ p {
 }
 
 #table #jobfair, #table #hand {
-  overflow-y: clip;
+  overflow-y: hidden;
 }
 
 #board {

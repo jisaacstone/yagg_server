@@ -1,14 +1,16 @@
 const expect = require('chai').expect,
-  Unit = require('../frontend/js/unit.js'),
   Helper = require('./helper');
+let Unit;
 
 describe('unit', () => {
   before(function() {
-    return Helper.setupJsdom('board.html');
+    return Helper.setupJsdom('board.html').then(() => {
+      Unit = require('../frontend/js/unit.js');
+    });
   });
   it('create unit', () => {
     const testUnit = {
-        name,
+        name: 'testname',
         attack: 1,
         defense: 0,
         player: 'north',
@@ -21,7 +23,7 @@ describe('unit', () => {
   });
   it('sidebar', () => {
     const testUnit = {
-        name,
+        name: 'testname',
         attack: 1,
         defense: 0,
         player: 'north',

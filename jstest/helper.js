@@ -7,6 +7,8 @@ export function setupJsdom(page) {
       global[key] = window[key];
     });
 
+    global.Audio = Audio;
+
     global.document = window.document;
     global.window = window;
     global.localStorage = (() => {
@@ -28,5 +30,12 @@ export function setupJsdom(page) {
     Element.prototype.animate = (frames, opt_options) => {
       return { finished: Promise.resolve(true) };
     };
+
   });
+}
+
+function Audio() {
+  this.play = () => {
+    return Promise.resolve(true);
+  };
 }

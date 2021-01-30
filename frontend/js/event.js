@@ -189,12 +189,9 @@ export function thing_moved(event) {
         return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
     }
     else if (event.direction) {
-        console.log(event);
         // moved offscreen
         const animation = () => {
-            console.log({ from, child: from.firstChild });
             const thing = from.firstChild, thingRect = thing.getBoundingClientRect(), xpos = thingRect.left, ypos = thingRect.top, { x, y } = Board.in_direction(event.direction, thingRect.width);
-            console.log({ xpos, ypos, x, y });
             const a = thing.animate([
                 {
                     top: ypos + 'px',
@@ -221,7 +218,7 @@ export function thing_moved(event) {
                 thing.remove();
             });
         };
-        return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+        return { animation, squares: [`${event.from.x},${event.from.y}`] };
     }
     else if (event.to === 'hand') {
         const animation = () => {

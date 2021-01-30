@@ -92,10 +92,13 @@ defmodule Yagg.Event do
         y: 0..8,
         unit: Unit.t
       ]) :: Event.t
-    def new(position, params) do
+    def new(:global, params) do
       if visible?(params[:unit]) do
-        Event.new(position, :unit_changed, params)
+        Event.new(:global, :unit_changed, params)
       end
+    end
+    def new(position, params) do
+      Event.new(position, :unit_changed, params)
     end
 
     defp visible?(%Unit{} = unit) do

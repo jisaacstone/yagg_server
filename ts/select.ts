@@ -164,7 +164,6 @@ function audioFor(el: HTMLElement) {
 }
 
 function handleSelect(el: HTMLElement, meta) {
-  console.log(meta);
   const options = [], audio = audioFor(el.firstElementChild as HTMLElement);
   maybeSidebar(el);
   if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {

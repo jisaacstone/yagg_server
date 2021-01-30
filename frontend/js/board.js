@@ -43,7 +43,6 @@ export function render(el, width = 5, height = 5) {
         }
     }
     el.style.backgroundImage = `url(img/grid_${width}x${height}_${gmeta.position}.png)`;
-    console.log(el.style);
 }
 export function square(x, y) {
     const el = document.getElementById(`c${x}-${y}`);
@@ -95,7 +94,6 @@ export function in_direction(direction, distance) {
 // simulate events from unit state
 export function unitdata({ grid, hand }) {
     for (const ob of grid) {
-        console.log(ob);
         Event.new_unit(ob).animation();
     }
     Array.prototype.forEach.call(Object.entries(hand), ([index, card]) => {

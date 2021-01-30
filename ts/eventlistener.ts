@@ -2,7 +2,7 @@ import { getname, tableid, hostname } from './urlvars.js';
 import * as Player from './player.js';
 import * as Event from './event.js';
 
-const state = {
+export const state = {
   eventListener: null,
   interval: null,
   timeout: null,
@@ -52,26 +52,31 @@ function awaitAnimations(result: Event.animData | null): Promise<any> {
   }
 }
 
-function readEventQueu(delay = 50) {
+function handleNextEvent(next): Promise<string> {
+  if (Event[next.event]) {
+    try {
+      const result = Event[next.event](next);
+      return awaitAnimations(result).then(() => {
+        return 'resolved';
+      }).catch((error) => {
+        console.error({error, next});
+        return 'rejected';
+      });
+    } catch (error) {
+      console.error({error, next});
+    }
+  } else {
+    console.log({msg: `no event handler for ${next.event}`, next});
+  }
+  return Promise.resolve('errored');
+}
+
+export function readEventQueu(delay = 50) {
   const next = state.queue.shift();
   if (next) {
-    if (Event[next.event]) {
-      try {
-        const result = Event[next.event](next);
-        awaitAnimations(result).then(() => {
-          readEventQueu();
-        }).catch((error) => {
-          console.error({error, next});
-          readEventQueu();
-        });
-        return;
-      } catch (error) {
-        console.error({error, next});
-      }
-    } else {
-      console.log({msg: `no event handler for ${next.event}`, next});
-    }
-    readEventQueu();
+    return handleNextEvent(next).then(() => {
+      return readEventQueu();
+    });
   } else {
     state.timeout = window.setTimeout(readEventQueu, delay, Math.min(delay * 2, 300));
   }
