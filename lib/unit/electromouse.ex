@@ -66,13 +66,16 @@ defmodule Unit.Electromouse do
         } end
       )
       # do battle
-      {board, e2} = Board.do_battle(board, Grid.thing_at(board, from), opponent, from, to)
-      # create the trap
-      {x, y} = from
-      trap = Unit.Electromousetrap.new(position)
-      grid = Map.put(board.grid, from, trap)
-      events = e1 ++ e2 ++ [Event.NewUnit.new(position, x: x, y: y, unit: trap)]
-      {%{board | grid: grid}, events}
+      case Board.do_battle(board, Grid.thing_at(board, from), opponent, from, to) do
+        {:err, _} = err -> err
+        {board, e2} ->
+          # create the trap
+          {x, y} = from
+          trap = Unit.Electromousetrap.new(position)
+          grid = Map.put(board.grid, from, trap)
+          events = e1 ++ e2 ++ [Event.NewUnit.new(position, x: x, y: y, unit: trap)]
+          {%{board | grid: grid}, events}
+      end
     end
   end
 

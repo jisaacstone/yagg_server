@@ -300,4 +300,16 @@ defmodule YaggTest.Action.Ability do
     assert %{name: :electromousetrap} = newboard.grid[{2, 2}]
     assert :nil == newboard.grid[{2, 3}]
   end
+
+  test "tacticion friendly attack" do
+    board = set_board([
+      {{0, 3}, %Unit{attack: 5, defense: 4, monarch: false, name: :tactician, position: :north, triggers: %{move: Yagg.Unit.Tactician.Manuver}, visible: MapSet.new([:player])}}, 
+      {{0, 4}, %Unit{attack: 3, defense: 4, monarch: false, name: :"electromouse trap", position: :north, triggers: %{attack: Yagg.Unit.Electromouse.SetAtrap, death: Yagg.Unit.Electromousetrap.Trap, move: Yagg.Unit.Electromouse.Settrap}, visible: MapSet.new([:player])}}, 
+      {{1, 4}, %Unit{attack: 3, defense: 2, monarch: false, name: :spikeder, position: :north, triggers: %{death: Yagg.Unit.Ability.Poison, move: Yagg.Unit.Ability.Slide}, visible: MapSet.new([:player])}}, 
+    ])
+    action = %Yagg.Board.Action.Move{from_x: 0, from_y: 3, to_x: 1, to_y: 3}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :north)
+    assert %{name: :tactician} = newboard.grid[{1, 3}]
+    assert %{name: :spikeder} = newboard.grid[{1, 4}]
+  end
 end
