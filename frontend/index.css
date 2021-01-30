@@ -116,8 +116,8 @@ body > div, body > form {
 
 #player {
   position: absolute;
-  top: 1.2em;
-  right: 1.2em;
+  top: 1.6em;
+  right: 1.4em;
   display: grid;
   min-width: 30%;
   filter: none;
@@ -146,7 +146,7 @@ body > div, body > form {
   margin: 0.5em;
   display: grid;
   border-radius: 0.5em;
-  width: 18vw;
+  width: 9em;
 }
 
 #settings {

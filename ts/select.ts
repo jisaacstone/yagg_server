@@ -7,6 +7,7 @@ import * as Unit from './unit.js';
 import * as Infobox from './infobox.js';
 import * as Element from './element.js';
 import * as SFX from './sfx.js';
+import * as Dialog from './dialog.js';
 
 const global = { selected: null };
 
@@ -31,6 +32,11 @@ function action(actType, args, cb=null) {
           displayerror('you cannot attack your own units');
         } else if (request.responseText.includes('illegal')) {
           displayerror('illegal move');
+        } else if (request.responseText.includes('empty')) {
+          //UI is messed up most likely
+          Dialog.alert('oops, something went wrong').then(() => {
+            window.location = window.location;
+          });
         }
       }
     });
