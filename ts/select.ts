@@ -200,11 +200,13 @@ function handleSelect(el: HTMLElement, meta) {
 export function select(thisEl, meta) {
   function select() {
     SFX.startMusic();
-    if (
-      (gmeta.boardstate === 'gameover') ||
-      (gmeta.boardstate === 'battle' && gmeta.position !== gmeta.turn) ||  // not your turn
-      (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile'))
-    ){
+    if (gmeta.boardstate === 'gameover') {
+      maybeSidebar(thisEl);
+      return;
+    } else if (gmeta.boardstate === 'battle' && (
+      gmeta.position !== gmeta.turn ||  // not your turn
+      (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile')) // cannot move
+    )){
       maybeSidebar(thisEl);
       return;
     }
