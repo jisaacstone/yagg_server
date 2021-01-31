@@ -1,6 +1,7 @@
 import { gameaction } from './request.js';
 import { displayerror } from './err.js';
 import * as SFX from './sfx.js';
+import * as Select from './select.js';
 
 export function display(label = 'ready', onclick = null) {
   const readyButton = document.createElement('button');
@@ -22,6 +23,7 @@ export function display(label = 'ready', onclick = null) {
   }
   readyButton.onclick = () => {
     SFX.play('click').then(SFX.startMusic);
+    Select.deselect();
     onclick();
   }
   document.getElementById('buttons').appendChild(readyButton);

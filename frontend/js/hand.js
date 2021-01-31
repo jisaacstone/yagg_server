@@ -5,7 +5,7 @@ export function createCard(unit, index) {
     card.dataset.index = `${index}`;
     card.className = 'card';
     Select.bind_hand(card, index, unit);
-    hand.appendChild(card);
+    hand.prepend(card);
     card.appendChild(unitEl);
     return unitEl;
 }

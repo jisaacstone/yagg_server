@@ -30,6 +30,9 @@ export interface Unit {
 
 function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit, cb = null) {
   abilityButton.onclick = (e) => {
+    if (! owned(unit)) {
+      return;
+    }
     SFX.play('ability');
     if (
       gmeta.boardstate !== 'battle' ||
@@ -69,8 +72,14 @@ function abilityButton(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = nu
     square = unitSquare ? unitSquare : el.parentNode as HTMLElement;
 
   // Tooltip.addTooltip(abilbut, unit.ability.description);
-  bindAbility(abilbut, square, unit);
+  if (owned(unit)) {
+    bindAbility(abilbut, square, unit);
+  }
   el.appendChild(abilbut);
+}
+
+function owned({ player }) {
+  return player === gmeta.position;
 }
 
 function abilityIcon(unit: Unit, el: HTMLElement) {

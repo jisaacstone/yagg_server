@@ -15,24 +15,24 @@ function render_board(board, players) {
     if (players !== 2) {
         return;
     }
-    Event.game_started(board);
+    Event.game_started(board).animation();
     if (board.ready) {
-        Event.player_ready({ player: board.ready });
+        Event.player_ready({ player: board.ready }).animation();
     }
     Object.entries(board.grid).forEach(([coor, feature]) => {
         if (feature) {
             const [x, y] = coor.split(',');
             if (feature.kind === 'unit') {
-                Event.unit_placed(Object.assign({ x, y }, feature));
+                Event.unit_placed(Object.assign({ x, y }, feature)).animation();
             }
             else {
-                Event.feature({ x, y, feature });
+                Event.feature({ x, y, feature }).animation();
             }
         }
     });
 }
 function render_jobfair(jobfair) {
-    Event.game_started(jobfair);
+    Event.game_started(jobfair).animation();
 }
 function render_(boardstate, phase, players) {
     if (phase === 'jobfair') {
@@ -108,7 +108,7 @@ function setstate(gamedata, phase) {
     console.log({ gamedata, phase });
     let players = 0;
     for (const player of gamedata.players) {
-        Event.player_joined(player);
+        Event.player_joined(player).animation();
         players++;
     }
     render_(gamedata.board, phase, players);
@@ -116,7 +116,7 @@ function setstate(gamedata, phase) {
         waitingforplayers();
     }
     if (gamedata.turn) {
-        Event.turn({ player: gamedata.turn });
+        Event.turn({ player: gamedata.turn }).animation();
     }
     return players === 2; // continue and fetch player hands
 }

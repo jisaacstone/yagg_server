@@ -1,4 +1,6 @@
 alias Yagg.Unit
+alias Yagg.Event
+alias Yagg.Table.Player
 alias Yagg.Board.Grid
 alias Yagg.Board.Action.Ability
 
@@ -34,12 +36,14 @@ defmodule Unit.Electromousetrap do
     defp control(board, :nil, _) do
       {board, []}
     end
-    defp control(board, {unit, coord}, %{position: position}) do
-      Grid.update(
+    defp control(board, {unit, {x, y}}, %{position: position}) do
+      {board, events} = Grid.update(
         board,
-        coord,
-        fn(u) -> %{u | position: position} end
+        {x, y},
+        fn(u) -> %{u | position: position, visible: :all} end
       ) |> maybe_gameover(unit, unit.triggers[:death])
+      event = Event.UnitChanged.new(Player.opposite(position), x: x, y: y, unit: board.grid[{x, y}])
+      {board, [event | events]}
     end
 
     defp maybe_gameover({board, events}, unit, Unit.Ability.Concede) do

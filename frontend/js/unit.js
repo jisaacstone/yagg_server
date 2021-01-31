@@ -10,6 +10,9 @@ import * as Tooltip from './tooltip.js';
 import * as SFX from './sfx.js';
 function bindAbility(abilityButton, square, unit, cb = null) {
     abilityButton.onclick = (e) => {
+        if (!owned(unit)) {
+            return;
+        }
         SFX.play('ability');
         if (gmeta.boardstate !== 'battle' ||
             !isYourTurn() ||
@@ -43,8 +46,13 @@ function abilityButton(unit, el, unitSquare = null) {
         innerHTML: unit.ability.name,
     }), square = unitSquare ? unitSquare : el.parentNode;
     // Tooltip.addTooltip(abilbut, unit.ability.description);
-    bindAbility(abilbut, square, unit);
+    if (owned(unit)) {
+        bindAbility(abilbut, square, unit);
+    }
     el.appendChild(abilbut);
+}
+function owned({ player }) {
+    return player === gmeta.position;
 }
 function abilityIcon(unit, el) {
     if (unit.ability) {

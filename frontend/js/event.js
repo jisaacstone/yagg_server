@@ -17,6 +17,12 @@ import { leave } from './leaveButton.js';
 import * as SFX from './sfx.js';
 import * as Request from './request.js';
 const unitsbyindex = {};
+function noGrid(fn) {
+    return {
+        animation: () => Promise.resolve(fn()),
+        squares: []
+    };
+}
 export function multi({ events }) {
     let squares = [];
     const animations = [], module = this;
@@ -35,66 +41,84 @@ export function multi({ events }) {
     }
 }
 export function game_started(event) {
-    const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
-    Hand.clear();
-    Ready.hide();
-    if (event.army_size || gmeta.phase === 'jobfair') {
-        if (gmeta.boardstate === 'gameover') {
-            Board.clear();
+    return noGrid(() => {
+        const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
+        Hand.clear();
+        Ready.hide();
+        if (event.army_size || gmeta.phase === 'jobfair') {
+            if (gmeta.boardstate === 'gameover') {
+                Board.clear();
+            }
+            else {
+                Overlay.clear();
+            }
+            gamestatechange(state || 'jobfair');
+            Jobfair.render(event.army_size);
         }
         else {
             Overlay.clear();
+            Jobfair.clear();
+            if (event.dimensions) {
+                Board.render(board, event.dimensions.x, event.dimensions.y);
+            }
+            gamestatechange(state || 'placement');
+            if (state === 'placement' || state === 'gameover') {
+                Ready.display(state === 'placement' ? 'ready' : 'rematch');
+            }
         }
-        gamestatechange(state || 'jobfair');
-        Jobfair.render(event.army_size);
-    }
-    else {
-        Overlay.clear();
-        Jobfair.clear();
-        if (event.dimensions) {
-            Board.render(board, event.dimensions.x, event.dimensions.y);
-        }
-        gamestatechange(state || 'placement');
-        if (state === 'placement' || state === 'gameover') {
-            Ready.display(state === 'placement' ? 'ready' : 'rematch');
-        }
-    }
+    });
 }
 export function timer(event) {
-    Timer.set(event.timer, event.player);
+    return noGrid(() => {
+        Timer.set(event.timer, event.player);
+    });
 }
 export function battle_started() {
-    gamestatechange('battle');
+    return noGrid(() => {
+        gamestatechange('battle');
+    });
 }
 export function player_joined({ player, position }) {
-    const thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois), playerDetailsEl = Player.render(player);
-    if (container.firstElementChild) {
-        if (container.firstElementChild.className === 'playername') {
-            return;
+    return noGrid(() => {
+        const thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois), playerDetailsEl = Player.render(player);
+        if (container.firstElementChild) {
+            if (container.firstElementChild.className === 'playername') {
+                return;
+            }
+            else {
+                container.innerHTML = '';
+            }
         }
-        else {
-            container.innerHTML = '';
+        container.appendChild(playerDetailsEl);
+        if (whois === 'player') {
+            gmeta.position = position;
+            document.getElementById('table').dataset.position = position;
         }
-    }
-    container.appendChild(playerDetailsEl);
-    if (whois === 'player') {
-        gmeta.position = position;
-        document.getElementById('table').dataset.position = position;
-    }
+    });
 }
 export function player_left({ player }) {
-    const thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois);
-    container.innerHTML = '';
-    container.appendChild(Element.create({ className: 'invisible' }));
+    return noGrid(() => {
+        const thisPlayer = Player.getLocal(), whois = thisPlayer.id == player.id ? 'player' : 'opponent', container = document.getElementById(whois);
+        container.innerHTML = '';
+        container.appendChild(Element.create({ className: 'invisible' }));
+    });
 }
 export function add_to_hand({ unit, index }) {
-    const unitEl = Hand.createCard(unit, index);
-    unitsbyindex[index] = unitEl;
+    return noGrid(() => {
+        const unitEl = Hand.createCard(unit, index);
+        unitsbyindex[index] = unitEl;
+        unitEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
 }
 export function unit_assigned({ x, y, index }) {
-    const square = Board.square(x, y), unit = unitsbyindex[index];
-    SFX.play('place');
-    square.appendChild(unit);
+    return {
+        animation: () => {
+            const square = Board.square(x, y), unit = unitsbyindex[index];
+            square.appendChild(unit);
+            return SFX.play('place');
+        },
+        squares: [`${x},${y}`]
+    };
 }
 export function new_unit({ x, y, unit }) {
     const animation = () => {
@@ -120,29 +144,43 @@ export function unit_changed(event) {
     return new_unit(event); // for now
 }
 export function unit_placed(event) {
-    const square = Board.square(event.x, event.y);
-    SFX.play('place');
-    if (!square.firstChild) {
-        const unit = Unit.render(event, null);
-        square.appendChild(unit);
-    }
-    else {
-        console.error({ msg: `${event.x},${event.y} already occupied`, event });
-    }
+    return {
+        animation: () => {
+            const square = Board.square(event.x, event.y);
+            if (!square.firstChild) {
+                const unit = Unit.render(event, null);
+                square.appendChild(unit);
+                return SFX.play('place');
+            }
+            else {
+                console.log({ msg: `${event.x},${event.y} already occupied`, event });
+                return Promise.resolve(false);
+            }
+        },
+        squares: [`${event.x},${event.y}`]
+    };
 }
 export function player_ready(event) {
-    if (event.player === gmeta.position) {
-        document.querySelector('#player .playername').dataset.ready = 'true';
-        Ready.hide();
-    }
-    else {
-        SFX.play('playerready');
-        document.querySelector('#opponent .playername').dataset.ready = 'true';
-    }
+    return noGrid(() => {
+        if (event.player === gmeta.position) {
+            document.querySelector('#player .playername').dataset.ready = 'true';
+            Ready.hide();
+        }
+        else {
+            SFX.play('playerready');
+            document.querySelector('#opponent .playername').dataset.ready = 'true';
+        }
+    });
 }
 export function feature(event) {
-    const square = Board.square(event.x, event.y), feature = Feature.render(event.feature);
-    square.appendChild(feature);
+    return {
+        animation: () => {
+            const square = Board.square(event.x, event.y), feature = Feature.render(event.feature);
+            square.appendChild(feature);
+            return Promise.resolve(true);
+        },
+        squares: [`${event.x},${event.y}`]
+    };
 }
 export function unit_died(event) {
     const square = Board.square(event.x, event.y), animation = () => {
@@ -165,6 +203,7 @@ export function thing_moved(event) {
     if (event.to.x !== undefined && event.to.y !== undefined) {
         const to = Board.square(event.to.x, event.to.y), fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), animation = () => {
             const thing = from.firstChild;
+            console.log({ from, thing, event });
             return SFX.play('move').then(() => {
                 const thingRect = thing.getBoundingClientRect(), xoffset = thingRect.left - fromRect.left, yoffset = thingRect.top - fromRect.top;
                 const a = thing.animate({
@@ -299,73 +338,82 @@ export function battle({ from, to }) {
     return { animation, squares: [`${to.x},${to.y}`, `${from.x},${from.y}`] };
 }
 export function gameover({ winner, reason }) {
-    let message;
-    const showRematch = !reason || !reason.toLowerCase().includes('opponent left'), choices = {
-        ok: () => { if (showRematch) {
-            Ready.display('rematch');
-        } },
-        leave,
-    };
-    gamestatechange('gameover');
-    Timer.stop();
-    turnchange(null);
-    if (winner === gmeta.position) {
-        SFX.play('go_win');
-        message = 'you win!';
-    }
-    else if (winner === 'draw') {
-        SFX.play('go_draw');
-        message = 'draw game';
-    }
-    else {
-        SFX.play('go_lose');
-        message = 'you lose';
-    }
-    if (reason) {
-        message = `<p>${reason}<p>${message}`;
-    }
-    if (showRematch) {
-        choices['rematch'] = () => {
-            return Request.gameaction('ready', {}, 'board').then(() => {
-                window.location.reload();
-            });
+    return noGrid(() => {
+        let message;
+        const showRematch = !reason || !reason.toLowerCase().includes('opponent left'), choices = {
+            ok: () => { if (showRematch) {
+                Ready.display('rematch');
+            } },
+            leave,
         };
-    }
-    Dialog.choices(message, choices);
+        gamestatechange('gameover');
+        Timer.stop();
+        turnchange(null);
+        if (winner === gmeta.position) {
+            SFX.play('go_win');
+            message = 'you win!';
+        }
+        else if (winner === 'draw') {
+            SFX.play('go_draw');
+            message = 'draw game';
+        }
+        else {
+            SFX.play('go_lose');
+            message = 'you lose';
+        }
+        if (reason) {
+            message = `<p>${reason}<p>${message}`;
+        }
+        if (showRematch) {
+            choices['rematch'] = () => {
+                return Request.gameaction('ready', {}, 'board').then(() => {
+                    window.location.reload();
+                });
+            };
+        }
+        Dialog.choices(message, choices);
+    });
 }
 export function turn({ player }) {
-    turnchange(player);
+    return noGrid(() => {
+        turnchange(player);
+    });
 }
 export function candidate(event) {
-    const jf = document.getElementById('jobfair'), existing = document.getElementById(`candidate-${event.index}`);
-    if (existing) {
-        return;
-    }
-    const unitEl = Unit.render(event.unit, event.index), cdd = Element.create({
-        className: 'candidate',
-        id: `candidate-${event.index}`,
-        children: [unitEl]
-    }), qbutton = Element.create({
-        tag: 'button',
-        className: 'detailsButton uibutton',
+    return noGrid(() => {
+        const jf = document.getElementById('jobfair'), existing = document.getElementById(`candidate-${event.index}`);
+        if (existing) {
+            return;
+        }
+        const unitEl = Unit.render(event.unit, event.index), cdd = Element.create({
+            className: 'candidate',
+            id: `candidate-${event.index}`,
+            children: [unitEl]
+        }), qbutton = Element.create({
+            tag: 'button',
+            className: 'detailsButton uibutton',
+        });
+        qbutton.setAttribute('title', 'details');
+        Select.bind_candidate(cdd, event.index, event.unit);
+        unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
+        qbutton.addEventListener('click', Unit.detailViewFn(event.unit, unitEl.className));
+        unitEl.appendChild(qbutton);
+        jf.appendChild(cdd);
     });
-    qbutton.setAttribute('title', 'details');
-    Select.bind_candidate(cdd, event.index, event.unit);
-    unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
-    qbutton.addEventListener('click', Unit.detailViewFn(event.unit, unitEl.className));
-    unitEl.appendChild(qbutton);
-    jf.appendChild(cdd);
 }
 export function ability_used(event) {
     if (!AbilityEvent[event.type]) {
-        SFX.play('ability');
         console.error({ error: 'no ability handler', event });
-        return null;
+        return noGrid(() => {
+            SFX.play('ability');
+        });
     }
     return AbilityEvent[event.type](event);
 }
 export function table_shutdown() {
-    Dialog.alert('table closed').then(() => {
-        window.location.href = 'index.html';
+    return noGrid(() => {
+        return Dialog.alert('table closed').then(() => {
+            window.location.href = 'index.html';
+        });
     });
 }

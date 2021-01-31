@@ -9,7 +9,7 @@ export function createCard(unit: Unit.Unit, index: number): HTMLElement {
   card.dataset.index = `${index}`;
   card.className = 'card';
   Select.bind_hand(card, index, unit);
-  hand.appendChild(card);
+  hand.prepend(card);
   card.appendChild(unitEl);
   return unitEl;
 }
