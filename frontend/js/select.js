@@ -61,7 +61,7 @@ function ismoveoption(el) {
 }
 export function deselect() {
     const selected = global.selected, rb = document.getElementById('returnbutton');
-    if (selected.element) {
+    if (selected && selected.element) {
         selected.element.dataset.uistate = '';
         for (const opt of selected.options) {
             opt.dataset.uistate = '';

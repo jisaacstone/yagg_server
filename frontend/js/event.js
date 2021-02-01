@@ -203,7 +203,6 @@ export function thing_moved(event) {
     if (event.to.x !== undefined && event.to.y !== undefined) {
         const to = Board.square(event.to.x, event.to.y), fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect(), animation = () => {
             const thing = from.firstChild;
-            console.log({ from, thing, event });
             return SFX.play('move').then(() => {
                 const thingRect = thing.getBoundingClientRect(), xoffset = thingRect.left - fromRect.left, yoffset = thingRect.top - fromRect.top;
                 const a = thing.animate({

@@ -238,7 +238,6 @@ export function thing_moved(event): animData {
       toRect = to.getBoundingClientRect(),
       animation = () => {
         const thing = from.firstChild as HTMLElement;
-        console.log({from, thing, event});
         return SFX.play('move').then(() => {
           const thingRect = thing.getBoundingClientRect(),
             xoffset = thingRect.left - fromRect.left,

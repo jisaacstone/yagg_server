@@ -1,7 +1,8 @@
 alias Yagg.Unit
+alias Yagg.Event
 alias Yagg.Board.Action.Ability
 
-defmodule Yagg.Unit.Flag do
+defmodule Unit.Flag do
   @behaviour Unit
   @impl Unit
   def new(position) do
@@ -12,7 +13,7 @@ defmodule Yagg.Unit.Flag do
       attack: :immobile,
       defense: 0,
       triggers: %{
-        death: Unit.Ability.Concede,
+        death: Unit.Flag.Captured,
         move: Ability.Immobile,
       }
     )
@@ -20,4 +21,22 @@ defmodule Yagg.Unit.Flag do
 
   defp name(:north), do: :"northern colors"
   defp name(:south), do: :"southern banner"
+
+  defmodule Captured do
+    @moduledoc """
+    Lose the game
+    """
+    use Ability
+
+    @impl Ability
+    def resolve(board, opts) do
+      {board, events} = Unit.Ability.Concede.resolve(board, opts)
+      case opts[:opponent] do
+        :nil -> {board, events}
+        {_, coord} ->
+          event = Event.AbilityUsed.new(type: :capture, coord: coord, name: opts[:unit].name)
+          {board, events ++ [event]}
+      end
+    end
+  end
 end

@@ -10,16 +10,27 @@ export const gmeta = {
   phase: null,
 };
 
+function monarchName() {
+  const monarch = document.querySelector('.monarch') as HTMLElement;
+  if (monarch && monarch.dataset.name) {
+    return monarch.dataset.name;
+  }
+  console.warn('could not determine monarch name');
+  return 'monarch';
+}
+
 function instructions(stateName) {
   Instructions.clear();
   if (stateName === 'placement') {
     Instructions.dropdown(
       'placement',
-      'Place your monarch and as many other units as desired');
+      `Place your ${monarchName()} and as many other units as desired`);
   } else if (stateName === 'battle') {
-    Instructions.dropdown(
-      'battle',
-      "Destroy your opponent's monarch or cross your monarch to the other side to win");
+    const monName = monarchName(),
+      instructions = (monName === 'monarch') ?
+        "Destroy your opponent's monarch, protect your monarch" :
+        "Capture your opponent's flag, protect your flag";
+    Instructions.dropdown(`battle-${monName}`, instructions);
   } else {
     console.log(`no instructions for ${stateName}`);
   }

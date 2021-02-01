@@ -82,7 +82,6 @@ let waits = 0;
 function handleNextEventQ(next) {
     if (Event[next.event]) {
         try {
-            console.log({ running: next });
             const { animation } = Event[next.event](next);
             return animation().then(() => {
                 return 'resolved';
@@ -100,11 +99,9 @@ function handleNextEventQ(next) {
     }
     return Promise.resolve('errored');
 }
-globalThis.events = [];
 export function readEventQueu(delay = 50) {
     const next = state.queue.shift();
     if (next) {
-        globalThis.events.push(next);
         return handleNextEventQ(next).then(() => {
             return readEventQueu();
         });
@@ -119,7 +116,6 @@ function createWSEventListener() {
         state.eventListener = new WebSocket(`${wshost}/ws/${tableid()}/${id}`);
         state.eventListener.onmessage = (event) => {
             const evt = JSON.parse(event.data);
-            console.log(evt);
             handleEvent(evt);
         };
         state.eventListener.onopen = (event) => {

@@ -35,6 +35,10 @@ function render_jobfair(jobfair) {
     Event.game_started(jobfair).animation();
 }
 function render_(boardstate, phase, players) {
+    if (!boardstate) {
+        console.warn('no state');
+        return;
+    }
     if (phase === 'jobfair') {
         render_jobfair(boardstate);
     }
@@ -91,7 +95,8 @@ function waitingforplayers() {
 }
 function fetchgamestate() {
     Request.request(`table/${tableid()}/state`).then((gamedata) => {
-        const phase = gamephase(gamedata.board);
+        const phase = gamephase(gamedata.board), oldmute = SFX.settings.mute;
+        SFX.settings.mute = true; // no sound, gonna be a lot of events
         if (setstate(gamedata, phase)) {
             Request.request(`board/${tableid()}/player_state`).then((unitdata) => {
                 if (phase === 'jobfair') {
@@ -100,20 +105,29 @@ function fetchgamestate() {
                 else if (phase === 'board') {
                     Board.unitdata(unitdata);
                 }
+            }).finally(() => {
+                SFX.settings.mute = oldmute;
             });
+        }
+        else {
+            SFX.settings.mute = oldmute;
         }
     });
 }
 function setstate(gamedata, phase) {
-    console.log({ gamedata, phase });
     let players = 0;
     for (const player of gamedata.players) {
         Event.player_joined(player).animation();
         players++;
     }
-    render_(gamedata.board, phase, players);
     if (!gamedata.board || players == 1) {
         waitingforplayers();
+    }
+    else {
+        render_(gamedata.board, phase, players);
+        if (gamedata.timer) {
+            Event.timer(gamedata).animation();
+        }
     }
     if (gamedata.turn) {
         Event.turn({ player: gamedata.turn }).animation();

@@ -9,7 +9,6 @@ defmodule Yagg.Table do
   alias __MODULE__
 
   @enforce_keys [:id, :players, :board, :turn, :configuration, :history]
-  @derive {Poison.Encoder, only: [:players, :board, :turn, :configuration]}
   defstruct [:subscribors, :timer | @enforce_keys]
 
   @opaque history :: [Board.t]
@@ -24,6 +23,24 @@ defmodule Yagg.Table do
     history: history,
     timer: :nil | reference
   }
+
+  defimpl Poison.Encoder, for: Table do
+    def encode(%{players: players, board: board, turn: turn, configuration: configuration, timer: timer}, options) do
+      time = case timer do
+        :nil -> :nil
+        ref -> Process.read_timer(ref)
+      end
+      Poison.Encoder.Map.encode(%{
+          players: players,
+          board: board,
+          turn: turn,
+          configuration: configuration,
+          timer: time
+        },
+        options
+      )
+    end
+  end
 
   def start_link(table, args \\ []) do
     GenServer.start_link(__MODULE__, table, args)
@@ -56,7 +73,7 @@ defmodule Yagg.Table do
       history: [],
       timer: nil,
     }
-    {:ok, pid} = DynamicSupervisor.start_child(
+    {:ok, _pid} = DynamicSupervisor.start_child(
       Yagg.TableSupervisor,
       %{
         id: Yagg.Table,
