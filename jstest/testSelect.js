@@ -57,18 +57,22 @@ describe('select', () => {
     Board.render(boardEl, 5, 5);
     State.gmeta.boardstate = 'placement';
     State.gmeta.position = 'north';
-    Event.add_to_hand(event1);
-    Event.add_to_hand(event2);
-    Event.unit_assigned({y: 0, x: 2, index: 6, event: "unit_assigned"});
-    Board.thingAt(2, 0).click();
-    let rb = document.getElementById('returnbutton');
-    expect(rb.className).include('uibutton');
-    rb.remove();
+    return Event.add_to_hand(event1).animation().then(() => {
+      return Event.add_to_hand(event2).animation();
+    }).then(() => {
+      return Event.unit_assigned({y: 0, x: 2, index: 6, event: "unit_assigned"}).animation();
+    }).then(() => {
+      Board.thingAt(2, 0).click();
+      let rb = document.getElementById('returnbutton');
+      expect(rb.className).include('uibutton');
 
-    // immobile object
-    Event.unit_assigned({y: 0, x: 3, index: 0, event: "unit_assigned"});
-    Board.thingAt(3, 0).click();
-    rb = document.getElementById('returnbutton');
-    expect(rb.className).include('uibutton');
+      // immobile object
+      rb.remove();
+      return Event.unit_assigned({y: 0, x: 3, index: 0, event: "unit_assigned"}).animation();
+    }).then(() => {
+      Board.thingAt(3, 0).click();
+      rb = document.getElementById('returnbutton');
+      expect(rb.className).include('uibutton');
+    });
   });
 });

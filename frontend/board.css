@@ -839,6 +839,7 @@ body {
 #readybutton {
   background-image: url('img/shimmer.png');
   animation: shimmer 8s linear infinite;
+  grid-row: 2;
 }
 
 #leavebutton,

@@ -289,6 +289,17 @@ defmodule YaggTest.Action.Ability do
     assert %{name: :miner, position: :north} = newboard.grid[{2, 0}]
   end
 
+  test "miner capture flag" do
+    board = set_board([
+      {{2, 0}, Unit.Flag.new(:south)},
+      {{3, 0}, Unit.Miner.new(:north)},
+    ])
+    action = %Board.Action.Move{from_x: 3, from_y: 0, to_x: 2, to_y: 0}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :north)
+    assert %State.Gameover{} = newboard.state
+    assert %{name: :miner, position: :north} = newboard.grid[{2, 0}]
+  end
+
   test "sparkle skipped" do
     board = set_board([
       {{2, 2}, %Unit{attack: :immobile, defense: 0, monarch: false, name: :electromousetrap, position: :south, triggers: %{death: Unit.Electromousetrap.Trap, move: Board.Action.Ability.Immobile}, visible: :none}}, 

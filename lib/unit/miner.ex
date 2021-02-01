@@ -33,7 +33,8 @@ defmodule Unit.Miner do
 
     defp defuse(board, coord) do
       grid = case Board.Grid.thing_at(board, coord) do
-        %{triggers: %{death: Unit.Ability.Concede}} -> board.grid  # don't defuse flags
+        %{triggers: %{death: Unit.Ability.Concede}} -> board.grid  # don't defuse monarch
+        %{triggers: %{death: Unit.Flag.Captured}} -> board.grid  # don't defuse flags
         %{triggers: %{death: _}} = unit ->
           {_, triggers} = Map.pop!(unit.triggers, :death)
           Map.put(board.grid, coord, %{unit | triggers: triggers})

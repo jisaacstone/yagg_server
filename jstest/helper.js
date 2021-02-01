@@ -30,6 +30,9 @@ export function setupJsdom(page) {
     Element.prototype.animate = (frames, opt_options) => {
       return { finished: Promise.resolve(true) };
     };
+    Element.prototype.scrollIntoView = () => {
+      return true;
+    };
 
   });
 }

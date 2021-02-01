@@ -155,24 +155,25 @@ describe('event', () => {
   it('moved offscreen', () => {
     const boardEl = document.getElementById('board');
     Board.render(boardEl, 5, 5);
-    Event.feature({ x: 0, y: 1, feature: 'block' });
+    Event.feature({ x: 0, y: 1, feature: 'block' }).animation();
     const result = Event.thing_moved({ from: { x: 0, y: 1}, to: 'offscrean', direction: 'south' });
     expect(result.squares[0]).equal('0,1');
   });
   it('moved 0', () => {
     const boardEl = document.getElementById('board');
     Board.render(boardEl, 5, 5);
-    Event.feature({ x: 1, y: 1, feature: 'block' });
-    const result = Event.thing_moved({ from: { x: 1, y: 1}, to: { x: 0, y: 1 } });
-    return result.animation().then(() => {
-      expect(Board.thingAt(0, 1).className).include('block');
+    return Event.feature({ x: 1, y: 1, feature: 'block' }).animation().then(() => {
+      const result = Event.thing_moved({ from: { x: 1, y: 1}, to: { x: 0, y: 1 } });
+      return result.animation().then(() => {
+        expect(Board.thingAt(0, 1).className).include('block');
+      });
     });
   });
   it('player joined', () => {
     localStorage.setItem('playerData.id', 1234);
     localStorage.setItem('playerData.name', 'testname');
-    Event.player_joined({player: {id: 1234, name: 'testname'}, position: 'north'});
-    Event.player_joined({player: {id: 5678, name: 'testname'}, position: 'south'});
+    Event.player_joined({player: {id: 1234, name: 'testname'}, position: 'north'}).animation();
+    Event.player_joined({player: {id: 5678, name: 'testname'}, position: 'south'}).animation();
     const pEl = document.querySelector('#player .playername'),
       oEl = document.querySelector('#opponent .playername');
     expect(pEl.innerHTML).include('testname');
