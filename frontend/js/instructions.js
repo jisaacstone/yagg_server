@@ -1,15 +1,15 @@
+import * as Storage from './storage.js';
 export function dropdown(key, text) {
-    const lsKey = `dropdown.${key}`;
-    if (localStorage.getItem(lsKey)) {
+    if (Storage.getItem('dropdown', key)) {
         return;
     }
-    displayDropdown(lsKey, text);
+    displayDropdown(key, text);
 }
 export function clear() {
     const existing = document.getElementsByClassName('dropdown');
     Array.prototype.forEach.call(existing, (el) => el.remove());
 }
-function displayDropdown(lsKey, text) {
+function displayDropdown(key, text) {
     const tableEl = document.getElementById('table'), dropdownEl = document.createElement('div'), dropdownText = document.createElement('div'), dismiss = document.createElement('button');
     dropdownEl.className = 'dropdown';
     dropdownEl.appendChild(dropdownText);
@@ -19,7 +19,7 @@ function displayDropdown(lsKey, text) {
     dismiss.className = 'dismiss uibutton';
     tableEl.appendChild(dropdownEl);
     dismiss.onclick = () => {
-        localStorage.setItem(lsKey, 'dismissed');
+        Storage.setItem('dropdown', key, 'dismissed');
         tableEl.removeChild(dropdownEl);
     };
 }

@@ -34,7 +34,7 @@ defmodule Yagg.Board do
           %{state: state}
       end
         |> Map.put(:grid, encodeable)
-        |> Map.put(:dimensions, board.dimensions)
+        |> Map.put(:dimensions, %{width: elem(board.dimensions, 0), height: elem(board.dimensions, 1)})
         |> Poison.Encoder.Map.encode(options)
     end
 
@@ -166,7 +166,7 @@ defmodule Yagg.Board do
     )
     {
       %{board | state: %State.Placement{}},
-      [Event.GameStarted.new(dimensions: board.dimensions) | events]
+      [Event.GameStarted.new(dimensions: %{width: elem(board.dimensions, 0), height: elem(board.dimensions, 1)}) | events]
     }
   end
 

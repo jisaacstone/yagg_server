@@ -1,6 +1,7 @@
 import * as Dialog from './dialog.js';
 import * as Element from './element.js';
 import * as SFX from './sfx.js';
+import * as Soundtrack from './soundtrack.js';
 import * as Overlay from './overlay.js';
 export function button() {
     const settingsEl = Element.create({
@@ -14,7 +15,7 @@ export function button() {
         SFX.play('click');
         show();
     };
-    if (SFX.settings.fxvolume === 0 || SFX.mute) {
+    if (SFX.settings().volume === 0 || SFX.settings().mute === true) {
         settingsEl.style.backgroundImage = 'url("img/muted.png")';
     }
     return settingsEl;
@@ -26,19 +27,17 @@ function show() {
     }), cancelEl = Element.create({
         className: 'uibutton',
         innerHTML: 'cancel',
-    }), fxvolume = Element.create({ tag: 'input' }), musicvolume = Element.create({ tag: 'input' }), mute = Element.create({ tag: 'input' }), optionsEl = Dialog.createDialog('options', Element.create({
+    }), fxvolume = Element.create({ tag: 'input' }), musicvolume = Element.create({ tag: 'input' }), mute = Element.create({ tag: 'input' }), fxsettings = SFX.settings(), stsettings = Soundtrack.settings(), optionsEl = Dialog.createDialog('options', Element.create({
         children: [
             Element.create({ innerHTML: 'sfx volume' }),
             fxvolume
         ]
-    }), 
-    //      Element.create({
-    //        children: [
-    //          Element.create({ innerHTML: 'music volume' }),
-    //          musicvolume
-    //        ]
-    //      }),
-    Element.create({
+    }), Element.create({
+        children: [
+            Element.create({ innerHTML: 'music volume' }),
+            musicvolume
+        ]
+    }), Element.create({
         children: [
             Element.create({ innerHTML: 'mute' }),
             mute
@@ -47,30 +46,43 @@ function show() {
     for (const volume of [fxvolume, musicvolume]) {
         volume.setAttribute('type', 'range');
         volume.setAttribute('min', '0');
-        volume.setAttribute('max', '10');
+        volume.setAttribute('max', '1');
+        volume.setAttribute('step', '0.05');
     }
-    fxvolume.setAttribute('value', '' + Math.round(SFX.settings.fxvolume * 10));
-    //musicvolume.setAttribute('value', '' + Math.round(SFX.settings.musicvolume * 10));
+    fxvolume.setAttribute('value', '' + fxsettings.volume);
+    fxvolume.addEventListener('input', () => {
+        SFX.setVolume(+fxvolume.value);
+    });
+    musicvolume.setAttribute('value', '' + stsettings.volume);
+    musicvolume.addEventListener('input', () => {
+        Soundtrack.setVolume(+musicvolume.value);
+    });
     mute.setAttribute('type', 'checkbox');
-    if (SFX.settings.mute) {
+    if (fxsettings.mute) {
         mute.setAttribute('checked', 'true');
     }
+    mute.addEventListener('change', () => {
+        console.log('mutechange');
+        if (mute.checked) {
+            SFX.mute();
+            Soundtrack.mute();
+        }
+        else {
+            SFX.unmute();
+            Soundtrack.unmute();
+        }
+    });
     return new Promise((resolve) => {
         cancelEl.onclick = () => {
             clearOverlay();
+            SFX.setVolume(fxsettings.volume);
+            SFX.setMute(fxsettings.mute);
+            Soundtrack.setVolume(stsettings.volume);
+            Soundtrack.setMute(stsettings.mute);
             resolve(true);
         };
         okEl.onclick = () => {
             clearOverlay();
-            if (mute.checked) {
-                SFX.mute();
-            }
-            else {
-                SFX.unmute();
-            }
-            SFX.setVolume(+fxvolume.value / 10);
-            //SFX.settings.musicvolume = +musicvolume.value / 10;
-            //SFX.soundtrack.setVolume();
             setbg();
             resolve(true);
         };
@@ -81,7 +93,7 @@ export function setbg() {
     if (!settingsEl) {
         return;
     }
-    if (SFX.settings.fxvolume === 0 || SFX.settings.mute) {
+    if (SFX.settings().volume === 0 || SFX.settings().mute) {
         settingsEl.style.backgroundImage = 'url("img/muted.png")';
     }
     else {

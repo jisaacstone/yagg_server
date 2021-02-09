@@ -1,4 +1,5 @@
 import * as Settings from './settings.js';
+import * as Storage from './storage.js';
 
 const mapping = {
   select: 'lego_click',
@@ -26,61 +27,46 @@ const mapping = {
 const loaded = {
 };
 
-export const soundtrack = (() => {
-  const audio = new Audio('sfx/smugglesnore.mp3'),
-    rv: any = {
-      playing: false
-    };
-  audio.loop = true;
-  rv.play = () => {
-    if (!rv.playing) {
-      console.log({l: 'starting audio', audio});
-      audio.play();
-      rv.playing = true;
-    }
-  };
-  rv.setVolume = (volume: number) => {
-    audio.volume = settings.musicvolume;
-  };
-  rv.audio = audio;
-  return rv;
-})();
-
-export const settings = {
-  fxvolume: 0.9,
-  musicvolume: 0,
+const state = {
+  volume: 0.9,
   mute: false,
 }
 
+export function settings(): { volume: number; mute: boolean } {
+  return {
+    volume: state.volume,
+    mute: state.mute,
+  }
+}
+
+export function mute(): void {
+  state.mute = true;
+  Storage.setItem('sfx', 'mute', 'true');
+}
+
+export function unmute(): void {
+  state.mute = false;
+  Storage.setItem('sfx', 'mute', 'false');
+}
+
+export function setMute(muted: boolean): void {
+  muted ? mute() : unmute();
+}
+
+export function setVolume(volume: number): void {
+  state.volume = volume;
+  Storage.setItem('sfx', 'volume', volume);
+}
+
 export function loadSettings() {
-  const lsv = localStorage.getItem('fxvolume'),
-    lsm = localStorage.getItem('mute');
-  if (lsv) {
-    settings.fxvolume = +lsv;
+  const sv = Storage.getItem('sfx', 'volume'),
+    sm = Storage.getItem('sfx', 'mute');
+  if (sv) {
+    setVolume(+sv);
   }
-  if (lsm) {
-    settings.mute = (lsm === 'true');
+  if (sm) {
+    setMute(sm === 'true');
   }
-}
-
-export function setVolume(value: number) {
-  settings.fxvolume = value;
-  localStorage.setItem('fxvolume', '' + value);
-}
-
-export function mute() {
-  settings.mute = true;
-  localStorage.setItem('mute', 'true');
-}
-
-export function unmute() {
-  settings.mute = false;
-  localStorage.setItem('mute', 'false');
-}
-
-export function startMusic() {
-  return; // disabling music...
-  //soundtrack.play();
 }
 
 function getAudio(name) {
@@ -93,13 +79,12 @@ function getAudio(name) {
   return audio;
 }
 
-
 export function play(name: string): Promise<any> {
-  if (settings.mute || settings.fxvolume === 0) {
+  if (state.mute || state.volume === 0) {
     return Promise.resolve(true);
   }
   const audio = getAudio(name);
-  audio.volume = settings.fxvolume;
+  audio.volume = state.volume;
   return audio.play().catch((e) => {
     console.error({ name, e });
     return false;

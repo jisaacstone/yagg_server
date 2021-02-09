@@ -1,14 +1,21 @@
 import * as Instructions from './instructions.js';
 import * as LeaveButton from './leaveButton.js';
 import * as SFX from './sfx.js';
+import * as Soundtrack from './soundtrack.js';
+import * as Board from './board.js';
 
-export const gmeta = {
-  position: null,
-  name: null,
-  boardstate: null,
-  turn: null,
-  phase: null,
-};
+export const gmeta: {
+  position?: string;
+  boardstate?: string;
+  turn?: string;
+  phase?: string;
+  config?: Board.Config;
+} = {};
+
+export function setConfig(config: Board.Config) {
+  gmeta.config = config;
+  document.getElementById('table').dataset.config = config.name;
+}
 
 function monarchName() {
   const monarch = document.querySelector('.monarch') as HTMLElement;
@@ -45,6 +52,7 @@ export function gamestatechange(newstate: string): void {
   document.getElementById('table').dataset.gamestate = newstate;
   gmeta.boardstate = newstate;
   instructions(newstate);
+  Soundtrack.setSoundtrack(newstate);
   Array.prototype.forEach.call(
     document.getElementsByClassName('playername') as HTMLCollectionOf<HTMLInputElement>,
     el => {

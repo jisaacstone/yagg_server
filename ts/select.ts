@@ -7,6 +7,7 @@ import * as Unit from './unit.js';
 import * as Infobox from './infobox.js';
 import * as Element from './element.js';
 import * as SFX from './sfx.js';
+import * as Soundtrack from './soundtrack.js';
 import * as Dialog from './dialog.js';
 
 const global = { selected: null };
@@ -199,7 +200,7 @@ function handleSelect(el: HTMLElement, meta) {
 
 export function select(thisEl, meta) {
   function select() {
-    SFX.startMusic();
+    Soundtrack.play();
     if (gmeta.boardstate === 'gameover') {
       maybeSidebar(thisEl);
       return;
@@ -224,7 +225,7 @@ export function bind_hand(card: HTMLElement, index: number, unit: Unit.Unit) {
 
 export function bind_candidate(candidate: HTMLElement, index: number, unit: Unit.Unit) {
   candidate.onclick = (e) => {
-    SFX.startMusic();
+    Soundtrack.play();
     const childEl = candidate.firstElementChild as HTMLElement,
       audio = unit.name;
     Infobox.clear();
@@ -239,28 +240,8 @@ export function bind_candidate(candidate: HTMLElement, index: number, unit: Unit
           SFX.play(audio);
           childEl.dispatchEvent(new Event('sidebar'));
           candidate.dataset.uistate = 'selected';
-          candidateAnimate(childEl, unit.name);
         }
       }
     }
   };
-}
-
-function candidateAnimate(el: HTMLElement, seed: string) {
-  // fun little animation for selected candidates
-  const rs = `${seed} *-();%#`,
-    biglittle = 6 + rs.charCodeAt(0) % 5 + rs.charCodeAt(1) % 6,
-    topbottom = 2 + rs.charCodeAt(2) % 7,
-    leftright = 34 + (rs.charCodeAt(3) % 10) + (rs.charCodeAt(4) % 10) + (rs.charCodeAt(5) % 10),
-    dur = 300 + (rs.charCodeAt(6) % 9) * 17 + (rs.charCodeAt(7) % 9) * 13,
-    size = biglittle === 10 ? '90% 95%' : `${biglittle}0% ${biglittle}0%`,
-    pos = `${leftright}% ${topbottom}0%`;
-  return;
-  el.animate({
-    backgroundSize: ['100% 100%', '99% 99%', size, '100% 100%'],
-    backgroundPosition: ['50% 50%', pos, '50% 50%']
-  }, {
-    duration: dur,
-    easing: 'ease-in-out'
-  });
 }

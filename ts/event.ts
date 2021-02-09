@@ -1,4 +1,4 @@
-import { gmeta, gamestatechange, turnchange } from './state.js';
+import * as State from './state.js';
 import * as Select from './select.js';
 import * as Unit from './unit.js';
 import { SKULL } from './constants.js';
@@ -53,26 +53,27 @@ export function multi({ events }): animData {
 }
 
 export function game_started(event): animData {
+  console.log(event);
   return noGrid(() => {
     const board = document.getElementById('board'),
       state = (event.state || '').toLowerCase();
     Hand.clear();
     Ready.hide();
-    if (event.army_size || gmeta.phase === 'jobfair') {
-      if (gmeta.boardstate === 'gameover') {
+    if (event.army_size || State.gmeta.phase === 'jobfair') {
+      if (State.gmeta.boardstate === 'gameover') {
         Board.clear();
       } else {
         Overlay.clear();
       }
-      gamestatechange(state || 'jobfair');
+      State.gamestatechange(state || 'jobfair');
       Jobfair.render(event.army_size);
     } else {
       Overlay.clear();
       Jobfair.clear();
       if (event.dimensions) {
-        Board.render(board, event.dimensions.x, event.dimensions.y);
+        Board.render(board, event.dimensions);
       }
-      gamestatechange(state || 'placement');
+      State.gamestatechange(state || 'placement');
       if (state === 'placement' || state === 'gameover') {
         Ready.display(state === 'placement' ? 'ready' : 'rematch');
       }
@@ -88,7 +89,7 @@ export function timer(event): animData {
 
 export function battle_started(): animData {
   return noGrid(() => {
-    gamestatechange('battle');
+    State.gamestatechange('battle');
   });
 }
 
@@ -108,7 +109,7 @@ export function player_joined({ player, position }): animData {
     }
     container.appendChild(playerDetailsEl);
     if (whois === 'player') {
-      gmeta.position = position;
+      State.gmeta.position = position;
       document.getElementById('table').dataset.position = position;
     }
   });
@@ -187,7 +188,7 @@ export function unit_placed(event): animData {
 
 export function player_ready(event): animData {
   return noGrid(() => {
-    if ( event.player === gmeta.position ) {
+    if ( event.player === State.gmeta.position ) {
       (document.querySelector('#player .playername') as HTMLElement).dataset.ready = 'true';
       Ready.hide();
     } else {
@@ -410,11 +411,11 @@ export function gameover({ winner, reason }): animData {
         leave,
       };
 
-    gamestatechange('gameover');
+    State.gamestatechange('gameover');
     Timer.stop();
-    turnchange(null);
+    State.turnchange(null);
 
-    if (winner === gmeta.position) {
+    if (winner === State.gmeta.position) {
       SFX.play('go_win');
       message = 'you win!';
     } else if (winner === 'draw') {
@@ -441,7 +442,7 @@ export function gameover({ winner, reason }): animData {
 
 export function turn({ player }): animData {
   return noGrid(() => {
-    turnchange(player);
+    State.turnchange(player);
   });
 }
 

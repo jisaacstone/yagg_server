@@ -30,3 +30,5 @@ node_modules
 package-lock.json
 build/
 *.zip
+
+frontend/music

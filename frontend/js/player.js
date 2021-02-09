@@ -2,6 +2,7 @@ import { _name_ } from './urlvars.js';
 import { post, request } from './request.js';
 import * as Dialog from './dialog.js';
 import * as Element from './element.js';
+import * as Storage from './storage.js';
 const state = {
     waiting: false
 };
@@ -16,8 +17,8 @@ function create() {
         return post('player/guest', { name });
     })
         .then(({ id, name }) => {
-        localStorage.setItem('playerData.id', id);
-        localStorage.setItem('playerData.name', name);
+        Storage.setItem('playerData', 'id', id);
+        Storage.setItem('playerData', 'name', name);
         return { id, name };
     })
         .finally(() => {
@@ -25,12 +26,12 @@ function create() {
     });
 }
 export function check() {
-    const id = localStorage.getItem('playerData.id'), name = localStorage.getItem('playerData.name');
+    const id = Storage.getItem('playerData', 'id'), name = Storage.getItem('playerData', 'name');
     if (id && name) {
         return request(`player/${id}`, false).then((resp) => {
             if (resp.name !== name) {
                 console.log('warning: name mismatch');
-                localStorage.setItem('playerData.name', resp.name);
+                Storage.setItem('playerData', 'name', resp.name);
             }
             return { id, name: resp.name };
         }).catch(() => {
@@ -38,8 +39,8 @@ export function check() {
                 .catch((err) => {
                 console.error({ message: 'error recreating guest account', err });
                 console.log({ "localstorage": "removePlayerData", id, name });
-                localStorage.removeItem('playerData.id');
-                localStorage.removeItem('playerData.name');
+                Storage.removeItem('playerData', 'id');
+                Storage.removeItem('playerData', 'name');
                 return create();
             })
                 .finally(() => {
@@ -52,14 +53,14 @@ export function check() {
     return create();
 }
 export function get() {
-    const id = localStorage.getItem('playerData.id'), name = localStorage.getItem('playerData.name');
+    const id = Storage.getItem('playerData', 'id'), name = Storage.getItem('playerData', 'name');
     if (id && name) {
         return Promise.resolve({ id, name });
     }
     return create();
 }
 export function getLocal() {
-    const id = localStorage.getItem('playerData.id'), name = localStorage.getItem('playerData.name');
+    const id = Storage.getItem('playerData', 'id'), name = Storage.getItem('playerData', 'name');
     return { id, name };
 }
 export function avatar({ id, name }) {

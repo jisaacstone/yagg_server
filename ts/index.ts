@@ -4,6 +4,8 @@ import * as Element from './element.js';
 import * as Err from './err.js';
 import * as Settings from './settings.js';
 import * as Dialog from './dialog.js';
+import * as Soundtrack from './soundtrack.js';
+import * as SFX from './sfx.js';
 
 const displayedTables = {};
 const configurations = {};
@@ -108,6 +110,16 @@ function renderPlayer({ id, name }): HTMLElement {
 window.onload = function() {
   const ct = document.getElementById('createtable'),
     sel_el = document.getElementById('config') as HTMLInputElement;
+
+  SFX.loadSettings();
+  Soundtrack.loadSettings();
+  Soundtrack.setSoundtrack('menu');
+  const mml = () => {
+    console.log('mml');
+    Soundtrack.play();
+    document.removeEventListener('click', mml);
+  };
+  document.addEventListener('click', mml);
 
   ct.style.display = 'hidden';
   sel_el.onchange = () => {

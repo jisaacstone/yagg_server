@@ -1,5 +1,5 @@
 import { tableid } from './urlvars.js';
-import { gmeta } from './state.js';
+import * as State from './state.js';
 import { listen } from './eventlistener.js';
 import * as Player from './player.js';
 import * as Request from './request.js';
@@ -10,6 +10,7 @@ import * as Board from './board.js';
 import * as Dialog from './dialog.js';
 import * as LeaveButton from './leaveButton.js';
 import * as SFX from './sfx.js';
+import * as Soundtrack from './soundtrack.js';
 import * as Settings from './settings.js';
 function render_board(board, players) {
     if (players !== 2) {
@@ -60,6 +61,7 @@ function gamephase(board) {
 }
 function waitingforplayers() {
     const waiting = document.createElement('div'), copy = document.createElement('button'), comp = document.createElement('button'), leav = document.createElement('button'), over = Overlay.create();
+    Soundtrack.setSoundtrack('waiting');
     over.className = over.className + ' waiting';
     waiting.innerHTML = 'waiting for opponent';
     over.appendChild(waiting);
@@ -95,8 +97,9 @@ function waitingforplayers() {
 }
 function fetchgamestate() {
     Request.request(`table/${tableid()}/state`).then((gamedata) => {
-        const phase = gamephase(gamedata.board), oldmute = SFX.settings.mute;
-        SFX.settings.mute = true; // no sound, gonna be a lot of events
+        const phase = gamephase(gamedata.board), oldmute = SFX.settings().mute;
+        SFX.mute();
+        Soundtrack.mute();
         if (setstate(gamedata, phase)) {
             Request.request(`board/${tableid()}/player_state`).then((unitdata) => {
                 if (phase === 'jobfair') {
@@ -106,11 +109,13 @@ function fetchgamestate() {
                     Board.unitdata(unitdata);
                 }
             }).finally(() => {
-                SFX.settings.mute = oldmute;
+                SFX.setMute(oldmute);
+                Soundtrack.setMute(oldmute);
             });
         }
         else {
-            SFX.settings.mute = oldmute;
+            SFX.setMute(oldmute);
+            Soundtrack.setMute(oldmute);
         }
     });
 }
@@ -136,10 +141,17 @@ function setstate(gamedata, phase) {
 }
 function reporterr() {
     const reporttext = prompt("Report an error with game state", "describe the problem");
-    Request.post(`table/${tableid()}/report`, { report: reporttext, meta: gmeta });
+    Request.post(`table/${tableid()}/report`, { report: reporttext, meta: State.gmeta });
 }
 window.onload = function () {
     SFX.loadSettings();
+    Soundtrack.loadSettings();
+    const mml = () => {
+        console.log('mml');
+        Soundtrack.play();
+        document.removeEventListener('click', mml);
+    };
+    document.addEventListener('click', mml);
     const errbutton = document.getElementById('errbutton');
     if (errbutton) {
         errbutton.onclick = () => {

@@ -1,12 +1,11 @@
 import * as Instructions from './instructions.js';
 import * as LeaveButton from './leaveButton.js';
-export const gmeta = {
-    position: null,
-    name: null,
-    boardstate: null,
-    turn: null,
-    phase: null,
-};
+import * as Soundtrack from './soundtrack.js';
+export const gmeta = {};
+export function setConfig(config) {
+    gmeta.config = config;
+    document.getElementById('table').dataset.config = config.name;
+}
 function monarchName() {
     const monarch = document.querySelector('.monarch');
     if (monarch && monarch.dataset.name) {
@@ -38,6 +37,7 @@ export function gamestatechange(newstate) {
     document.getElementById('table').dataset.gamestate = newstate;
     gmeta.boardstate = newstate;
     instructions(newstate);
+    Soundtrack.setSoundtrack(newstate);
     Array.prototype.forEach.call(document.getElementsByClassName('playername'), el => {
         el.dataset.ready = null;
     });

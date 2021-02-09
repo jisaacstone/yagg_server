@@ -1,6 +1,6 @@
 const expect = require('chai').expect,
   Helper = require('./helper');
-let Event, EventListener, Board;
+let Event, EventListener, Board, Storage;
 
 describe('event', () => {
   before(function() {
@@ -8,6 +8,7 @@ describe('event', () => {
       Event = require('../frontend/js/event.js');
       EventListener = require('../frontend/js/eventlistener.js');
       Board = require('../frontend/js/board.js');
+      Storage = require('../frontend/js/storage.js');
     });
   });
 
@@ -170,8 +171,8 @@ describe('event', () => {
     });
   });
   it('player joined', () => {
-    localStorage.setItem('playerData.id', 1234);
-    localStorage.setItem('playerData.name', 'testname');
+    Storage.setItem('playerData', 'id', 1234);
+    Storage.setItem('playerData', 'name', 'testname');
     Event.player_joined({player: {id: 1234, name: 'testname'}, position: 'north'}).animation();
     Event.player_joined({player: {id: 5678, name: 'testname'}, position: 'south'}).animation();
     const pEl = document.querySelector('#player .playername'),
