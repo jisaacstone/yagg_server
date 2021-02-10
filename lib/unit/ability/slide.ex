@@ -1,7 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 
 defmodule Unit.Ability.Slide do
   @moduledoc """

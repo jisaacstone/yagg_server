@@ -1,7 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Event
-alias Yagg.Board.Action.Ability
+
 defmodule Unit.Mediacreep do
   @behaviour Unit
   @impl Unit
@@ -22,9 +22,9 @@ defmodule Unit.Mediacreep do
     @moduledoc """
     Leave behind a replica with -2 attack and defense
     """
-    use Ability.AfterMove
+    use Unit.Trigger.AfterMove
 
-    @impl Ability.AfterMove
+    @impl Unit.Trigger.AfterMove
     def after_move(%Board{} = board, %{from: from, unit: unit}) do
       {x, y} = from
       copy = %{

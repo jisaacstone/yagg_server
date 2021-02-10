@@ -2,7 +2,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Trigger.OnDeath
 
 defmodule Unit.Explody do
   @behaviour Unit
@@ -20,9 +20,9 @@ defmodule Unit.Explody do
 
   defmodule Selfdestruct do
     @moduledoc "Destroy units in this and adjacent squares"
-    use Ability.OnDeath
+    use OnDeath
 
-    @impl Ability.OnDeath
+    @impl OnDeath
     def on_death(board, data) do
       {board, effects, events} = Enum.reduce(
         [{:_, data.coord} | Grid.surrounding(data.coord)],

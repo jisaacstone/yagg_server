@@ -3,7 +3,6 @@ alias Yagg.Board
 alias Yagg.AI.Choices
 alias Yagg.Board.Action
 require Helper.Board
-#alias Yagg.Board.State.Placement
 
 defmodule YaggTest.AI do
   use ExUnit.Case
@@ -86,7 +85,7 @@ defmodule YaggTest.AI do
       |> Map.put(:state, :battle)
       |> Board.place!(Unit.Howloo.new(:north), {3, 3})
     choices = Choices.choices(board, :north)
-    assert Enum.member?(choices.ability, %Action.Ability{x: 3, y: 3})
+    assert Enum.member?(choices.ability, %Unit.Ability{x: 3, y: 3})
     assert choices.place == []
   end
 
@@ -96,6 +95,6 @@ defmodule YaggTest.AI do
       |> Map.put(:state, :battle)
       |> Board.place!(Unit.Pushie.new(:north), {3, 3})
     choices = Choices.choices(board, :north)
-    refute Enum.member?(choices.ability, %Action.Ability{x: 3, y: 3})
+    refute Enum.member?(choices.ability, %Unit.Ability{x: 3, y: 3})
   end
 end

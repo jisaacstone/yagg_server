@@ -131,7 +131,7 @@ defmodule Yagg.AI.Choices do
     case them - us do
       n when n <= 0 -> actions
       n -> 
-        action = %Action.Ability{x: x, y: y}
+        action = %Unit.Ability{x: x, y: y}
         List.duplicate(action, n) ++ actions
     end
   end
@@ -148,17 +148,17 @@ defmodule Yagg.AI.Choices do
     case them - us do
       n when n <= 0 -> actions
       n -> 
-        action = %Action.Ability{x: x, y: y}
+        action = %Unit.Ability{x: x, y: y}
         List.duplicate(action, n) ++ actions
     end
   end
   defp unit_action(_, {{x, y}, %Unit{}}, actions) do
-    action = %Action.Ability{x: x, y: y}
+    action = %Unit.Ability{x: x, y: y}
     [action | actions]
   end
 
   defp concede([{{x, y}, %Unit{name: :monarch}}|_]) do
-    %Action.Ability{x: x, y: y}
+    %Unit.Ability{x: x, y: y}
   end
   defp concede([_|units]) do
     concede(units)

@@ -1,7 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 
 defmodule Unit.Howloo do
   alias __MODULE__

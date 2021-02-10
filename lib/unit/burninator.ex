@@ -1,7 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Board
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 
 defmodule Unit.Burninator do
   @behaviour Unit

@@ -2,7 +2,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 
 defmodule Unit.Antente do
   @behaviour Unit
@@ -49,9 +49,9 @@ defmodule Unit.Antente.Visible do
   @moduledoc """
   Becomes visible to opponent
   """
-  use Ability.BeforeAttack
+  use Unit.Trigger.BeforeAttack
 
-  @impl Ability.BeforeAttack
+  @impl Unit.Trigger.BeforeAttack
   def before_attack(board, data) do
     %{position: position} = data.unit
     {x, y} = data.from

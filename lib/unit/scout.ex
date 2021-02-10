@@ -1,6 +1,6 @@
 alias Yagg.Unit
 alias Yagg.Board
-alias Yagg.Board.Action.Ability.BeforeAttack
+alias Yagg.Unit.Trigger.BeforeAttack
 
 defmodule Unit.Scout do
   @behaviour Unit

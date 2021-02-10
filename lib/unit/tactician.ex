@@ -1,7 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Trigger.AfterMove
 
 defmodule Unit.Tactician do
   @behaviour Unit
@@ -23,21 +23,16 @@ defmodule Unit.Tactician do
     @moduledoc """
     Move all adjacent friendly units in the same direction
     """
-    use Ability
+    use AfterMove
 
-    @impl Ability
-    def resolve(%Board{} = board, opts) do
-      case {opts[:from], opts[:to]} do
-        {_,:nil} -> {:err, :misconfigured}
-        {:nil,_} -> {:err, :misconfigured}
-        {from, to} ->
-          direction = Grid.direction(from, to)
-          coords =
-            Grid.surrounding(from)
-            |> Enum.into(%{})
-            |> order(direction)
-          move_units(board, direction, opts[:unit].position, coords, [])
-      end
+    @impl AfterMove
+    def after_move(%Board{} = board, %{from: from, to: to, unit: %{position: position}}) do
+      direction = Grid.direction(from, to)
+      coords =
+        Grid.surrounding(from)
+        |> Enum.into(%{})
+        |> order(direction)
+      move_units(board, direction, position, coords, [])
     end
 
     defp order(coord_map, direction) do

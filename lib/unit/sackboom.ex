@@ -2,7 +2,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Trigger.AfterMove
 
 defmodule Unit.Sackboom do
   @behaviour Unit
@@ -71,8 +71,8 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its third move
     """
-    use Ability.AfterMove
-    @impl Ability.AfterMove
+    use AfterMove
+    @impl AfterMove
     def after_move(board, %{to: to}) do
       Unit.Sackboom.move(board, to, Move.One)
     end
@@ -82,8 +82,8 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its second move
     """
-    use Ability.AfterMove
-    @impl Ability.AfterMove
+    use AfterMove
+    @impl AfterMove
     def after_move(board, %{to: to}) do
       Unit.Sackboom.move(board, to, Move.Two)
     end
@@ -93,8 +93,8 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its next move
     """
-    use Ability.AfterMove
-    @impl Ability.AfterMove
+    use AfterMove
+    @impl AfterMove
     def after_move(board, %{unit: unit, to: to}) do
       Unit.Sackboom.explode(board, unit, to)
     end

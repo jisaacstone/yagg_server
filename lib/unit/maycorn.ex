@@ -2,7 +2,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 
 defmodule Unit.Maycorn do
   alias __MODULE__
@@ -60,8 +60,8 @@ defmodule Unit.Maycorn.Spark do
     @moduledoc """
     Fire a spark in all directions that kills units having 0 defense
     """
-    use Ability.OnDeath
-    @impl Ability.OnDeath
+    use Unit.Trigger.OnDeath
+    @impl Unit.Trigger.OnDeath
     def on_death(board, %{coord: coord}) do
       {board, [a1 | e1]} = Maycorn.spark(board, 1, coord, :north)
       {board, [a2 | e2]} = Maycorn.spark(board, 1, coord, :south)

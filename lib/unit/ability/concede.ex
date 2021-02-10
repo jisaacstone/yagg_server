@@ -1,4 +1,3 @@
-alias Yagg.Board.Action
 alias Yagg.Unit
 alias Yagg.Board.Grid
 alias Yagg.Table.Player
@@ -6,7 +5,7 @@ alias Yagg.Board.State
 
 defmodule Unit.Ability.Concede do
   @moduledoc "Lose the game"
-  use Action.Ability
+  use Unit.Ability
 
   def resolve(%{state: %State.Gameover{winner: winner}} = board, opts) do
     case Player.opposite(opts[:unit].position) do

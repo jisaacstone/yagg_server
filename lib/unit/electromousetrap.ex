@@ -2,7 +2,8 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Table.Player
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
+alias Yagg.Unit.Trigger.OnDeath
 
 defmodule Unit.Electromousetrap do
   @behaviour Unit
@@ -26,9 +27,9 @@ defmodule Unit.Electromousetrap do
     @moduledoc """
     Invisible. Captures attacker, giving you control
     """
-    use Ability.OnDeath, noreveal: :true
+    use OnDeath, noreveal: :true
 
-    @impl Ability.OnDeath
+    @impl OnDeath
     def on_death(board, %{unit: unit, opponent: opponent}) do
       control(board, opponent, unit)
     end
@@ -46,8 +47,8 @@ defmodule Unit.Electromousetrap do
       {board, [event | events]}
     end
 
-    defp maybe_gameover({board, events}, unit, Unit.Ability.Concede) do
-      {board, e2} = Unit.Ability.Concede.resolve(board, unit: unit)
+    defp maybe_gameover({board, events}, unit, Ability.Concede) do
+      {board, e2} = Ability.Concede.resolve(board, unit: unit)
       {board, events ++ e2}
     end
     defp maybe_gameover(b_e, _, _), do: b_e

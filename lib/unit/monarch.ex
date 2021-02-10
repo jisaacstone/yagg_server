@@ -1,7 +1,7 @@
 alias Yagg.Unit
 alias Yagg.Board.Grid
 alias Yagg.Board.State.Gameover
-alias Yagg.Board.Action.Ability.AfterMove
+alias Yagg.Unit.Trigger.AfterMove
 
 defmodule Unit.Monarch do
   @behaviour Unit

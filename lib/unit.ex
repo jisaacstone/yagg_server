@@ -1,4 +1,4 @@
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 alias Yagg.Table.Player
 alias Yagg.Board
 

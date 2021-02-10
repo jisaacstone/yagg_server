@@ -2,7 +2,7 @@ alias Yagg.Unit
 alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 
 defmodule Unit.Electromouse do
   @behaviour Unit
@@ -50,9 +50,9 @@ defmodule Unit.Electromouse do
     @moduledoc """
     Leave the unit capture trap behind
     """
-    use Ability.BeforeAttack, noreveal: :true
+    use Unit.Trigger.BeforeAttack, noreveal: :true
 
-    @impl Ability.BeforeAttack
+    @impl Unit.Trigger.BeforeAttack
     def before_attack(board, %{unit: %{position: position}, opponent: opponent, from: from, to: to}) do
       # change the thing at from to normal electromouse
       {board, e1} = Grid.update(
@@ -83,9 +83,9 @@ defmodule Unit.Electromouse do
     @moduledoc """
     Leave the unit capture trap behind
     """
-    use Ability.AfterMove, noreveal: :true
+    use Unit.Trigger.AfterMove, noreveal: :true
 
-    @impl Ability.AfterMove
+    @impl Unit.Trigger.AfterMove
     def after_move(board, %{unit: unit, from: from, to: to}) do
       position = unit.position
       {x, y} = from

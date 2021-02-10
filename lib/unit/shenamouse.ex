@@ -1,6 +1,6 @@
 alias Yagg.Unit
 alias Yagg.Board.Grid
-alias Yagg.Board.Action.Ability
+alias Yagg.Unit.Ability
 
 defmodule Unit.Shenamouse do
   @behaviour Unit

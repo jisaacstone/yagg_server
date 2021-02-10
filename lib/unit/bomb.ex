@@ -1,5 +1,4 @@
 alias Yagg.Unit
-alias Yagg.Board.Action.Ability
 
 defmodule Unit.Bomb do
   @behaviour Unit
@@ -12,7 +11,7 @@ defmodule Unit.Bomb do
       defense: 0,
       triggers: %{
         death: Unit.Ability.Poison,
-        move: Ability.Immobile,
+        move: Unit.Ability.Immobile,
       }
     )
   end
