@@ -9,10 +9,17 @@ import * as Element from './element.js';
 import * as Triggers from './triggers.js';
 import * as Tooltip from './tooltip.js';
 import * as SFX from './sfx.js';
+import * as Board from './board.js';
 
 interface Ability {
   name: string;
   description: string;
+}
+
+interface Triggers {
+  move?: Ability;
+  attack?: Ability;
+  death?: Ability;
 }
 
 export interface Unit {
@@ -20,20 +27,72 @@ export interface Unit {
   attack: number | "immobile";
   defense: number;
   player: null | string;
-  ability: null | Ability;
-  triggers: null | {
-    move?: Ability;
-    death?: Ability;
-  };
+  ability?: Ability;
+  triggers?: Triggers;
   attributes: string[];
 }
 
-function bindAbility(abilityButton: HTMLElement, square: HTMLElement, unit: Unit, cb = null) {
+export function showName(coord: Board.Coord, name: string): void {
+  const squareId = Board.squareId(coord),
+    unitEl = document.querySelector(`#${squareId} .unit`) as HTMLElement,
+    nameEl = document.querySelector(`#${squareId} .unit-name`);
+  if (unitEl && !nameEl) {
+    unitEl.appendChild(Element.create({
+      className: 'unit-name',
+      innerHTML: convertAttr('name', name)
+    }));
+    unitEl.style.backgroundImage = `url("img/${name}.png")`;
+  }
+}
+
+export function showAbility(coord: Board.Coord, ability: Ability): void {
+  const squareId = Board.squareId(coord),
+    unitEl = document.querySelector(`#${squareId} .unit`) as HTMLElement,
+    abilityEl = document.querySelector(`#${squareId} .unit-abiltiy`);
+  if (unitEl && !abilityEl) {
+    abilityIcon(unitEl, ability);
+  }
+}
+
+export function showTriggers(coord: Board.Coord, triggers: Triggers): void {
+  const squareId = Board.squareId(coord),
+    unitEl = document.querySelector(`#${squareId} .unit`) as HTMLElement,
+    triggerEl = document.querySelector(`#${squareId} .unit-abiltiy`);
+  if (unitEl && !triggerEl) {
+    // immobile, invisible, etc should never be revealed so we should be OK
+    // with this type coercion
+    shortTriggers(unitEl, { triggers } as Unit);
+  }
+}
+
+export function hilight(coord: Board.Coord, className: string): Promise<any> {
+  const el = document.querySelector(`#${Board.squareId(coord)} .${className}`) as HTMLElement;
+  if (!el) {
+    console.log({ coord, className });
+    return Promise.resolve(false);
+  }
+  //SFX.play('hilight');
+  el.dataset.hilighted = 'true';
+  el.classList.add('hilight');
+  console.log(el);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      delete el.dataset.hilighted;
+      el.classList.remove('hilight');
+      resolve(true);
+    }, 600);
+  });
+}
+
+function bindAbility(abilityButton: HTMLElement, square: HTMLElement | null, unit: Unit, cb = null) {
   abilityButton.onclick = (e) => {
     if (! owned(unit)) {
       return;
     }
     SFX.play('ability');
+    if (square === null) {
+      square = abilityButton.parentNode.parentNode as HTMLElement;
+    }
     if (
       gmeta.boardstate !== 'battle' ||
       !isYourTurn() ||
@@ -71,7 +130,6 @@ function abilityButton(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = nu
     }),
     square = unitSquare ? unitSquare : el.parentNode as HTMLElement;
 
-  // Tooltip.addTooltip(abilbut, unit.ability.description);
   if (owned(unit)) {
     bindAbility(abilbut, square, unit);
   }
@@ -82,15 +140,20 @@ function owned({ player }) {
   return player === gmeta.position;
 }
 
-function abilityIcon(unit: Unit, el: HTMLElement) {
-  if ( unit.ability ) {
-    const abil = Element.create({
-      className: 'unit-ability',
-      innerHTML: unit.ability.name,
-    });
+function abilityIcon(el: HTMLElement, ability: Ability, unit?: Unit): void {
+  const abil = Element.create({
+    className: 'unit-ability',
+    innerHTML: ability.name,
+    tag: 'button',
+    title: 'ability',
+  });
 
-    Tooltip.addTooltip(abil, unit.ability.description);
-    el.appendChild(abil);
+  Tooltip.addTooltip(abil, ability.description);
+  el.appendChild(abil);
+
+  if (unit) {
+    console.log({binding: abil});
+    bindAbility(abil, null, unit);
   }
 }
 
@@ -119,9 +182,18 @@ function renderTile(unit: Unit, el: HTMLElement) {
   // if we have no name we have nothing else
   if (unit.name) {
     renderAttrs(unit, el);
-    shortTriggers(unit, el);
-    abilityIcon(unit, el);
+    shortTriggers(el, unit);
     el.style.backgroundImage = `url("img/${unit.name}.png")`;
+    const qbutton = Element.create({
+        tag: 'button',
+        className: 'detailsButton',
+        title: 'details',
+      });
+    qbutton.addEventListener('click', detailViewFn(unit, el.className));
+    el.appendChild(qbutton);
+  }
+  if (unit.ability) {
+    abilityIcon(el, unit.ability, unit);
   }
   // @ts-ignore
   if (el.sidebar) { // @ts-ignore
@@ -148,7 +220,7 @@ function anyDetails(unit) {
   return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
 
-function shortTriggers(unit: Unit, el: HTMLElement) {
+function shortTriggers(el: HTMLElement, unit: Unit) {
   const triggers = Triggers.get(unit),
     triggerEls = [];
   if ( triggers.length === 0 ) {
@@ -167,21 +239,21 @@ function shortTriggers(unit: Unit, el: HTMLElement) {
 }
 
 function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
-  const qbutton = Element.create({
-      tag: 'button',
-      className: 'detailsButton uibutton',
-    });
-  qbutton.setAttribute('title', 'details');
-  el.appendChild(qbutton);
   renderAttrs(unit, el);
   if (unit.name) {
+    const qbutton = Element.create({
+        tag: 'button',
+        className: 'detailsButton uibutton',
+        title: 'details',
+      });
+    el.appendChild(qbutton);
     el.style.backgroundImage = `url("img/${unit.name}.png")`;
   }
   el.onclick = detailViewFn(unit, el.className, squareEl);
   if (unit.ability) {
     abilityButton(unit, el, squareEl);
   }
-  shortTriggers(unit, el);
+  shortTriggers(el, unit);
 }
 
 const fakeDescriptions = [

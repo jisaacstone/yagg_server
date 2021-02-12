@@ -18,30 +18,26 @@ import * as SFX from './sfx.js';
 import * as Request from './request.js';
 const unitsbyindex = {};
 function noGrid(fn) {
-    return {
-        animation: () => Promise.resolve(fn()),
-        squares: []
-    };
+    return () => Promise.resolve(fn());
+}
+function noOp() {
+    return Promise.resolve(null);
 }
 export function multi({ events }) {
-    let squares = [];
     const animations = [], module = this;
     for (const event of events) {
         const result = module[event.event](event);
-        if (result && result.squares) {
-            squares = squares.concat(result.squares);
-            animations.push(result.animation);
-        }
+        animations.push(result);
     }
     if (animations.length > 0) {
         const animation = () => {
             return Promise.all(animations.map((a) => a()));
         };
-        return { animation, squares };
+        return animation;
     }
+    return noOp;
 }
 export function game_started(event) {
-    console.log(event);
     return noGrid(() => {
         const board = document.getElementById('board'), state = (event.state || '').toLowerCase();
         Hand.clear();
@@ -112,13 +108,10 @@ export function add_to_hand({ unit, index }) {
     });
 }
 export function unit_assigned({ x, y, index }) {
-    return {
-        animation: () => {
-            const square = Board.square(x, y), unit = unitsbyindex[index];
-            square.appendChild(unit);
-            return SFX.play('place');
-        },
-        squares: [`${x},${y}`]
+    return () => {
+        const square = Board.square(x, y), unit = unitsbyindex[index];
+        square.appendChild(unit);
+        return SFX.play('place');
     };
 }
 export function new_unit({ x, y, unit }) {
@@ -139,26 +132,23 @@ export function new_unit({ x, y, unit }) {
         const a = unitEl.animate({ opacity: [0.5, 0.9, 1] }, { duration: 100 });
         return a.finished;
     };
-    return { animation, squares: [`${x},${y}`] };
+    return animation;
 }
 export function unit_changed(event) {
     return new_unit(event); // for now
 }
 export function unit_placed(event) {
-    return {
-        animation: () => {
-            const square = Board.square(event.x, event.y);
-            if (!square.firstChild) {
-                const unit = Unit.render(event, null);
-                square.appendChild(unit);
-                return SFX.play('place');
-            }
-            else {
-                console.log({ msg: `${event.x},${event.y} already occupied`, event });
-                return Promise.resolve(false);
-            }
-        },
-        squares: [`${event.x},${event.y}`]
+    return () => {
+        const square = Board.square(event.x, event.y);
+        if (!square.firstChild) {
+            const unit = Unit.render(event, null);
+            square.appendChild(unit);
+            return SFX.play('place');
+        }
+        else {
+            console.log({ msg: `${event.x},${event.y} already occupied`, event });
+            return Promise.resolve(false);
+        }
     };
 }
 export function player_ready(event) {
@@ -174,13 +164,10 @@ export function player_ready(event) {
     });
 }
 export function feature(event) {
-    return {
-        animation: () => {
-            const square = Board.square(event.x, event.y), feature = Feature.render(event.feature);
-            square.appendChild(feature);
-            return Promise.resolve(true);
-        },
-        squares: [`${event.x},${event.y}`]
+    return () => {
+        const square = Board.square(event.x, event.y), feature = Feature.render(event.feature);
+        square.appendChild(feature);
+        return Promise.resolve(true);
     };
 }
 export function unit_died(event) {
@@ -197,7 +184,7 @@ export function unit_died(event) {
             });
         });
     };
-    return { animation, squares: [`${event.x},${event.y}`] };
+    return animation;
 }
 export function thing_moved(event) {
     const from = Board.square(event.from.x, event.from.y);
@@ -225,7 +212,7 @@ export function thing_moved(event) {
                 });
             });
         };
-        return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+        return animation;
     }
     else if (event.direction) {
         // moved offscreen
@@ -257,7 +244,7 @@ export function thing_moved(event) {
                 thing.remove();
             });
         };
-        return { animation, squares: [`${event.from.x},${event.from.y}`] };
+        return animation;
     }
     else if (event.to === 'hand') {
         const animation = () => {
@@ -277,35 +264,34 @@ export function thing_moved(event) {
                 thing.remove();
             });
         };
-        return { animation, squares: [`${event.from.x},${event.from.y}`] };
-    }
-    else {
-        console.error({ err: 'unrecognized move', event });
+        return animation;
     }
 }
 export function thing_gone(event) {
-    const thing = Board.thingAt(event.x, event.y);
-    if (!thing) {
-        console.error({ msg: `nothing at ${event.x},${event.y}`, event });
-        return;
-    }
-    if (thing.className.includes('owned')) {
-        thing.dataset.state = 'invisible';
-    }
-    else {
-        const animation = () => {
+    return () => {
+        const thing = Board.thingAt(event.x, event.y);
+        if (!thing) {
+            console.error({ msg: `nothing at ${event.x},${event.y}`, event });
+            return noOp();
+        }
+        if (thing.className.includes('owned')) {
+            thing.dataset.state = 'invisible';
+            return noOp();
+        }
+        else {
             const a = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
             return a.finished.then(() => {
                 thing.remove();
             });
-        };
-        return { animation, squares: [`${event.x},${event.y}`] };
-    }
+        }
+    };
 }
 export function battle({ from, to }) {
     // animation only, no lasting chages
     const animation = () => {
         return SFX.play('battle').then(() => {
+            Unit.hilight(from, 'unit-attack');
+            Unit.hilight(to, 'unit-defense');
             const attacker = Board.thingAt(from.x, from.y), defender = Board.thingAt(to.x, to.y), arect = attacker.getBoundingClientRect(), drect = defender.getBoundingClientRect(), xpos = arect.left, ypos = arect.top;
             let xdiff = 0, ydiff = 0;
             if (from.x !== to.x) {
@@ -335,7 +321,7 @@ export function battle({ from, to }) {
             });
         });
     };
-    return { animation, squares: [`${to.x},${to.y}`, `${from.x},${from.y}`] };
+    return animation;
 }
 export function gameover({ winner, reason }) {
     return noGrid(() => {
@@ -389,16 +375,23 @@ export function candidate(event) {
             className: 'candidate',
             id: `candidate-${event.index}`,
             children: [unitEl]
-        }), qbutton = Element.create({
-            tag: 'button',
-            className: 'detailsButton uibutton',
         });
-        qbutton.setAttribute('title', 'details');
         Select.bind_candidate(cdd, event.index, event.unit);
         unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
-        qbutton.addEventListener('click', Unit.detailViewFn(event.unit, unitEl.className));
-        unitEl.appendChild(qbutton);
         jf.appendChild(cdd);
+    });
+}
+export function show_ability({ x, y, type, reveal }) {
+    return noGrid(() => {
+        Unit.showName({ x, y }, reveal.name);
+        if (type === 'ability') {
+            Unit.showAbility({ x, y }, reveal.ability);
+            return Unit.hilight({ x, y }, 'unit-ability');
+        }
+        else {
+            Unit.showTriggers({ x, y }, reveal.triggers);
+            return Unit.hilight({ x, y }, `${type}-t`);
+        }
     });
 }
 export function ability_used(event) {

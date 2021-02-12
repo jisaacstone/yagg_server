@@ -2,7 +2,7 @@ import { select } from './select.js';
 import { gmeta } from './state.js';
 import * as Event from './event.js';
 import * as Element from './element.js';
-function squareId(coord) {
+export function squareId(coord) {
     return `c${coord.x}-${coord.y}`;
 }
 export function render(el, dimensions) {
@@ -99,12 +99,12 @@ export function in_direction(direction, distance) {
 // simulate events from unit state
 export function unitdata({ grid, hand }) {
     for (const ob of grid) {
-        Event.new_unit(ob).animation();
+        Event.new_unit(ob)();
     }
     Array.prototype.forEach.call(Object.entries(hand), ([index, card]) => {
-        Event.add_to_hand({ index: +index, unit: card.unit }).animation();
+        Event.add_to_hand({ index: +index, unit: card.unit })();
         if (card.assigned) {
-            Event.unit_assigned({ index: +index, x: card.assigned.x, y: card.assigned.y }).animation();
+            Event.unit_assigned({ index: +index, x: card.assigned.x, y: card.assigned.y })();
         }
     });
 }

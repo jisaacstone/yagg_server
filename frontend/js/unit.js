@@ -8,12 +8,58 @@ import * as Element from './element.js';
 import * as Triggers from './triggers.js';
 import * as Tooltip from './tooltip.js';
 import * as SFX from './sfx.js';
+import * as Board from './board.js';
+export function showName(coord, name) {
+    const squareId = Board.squareId(coord), unitEl = document.querySelector(`#${squareId} .unit`), nameEl = document.querySelector(`#${squareId} .unit-name`);
+    if (unitEl && !nameEl) {
+        unitEl.appendChild(Element.create({
+            className: 'unit-name',
+            innerHTML: convertAttr('name', name)
+        }));
+        unitEl.style.backgroundImage = `url("img/${name}.png")`;
+    }
+}
+export function showAbility(coord, ability) {
+    const squareId = Board.squareId(coord), unitEl = document.querySelector(`#${squareId} .unit`), abilityEl = document.querySelector(`#${squareId} .unit-abiltiy`);
+    if (unitEl && !abilityEl) {
+        abilityIcon(unitEl, ability);
+    }
+}
+export function showTriggers(coord, triggers) {
+    const squareId = Board.squareId(coord), unitEl = document.querySelector(`#${squareId} .unit`), triggerEl = document.querySelector(`#${squareId} .unit-abiltiy`);
+    if (unitEl && !triggerEl) {
+        // immobile, invisible, etc should never be revealed so we should be OK
+        // with this type coercion
+        shortTriggers(unitEl, { triggers });
+    }
+}
+export function hilight(coord, className) {
+    const el = document.querySelector(`#${Board.squareId(coord)} .${className}`);
+    if (!el) {
+        console.log({ coord, className });
+        return Promise.resolve(false);
+    }
+    //SFX.play('hilight');
+    el.dataset.hilighted = 'true';
+    el.classList.add('hilight');
+    console.log(el);
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            delete el.dataset.hilighted;
+            el.classList.remove('hilight');
+            resolve(true);
+        }, 500);
+    });
+}
 function bindAbility(abilityButton, square, unit, cb = null) {
     abilityButton.onclick = (e) => {
         if (!owned(unit)) {
             return;
         }
         SFX.play('ability');
+        if (square === null) {
+            square = abilityButton.parentNode.parentNode;
+        }
         if (gmeta.boardstate !== 'battle' ||
             !isYourTurn() ||
             !square ||
@@ -45,7 +91,6 @@ function abilityButton(unit, el, unitSquare = null) {
         className: 'unit-ability',
         innerHTML: unit.ability.name,
     }), square = unitSquare ? unitSquare : el.parentNode;
-    // Tooltip.addTooltip(abilbut, unit.ability.description);
     if (owned(unit)) {
         bindAbility(abilbut, square, unit);
     }
@@ -54,14 +99,18 @@ function abilityButton(unit, el, unitSquare = null) {
 function owned({ player }) {
     return player === gmeta.position;
 }
-function abilityIcon(unit, el) {
-    if (unit.ability) {
-        const abil = Element.create({
-            className: 'unit-ability',
-            innerHTML: unit.ability.name,
-        });
-        Tooltip.addTooltip(abil, unit.ability.description);
-        el.appendChild(abil);
+function abilityIcon(el, ability, unit) {
+    const abil = Element.create({
+        className: 'unit-ability',
+        innerHTML: ability.name,
+        tag: 'button',
+        title: 'ability',
+    });
+    Tooltip.addTooltip(abil, ability.description);
+    el.appendChild(abil);
+    if (unit) {
+        console.log({ binding: abil });
+        bindAbility(abil, null, unit);
     }
 }
 function convertAttr(att, value) {
@@ -87,9 +136,18 @@ function renderTile(unit, el) {
     // if we have no name we have nothing else
     if (unit.name) {
         renderAttrs(unit, el);
-        shortTriggers(unit, el);
-        abilityIcon(unit, el);
+        shortTriggers(el, unit);
         el.style.backgroundImage = `url("img/${unit.name}.png")`;
+        const qbutton = Element.create({
+            tag: 'button',
+            className: 'detailsButton',
+            title: 'details',
+        });
+        qbutton.addEventListener('click', detailViewFn(unit, el.className));
+        el.appendChild(qbutton);
+    }
+    if (unit.ability) {
+        abilityIcon(el, unit.ability, unit);
     }
     // @ts-ignore
     if (el.sidebar) { // @ts-ignore
@@ -113,7 +171,7 @@ function renderTile(unit, el) {
 function anyDetails(unit) {
     return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
-function shortTriggers(unit, el) {
+function shortTriggers(el, unit) {
     const triggers = Triggers.get(unit), triggerEls = [];
     if (triggers.length === 0) {
         return;
@@ -129,21 +187,21 @@ function shortTriggers(unit, el) {
     }));
 }
 function infoview(unit, el, squareEl) {
-    const qbutton = Element.create({
-        tag: 'button',
-        className: 'detailsButton uibutton',
-    });
-    qbutton.setAttribute('title', 'details');
-    el.appendChild(qbutton);
     renderAttrs(unit, el);
     if (unit.name) {
+        const qbutton = Element.create({
+            tag: 'button',
+            className: 'detailsButton uibutton',
+            title: 'details',
+        });
+        el.appendChild(qbutton);
         el.style.backgroundImage = `url("img/${unit.name}.png")`;
     }
     el.onclick = detailViewFn(unit, el.className, squareEl);
     if (unit.ability) {
         abilityButton(unit, el, squareEl);
     }
-    shortTriggers(unit, el);
+    shortTriggers(el, unit);
 }
 const fakeDescriptions = [
     'Listens to smooth jazz',

@@ -6,30 +6,9 @@ alias Yagg.Board.Grid
 alias Yagg.Board.Hand
 
 defmodule Unit.Ability do
-  @behaviour Board.Action
-
-  @callback resolve(Board.t, keyword()) :: {Board.t, [Event.t]} | {:err, term}
+  @callback resolve(Board.t, keyword()) :: Board.resolved
   @callback description() :: String.t
   @callback reveal?() :: boolean
-
-  @enforce_keys [:x, :y]
-  defstruct @enforce_keys
-
-  @impl Board.Action
-  def resolve(data, %Board{state: :battle} = board, position) do
-    coord = {data.x, data.y}
-    case ability_at(board, coord, position) do
-      {:err, _} = err -> err
-      {:ok, unit} ->
-        {board, e1} = if unit.ability.reveal?() and not Unit.visible?(unit, :ability) do
-          Grid.update(board, coord, fn(u) -> Unit.make_visible(u, [:ability, :name]) end)
-        else
-          {board, []}
-        end
-        {board, e2} = unit.ability.resolve(board, unit: unit, coords: coord)
-        {board, e1 ++ e2}
-    end
-  end
 
   def describe(:nil), do: :nil
   def describe(action) do
@@ -66,20 +45,11 @@ defmodule Unit.Ability do
           board,
           {x, y},
           fn(u) -> %{u | visible: :all} end,
-          [Event.AbilityUsed.new(position, type: :scan, x: x, y: y) | events]
+          events
         )
       _ -> {board, events}
     end
     {board, events}
-  end
-
-  defp ability_at(board, coords, position) do
-    case board.grid[coords] do
-      %Unit{ability: :nil} -> {:err, :noable}
-      %Unit{position: ^position} = unit -> {:ok, unit}
-      %Unit{} -> {:err, :unowned}
-      _ -> {:err, :nounit}
-    end
   end
 end
 

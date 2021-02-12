@@ -1,9 +1,9 @@
 :root {
   --north-main:	hsla(196, 78%, 55%, 1);
-  --north-muted: hsla(210, 42%, 64%, 0.8);
+  --north-muted: hsla(210, 42%, 74%, 0.9);
   --north-saturated:	hsla(196, 98%, 45%, 1);
   --south-main: hsla(270, 76%, 66%, 1);
-  --south-muted: hsla(262, 42%, 69%, 0.8);
+  --south-muted: hsla(262, 42%, 79%, 0.9);
   --south-saturated: hsla(272, 96%, 62%, 1);
   --ui-alt-saturated: hsla(69, 65%, 50%, 1);
   --ui-alt-desaturated: hsla(69, 25%, 70%, 0.9);
@@ -30,49 +30,3 @@
   --water-alt: hsla(235, 35%, 55%, 1);
 }
 
-@keyframes shimmer {
-  0% {background-position: 400% 0}
-  100% {background-position: -600px 0}
-}
-
-@keyframes glow {
-  0% {text-shadow: 0 0 1px white}
-  50% {text-shadow: 0 0 0.4em white}
-  100% {text-shadow: 0 0 1px white}
-}
-
-@keyframes huerotate {
-  0% {filter: hue-rotate(0)}
-  100% {filter: hue-rotate(360deg)}
-}
-
-@keyframes northglow {
-  0% {
-    background-color: var(--north-main);
-  }
-  45% {
-    background-color: var(--north-main);
-  }
-  70% {
-    background-color: var(--north-muted);
-    border-bottom-width: 0.3em;
-  }
-  100% {
-    background-color: var(--north-main);
-  }
-}
-@keyframes southglow {
-  0% {
-    background-color: var(--south-main);
-  }
-  45% {
-    background-color: var(--south-main);
-  }
-  70% {
-    background-color: var(--south-muted);
-    border-bottom-width: 0.3em;
-  }
-  100% {
-    background-color: var(--south-main);
-  }
-}

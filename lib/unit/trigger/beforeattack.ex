@@ -28,7 +28,9 @@ defmodule Unit.Trigger.BeforeAttack do
         {unit, opts} = Keyword.pop!(opts, :unit)
         {opponent, opts} = Keyword.pop!(opts, :opponent)
         data = %BeforeAttack{from: from, to: to, unit: unit, opponent: opponent}
-        before_attack(board, data)
+        before_attack(board, data) |> Unit.Trigger.maybe_reveal(
+          reveal?(), from, unit, :attack
+        )
       end
     end
   end

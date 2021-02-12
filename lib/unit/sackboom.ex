@@ -71,7 +71,7 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its third move
     """
-    use AfterMove
+    use AfterMove, noreveal: :true
     @impl AfterMove
     def after_move(board, %{to: to}) do
       Unit.Sackboom.move(board, to, Move.One)
@@ -82,7 +82,7 @@ defmodule Unit.Sackboom.Move do
     @moduledoc """
     Destroy everything in the left square on its second move
     """
-    use AfterMove
+    use AfterMove, noreveal: :true
     @impl AfterMove
     def after_move(board, %{to: to}) do
       Unit.Sackboom.move(board, to, Move.Two)

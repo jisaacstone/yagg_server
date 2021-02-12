@@ -6,7 +6,6 @@ export const state = {
     interval: null,
     timeout: null,
     queue: [],
-    animations: {},
 };
 export function listen() {
     if (state.eventListener === null) {
@@ -18,71 +17,11 @@ function handleEvent(event) {
     state.queue.push(event);
 }
 let waits = 0;
-//function awaitAnimations(result: Event.animData | null): Promise<any> {
-//  if (! result || !result.squares) {
-//    console.log({ result });
-//    return Promise.resolve(true);
-//  }
-//  waits ++;
-//  console.log({ squares: result.squares, animations: state.animations, waits });
-//  const runAnimation = () => {
-//    const aniPromise = result.animation();
-//    for (const k of result.squares) {
-//      state.animations[k] = aniPromise;
-//    }
-//  };
-//  if (result.squares.some((k) => state.animations[k])) {
-//    // animations already happening in some squares, wait
-//    const promises = [], keys = [];
-//    for (const [k, v] of Object.entries(state.animations)) {
-//      promises.push(v);
-//      keys.push(k);
-//    }
-//    console.log(`waiting ${waits}`);
-//    return Promise.all(promises).then(() => {
-//      console.log(`finished ${waits}`);
-//      for (const k of keys) {
-//        delete state.animations[k];
-//      }
-//      runAnimation();
-//    }).catch((e) => {
-//      console.log(`errors ${waits}`);
-//      console.error(e);
-//      for (const k of keys) {
-//        delete state.animations[k];
-//      }
-//      runAnimation();
-//    });
-//  } else {
-//    // no animation conflicts, start animations and read next event
-//    runAnimation();
-//    return Promise.resolve(true);
-//  }
-//}
-//
-//function handleNextEvent(next): Promise<string> {
-//  if (Event[next.event]) {
-//    try {
-//      console.log({ running: next });
-//      const result = Event[next.event](next);
-//      return awaitAnimations(result).then(() => {
-//        return 'resolved';
-//      }).catch((error) => {
-//        console.error({error, next});
-//        return 'rejected';
-//      });
-//    } catch (error) {
-//      console.error({error, next});
-//    }
-//  } else {
-//    console.log({msg: `no event handler for ${next.event}`, next});
-//  }
-//  return Promise.resolve('errored');
-//}
 function handleNextEventQ(next) {
     if (Event[next.event]) {
+        console.log(next);
         try {
-            const { animation } = Event[next.event](next);
+            const animation = Event[next.event](next);
             return animation().then(() => {
                 return 'resolved';
             }).catch((error) => {

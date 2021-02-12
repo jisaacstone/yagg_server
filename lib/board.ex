@@ -127,11 +127,7 @@ defmodule Yagg.Board do
     {unit, grid} = Map.pop(board.grid, {x, y})
     board = %{board | grid: grid}
     opts = meta ++ [{:unit, unit}]
-    {board, events} = Unit.after_death(board, opts[:unit], {x, y}, opts)
-    {
-      board,
-      [Event.UnitDied.new(x: x, y: y) | events]
-    }
+    Unit.Trigger.death(board, opts[:unit], {x, y}, opts)
   end
 
   @spec new(Configuration.t) :: Board.t
@@ -225,7 +221,7 @@ defmodule Yagg.Board do
     grid = Map.put(grid, to, unit)
     board = %{board | grid: grid}
 
-    case Unit.after_move(board, unit, from, to, opts) do
+    case Unit.Trigger.after_move(board, unit, from, to, opts) do
       {:err, _} = err -> err
       {board, events} ->
         events = [Event.ThingMoved.new(unit, from: from, to: to) | events]

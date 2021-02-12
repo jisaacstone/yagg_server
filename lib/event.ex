@@ -273,6 +273,18 @@ defmodule Yagg.Event do
     end
   end
 
+  defmodule ShowAbility do
+    @spec new([
+      x: 0..9,
+      y: 0..9,
+      type: :ability | :move | :attack | :death,
+      reveal: %{}
+    ]) :: Event.t
+    def new(params) do
+      Event.new(:global, :show_ability, params)
+    end
+  end
+
   defmodule AbilityUsed do
     @spec new(Keyword.t) :: Event.t
     def new(params) do

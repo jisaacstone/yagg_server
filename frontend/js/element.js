@@ -1,4 +1,4 @@
-export function create({ tag = 'div', className = '', innerHTML = '', id = '', children = [] }) {
+export function create({ tag = 'div', className = '', innerHTML = '', id = '', children = [], title = '' }) {
     const el = document.createElement(tag);
     if (className) {
         el.className = className;
@@ -11,6 +11,9 @@ export function create({ tag = 'div', className = '', innerHTML = '', id = '', c
     }
     for (const child of children) {
         el.appendChild(child);
+    }
+    if (title) {
+        el.setAttribute('title', title);
     }
     return el;
 }

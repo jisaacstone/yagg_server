@@ -224,8 +224,7 @@ body {
   font-size: 50%;
 }
 
-.boardsquare .unit .unit-name,
-.boardsquare .unit .unit-ability {
+.boardsquare .unit .unit-name {
   display: none;
 }
 
@@ -259,6 +258,10 @@ body {
   box-shadow: 0.8vh 1vh 0.7vh var(--ui-main-dark-transparent);
 }
 
+.card[data-uistate='selected'] .unit {
+  border-width: 0.4em;
+}
+
 /* UNITS */
 
 .unit {
@@ -273,11 +276,11 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   grid-template-rows: 15% 70% 15%;
-  grid-template-columns: 15% 70% 15%;
+  grid-template-columns: 15% 65% 20%;
   grid-template-areas:
-    "attack name defense"
+    "defense name attack"
     "info . details"
-    ". ability .";
+    ". ability ability";
 }
 
 .unit.owned:hover {
@@ -384,26 +387,27 @@ body {
 }
 
 .unit-ability {
-  margin-bottom: 1px;
-  padding: 0 3px;
-  background-color: var(--white-transparent-low);
-  color: var(--ui-alt-dark-dark);
-  border-width: 2px;
-  border-radius: min(1vw, 1vh);
-  border-color: var(--ui-alt-dark);
-  text-shadow: var(--ui-alt-desaturated-transparent) -1px -1px 0;
-  text-overflow: ellipsis;
-  overflow-x: clip;
-  overflow-y: visible;
   grid-area: ability;
-  border-width: 0.1em;
-  cursor: pointer;
-  box-shadow: inset 0.2em 0.2em 0.3em rgba(240, 241, 242, 0.5);
-  min-height: 1.1em;
+  background: center right / contain no-repeat url('img/ability_t.png');
+  height: 1.5em;
+  margin: 0.3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  place-self: stretch;
+  text-align: right;
+  border: none;
 }
-.unit-ability:hover {
+
+#board .unit-ability {
+  color: transparent;
+}
+
+#board [data-uistate='selected'] .unit-ability {
+  color: inherit;
+}
+
+#board .owned .unit-ability:hover {
   cursor: pointer;
-  background-color: var(--ui-main-light);
 }
 
 .hover .tooltip,
@@ -416,15 +420,9 @@ body {
 .candidate .unit-ability,
 .card .unit-ability {
   overflow: visible;
-  text-align: center;
-  padding: 0.2em;
-  background-color: var(--white-transparent-high);
-  border-radius: 0.3em;
-  border-color: inherit;
-  border-width: 0.1em;
-  border-style: outset;
-  place-self: center;
   font-size: 80%;
+  padding-right: 1.5em;
+  text-shadow: 1px 1px 1px var(--white-transparent-med);
 }
 
 .triggers {
@@ -482,7 +480,7 @@ body {
 }
 
 .unit-ability .tttext:after {
-  left: 3em;
+  left: 8em;
 }
 
 .tttext {
@@ -495,6 +493,7 @@ body {
   color: var(--ui-main-dark-dark);
   background-color: var(--ui-main-light);
   border: 2px solid var(--ui-main-dark);
+  text-align: center;
 }
 .tttext:after {
   content: '';
@@ -517,13 +516,21 @@ body {
 }
 
 .detailsButton {
-  display: none;
   grid-area: details;
   margin: 0;
   height: 20%;
   width: 75%;
   justify-self: center;
   background: center / contain no-repeat url('img/question mark.png');
+  box-shadow: none;
+}
+
+#board .detailsButton {
+  visibility: hidden;
+  border: none;
+}
+#board [data-uistate=selected] .detailsButton {
+  visibility: visible;
 }
 
 .candidate .unit button.detailsButton {
@@ -541,11 +548,35 @@ body {
 #table[data-yourturn=yes] #infobox .unit.owned.info {
   animation: none;
 }
-#table[data-yourturn=yes] .unit.south.owned {
-  animation: southglow 2s linear infinite;
+#table[data-yourturn=yes] .south.owned {
+  animation: southglow 2.7s linear infinite;
 }
-#table[data-yourturn=yes] .unit.north.owned {
-  animation: northglow 2s linear infinite;
+#table[data-yourturn=yes] .north.owned {
+  animation: northglow 2.7s linear infinite;
+}
+#table[data-yourturn=yes] .boardsquare:nth-child(2) .unit {
+  animation-delay: 0.11s;
+}
+#table[data-yourturn=yes] .boardsquare:nth-child(3) .unit {
+  animation-delay: 0.22s;
+}
+#table[data-yourturn=yes] .boardsquare:nth-child(4) .unit {
+  animation-delay: 0.33s;
+}
+#table[data-yourturn=yes] .boardsquare:nth-child(5) .unit {
+  animation-delay: 0.44s;
+}
+#table[data-yourturn=yes] .boardsquare:nth-child(6) .unit {
+  animation-delay: 0.55s;
+}
+#table[data-yourturn=yes] .boardsquare:nth-child(7) .unit {
+  animation-delay: 0.66s;
+}
+#table[data-yourturn=yes] .boardsquare:nth-child(8) .unit {
+  animation-delay: 0.77s;
+}
+#table[data-yourturn=yes] .candidate .unit {
+  animation-delay: 0.88s;
 }
 
 /* details */
@@ -558,7 +589,7 @@ body {
   padding: min(1vw, 1vh);
   background-image: url("img/details_bg.png");
   grid-template-areas:
-    "attack name defense"
+    "defense name attack"
     "info info info"
     "ability ability ability";
   grid-template-rows: 15% 55% 30%;
@@ -706,12 +737,33 @@ body {
 
 /* UIState */
 
-[data-uistate='selected'] {
+#board [data-uistate='selected'] {
   border-width: 3px;
 }
-[data-uistate='selected'] .unit {
-  border-width: 0.4em
+#board [data-uistate='selected'] .unit {
+  border-width: 0.4em;
+  grid-template-columns: 15% 55% 30%;
+  grid-template-rows: 15% 15% 40% 30%;
+  grid-template-areas:
+    "defense name attack"
+    "info name attack"
+    "info . details"
+    "ability ability ability";
 }
+#board [data-uistate='selected'] .unit .detailsButton {
+  visibility: visible;
+  width: 2.5em%;
+  height: 2.5em;
+}
+#board [data-uistate='selected'] .unit .unit-attack {
+  font-size: 200%;
+}
+#board [data-uistate='selected'] .unit .unit-ability {
+  height: 2.5em;
+  cursor: pointer;
+  padding-right: 2em;
+}
+
 [data-uistate='moveoption']::before {
   content: '';
   width: 90%;
@@ -888,13 +940,11 @@ body {
   background-image: url('img/nametag_s.png');
 }
 
-.unit.north .uibutton,
-.unit.north button {
+.unit.north .uibutton {
   border-color: var(--north-saturated);
 }
 
-.unit.south .uibutton,
-.unit.south button {
+.unit.south .uibutton {
   border-color: var(--south-saturated);
 }
 

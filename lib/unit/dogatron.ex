@@ -21,7 +21,7 @@ defmodule Unit.Dogatron do
     @moduledoc """
     Add a copy to hand with +2 defense.
     """
-    use Unit.Trigger.OnDeath, noreveal: true
+    use Unit.Trigger.OnDeath
     @impl Unit.Trigger.OnDeath
     def on_death(%Board{} = board, data) do
       %{name: name, defense: defense, position: position} = data.unit
@@ -29,7 +29,11 @@ defmodule Unit.Dogatron do
         :nil -> {board, []}
         %Unit{name: ^name} -> Board.unit_death(board, data.coord)
       end
-      newunit = %{data.unit | ability: Unit.Dogatron.Upgrade, defense: defense + 2}
+      newunit = %{
+        data.unit |
+        defense: defense + 2,
+        visible: MapSet.new([:player])
+      } |> Unit.set_trigger(:death, Unit.Dogatron.Upgrade)
       {board, e2} = Board.Hand.add_unit(board, position, newunit)
       {board, e1 ++ e2}
     end
@@ -39,7 +43,7 @@ defmodule Unit.Dogatron do
     @moduledoc """
     Add a copy to hand with +2 attack.
     """
-    use Unit.Trigger.OnDeath, noreveal: true
+    use Unit.Trigger.OnDeath
     @impl Unit.Trigger.OnDeath
     def on_death(%Board{} = board, data) do
       %{name: name, attack: attack, position: position} = data.unit
@@ -47,7 +51,11 @@ defmodule Unit.Dogatron do
         :nil -> {board, []}
         %Unit{name: ^name} -> Board.unit_death(board, data.coord)
       end
-      newunit = %{data.unit | attack: attack + 2, ability: Unit.Dogatron.Armor}
+      newunit = %{
+        data.unit |
+        attack: attack + 2,
+        visible: MapSet.new([:player])
+      } |> Unit.set_trigger(:death, Unit.Dogatron.Armor)
       {board, e2} = Board.Hand.add_unit(board, position, newunit)
       {board, e1 ++ e2}
     end

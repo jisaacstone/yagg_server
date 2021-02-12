@@ -18,24 +18,24 @@ function render_board(board, players: number) {
   if (players !== 2) {
     return;
   }
-  Event.game_started(board).animation();
+  Event.game_started(board)();
   if (board.ready) {
-    Event.player_ready({player: board.ready}).animation();
+    Event.player_ready({player: board.ready})();
   }
   Object.entries(board.grid).forEach(([coor, feature]: [string, any]) => {
     if (feature) {
       const [x, y] = coor.split(',');
       if (feature.kind === 'unit') {
-        Event.unit_placed({x, y, ...feature}).animation();
+        Event.unit_placed({x, y, ...feature})();
       } else {
-        Event.feature({x, y, feature}).animation();
+        Event.feature({x, y, feature})();
       }
     }
   });
 }
 
 function render_jobfair(jobfair) {
-  Event.game_started(jobfair).animation();
+  Event.game_started(jobfair)();
 }
 
 function render_(boardstate, phase, players) {
@@ -134,7 +134,7 @@ function fetchgamestate() {
 function setstate(gamedata, phase) {
   let players = 0;
   for (const player of gamedata.players) {
-    Event.player_joined(player).animation();
+    Event.player_joined(player)();
     players ++;
   }
   if (!gamedata.board || players == 1) {
@@ -142,11 +142,11 @@ function setstate(gamedata, phase) {
   } else {
     render_(gamedata.board, phase, players);
     if (gamedata.timer) {
-      Event.timer(gamedata).animation();
+      Event.timer(gamedata)();
     }
   }
   if (gamedata.turn) {
-    Event.turn({player: gamedata.turn}).animation();
+    Event.turn({player: gamedata.turn})();
   }
   return players === 2;  // continue and fetch player hands
 }

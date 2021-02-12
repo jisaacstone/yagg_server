@@ -17,7 +17,7 @@ export function projectile(event) {
             });
         });
     };
-    return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+    return animation;
 }
 function createProjectile(subtype) {
     const projectileEl = document.createElement('div');
@@ -41,7 +41,7 @@ export function scan({ x, y }) {
         const animation = () => {
             return child.animate({ opacity: [1, 0.5, 1] }, { duration: 150 }).finished;
         };
-        return { animation, squares: [`${x},${y}`] };
+        return animation;
     }
 }
 export function fire(event) {
@@ -61,7 +61,7 @@ export function fire(event) {
             burn(square);
         };
     }
-    return { animation, squares: [`${event.x},${event.y}`] };
+    return animation;
 }
 function burn(el) {
     return SFX.play('fire').then(() => {
@@ -83,12 +83,9 @@ function createContents(text) {
     return el;
 }
 export function capture({ coord, name }) {
-    return {
-        animation: () => {
-            const unit = Board.thingAt(coord.x, coord.y, 'unit'), style = window.getComputedStyle(unit), bgimg = style.backgroundImage;
-            unit.style.backgroundImage = `url('img/${name}.png'), ${bgimg}`;
-            return Promise.resolve(true);
-        },
-        squares: [`${coord.x},${coord.y}`]
+    return () => {
+        const unit = Board.thingAt(coord.x, coord.y, 'unit'), style = window.getComputedStyle(unit), bgimg = style.backgroundImage;
+        unit.style.backgroundImage = `url('img/${name}.png'), ${bgimg}`;
+        return Promise.resolve(true);
     };
 }

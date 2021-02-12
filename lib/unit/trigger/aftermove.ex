@@ -26,7 +26,9 @@ defmodule Unit.Trigger.AfterMove do
         {to, opts} = Keyword.pop!(opts, :to)
         {unit, opts} = Keyword.pop!(opts, :unit)
         data = %AfterMove{from: from, to: to, unit: unit}
-        after_move(board, data)
+        after_move(board, data) |> Unit.Trigger.maybe_reveal(
+          reveal?(), to, unit, :move
+        )
       end
     end
   end

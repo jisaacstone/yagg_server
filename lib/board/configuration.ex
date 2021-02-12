@@ -1,5 +1,4 @@
 alias Yagg.Unit
-alias Yagg.Board.Action.Ability
 alias Yagg.Board
 alias Yagg.Jobfair
 alias Yagg.Event
@@ -129,7 +128,7 @@ defmodule Board.Configuration.Random do
       Unit.Tinker.new(position),
       Unit.new(position, :bezerker, 9, 2),
       Unit.new(position, :chopper, 7, 4),
-      Unit.new(position, :rollander, 1, 6, :nil, %{death: Ability.Secondwind}),
+      Unit.new(position, :rollander, 1, 6, :nil, %{death: Unit.Ability.Secondwind}),
       Unit.new(position, :tim, 1, 8),
       Unit.Bomb.new(position),
       Unit.Miner.new(position),

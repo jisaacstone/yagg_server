@@ -18,7 +18,7 @@ export interface Config {
   name: string;
 }
 
-function squareId(coord: Coord): string {
+export function squareId(coord: Coord): string {
   return `c${coord.x}-${coord.y}`;
 }
 
@@ -123,14 +123,14 @@ export function in_direction(direction: string, distance: number): {x: number, y
 // simulate events from unit state
 export function unitdata({ grid, hand }) {
   for (const ob of grid) {
-    Event.new_unit(ob).animation();
+    Event.new_unit(ob)();
   }
   Array.prototype.forEach.call(
     Object.entries(hand),
     ([index, card]: [string, any]) => {
-      Event.add_to_hand({index: +index, unit: card.unit}).animation();
+      Event.add_to_hand({index: +index, unit: card.unit})();
       if (card.assigned) {
-        Event.unit_assigned({index: +index, x: card.assigned.x, y: card.assigned.y}).animation();
+        Event.unit_assigned({index: +index, x: card.assigned.x, y: card.assigned.y})();
       }
     }
   );

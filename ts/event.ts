@@ -19,28 +19,22 @@ import * as Request from './request.js';
 
 const unitsbyindex = {};
 
-export interface animData {
-  animation: () => Promise<any>;
-  squares: string[];
+export type eventHandler = () => Promise<any>;
+
+function noGrid(fn: () => any): eventHandler {
+  return () => Promise.resolve(fn());
 }
 
-function noGrid(fn: () => any): animData {
-  return {
-    animation: () => Promise.resolve(fn()),
-    squares: []
-  };
+function noOp() {
+  return Promise.resolve(null);
 }
 
-export function multi({ events }): animData {
-  let squares = [];
+export function multi({ events }): eventHandler {
   const animations = [],
     module = this;
   for (const event of events) {
     const result = module[event.event](event);
-    if (result && result.squares) {
-      squares = squares.concat(result.squares);
-      animations.push(result.animation);
-    }
+    animations.push(result);
   }
   if (animations.length > 0) {
     const animation = () => {
@@ -48,12 +42,12 @@ export function multi({ events }): animData {
         animations.map((a) => a())
       );
     };
-    return { animation, squares };
+    return animation;
   }
+  return noOp;
 }
 
-export function game_started(event): animData {
-  console.log(event);
+export function game_started(event): eventHandler {
   return noGrid(() => {
     const board = document.getElementById('board'),
       state = (event.state || '').toLowerCase();
@@ -81,19 +75,19 @@ export function game_started(event): animData {
   });
 }
 
-export function timer(event): animData {
+export function timer(event): eventHandler {
   return noGrid(() => {
     Timer.set(event.timer, event.player);
   });
 }
 
-export function battle_started(): animData {
+export function battle_started(): eventHandler {
   return noGrid(() => {
     State.gamestatechange('battle');
   });
 }
 
-export function player_joined({ player, position }): animData {
+export function player_joined({ player, position }): eventHandler {
   return noGrid(() => {
     const thisPlayer = Player.getLocal(),
       whois = thisPlayer.id == player.id ? 'player' : 'opponent',
@@ -115,7 +109,7 @@ export function player_joined({ player, position }): animData {
   });
 }
 
-export function player_left({ player }): animData {
+export function player_left({ player }): eventHandler {
   return noGrid(() => {
     const thisPlayer = Player.getLocal(),
       whois = thisPlayer.id == player.id ? 'player' : 'opponent',
@@ -125,7 +119,7 @@ export function player_left({ player }): animData {
   });
 }
 
-export function add_to_hand({ unit, index }): animData {
+export function add_to_hand({ unit, index }): eventHandler {
   return noGrid(() => {
     const unitEl = Hand.createCard(unit, index)
     unitsbyindex[index] = unitEl;
@@ -133,19 +127,16 @@ export function add_to_hand({ unit, index }): animData {
   });
 }
 
-export function unit_assigned({ x, y, index }): animData {
-  return {
-    animation: () => {
+export function unit_assigned({ x, y, index }): eventHandler {
+  return () => {
       const square = Board.square(x, y),
         unit = unitsbyindex[index];
       square.appendChild(unit);
       return SFX.play('place');
-    },
-    squares: [`${x},${y}`]
   };
 }
 
-export function new_unit({ x, y, unit }): animData {
+export function new_unit({ x, y, unit }): eventHandler {
   const animation = () => {
     const exist = Board.thingAt(x, y);
     let unitEl;
@@ -162,31 +153,28 @@ export function new_unit({ x, y, unit }): animData {
     const a = unitEl.animate({ opacity: [0.5, 0.9, 1] }, { duration: 100 });
     return a.finished;
   };
-  return { animation, squares: [`${x},${y}`] }
+  return animation;
 }
 
-export function unit_changed(event): animData {
+export function unit_changed(event): eventHandler {
   return new_unit(event);  // for now
 }
 
-export function unit_placed(event): animData {
-  return {
-    animation: () => {
-      const square = Board.square(event.x, event.y);
-      if (! square.firstChild) {
-        const unit = Unit.render(event, null)
-        square.appendChild(unit);
-        return SFX.play('place');
-      } else {
-        console.log({ msg: `${event.x},${event.y} already occupied`, event });
-        return Promise.resolve(false);
-      }
-    },
-    squares: [`${event.x},${event.y}`]
-  }
+export function unit_placed(event): eventHandler {
+  return () => {
+    const square = Board.square(event.x, event.y);
+    if (! square.firstChild) {
+      const unit = Unit.render(event, null)
+      square.appendChild(unit);
+      return SFX.play('place');
+    } else {
+      console.log({ msg: `${event.x},${event.y} already occupied`, event });
+      return Promise.resolve(false);
+    }
+  };
 }
 
-export function player_ready(event): animData {
+export function player_ready(event): eventHandler {
   return noGrid(() => {
     if ( event.player === State.gmeta.position ) {
       (document.querySelector('#player .playername') as HTMLElement).dataset.ready = 'true';
@@ -198,19 +186,16 @@ export function player_ready(event): animData {
   });
 }
 
-export function feature(event): animData {
-  return {
-    animation: () => {
-      const square = Board.square(event.x, event.y),
-        feature = Feature.render(event.feature);
-      square.appendChild(feature);
-      return Promise.resolve(true);
-    },
-    squares: [`${event.x},${event.y}`]
+export function feature(event): eventHandler {
+  return () => {
+    const square = Board.square(event.x, event.y),
+      feature = Feature.render(event.feature);
+    square.appendChild(feature);
+    return Promise.resolve(true);
   }
 }
 
-export function unit_died(event): animData {
+export function unit_died(event): eventHandler {
   const square = Board.square(event.x, event.y),
     animation = () => {
       const unit = square.firstChild as HTMLElement;
@@ -228,10 +213,10 @@ export function unit_died(event): animData {
         });
       });
     };
-  return { animation, squares: [`${event.x},${event.y}`] };
+  return animation;
 }
 
-export function thing_moved(event): animData {
+export function thing_moved(event): eventHandler {
   const from = Board.square(event.from.x, event.from.y);
   if (event.to.x !== undefined && event.to.y !== undefined) {
     const to = Board.square(event.to.x, event.to.y),
@@ -262,7 +247,7 @@ export function thing_moved(event): animData {
           });
         });
       };
-    return { animation, squares: [`${event.to.x},${event.to.y}`, `${event.from.x},${event.from.y}`] };
+    return animation;
   } else if (event.direction) {
     // moved offscreen
     const animation = () => {
@@ -298,7 +283,7 @@ export function thing_moved(event): animData {
         thing.remove();
       });
     };
-    return { animation, squares: [`${event.from.x},${event.from.y}`] };
+    return animation;
   } else if (event.to === 'hand') {
     const animation = () => {
       const thing = from.firstChild as HTMLElement,
@@ -324,85 +309,85 @@ export function thing_moved(event): animData {
         thing.remove();
       });
     }
-    return { animation, squares: [`${event.from.x},${event.from.y}`] }
-  } else {
-    console.error({ err: 'unrecognized move', event });
+    return animation;
   }
 }
 
-export function thing_gone(event): animData {
-  const thing = Board.thingAt(event.x, event.y);
-  if (!thing) {
-    console.error({ msg: `nothing at ${event.x},${event.y}`, event});
-    return;
-  }
-  if (thing.className.includes('owned')) {
-    thing.dataset.state = 'invisible';
-  } else {
-    const animation = () => {
+export function thing_gone(event): eventHandler {
+  return () => {
+    const thing = Board.thingAt(event.x, event.y);
+    if (!thing) {
+      console.error({ msg: `nothing at ${event.x},${event.y}`, event});
+      return noOp();
+    }
+    if (thing.className.includes('owned')) {
+      thing.dataset.state = 'invisible';
+      return noOp();
+    } else {
       const a = thing.animate({ opacity: [1, 0] }, { duration: 1000, easing: "ease-in" });
       return a.finished.then(() => {
         thing.remove();
       });
-    };
-    return { animation, squares: [`${event.x},${event.y}`] }
+    }
   }
 }
 
-export function battle({ from, to }): animData {
+export function battle({ from, to }): eventHandler {
   // animation only, no lasting chages
   const animation = () => {
-      return SFX.play('battle').then(() => {
-        const attacker = Board.thingAt(from.x, from.y),
-          defender = Board.thingAt(to.x, to.y),
-          arect = attacker.getBoundingClientRect(),
-          drect = defender.getBoundingClientRect(),
-          xpos = arect.left,
-          ypos = arect.top;
-        let xdiff = 0, ydiff = 0;
+    return SFX.play('battle').then(() => {
+      Unit.hilight(from, 'unit-attack');
+      Unit.hilight(to, 'unit-defense');
+      const attacker = Board.thingAt(from.x, from.y),
+        defender = Board.thingAt(to.x, to.y),
+        arect = attacker.getBoundingClientRect(),
+        drect = defender.getBoundingClientRect(),
+        xpos = arect.left,
+        ypos = arect.top;
+      let xdiff = 0, ydiff = 0;
 
-        if (from.x !== to.x) {
-          xdiff = (drect.left > arect.left ? drect.left - arect.right : drect.right - arect.left) * 1.8;
-        }
+      if (from.x !== to.x) {
+        xdiff = (drect.left > arect.left ? drect.left - arect.right : drect.right - arect.left) * 1.8;
+      }
 
-        if (from.y !== to.y) {
-          ydiff = (drect.top > arect.top ? drect.top - arect.bottom : drect.bottom - arect.top) * 1.8;
-        }
+      if (from.y !== to.y) {
+        ydiff = (drect.top > arect.top ? drect.top - arect.bottom : drect.bottom - arect.top) * 1.8;
+      }
 
-        Object.assign(attacker.style, {
-          position: 'fixed',
-          width: arect.width + 'px',
-          height: arect.height + 'px',
-        });
+      Object.assign(attacker.style, {
+        position: 'fixed',
+        width: arect.width + 'px',
+        height: arect.height + 'px',
+      });
+      return attacker.animate(
+        { 
+          top: [ypos + 'px', ypos + ydiff + 'px'],
+          left: [xpos + 'px', xpos + xdiff + 'px']
+        },
+        { duration: 100, easing: 'ease-in' }
+      ).finished.then(() => {
+        defender.animate(
+          { opacity: [1, 0.5, 1] },
+          { duration: 80 }
+        );
         return attacker.animate(
           { 
-            top: [ypos + 'px', ypos + ydiff + 'px'],
-            left: [xpos + 'px', xpos + xdiff + 'px']
+            top: [ypos + ydiff + 'px', ypos + 'px'],
+            left: [xpos + xdiff + 'px', xpos + 'px']
           },
-          { duration: 100, easing: 'ease-in' }
-        ).finished.then(() => {
-          defender.animate(
-            { opacity: [1, 0.5, 1] },
-            { duration: 80 }
-          );
-          return attacker.animate(
-            { 
-              top: [ypos + ydiff + 'px', ypos + 'px'],
-              left: [xpos + xdiff + 'px', xpos + 'px']
-            },
-            { duration: 80, easing: 'ease-out' }
-          ).finished;
-        }).then(() => {
-          attacker.style.position = '';
-          attacker.style.width = '';
-          attacker.style.height = '';
-        });
+          { duration: 80, easing: 'ease-out' }
+        ).finished;
+      }).then(() => {
+        attacker.style.position = '';
+        attacker.style.width = '';
+        attacker.style.height = '';
       });
+    });
     };
-  return { animation, squares: [`${to.x},${to.y}`, `${from.x},${from.y}`] };
+  return animation;
 }
 
-export function gameover({ winner, reason }): animData {
+export function gameover({ winner, reason }): eventHandler {
   return noGrid(() => {
     let message;
     const showRematch = ! reason || ! reason.toLowerCase().includes('opponent left'),
@@ -440,13 +425,13 @@ export function gameover({ winner, reason }): animData {
   });
 }
 
-export function turn({ player }): animData {
+export function turn({ player }): eventHandler {
   return noGrid(() => {
     State.turnchange(player);
   });
 }
 
-export function candidate(event): animData {
+export function candidate(event): eventHandler {
   return noGrid(() => {
     const jf = document.getElementById('jobfair'),
       existing = document.getElementById(`candidate-${event.index}`);
@@ -458,21 +443,27 @@ export function candidate(event): animData {
         className: 'candidate',
         id: `candidate-${event.index}`,
         children: [unitEl]
-      }),
-      qbutton = Element.create({
-        tag: 'button',
-        className: 'detailsButton uibutton',
       });
-    qbutton.setAttribute('title', 'details');
     Select.bind_candidate(cdd, event.index, event.unit);
     unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
-    qbutton.addEventListener('click', Unit.detailViewFn(event.unit, unitEl.className));
-    unitEl.appendChild(qbutton);
     jf.appendChild(cdd);
   });
 }
 
-export function ability_used(event): animData {
+export function show_ability({ x, y, type, reveal }) {
+  return noGrid(() => {
+    Unit.showName({ x, y }, reveal.name);
+    if (type === 'ability') {
+      Unit.showAbility({ x, y }, reveal.ability);
+      return Unit.hilight({ x, y }, 'unit-ability');
+    } else {
+      Unit.showTriggers({ x, y }, reveal.triggers);
+      return Unit.hilight({ x, y }, `${type}-t`);
+    }
+  });
+}
+
+export function ability_used(event): eventHandler {
   if (!AbilityEvent[event.type]) {
     console.error({error: 'no ability handler', event});
     return noGrid(() => {
@@ -482,7 +473,7 @@ export function ability_used(event): animData {
   return AbilityEvent[event.type](event);
 }
 
-export function table_shutdown(): animData {
+export function table_shutdown(): eventHandler {
   return noGrid(() => {
     return Dialog.alert('table closed').then(() => {
       window.location.href = 'index.html';

@@ -1,4 +1,5 @@
 alias Yagg.Unit.Ability
+alias Yagg.Unit.Trigger
 alias Yagg.Table.Player
 alias Yagg.Board
 
@@ -10,8 +11,7 @@ defmodule Yagg.Unit do
 
   @callback new(Player.position) :: t
 
-  @type trigger :: :death | :move | :attack
-  @type triggers :: %{optional(trigger) => module()}
+  @type triggers :: %{optional(Trigger.type) => module()}
 
   @type t :: %Unit{
     :attack => 1 | 3 | 5 | 7 | 9,
@@ -78,44 +78,26 @@ defmodule Yagg.Unit do
     %{unit | triggers: Map.put(unit.triggers, type, ability)}
   end
 
-  @spec after_death(Board.t, Unit.t, Board.Grid.coord, Keyword.t) :: Board.resolved
-  def after_death(board, unit, coords, opts \\ []) do
-    trigger_module(unit, :death).resolve(board, [{:coords, coords}, {:unit, unit} | opts])
-  end
-
-  @spec after_move(Board.t, Unit.t, Board.Grid.coord, Board.Grid.coord, Keyword.t) :: Board.resolved
-  def after_move(board, unit, from, to, opts \\ []) do
-    trigger_module(unit, :move).resolve(board, [{:from, from}, {:to, to}, {:unit, unit} | opts])
-  end
-
   @spec attack(Board.t, Unit.t, Unit.t, Board.Grid.coord, Board.Grid.coord) :: Board.resolved
   def attack(board, unit, opponent, from, to), do: attack(board, unit, opponent, from, to, [])
   def attack(_, %{attack: :immobile}, _, _, _, _), do: {:err, :immobile}
   def attack(board, unit, opponent, from, to, opts) do
-    case trigger_module(unit, :attack) do
+    case Trigger.module(unit, :attack) do
       Ability.NOOP -> Board.do_battle(board, unit, opponent, from, to)
       module -> module.resolve(board, [{:from, from}, {:to, to}, {:opponent, opponent}, {:unit, unit} | opts])
     end
   end
 
-  @spec trigger_module(Unit.t, atom) :: module
-  def trigger_module(%Unit{triggers: %{}} = unit, trigger) do
-    unit.triggers[trigger] || Ability.NOOP
-  end
-  def trigger_module(_, _) do
-    Ability.NOOP
-  end
-
-  defp encode_fields(_unit, [], encoded), do: encoded
-  defp encode_fields(unit, [field | fields], encoded) do
+  def encode_fields(_unit, [], encoded), do: encoded
+  def encode_fields(unit, [field | fields], encoded) do
     encoded = Map.put_new(encoded, field, encode_field(unit, field))
     encode_fields(unit, fields, encoded)
   end
 
-  defp encode_field(unit, :player), do: unit.position
-  defp encode_field(unit, :ability), do: Ability.describe(unit.ability)
-  defp encode_field(unit, :triggers), do: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
-  defp encode_field(unit, :attributes) do
+  def encode_field(unit, :player), do: unit.position
+  def encode_field(unit, :ability), do: Ability.describe(unit.ability)
+  def encode_field(unit, :triggers), do: Enum.map(unit.triggers || %{}, fn({k, v}) -> {k, Ability.describe(v)} end) |> Enum.into(%{})
+  def encode_field(unit, :attributes) do
     Enum.reduce(
       [
         monarch: unit.monarch,
@@ -129,5 +111,5 @@ defmodule Yagg.Unit do
       end
     )
   end
-  defp encode_field(unit, field), do: Map.get(unit, field)
+  def encode_field(unit, field), do: Map.get(unit, field)
 end

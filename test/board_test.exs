@@ -19,7 +19,7 @@ defmodule YaggTest.Board do
     player = Table.Player.new("north")
     table = %Table{id: :test, turn: :north, board: board, history: [], players: [north: player], configuration: %{}, subscribors: []}
     assert {:reply, :ok, table} = Table.handle_call(
-      {:board_action, player, %Unit.Ability{x: 3, y: 3}},
+      {:board_action, player, %Board.Action.Ability{x: 3, y: 3}},
       self(),
       table
     )
@@ -35,7 +35,7 @@ defmodule YaggTest.Board do
     player = Table.Player.new("north")
     table = %Table{id: :test, turn: :north, board: board, history: [], players: [north: player], configuration: %{}, subscribors: []}
     assert {:reply, :ok, table} = Table.handle_call(
-      {:board_action, player, %Unit.Ability{x: 1, y: 1}},
+      {:board_action, player, %Board.Action.Ability{x: 1, y: 1}},
       self(),
       table
     )
@@ -53,7 +53,7 @@ defmodule YaggTest.Board do
     player = Table.Player.new("north")
     table = %Table{id: :test, turn: :north, board: board, history: [], players: [north: player], configuration: %{}, subscribors: []}
     assert {:reply, :ok, table} = Table.handle_call(
-      {:board_action, player, %Unit.Ability{x: 1, y: 1}},
+      {:board_action, player, %Board.Action.Ability{x: 1, y: 1}},
       self(),
       table
     )

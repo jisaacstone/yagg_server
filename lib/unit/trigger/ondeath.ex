@@ -26,7 +26,9 @@ defmodule Unit.Trigger.OnDeath do
         {unit, opts} = Keyword.pop!(opts, :unit)
         {opponent, opts} = Keyword.pop(opts, :opponent)
         data = %OnDeath{coord: coord, unit: unit, opponent: opponent}
-        on_death(board, data)
+        on_death(board, data) |> Unit.Trigger.maybe_reveal(
+          reveal?(), coord, unit, :death
+        )
       end
     end
   end

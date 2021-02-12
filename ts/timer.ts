@@ -9,7 +9,6 @@ const state = {
 }
 
 export function set(time_in_ms: number, kind: string) {
-  console.log({ timer: kind });
   if (state.el) {
     state.el.innerHTML = '';
   }

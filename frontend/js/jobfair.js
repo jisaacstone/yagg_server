@@ -93,7 +93,7 @@ export function deselect(index) {
 }
 export function unitdata(unitdata) {
     for (let [index, unit] of Object.entries(unitdata.choices)) {
-        Event.candidate({ index, unit }).animation();
+        Event.candidate({ index, unit })();
     }
     for (let index of unitdata.chosen) {
         document.getElementById(`candidate-${index}`).dataset.uistate = 'selected';
