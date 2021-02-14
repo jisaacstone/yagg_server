@@ -106,7 +106,9 @@ defmodule Yagg.Board do
             :out_of_bounds -> {:err, :out_of_bounds}
             :water -> {:err, :illegal}
             :block -> 
-              push_block(board, from, to)
+              {board, e1} = push_block(board, from, to)
+              {board, e2} = do_move(board, from, to)
+              {board, e1 ++ e2}
             :nil -> 
               do_move(board, from, to)
             %Unit{} = opponent -> 
@@ -172,9 +174,7 @@ defmodule Yagg.Board do
     square = Grid.next(dir, to)
     case Grid.thing_at(board, square) do
       :nil -> 
-        {board, events1} = do_move(board, to, square)
-        {board, events2} = do_move(board, from, to, action: :push)
-        {board, events1 ++ events2}
+        do_move(board, to, square)
       :out_of_bounds ->
         {:err, :out_of_bounds}
       _ ->

@@ -56,6 +56,17 @@ defmodule YaggTest.Action.Ability do
     assert newboard.grid[{3, 3}] == unitF
   end
 
+  test "push block board edge" do
+    board = set_board([
+      {{2, 1}, Unit.Pushie.new(:north)},
+      {{3, 1}, :block},
+    ])
+    action = %Board.Action.Ability{x: 2, y: 1}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :north)
+    assert newboard.grid[{3, 1}] == :nil
+    assert newboard.grid[{4, 1}] == :block
+  end
+
   test "push manuver" do
     unitM = Unit.Tactician.new(:south)
     unitP = Unit.Pushie.new(:south)

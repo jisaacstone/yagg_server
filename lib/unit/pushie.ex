@@ -28,14 +28,14 @@ defmodule Unit.Pushie do
       push_adjacent_units(board, opts[:coords])
     end
 
-    defp push_adjacent_units(board, coords) do
+    defp push_adjacent_units(board, unit_coord) do
       Enum.reduce(
-        Grid.surrounding(coords),
+        Grid.surrounding(unit_coord),
         {board, []},
         fn({direction, coord}, b_e) ->
           case board.grid[coord] do
             %Unit{} = unit -> push_unit(b_e, direction, coord, unit)
-            :block -> push_block(b_e, direction, coord)
+            :block -> push_block(b_e, unit_coord, coord)
             _ -> b_e
           end
         end
@@ -53,12 +53,14 @@ defmodule Unit.Pushie do
       end
     end
 
-    defp push_block({board, events}, direction, coord) do
-      next = Grid.next(direction, coord)
-      case Board.push_block(board, coord, next) do
+    defp push_block({board, events}, unit_coord, block_coord) do
+      case Board.push_block(board, unit_coord, block_coord) do
         {:err, :out_of_bounds} ->
-          board = %{board | grid: Map.delete(board.grid, coord)}
-          event = Event.ThingMoved.new(from: coord, to: :offscreen, direction: direction) 
+          board = %{board | grid: Map.delete(board.grid, block_coord)}
+          event = Event.ThingMoved.new(
+            from: block_coord,
+            to: :offscreen,
+            direction: Grid.direction(unit_coord, block_coord)) 
           {board, [event | events]}
         {:err, _} -> {board, events}
         {newboard, newevents} -> {newboard, events ++ newevents}
