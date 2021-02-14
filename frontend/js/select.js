@@ -1,6 +1,5 @@
-import { gameaction } from './request.js';
+import { action } from './request.js';
 import { gmeta } from './state.js';
-import { displayerror } from './err.js';
 import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
 import * as Unit from './unit.js';
@@ -8,7 +7,6 @@ import * as Infobox from './infobox.js';
 import * as Element from './element.js';
 import * as SFX from './sfx.js';
 import * as Soundtrack from './soundtrack.js';
-import * as Dialog from './dialog.js';
 const global = { selected: null };
 export function selected() {
     if (global.selected === null) {
@@ -18,33 +16,6 @@ export function selected() {
         return false;
     }
     return true;
-}
-function action(actType, args, cb = null) {
-    gameaction(actType, args, 'board')
-        .then(() => {
-        if (cb) {
-            cb();
-        }
-    })
-        .catch(({ request }) => {
-        if (request.status === 400) {
-            if (request.responseText.includes('occupied')) {
-                displayerror('space is already occupied');
-            }
-            else if (request.responseText.includes('noselfattack')) {
-                displayerror('you cannot attack your own units');
-            }
-            else if (request.responseText.includes('illegal')) {
-                displayerror('illegal move');
-            }
-            else if (request.responseText.includes('empty')) {
-                //UI is messed up most likely
-                Dialog.alert('oops, something went wrong').then(() => {
-                    window.location = window.location;
-                });
-            }
-        }
-    });
 }
 function ismoveoption(el) {
     if (!el) {
@@ -70,6 +41,7 @@ export function deselect() {
     }
     global.selected = {};
     Infobox.clear();
+    Unit.clearButtonOverlay();
     if (rb) {
         rb.remove();
     }
@@ -169,6 +141,7 @@ function handleSelect(el, meta) {
         }
     }
     else {
+        // on board
         if (!Unit.containsOwnedUnit(el)) {
             // Square with no owned unit
             return;

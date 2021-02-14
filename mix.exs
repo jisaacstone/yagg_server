@@ -5,7 +5,7 @@ defmodule YaggServer.MixProject do
     [
       app: :yagg_server,
       version: "0.1.0",
-      elixir: "~> 1.10",
+      elixir: "~> 1.9",
       start_permanent: :true,
       deps: deps(),
       elixirc_paths: compiler_paths(Mix.env()),

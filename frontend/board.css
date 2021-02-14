@@ -402,10 +402,6 @@ body {
   color: transparent;
 }
 
-#board [data-uistate='selected'] .unit-ability {
-  color: inherit;
-}
-
 #board .owned .unit-ability:hover {
   cursor: pointer;
 }
@@ -527,10 +523,6 @@ body {
 
 #board .detailsButton {
   visibility: hidden;
-  border: none;
-}
-#board [data-uistate=selected] .detailsButton {
-  visibility: visible;
 }
 
 .candidate .unit button.detailsButton {
@@ -742,26 +734,35 @@ body {
 }
 #board [data-uistate='selected'] .unit {
   border-width: 0.4em;
-  grid-template-columns: 15% 55% 30%;
-  grid-template-rows: 15% 15% 40% 30%;
-  grid-template-areas:
-    "defense name attack"
-    "info name attack"
-    "info . details"
-    "ability ability ability";
 }
-#board [data-uistate='selected'] .unit .detailsButton {
+#board [data-uistate='selected'] #overlayButtons .detailsButton {
   visibility: visible;
-  width: 2.5em%;
-  height: 2.5em;
 }
-#board [data-uistate='selected'] .unit .unit-attack {
-  font-size: 200%;
+#table:not([data-yourturn="yes"]) #overlayButtons .abilityButton {
+  display: none;
 }
-#board [data-uistate='selected'] .unit .unit-ability {
+
+#overlayButtons {
+  grid-area: details;
+  position: relative;
+  top: -0.3em;
+  left: -1em;
+}
+
+#overlayButtons button {
+  width: 2.5em;
   height: 2.5em;
-  cursor: pointer;
-  padding-right: 2em;
+  background-color: var(--white-transparent-med);
+}
+.north #overlayButtons button {
+  border-color: var(--south-main);
+}
+.south #overlayButtons button {
+  border-color: var(--north-main);
+}
+
+.abilityButton {
+  background: center / contain no-repeat url('img/ability_t.png');
 }
 
 [data-uistate='moveoption']::before {
@@ -924,11 +925,6 @@ body {
   display: grid;
   place-content: center;
   margin: 0.2em 0.5em;
-}
-
-#table[data-yourturn=yes] .unit.info .unit-ability {
-  background-image: url('img/shimmer.png');
-  animation: shimmer 7s linear infinite;
 }
 
 #table[data-position=north] #player .playerdetails,

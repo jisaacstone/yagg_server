@@ -22,9 +22,9 @@ defmodule Unit.Trigger.AfterMove do
       Unit.Ability.__using__(unquote(opts))
       @behaviour Unit.Trigger.AfterMove
       def resolve(board, opts) do
-        {from, opts} = Keyword.pop!(opts, :from)
-        {to, opts} = Keyword.pop!(opts, :to)
-        {unit, opts} = Keyword.pop!(opts, :unit)
+        {from, opts} = Keyword.pop(opts, :from)
+        {to, opts} = Keyword.pop(opts, :to)
+        {unit, opts} = Keyword.pop(opts, :unit)
         data = %AfterMove{from: from, to: to, unit: unit}
         after_move(board, data) |> Unit.Trigger.maybe_reveal(
           reveal?(), to, unit, :move

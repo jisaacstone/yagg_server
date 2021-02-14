@@ -10,6 +10,10 @@ export function createDialog(cls: string, ...children: HTMLElement[]): HTMLEleme
   });
 }
 
+export function displayError(message: string): void {
+  displayMessage(message, 'error');
+}
+
 export function displayMessage(message: string, cls='info') {
   const messageEl = createDialog(cls, Element.create({ innerHTML: message }));
   Overlay.dismissable(messageEl);

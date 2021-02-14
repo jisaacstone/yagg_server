@@ -23,10 +23,10 @@ defmodule Unit.Trigger.BeforeAttack do
       Unit.Ability.__using__(unquote(opts))
       @behaviour Unit.Trigger.BeforeAttack
       def resolve(board, opts) do
-        {from, opts} = Keyword.pop!(opts, :from)
-        {to, opts} = Keyword.pop!(opts, :to)
-        {unit, opts} = Keyword.pop!(opts, :unit)
-        {opponent, opts} = Keyword.pop!(opts, :opponent)
+        {from, opts} = Keyword.pop(opts, :from)
+        {to, opts} = Keyword.pop(opts, :to)
+        {unit, opts} = Keyword.pop(opts, :unit)
+        {opponent, opts} = Keyword.pop(opts, :opponent)
         data = %BeforeAttack{from: from, to: to, unit: unit, opponent: opponent}
         before_attack(board, data) |> Unit.Trigger.maybe_reveal(
           reveal?(), from, unit, :attack

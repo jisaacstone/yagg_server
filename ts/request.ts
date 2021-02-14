@@ -1,6 +1,7 @@
 import { hostname, getname, tableid } from './urlvars.js';
 import * as Player from './player.js';
 import * as Infobox from './infobox.js';
+import * as Dialog from './dialog.js';
 
 const dn = {name: null};
 
@@ -16,6 +17,31 @@ function add_auth(request, method, url) {
   // still no auth, get player name from query params
   const name = getname() || _name_();
   return request;
+}
+
+export function action(actType, args, cb=null) {
+  gameaction(actType, args, 'board')
+    .then(() => {
+      if (cb) {
+        cb();
+      }
+    })
+    .catch(({ request }) => {
+      if (request.status === 400) {
+        if (request.responseText.includes('occupied')) {
+          Dialog.displayError('space is already occupied');
+        } else if (request.responseText.includes('noselfattack')) {
+          Dialog.displayError('you cannot attack your own units');
+        } else if (request.responseText.includes('illegal')) {
+          Dialog.displayError('illegal move');
+        } else if (request.responseText.includes('empty')) {
+          //UI is messed up most likely
+          Dialog.alert('oops, something went wrong').then(() => {
+            window.location = window.location;
+          });
+        }
+      }
+    });
 }
 
 export function gameaction(action, data, scope = 'table', id = null, retries = 1) {

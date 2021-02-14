@@ -1,4 +1,4 @@
-import { gameaction } from './request.js';
+import { gameaction, action } from './request.js';
 import * as Constants from './constants.js';
 import { gmeta, isYourTurn } from './state.js';
 import { displayerror } from './err.js';
@@ -140,21 +140,21 @@ function owned({ player }) {
   return player === gmeta.position;
 }
 
-function abilityIcon(el: HTMLElement, ability: Ability, unit?: Unit): void {
+export function clearButtonOverlay() {
+  const overlay = document.getElementById('overlayButtons');
+  if ( overlay ) {
+    overlay.remove();
+  }
+}
+
+function abilityIcon(el: HTMLElement, ability: Ability): void {
   const abil = Element.create({
     className: 'unit-ability',
     innerHTML: ability.name,
-    tag: 'button',
-    title: 'ability',
   });
 
   Tooltip.addTooltip(abil, ability.description);
   el.appendChild(abil);
-
-  if (unit) {
-    console.log({binding: abil});
-    bindAbility(abil, null, unit);
-  }
 }
 
 function convertAttr(att, value) {
@@ -171,11 +171,50 @@ function renderAttrs(unit: Unit, el: HTMLElement) {
         className: `unit-${att}`,
         innerHTML: convertAttr(att, unit[att])
       }));
-    } 
+    }
   }
   if (unit.name === 'monarch') {
     el.className = `monarch ${el.className}`;
   }
+}
+
+function overlayInfo(unit: Unit, el: HTMLElement) {
+  const qbutton = Element.create({
+      tag: 'button',
+      className: 'detailsButton uibutton',
+      title: 'details',
+    }),
+    allButtons = [qbutton];
+  qbutton.addEventListener('click', detailViewFn(unit, el.className));
+  if (owned(unit)) {
+    if (unit.ability) {
+      const abutton = Element.create({
+        tag: 'button',
+        className: 'abilityButton uibutton',
+        title: 'use ability',
+      });
+      bindAbility(abutton, el.parentNode as HTMLElement, unit, Select.deselect);
+      allButtons.push(abutton);
+    }
+    if (gmeta.boardstate === 'placement') {
+      const rbutton = Element.create({
+        tag: 'button',
+        className: 'returnButton uibutton',
+        title: 'return to hand',
+      });
+      rbutton.onclick = () => {
+        SFX.play('click');
+        action(
+          'return',
+          {index: +el.dataset.index},
+          Select.deselect,
+        )
+      }
+      allButtons.push(rbutton);
+    }
+  }
+
+  el.appendChild(Element.create({ id: 'overlayButtons', children: allButtons }));
 }
 
 function renderTile(unit: Unit, el: HTMLElement) {
@@ -193,7 +232,7 @@ function renderTile(unit: Unit, el: HTMLElement) {
     el.appendChild(qbutton);
   }
   if (unit.ability) {
-    abilityIcon(el, unit.ability, unit);
+    abilityIcon(el, unit.ability);
   }
   // @ts-ignore
   if (el.sidebar) { // @ts-ignore
@@ -211,6 +250,9 @@ function renderTile(unit: Unit, el: HTMLElement) {
         className: 'no-info',
         innerHTML: 'no information'
       }));
+    }
+    if ((el.parentNode as HTMLElement).className.includes('boardsquare')) {
+      overlayInfo(unit, el);
     }
   }; // @ts-ignore
   el.addEventListener('sidebar', el.sidebar, false);
@@ -331,7 +373,7 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
       desc = fakeDescriptions[seed % fakeDescriptions.length];
     descriptions.push(Element.create({ className: 'bio', innerHTML: desc }));
   }
-  
+
   return Element.create({
     className: 'descriptions',
     children: descriptions
@@ -346,7 +388,7 @@ export function detailViewFn(unit: Unit, className: string, square: HTMLElement 
       className: `${className} details`,
       children: [descriptions, portrait]
     });
-  
+
   renderAttrs(unit, details);
   portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
 

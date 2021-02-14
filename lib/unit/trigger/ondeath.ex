@@ -22,8 +22,8 @@ defmodule Unit.Trigger.OnDeath do
       Unit.Ability.__using__(unquote(opts))
       @behaviour Unit.Trigger.OnDeath
       def resolve(board, opts) do
-        {coord, opts} = Keyword.pop!(opts, :coords)
-        {unit, opts} = Keyword.pop!(opts, :unit)
+        {coord, opts} = Keyword.pop(opts, :coords)
+        {unit, opts} = Keyword.pop(opts, :unit)
         {opponent, opts} = Keyword.pop(opts, :opponent)
         data = %OnDeath{coord: coord, unit: unit, opponent: opponent}
         on_death(board, data) |> Unit.Trigger.maybe_reveal(

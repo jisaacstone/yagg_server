@@ -1,4 +1,4 @@
-import { gameaction } from './request.js';
+import { gameaction, action } from './request.js';
 import { gmeta } from './state.js';
 import { displayerror } from './err.js';
 import * as Ready from './ready.js';
@@ -16,31 +16,6 @@ export function selected(): boolean {
   if (global.selected === null) { return false }
   if (Object.keys(global.selected).length === 0) { return false }
   return true;
-}
-
-function action(actType, args, cb=null) {
-  gameaction(actType, args, 'board')
-    .then(() => {
-      if (cb) {
-        cb();
-      }
-    })
-    .catch(({ request }) => {
-      if (request.status === 400) {
-        if (request.responseText.includes('occupied')) {
-          displayerror('space is already occupied');
-        } else if (request.responseText.includes('noselfattack')) {
-          displayerror('you cannot attack your own units');
-        } else if (request.responseText.includes('illegal')) {
-          displayerror('illegal move');
-        } else if (request.responseText.includes('empty')) {
-          //UI is messed up most likely
-          Dialog.alert('oops, something went wrong').then(() => {
-            window.location = window.location;
-          });
-        }
-      }
-    });
 }
 
 function ismoveoption(el: HTMLElement) {
@@ -69,6 +44,7 @@ export function deselect() {
   }
   global.selected = {};
   Infobox.clear();
+  Unit.clearButtonOverlay();
   if (rb) {
     rb.remove();
   }
@@ -181,6 +157,7 @@ function handleSelect(el: HTMLElement, meta) {
       displayReturnButton(el, meta);
     }
   } else {
+    // on board
     if (! Unit.containsOwnedUnit(el)) {
       // Square with no owned unit
       return;

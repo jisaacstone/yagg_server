@@ -1,4 +1,4 @@
-import { gameaction } from './request.js';
+import { gameaction, action } from './request.js';
 import { gmeta, isYourTurn } from './state.js';
 import { displayerror } from './err.js';
 import { dismissable, clear } from './overlay.js';
@@ -48,7 +48,7 @@ export function hilight(coord, className) {
             delete el.dataset.hilighted;
             el.classList.remove('hilight');
             resolve(true);
-        }, 500);
+        }, 600);
     });
 }
 function bindAbility(abilityButton, square, unit, cb = null) {
@@ -99,19 +99,19 @@ function abilityButton(unit, el, unitSquare = null) {
 function owned({ player }) {
     return player === gmeta.position;
 }
-function abilityIcon(el, ability, unit) {
+export function clearButtonOverlay() {
+    const overlay = document.getElementById('overlayButtons');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+function abilityIcon(el, ability) {
     const abil = Element.create({
         className: 'unit-ability',
         innerHTML: ability.name,
-        tag: 'button',
-        title: 'ability',
     });
     Tooltip.addTooltip(abil, ability.description);
     el.appendChild(abil);
-    if (unit) {
-        console.log({ binding: abil });
-        bindAbility(abil, null, unit);
-    }
 }
 function convertAttr(att, value) {
     if (att === 'attack' && value === 'immobile') {
@@ -132,6 +132,38 @@ function renderAttrs(unit, el) {
         el.className = `monarch ${el.className}`;
     }
 }
+function overlayInfo(unit, el) {
+    const qbutton = Element.create({
+        tag: 'button',
+        className: 'detailsButton uibutton',
+        title: 'details',
+    }), allButtons = [qbutton];
+    qbutton.addEventListener('click', detailViewFn(unit, el.className));
+    if (owned(unit)) {
+        if (unit.ability) {
+            const abutton = Element.create({
+                tag: 'button',
+                className: 'abilityButton uibutton',
+                title: 'use ability',
+            });
+            bindAbility(abutton, el.parentNode, unit, Select.deselect);
+            allButtons.push(abutton);
+        }
+        if (gmeta.boardstate === 'placement') {
+            const rbutton = Element.create({
+                tag: 'button',
+                className: 'returnButton uibutton',
+                title: 'return to hand',
+            });
+            rbutton.onclick = () => {
+                SFX.play('click');
+                action('return', { index: +el.dataset.index }, Select.deselect);
+            };
+            allButtons.push(rbutton);
+        }
+    }
+    el.appendChild(Element.create({ id: 'overlayButtons', children: allButtons }));
+}
 function renderTile(unit, el) {
     // if we have no name we have nothing else
     if (unit.name) {
@@ -147,7 +179,7 @@ function renderTile(unit, el) {
         el.appendChild(qbutton);
     }
     if (unit.ability) {
-        abilityIcon(el, unit.ability, unit);
+        abilityIcon(el, unit.ability);
     }
     // @ts-ignore
     if (el.sidebar) { // @ts-ignore
@@ -164,6 +196,9 @@ function renderTile(unit, el) {
                 className: 'no-info',
                 innerHTML: 'no information'
             }));
+        }
+        if (el.parentNode.className.includes('boardsquare')) {
+            overlayInfo(unit, el);
         }
     }; // @ts-ignore
     el.addEventListener('sidebar', el.sidebar, false);
