@@ -7,9 +7,9 @@ const state = {
     mute: false,
 };
 const mapping = {
-    menu: 'music/the_biggest_pile_of_leaves.mp3',
-    waiting: 'music/trying_to_work.mp3',
-    jobfair: 'music/race_against_the_sunset.mp3',
+    menu: 'music/trying_to_work.mp3',
+    jobfair: 'music/the_biggest_pile_of_leaves.mp3',
+    waiting: 'music/race_against_the_sunset.mp3',
     placement: 'music/checking_things_off.mp3',
     battle: 'music/tool_belts_are_the_cool_belts.mp3',
     gameover: 'music/two_turntables_and_a_casiotone.mp3'

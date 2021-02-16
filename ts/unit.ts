@@ -181,7 +181,7 @@ function renderAttrs(unit: Unit, el: HTMLElement) {
 function overlayInfo(unit: Unit, el: HTMLElement) {
   const qbutton = Element.create({
       tag: 'button',
-      className: 'detailsButton uibutton',
+      className: 'details-button uibutton',
       title: 'details',
     }),
     allButtons = [qbutton];
@@ -190,7 +190,7 @@ function overlayInfo(unit: Unit, el: HTMLElement) {
     if (unit.ability) {
       const abutton = Element.create({
         tag: 'button',
-        className: 'abilityButton uibutton',
+        className: 'ability-button uibutton',
         title: 'use ability',
       });
       bindAbility(abutton, el.parentNode as HTMLElement, unit, Select.deselect);
@@ -199,7 +199,7 @@ function overlayInfo(unit: Unit, el: HTMLElement) {
     if (gmeta.boardstate === 'placement') {
       const rbutton = Element.create({
         tag: 'button',
-        className: 'returnButton uibutton',
+        className: 'return-button uibutton',
         title: 'return to hand',
       });
       rbutton.onclick = () => {
@@ -225,7 +225,7 @@ function renderTile(unit: Unit, el: HTMLElement) {
     el.style.backgroundImage = `url("img/${unit.name}.png")`;
     const qbutton = Element.create({
         tag: 'button',
-        className: 'detailsButton',
+        className: 'details-button',
         title: 'details',
       });
     qbutton.addEventListener('click', detailViewFn(unit, el.className));
@@ -285,7 +285,7 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
   if (unit.name) {
     const qbutton = Element.create({
         tag: 'button',
-        className: 'detailsButton uibutton',
+        className: 'details-button uibutton',
         title: 'details',
       });
     el.appendChild(qbutton);

@@ -275,8 +275,8 @@ body {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  grid-template-rows: 15% 70% 15%;
-  grid-template-columns: 15% 65% 20%;
+  grid-template-rows: 18% 64% 18%;
+  grid-template-columns: 18% 62% 20%;
   grid-template-areas:
     "defense name attack"
     "info center details"
@@ -347,6 +347,7 @@ body {
   text-shadow: 1px 1px 1px var(--ui-main-desaturated), 0 0 1px var(--white-transparent-low);
   border-color: rgba(199, 45, 46, 0.4);
   grid-area: attack;
+  background: center / contain no-repeat url('img/unit-attack.png');
 }
 
 .unit-defense {
@@ -354,7 +355,9 @@ body {
   text-shadow: 1px 1px 1px var(--ui-alt-desaturated), 0 0 1px var(--white-transparent-low);
   border-color: rgba(82, 189, 6, 0.4);
   grid-area: defense;
+  background: center / contain no-repeat url('img/unit-defense.png');
 }
+
 .unit-attack, .unit-defense {
   font-weight: bold;
   margin: 0.1em;
@@ -364,6 +367,8 @@ body {
   height: 85%;
   place-self: center;
   text-align: center;
+  place-content: center;
+  display: grid;
 }
 
 /* attack/defense tooltips */
@@ -519,7 +524,7 @@ body {
   filter: drop-shadow(0, 0, 0.3em var(--grey-transparent-med));
 }
 
-.detailsButton {
+.details-button {
   grid-area: details;
   margin: 0;
   height: 20%;
@@ -529,16 +534,16 @@ body {
   box-shadow: none;
 }
 
-#board .detailsButton {
+#board .details-button {
   visibility: hidden;
 }
 
-.candidate .unit button.detailsButton {
+.candidate .unit button.details-button {
   display: grid;
   border: 1px outset var(--ui-main-saturated);
   border-radius: 0.3em;
 }
-#infobox .unit button.detailsButton {
+#infobox .unit button.details-button {
   display: grid;
   border: 1px outset inherit;
   border-radius: 0.3em;
@@ -743,24 +748,28 @@ body {
 #board [data-uistate='selected'] .unit {
   border-width: 0.4em;
 }
-#board [data-uistate='selected'] #overlayButtons .detailsButton {
+#board [data-uistate='selected'] #overlayButtons .details-button {
   visibility: visible;
 }
-#table:not([data-yourturn="yes"]) #overlayButtons .abilityButton {
+#table:not([data-yourturn="yes"]) #overlayButtons .ability-button {
   display: none;
 }
 
 #overlayButtons {
   grid-area: details;
   position: relative;
-  top: -0.3em;
-  left: -1em;
+  top: -0.8em;
+  left: -1.8em;
 }
 
 #overlayButtons button {
-  width: 2.5em;
-  height: 2.5em;
-  background-color: var(--white-transparent-med);
+  width: 3em;
+  height: 3em;
+  background-color: var(--grey-transparent-med);
+  box-shadow: none;
+}
+#overlayButtons button:hover {
+  background-color: #20b064;
 }
 .north #overlayButtons button {
   border-color: var(--south-main);
@@ -769,7 +778,11 @@ body {
   border-color: var(--north-main);
 }
 
-.abilityButton {
+.return-button {
+  background: center / contain no-repeat url('img/return_to_hand.png');
+}
+
+.ability-button {
   background: center / contain no-repeat url('img/ability_t.png');
 }
 

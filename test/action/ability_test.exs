@@ -334,4 +334,49 @@ defmodule YaggTest.Action.Ability do
     assert %{name: :tactician} = newboard.grid[{1, 3}]
     assert %{name: :spikeder} = newboard.grid[{1, 4}]
   end
+
+  test "scare" do
+    board = set_board([
+      {{0, 1}, Unit.Maycorn.new(:north)},
+      {{1, 1}, Unit.JackoScare.new(:north)},
+      {{1, 2}, Unit.Sparky.new(:south)},
+      {{2, 1}, Unit.Tactician.new(:south)}
+    ])
+    action = %Board.Action.Ability{x: 1, y: 1}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :north)
+    assert %{ability: :nil} = newboard.grid[{1, 1}]
+    assert %{ability: :nil, attack: 1, defense: 0} = newboard.grid[{1, 2}]
+    assert :nil == Map.get(newboard.grid[{2, 1}].triggers, :move)
+    assert %{ability: Unit.Maycorn.Spark.Spark} = newboard.grid[{0, 1}]
+  end
+
+  test "strike" do
+    board = set_board([
+      {{0, 0}, Unit.Telnake.new(:south)},
+      {{0, 1}, Unit.Tinker.new(:north)},
+      {{0, 2}, Unit.Sparky.new(:north)}
+    ])
+    action = %Board.Action.Ability{x: 0, y: 0}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
+    assert :nil == newboard.grid[{0, 0}]
+    assert :nil == newboard.grid[{0, 1}]
+    assert %{name: :telnake} = newboard.grid[{0, 2}]
+  end
+
+  test "rampage" do
+    board = set_board([
+      {{1, 0}, Unit.Glosto.new(:south)},
+      {{1, 1}, :block},
+      {{0, 1}, Unit.new(defense: 4, position: :north, name: :one)},
+      {{2, 1}, Unit.new(defense: 4, position: :south, name: :two)},
+      {{0, 0}, Unit.new(defense: 4, position: :north, name: :three)}
+    ])
+    action = %Board.Action.Ability{x: 1, y: 0}
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
+    assert :nil == newboard.grid[{0, 0}]
+    assert :nil == newboard.grid[{0, 1}]
+    assert %{name: :glosto} = newboard.grid[{1, 0}]
+    assert :block = newboard.grid[{1, 2}]
+    assert %{name: :two} = newboard.grid[{2, 1}]
+  end
 end

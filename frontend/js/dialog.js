@@ -17,7 +17,7 @@ export function displayMessage(message, cls = 'info') {
 }
 export function alert(message, confirm = 'ok') {
     const okEl = Element.create({
-        className: 'uibutton',
+        className: 'ok-b uibutton',
         innerHTML: confirm
     }), alertEl = createDialog('alert', Element.create({ innerHTML: message }), okEl), clearOverlay = Overlay.clearable(alertEl);
     return new Promise((resolve) => {
@@ -29,7 +29,7 @@ export function alert(message, confirm = 'ok') {
 }
 export function prompt(message, defaultv = '', confirm = 'ok') {
     const okEl = Element.create({
-        className: 'uibutton',
+        className: 'ok-b uibutton',
         innerHTML: confirm
     }), inputEl = Element.create({
         tag: 'input'
@@ -51,10 +51,10 @@ export function prompt(message, defaultv = '', confirm = 'ok') {
 }
 export function confirm(message, confirm = 'ok', cancel = 'cancel') {
     const okEl = Element.create({
-        className: 'uibutton',
+        className: 'ok-b uibutton',
         innerHTML: confirm
     }), cancelEl = Element.create({
-        className: 'uibutton',
+        className: 'cancel-b uibutton',
         innerHTML: cancel
     }), promptEl = createDialog('confirm', Element.create({ innerHTML: message }), okEl, cancelEl), clearOverlay = Overlay.clearable(promptEl);
     return new Promise((resolve) => {
@@ -73,7 +73,7 @@ export function choices(message, choices) {
     for (let [choice, effect] of Object.entries(choices)) {
         const choiceEl = Element.create({
             tag: 'button',
-            className: 'uibutton',
+            className: `${choice}-b uibutton`,
             innerHTML: choice,
         });
         choiceEls.push({ el: choiceEl, effect });

@@ -21,7 +21,7 @@ export function displayMessage(message: string, cls='info') {
 
 export function alert(message: string, confirm='ok'): Promise<boolean> {
   const okEl = Element.create({
-      className: 'uibutton',
+      className: 'ok-b uibutton',
       innerHTML: confirm
     }), 
     alertEl = createDialog(
@@ -40,7 +40,7 @@ export function alert(message: string, confirm='ok'): Promise<boolean> {
 
 export function prompt(message: string, defaultv='', confirm='ok'): Promise<string> {
   const okEl = Element.create({
-      className: 'uibutton',
+      className: 'ok-b uibutton',
       innerHTML: confirm
     }), 
     inputEl = Element.create({
@@ -70,11 +70,11 @@ export function prompt(message: string, defaultv='', confirm='ok'): Promise<stri
 
 export function confirm(message: string, confirm='ok', cancel='cancel'): Promise<boolean> {
   const okEl = Element.create({
-      className: 'uibutton',
+      className: 'ok-b uibutton',
       innerHTML: confirm
     }), 
     cancelEl = Element.create({
-      className: 'uibutton',
+      className: 'cancel-b uibutton',
       innerHTML: cancel
     }), 
     promptEl = createDialog(
@@ -102,7 +102,7 @@ export function choices(message: string, choices: {[key: string]: () => any}) {
   for (let [choice, effect] of Object.entries(choices)) {
     const choiceEl = Element.create({
       tag: 'button',
-      className: 'uibutton',
+      className: `${choice}-b uibutton`,
       innerHTML: choice,
     });
     choiceEls.push({ el: choiceEl, effect });

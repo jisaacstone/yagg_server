@@ -182,20 +182,26 @@ defmodule Yagg.Board do
     end
   end
 
-  @spec do_battle(t, Unit.t, Unit.t, Grid.coord, Grid.coord) :: resolved
-  def do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _) do
+  def do_battle(b, u, o, f, t), do: do_battle(b, u, o, f, t, [])
+
+  @spec do_battle(t, Unit.t, Unit.t, Grid.coord, Grid.coord, Keyword.t) :: resolved
+  def do_battle(_, %Unit{position: pos}, %Unit{position: pos}, _, _, _) do
     {:err, :noselfattack}
   end
-  def do_battle(board, unit, opponent, from, to) do
+  def do_battle(board, unit, opponent, from, to, opts) do
     # if attack and defense are ever equal this will crash with :nomatch
     battle_event = Event.Battle.new(from: from, to: to)
     cond do
       unit.attack > opponent.defense ->
         {board, e0} = Unit.Ability.reveal(to, board, unit.position)
         {board, e1} = unit_death(board, to, opponent: {unit, from})
-        case do_move(board, from, to, action: :battle) do
-          {:err, _} = err -> err
-          {board, e2} -> {board, e0 ++ [battle_event | e1] ++ e2}
+        unless opts[:no_move] do
+          case do_move(board, from, to, action: :battle) do
+            {:err, _} = err -> err
+            {board, e2} -> {board, e0 ++ [battle_event | e1] ++ e2}
+          end
+        else
+          {board, e0 ++ [battle_event | e1]}
         end
       unit.attack < opponent.defense ->
         {board, events} = unit_death(board, from, opponent: {opponent, to}, attacking: :true)
