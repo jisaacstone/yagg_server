@@ -81,4 +81,14 @@ defmodule YaggTest.Action.Move do
     assert newboard.grid[{2, 2}] == unit
     assert newboard.grid[{2, 1}] == :block
   end
+
+  test "block on edge" do
+    board = set_board([
+      {{1, 1}, Unit.Howloo.new(:north)},
+      {{1, 0}, :block},
+    ])
+    action = %Board.Action.Move{from_x: 1, from_y: 1, to_x: 1, to_y: 0}
+    assert {:err, _reason} = Board.Action.resolve(action, board, :north)
+  end
+
 end

@@ -381,14 +381,6 @@ body {
 
 .unit-attack::after, .unit-defense::after {
   visibility: hidden;
-  color: var(--ui-main-dark-dark);
-  font-weight: normal;
-  padding: 3px;
-  font-size: 12px;
-  background-color: var(--ui-main-light);
-  border: 0.1em solid rgba(89, 78, 86, 0.9);
-  text-shadow: rgba(220, 218, 219, 0.2) -0.1em -0.1em 0;
-  -webkit-text-stroke: transparent;
 }
 .unit-attack:hover::after, .unit-defense:hover::after {
   position: absolute;
@@ -487,17 +479,29 @@ body {
   left: 0.2em;
 }
 
+#board .unit-ability .tttext {
+  left: -8em;
+}
+
+#hand .unit-ability .tttext:after {
+  left: auto;
+  right: 3em;
+}
+
 .unit-ability .tttext:after {
   left: 8em;
 }
 
+.unit-attack::after,
+.unit-defense::after,
 .tttext {
   position: relative;
+  font-size: min(1.8vh, 1.8vw);
+  font-weight: normal;
   margin-left: 0.4em;
   max-width: 20em;
   padding: 0.3em;
   border-radius: 0.6em;
-  font-size: 80%;
   color: var(--ui-main-dark-dark);
   background-color: var(--ui-main-light);
   border: 2px solid var(--ui-main-dark);
@@ -610,14 +614,16 @@ body {
   text-transform: capitalize;
 }
 .unit.details .unit-ability {
-  max-width: 100%;
-  padding: min(1vw, 1vh);
-  background: none;
-  box-shadow: none;
+  padding: 0 1em;
+  height: inherit;
+  background-size: 2em;
+  background-position: top right;
+  text-align: center;
 }
 
 .descriptions {
   grid-area: ability;
+  display: grid;
 }
 
 .bio {
@@ -648,7 +654,7 @@ body {
 }
 
 .unit.details .unit-attack::after,
-.unit.details .unit-defense::after {
+.unit.details .unit-defense:after {
   font-variant-caps: all-small-caps;
   position: relative;
   display: block;
@@ -911,8 +917,6 @@ body {
 }
 
 #readybutton {
-  background-image: url('img/shimmer.png');
-  animation: shimmer 8s linear infinite;
   grid-row: 2;
 }
 

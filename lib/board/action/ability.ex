@@ -23,16 +23,20 @@ defmodule Action.Ability do
           board
         end
         {board, events} = unit.ability.resolve(board, unit: unit, coords: coord)
-        event = Event.ShowAbility.new(
-          x: data.x,
-          y: data.y,
-          type: :ability,
-          reveal: %{
-            name: Unit.encode_field(unit, :name),
-            ability: Unit.encode_field(unit, :ability)
-          }
-        )
-        {board, [event | events]}
+        events = if unit.ability.reveal?() do
+          [Event.ShowAbility.new(
+            x: data.x,
+            y: data.y,
+            type: :ability,
+            reveal: %{
+              name: Unit.encode_field(unit, :name),
+              ability: Unit.encode_field(unit, :ability)
+            }
+          ) | events]
+        else
+          events
+        end
+        {board, events}
     end
   end
 

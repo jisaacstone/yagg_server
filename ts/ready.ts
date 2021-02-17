@@ -7,7 +7,7 @@ import * as Soundtrack from './soundtrack.js';
 export function display(label = 'ready', onclick = null) {
   const readyButton = document.createElement('button');
   readyButton.id = 'readybutton';
-  readyButton.className = 'uibutton';
+  readyButton.className = `uibutton ${label}-b`;
 
   readyButton.innerHTML = label;
   if (!onclick) {

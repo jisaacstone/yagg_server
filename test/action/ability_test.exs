@@ -241,7 +241,8 @@ defmodule YaggTest.Action.Ability do
       {{4, 2}, Unit.Electromouse.new(:south)}
     ])
     action = %Board.Action.Ability{x: 4, y: 2}
-    assert {%Board{} = board, _events} = Board.Action.resolve(action, board, :south)
+    assert {%Board{} = board, events} = Board.Action.resolve(action, board, :south)
+    assert not Enum.any?(events, fn(e) -> e && e.kind == :show_ability end)
     assert %{name: :"electromouse trap", triggers: %{move: Unit.Electromouse.Settrap}} = board.grid[{4, 2}]
     action = %Board.Action.Move{from_x: 4, from_y: 2, to_x: 4, to_y: 3}
     assert {%Board{} = board, events} = Board.Action.resolve(action, board, :south)

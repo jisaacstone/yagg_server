@@ -106,9 +106,12 @@ defmodule Yagg.Board do
             :out_of_bounds -> {:err, :out_of_bounds}
             :water -> {:err, :illegal}
             :block -> 
-              {board, e1} = push_block(board, from, to)
-              {board, e2} = do_move(board, from, to)
-              {board, e1 ++ e2}
+              case push_block(board, from, to) do
+                {:err, reason} -> {:err, reason}
+                {board, e1} ->
+                  {board, e2} = do_move(board, from, to)
+                  {board, e1 ++ e2}
+              end
             :nil -> 
               do_move(board, from, to)
             %Unit{} = opponent -> 

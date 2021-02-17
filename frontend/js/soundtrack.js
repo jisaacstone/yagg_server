@@ -52,10 +52,12 @@ export function setMute(muted) {
 }
 export function setVolume(volume) {
     audio.volume = volume;
+    state.volume = volume;
     Storage.setItem('music', 'volume', volume);
 }
 export function loadSettings() {
     const sv = Storage.getItem('music', 'volume'), sm = Storage.getItem('music', 'mute');
+    console.log({ sv, sm });
     if (sv) {
         setVolume(+sv);
     }

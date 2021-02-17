@@ -36,7 +36,7 @@ defmodule Unit.Trigger do
     case module(unit, :death).resolve(board, [{:coords, {x, y}}, {:unit, unit} | opts]) do
       {board, []} -> {board, [death_event]}
       # reveal event should be sent before death event so ui can hilight the trigger
-      {board, [reveal_event | events]} -> {board, IO.inspect([reveal_event, death_event | events])}
+      {board, [reveal_event | events]} -> {board, [reveal_event, death_event | events]}
     end
   end
 
