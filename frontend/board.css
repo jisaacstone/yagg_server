@@ -542,10 +542,16 @@ body {
   visibility: hidden;
 }
 
-.candidate .unit button.details-button {
+.unit .details-button {
   display: grid;
   border: 1px outset var(--ui-main-saturated);
   border-radius: 0.3em;
+}
+.card .north .details-button {
+  border-color: var(--south-main);
+}
+.card .south .details-button {
+  border-color: var(--north-main);
 }
 #infobox .unit button.details-button {
   display: grid;
@@ -607,8 +613,8 @@ body {
   text-align: center;
   align-self: center;
   width: 100%;
-  font-weight: bold;
-  font-size: min(6vw, 6vh);
+  font-size: 360%;
+  font-family: 'summershand';
 }
 .unit-details .unit-name:first-letter {
   text-transform: capitalize;
@@ -649,8 +655,8 @@ body {
 
 .unit.details .unit-attack,
 .unit.details .unit-defense {
-  font-size: max(5vw, 5vh);
-  -webkit-text-stroke: 1px var(--black-transparent-med);
+  font-size: 280%;
+  display: block;
 }
 
 .unit.details .unit-attack::after,
@@ -736,7 +742,8 @@ body {
 
 .feature .text {
   color: var(--ui-main-dark-dark);
-  font-size: 130%;
+  font-size: 180%;
+  font-family: 'summershand';
   width: 100%;
   place-self: end;
   padding: 0.3em;
@@ -833,10 +840,12 @@ body {
   color: var(--ui-alt-dark-dark);
   grid-area: timer;
   text-shadow: 1px 1px 1px var(--white-transparent-med);
+  font-family: 'summershand';
+  font-size: 150%;
 }
 
 #timer.timer {
-  font-size: 123%;
+  font-size: 183%;
   align-self: center;
 }
 
@@ -851,7 +860,6 @@ body {
 }
 
 .playerdetails .timer {
-  font-size: 90%;
   align-content: start;
 }
 
@@ -893,7 +901,6 @@ body {
 .playername {
   width: 100%;
   grid-area: name;
-  font-size: 90%;
   align-content: end;
 }
 

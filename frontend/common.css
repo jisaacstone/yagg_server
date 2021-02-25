@@ -1,3 +1,7 @@
+@font-face {
+  font-family: 'summershand';
+  src: url('SummersHand.woff');
+}
 
 body {
   justify-content: center;
@@ -126,7 +130,8 @@ body {
 }
 
 .playername {
-  font-weight: bold;
+  font-family: 'summershand';
+  font-size: 250%;
   color: var(--ui-main-dark-dark);
   text-shadow: 1px 1px 2px var(--white-transparent-med);
   border-radius: 0.5em;
