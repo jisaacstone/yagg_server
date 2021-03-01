@@ -1,18 +1,20 @@
 import * as Storage from './storage.js';
 const audio = new Audio();
 audio.loop = true;
+const ext = audio.canPlayType('audio/ogg') ? 'ogg' : 'mp3';
+const mime = `audio/${ext}`;
 const state = {
     playing: false,
     volume: 0.5,
     mute: false,
 };
 const mapping = {
-    menu: 'music/trying_to_work.mp3',
-    jobfair: 'music/the_biggest_pile_of_leaves.mp3',
-    waiting: 'music/race_against_the_sunset.mp3',
-    placement: 'music/checking_things_off.mp3',
-    battle: 'music/tool_belts_are_the_cool_belts.mp3',
-    gameover: 'music/two_turntables_and_a_casiotone.mp3'
+    menu: `music/barcelona-loop.${ext}`,
+    jobfair: `music/pile-of-leaves.${ext}`,
+    waiting: `music/barcelona-beat-synth.${ext}`,
+    placement: `music/turntables.${ext}`,
+    battle: `music/toolbelts.${ext}`,
+    gameover: `music/cuddlefish.${ext}`
 };
 export function play() {
     if (state.playing) {
@@ -71,7 +73,11 @@ export function setSoundtrack(track) {
     }
     state.track = track;
     fadeTo(0).then(() => {
-        audio.src = mapping[track];
+        audio.innerHTML = '';
+        const source = document.createElement('source');
+        source.setAttribute('src', mapping[track]);
+        source.setAttribute('type', mime);
+        audio.appendChild(source);
         audio.load();
         audio.play();
     }).then(() => {

@@ -24,7 +24,8 @@ defmodule Yagg.AI.Choices do
     %{place: pc, move: mc, ability: ac}
   end
 
-  defp owned_units(grid, position) do
+  @spec owned_units(Grid.t, Player.position) :: [{Grid.coord, Unit.t}]
+  def owned_units(grid, position) do
     Enum.filter(
       grid,
       fn

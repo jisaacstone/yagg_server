@@ -418,6 +418,7 @@ body {
 
 .unowned .unit-ability,
 .candidate .unit-ability,
+.info .unit-ability,
 .card .unit-ability {
   overflow: visible;
   font-size: 80%;
@@ -630,6 +631,8 @@ body {
 .descriptions {
   grid-area: ability;
   display: grid;
+  justify-self: center;
+  align-self: start;
 }
 
 .bio {
@@ -709,7 +712,6 @@ body {
 .unit.details .triggers:first-child::before {
   content: 'Triggers:';
   position: relative;
-  width: 80%;
 }
 
 .unit.invisible {
@@ -834,18 +836,16 @@ body {
 
 .timer {
   display: grid;
-  place-content: start;
-  padding-top: 0.1em;
-  padding-left: 0.5em;
+  place-content: center;
   color: var(--ui-alt-dark-dark);
   grid-area: timer;
   text-shadow: 1px 1px 1px var(--white-transparent-med);
   font-family: 'summershand';
-  font-size: 150%;
+  font-size: 180%;
 }
 
 #timer.timer {
-  font-size: 183%;
+  font-size: 283%;
   align-self: center;
 }
 

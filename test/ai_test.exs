@@ -1,5 +1,6 @@
 alias Yagg.Unit
 alias Yagg.Board
+alias Yagg.AI.Attack
 alias Yagg.AI.Choices
 alias Yagg.Board.Action
 require Helper.Board
@@ -29,6 +30,17 @@ defmodule YaggTest.AI do
 
     actions = possible_actions(board, :north)
     assert Enum.count(actions) == 4
+  end
+
+  test "action move" do
+    board =
+      HB.new_board() |>
+      Map.put(:state, :battle) |>
+      Board.place!(Unit.new(:north, :test, 3, 3), {2, 4}) |>
+      Board.place!(Unit.new(:south, :test, 3, 3), {1, 1})
+
+    action = Attack.turn(board, :north)
+    assert %Action.Move{} = action
   end
 
   test "placement" do

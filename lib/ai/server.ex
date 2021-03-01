@@ -3,6 +3,7 @@ alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Jobfair
 alias Yagg.Bugreport
+alias Yagg.AI.Attack
 alias Yagg.AI.Choices
 alias Yagg.Board.Action.Ready
 alias Yagg.Table.Action
@@ -103,7 +104,8 @@ defmodule Yagg.AI.Server do
   end
 
   defp take_your_turn(board, state) do
-    action = Choices.move(board, state.position)
+    #action = Choices.move(board, state.position)
+    action = Attack.turn(board, state.position)
     {:ok, _} = :timer.apply_after(1500, Table, :board_action, [state.pid, state.robot, action])
     :ok
   end
