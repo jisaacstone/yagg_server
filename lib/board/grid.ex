@@ -10,7 +10,7 @@ defmodule Yagg.Board.Grid do
   @type t :: %{coord => terrain}
 
   defguard is_relative(dir) when dir == :left or dir == :right or dir == :front or dir == :back
-  defguard is_cardinal(dir) when dir == :nort or dir == :south or dir == :east or dir == :west
+  defguard is_cardinal(dir) when dir == :north or dir == :south or dir == :east or dir == :west
   defguard is_coord(c) when is_tuple(c) and is_integer(elem(c, 0)) and is_integer(elem(c, 1))
 
   @doc """

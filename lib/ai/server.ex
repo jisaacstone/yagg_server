@@ -3,9 +3,8 @@ alias Yagg.Event
 alias Yagg.Board
 alias Yagg.Jobfair
 alias Yagg.Bugreport
-alias Yagg.AI.Attack
-alias Yagg.AI.Choices
-alias Yagg.Board.Action.Ready
+alias Yagg.AI.Handwrit
+alias Yagg.Board.Action.{Ready,Concede}
 alias Yagg.Table.Action
 alias Yagg.Table.Player
 
@@ -93,6 +92,8 @@ defmodule Yagg.AI.Server do
 
   def terminate(:normal, _), do: :ok
   def terminate({type, context}, state) do
+    concede = %Concede{reason: "#{state.robot.name} Crashed"}
+    _ = :timer.apply_after(500, Table, :board_action, [state.pid, state.robot, concede])
     Bugreport.report(
       state,
       [],
@@ -105,44 +106,19 @@ defmodule Yagg.AI.Server do
 
   defp take_your_turn(board, state) do
     #action = Choices.move(board, state.position)
-    action = Attack.turn(board, state.position)
+    action = Handwrit.turn(board, state.position)
     {:ok, _} = :timer.apply_after(1500, Table, :board_action, [state.pid, state.robot, action])
     :ok
   end
 
   defp do_initial_placement(board, %{pid: table_pid, robot: robot, position: position}) do
-    %{place: place_choices} = Choices.choices(board, position)
-    {monarch_idx, _} = Enum.find(board.hands[position], fn({_, {u, _}}) -> u.monarch end)
-    choices = Enum.shuffle(place_choices)
-    # place monarch first to ensure there will be space
-    place_monarch = Enum.find(choices, &cpm(&1, monarch_idx, board.grid))
-    occupied = [{place_monarch.x, place_monarch.y} | Map.keys(board.grid)]
-    choices = drop_dupes(choices, MapSet.new([monarch_idx]), MapSet.new(occupied))
-    # place on average just above half the units?
-    actions =  [place_monarch | choices]
+    actions = Handwrit.placement(board, position)
 
     Enum.each(
       actions,
       fn(action) -> :ok = Table.board_action(table_pid, robot, action) end
     )
     :ok = Table.board_action(table_pid, robot, %Ready{})
-  end
-
-  defp cpm(%{index: i, x: x, y: y}, i, grid) do
-    case grid[{x, y}] do
-      :nil -> :true
-      _ -> :false
-    end
-  end
-  defp cpm(_, _, _), do: :false
-
-  defp drop_dupes([], _, _), do: []
-  defp drop_dupes([choice | choices], ids, coords) do
-    case {Enum.member?(ids, choice.index), Enum.member?(coords, {choice.x, choice.y})} do
-      {:false, :false} ->
-        [choice | drop_dupes(choices, MapSet.put(ids, choice.index), MapSet.put(coords, {choice.x, choice.y}))]
-      _ -> drop_dupes(choices, ids, coords)
-    end
   end
 
   defp recruit(fair, army_size, %{pid: table_pid, robot: robot}) do

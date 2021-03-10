@@ -5,15 +5,15 @@ alias Yagg.Table.Player
 
 defmodule Board.Action.Concede do
   @behaviour Action
-  defstruct []
+  defstruct reason: "conceded"
 
   @impl Action
   def resolve(_, %Board{state: %Gameover{}}, _) do
     {:err, :gameover}
   end
-  def resolve(_, %Board{} = board, position) do
+  def resolve(con, %Board{} = board, position) do
     {grid, events} = Board.Grid.reveal_units(board.grid)
-    board = %{board | state: %Gameover{winner: Player.opposite(position), reason: "conceded"}, grid: grid}
+    board = %{board | state: %Gameover{winner: Player.opposite(position), reason: con.reason}, grid: grid}
     {board, events}
   end
   def resolve(_, _, _) do

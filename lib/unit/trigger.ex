@@ -6,7 +6,7 @@ alias Yagg.Board.Grid
 defmodule Unit.Trigger do
   @type type :: :attack | :move | :death
 
-  @spec reveal(Board.t, Grid.coord, atom, type) :: {Board.t, [Event.t]}
+  @spec reveal(Board.t, Grid.coord, Unit.t, type) :: {Board.t, [Event.t]}
   def reveal(board, {x, y}, unit, type) do
     {board, _} = Grid.update(board, {x, y}, fn(u) -> Unit.make_visible(u, [:triggers, :name]) end)
     event = Event.ShowAbility.new(

@@ -1,6 +1,6 @@
 alias Yagg.Unit
 alias Yagg.Board
-alias Yagg.AI.Attack
+alias Yagg.AI.Handwrit
 alias Yagg.AI.Choices
 alias Yagg.Board.Action
 require Helper.Board
@@ -39,8 +39,17 @@ defmodule YaggTest.AI do
       Board.place!(Unit.new(:north, :test, 3, 3), {2, 4}) |>
       Board.place!(Unit.new(:south, :test, 3, 3), {1, 1})
 
-    action = Attack.turn(board, :north)
+    action = Handwrit.turn(board, :north)
     assert %Action.Move{} = action
+  end
+
+  test "placement timme" do
+    board = HB.new_board(
+      [Unit.Monarch.new(:nil), Unit.Tinker.new(:nil), Unit.Sparky.new(:nil), Unit.Howloo.new(:nil)],
+      [],
+      {4, 4}
+    )
+    assert [_, _, _, _] = Handwrit.placement(board, :north)
   end
 
   test "placement" do
