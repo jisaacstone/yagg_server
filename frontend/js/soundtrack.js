@@ -10,8 +10,8 @@ const state = {
 };
 const mapping = {
     menu: `music/barcelona-loop.${ext}`,
-    jobfair: `music/pile-of-leaves.${ext}`,
     waiting: `music/barcelona-beat-synth.${ext}`,
+    jobfair: `music/pile-of-leaves.${ext}`,
     placement: `music/turntables.${ext}`,
     battle: `music/toolbelts.${ext}`,
     gameover: `music/cuddlefish.${ext}`

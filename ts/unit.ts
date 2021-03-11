@@ -32,11 +32,14 @@ export interface Unit {
   attributes: string[];
 }
 
+const units: {[key: string]: Unit} = {};
+
 export function showName(coord: Board.Coord, name: string): void {
   const squareId = Board.squareId(coord),
     unitEl = document.querySelector(`#${squareId} .unit`) as HTMLElement,
     nameEl = document.querySelector(`#${squareId} .unit-name`);
   if (unitEl && !nameEl) {
+    units[unitEl.id].name = name;
     unitEl.appendChild(Element.create({
       className: 'unit-name',
       innerHTML: convertAttr('name', name)
@@ -50,6 +53,7 @@ export function showAbility(coord: Board.Coord, ability: Ability): void {
     unitEl = document.querySelector(`#${squareId} .unit`) as HTMLElement,
     abilityEl = document.querySelector(`#${squareId} .unit-abiltiy`);
   if (unitEl && !abilityEl) {
+    units[unitEl.id].ability = ability;
     abilityIcon(unitEl, ability);
   }
 }
@@ -61,7 +65,8 @@ export function showTriggers(coord: Board.Coord, triggers: Triggers): void {
   if (unitEl && !triggerEl) {
     // immobile, invisible, etc should never be revealed so we should be OK
     // with this type coercion
-    shortTriggers(unitEl, { triggers } as Unit);
+    units[unitEl.id].triggers = triggers;
+    shortTriggers(unitEl, units[unitEl.id]);
   }
 }
 
@@ -178,14 +183,16 @@ function renderAttrs(unit: Unit, el: HTMLElement) {
   }
 }
 
-function overlayInfo(unit: Unit, el: HTMLElement) {
+function overlayInfo(el: HTMLElement) {
+  const unit = units[el.id];
+  console.log(unit);
   const qbutton = Element.create({
       tag: 'button',
       className: 'details-button uibutton',
       title: 'details',
     }),
     allButtons = [qbutton];
-  qbutton.addEventListener('click', detailViewFn(unit, el.className));
+  qbutton.addEventListener('click', detailViewFn(el));
   if (owned(unit)) {
     if (unit.ability) {
       const abutton = Element.create({
@@ -223,13 +230,15 @@ function renderTile(unit: Unit, el: HTMLElement) {
     renderAttrs(unit, el);
     shortTriggers(el, unit);
     el.style.backgroundImage = `url("img/${unit.name}.png")`;
-    const qbutton = Element.create({
-        tag: 'button',
-        className: 'details-button',
-        title: 'details',
-      });
-    qbutton.addEventListener('click', detailViewFn(unit, el.className));
-    el.appendChild(qbutton);
+    if (owned(unit)) {
+      const qbutton = Element.create({
+          tag: 'button',
+          className: 'details-button',
+          title: 'details',
+        });
+      qbutton.addEventListener('click', detailViewFn(el));
+      el.appendChild(qbutton);
+    }
   }
   if (unit.ability) {
     abilityIcon(el, unit.ability);
@@ -252,7 +261,7 @@ function renderTile(unit: Unit, el: HTMLElement) {
       }));
     }
     if ((el.parentNode as HTMLElement).className.includes('boardsquare')) {
-      overlayInfo(unit, el);
+      overlayInfo(el);
     }
   }; // @ts-ignore
   el.addEventListener('sidebar', el.sidebar, false);
@@ -291,41 +300,12 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
     el.appendChild(qbutton);
     el.style.backgroundImage = `url("img/${unit.name}.png")`;
   }
-  el.onclick = detailViewFn(unit, el.className, squareEl);
+  el.onclick = detailViewFn(el, squareEl, unit);
   if (unit.ability) {
     abilityButton(unit, el, squareEl);
   }
   shortTriggers(el, unit);
 }
-
-const fakeDescriptions = [
-  'Listens to smooth jazz',
-  'Loves action movies',
-  'Smiles at inappropriate times',
-  'Donates to public radio',
-  'Makes excellent chili',
-  'Snacks constantly',
-  'Believes the moon does not exist',
-  'Former child',
-  'Collects viynl',
-  'Aspiring hipster',
-  'Community college graduate',
-  'Good at remembering names',
-  'Never learned to drive',
-  'Taking flute lessons',
-  'Craft beer nerd',
-  'Loves crosswords, hates sudoku',
-  'Amateur BMX racer',
-  'Competitive salsa dancer',
-  'Watches TV until 2am every night',
-  "Has a tattoo, but won't say where",
-  'Once won $2,000 in Vegas',
-  'Went to clown school',
-  'Failed pacifist',
-  'Believes everything that happens was fated to happen',
-  'Pastafarian',
-  'Whistles off key',
-]
 
 function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
   const descriptions = [],
@@ -369,9 +349,7 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
   }
 
   if (descriptions.length === 0 && unit.name) {
-    const seed = unit.name.charCodeAt(0) + unit.name.charCodeAt(1) + unit.name.charCodeAt(2) + (gmeta.position || 'e').charCodeAt(0),
-      desc = fakeDescriptions[seed % fakeDescriptions.length];
-    descriptions.push(Element.create({ className: 'bio', innerHTML: desc }));
+    descriptions.push(Element.create({ className: 'bio', innerHTML: 'No ability or triggers' }));
   }
 
   return Element.create({
@@ -380,21 +358,27 @@ function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
   });
 }
 
-export function detailViewFn(unit: Unit, className: string, square: HTMLElement = null) {
-  SFX.play('click');
-  const descriptions = describe(unit, square),
-    portrait = Element.create({ className: 'unit-portrait' }),
-    details = Element.create({
-      className: `${className} details`,
-      children: [descriptions, portrait]
-    });
-
-  renderAttrs(unit, details);
-  portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
+export function detailViewFn(el: HTMLElement, square: HTMLElement = null, unit = null) {
+  if (unit === null) {
+    unit = units[el.id];
+  }
 
   return (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log({ unit, s: units[el.id], id: el.id, units });
+
+    SFX.play('click');
+    const descriptions = describe(unit, square),
+      portrait = Element.create({ className: 'unit-portrait' }),
+      details = Element.create({
+        className: `${el.className} details`,
+        children: [descriptions, portrait]
+      });
+
+    renderAttrs(unit, details);
+    portrait.style.backgroundImage = `url("img/${unit.name}.png")`;
+
     dismissable(details);
   }
 }
@@ -430,7 +414,7 @@ function bindDetailsEvenet(unit: Unit, el: HTMLElement) {
   const eventListener = (e) => {
     const parent = el.parentNode as HTMLElement,
       square = parent.className.includes('boardsquare') ? parent : null;
-    detailViewFn(unit, el.className, square)(e);
+    detailViewFn(el, square)(e);
   }; // @ts-ignore
   if (el.detailsEvent) {  // @ts-ignore
     el.removeEventListener('details', el.detailsEvent);
@@ -453,7 +437,21 @@ function setClassName(unit: Unit, el: HTMLElement) {
   }
 }
 
+const addId = (() => {
+  let nextId = 1;
+  return (unit: Unit, el: HTMLElement): void => {
+    if (! el.id) {
+      el.id = `unit${nextId}`;
+      nextId++;
+      units[el.id] = unit;
+    } else {
+      Object.assign(units[el.id], unit);
+    }
+  }
+})();
+
 export function render_into(unit: Unit, el: HTMLElement): void {
+  addId(unit, el);
   bindDetailsEvenet(unit, el);
   setClassName(unit, el);
   return renderTile(unit, el);

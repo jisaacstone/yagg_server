@@ -377,7 +377,7 @@ export function candidate(event) {
             children: [unitEl]
         });
         Select.bind_candidate(cdd, event.index, event.unit);
-        unitEl.addEventListener('dblclick', Unit.detailViewFn(event.unit, unitEl.className));
+        unitEl.addEventListener('dblclick', Unit.detailViewFn(unitEl));
         jf.appendChild(cdd);
     });
 }

@@ -1003,6 +1003,14 @@ body {
   box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px var(--ui-main-dark-transparent);
 }
 
+.no-info {
+  font-family: 'summershand';
+  text-align: center;
+  grid-row: 2;
+  grid-column: 2;
+  font-size: 140%;
+}
+
 /* UI - dropdown */
 
 .dropdown {
