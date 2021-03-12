@@ -331,6 +331,65 @@
   animation: zoom 0.3s linear 3;
 }
 
+@keyframes telnake {
+  10% {
+    background-position: 0 -1em;
+  }
+  80% {
+    background-position: 0 1em;
+  }
+  90% {
+    background-position: 0 -20em;
+  }
+}
+[data-uistate=selected] [data-name=telnake] {
+  animation: telnake 2s linear 1;
+}
+
+@keyframes glosto {
+  10%, 90% {
+    filter: grayscale(80%) blur(1px);
+    background-position: -1em 51%;
+  }
+  25% {
+    filter: grayscale(90%) blur(3px);
+    background-position: 1em 48%;
+  }
+  60% {
+    filter: grayscale(100%) blur(5px);
+    background-position: -40em -20em;
+  }
+  80% {
+    background-position: 10em -20em;
+  }
+}
+[data-uistate=selected] [data-name=glosto] {
+  animation: glosto 1.9s linear 1;
+}
+
+@keyframes jacko {
+  0%, 9%, 18%, 27%, 36%, 45%, 100% {
+    background-position: 50% 50%;
+    background-size: 100%;
+    filter: grayscale(10%);
+  }
+  5%, 23%, 71% {
+    background-position: 1em 50%;
+    filter: grayscale(10%);
+  }
+  14%, 33% {
+    background-position: -1em 50%;
+    filter: grayscale(10%);
+  }
+  40% {
+    background-size: 400%;
+    fliter: invert(90%) grayscale(50%):
+  }
+}
+[data-uistate=selected] [data-name="jacko scare"] {
+  animation: jacko 0.7s linear 1;
+}
+
 @keyframes monarch {
   30%, 80% {
     background-color: gold;
