@@ -1,6 +1,5 @@
 import { hostname, getname, tableid } from './urlvars.js';
 import * as Player from './player.js';
-import * as Infobox from './infobox.js';
 import * as Dialog from './dialog.js';
 
 const dn = {name: null};
@@ -49,7 +48,6 @@ export function gameaction(action, data, scope = 'table', id = null, retries = 1
   const host = hostname(),
     url = `${host}/${scope}/${tableId}/a/${action}`;
   return Player.get().then(({ id }) => {
-    Infobox.clear();
     return new Promise(function (resolve, reject) {
       var xhr = new XMLHttpRequest();
       xhr.addEventListener('load', function() {

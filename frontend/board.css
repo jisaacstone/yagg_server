@@ -8,58 +8,61 @@ body {
 
 #table {
   display: grid;
+  box-sizing: border-box;
   height: 100vh;
   overflow: hidden;
 }
 
 @media (orientation: landscape) {
+  :root {
+    --board-length: calc(min(70vw, 100vh) - 1em);
+    --card-width: min(20vw, max(16vw, 16vh));
+  }
   #table {
-    grid-template-columns: minmax(0, 1fr) min(60vw, 100vh) minmax(0, 1fr);
-    grid-template-rows: 11fr 45fr 10fr 23fr 11fr;
-    grid-template-areas:
-      "opponent board  hand"
-      "infobox  board  hand"
-      "timer    board  hand"
-      "buttons  board  hand"
-      "player   board  hand";
+    grid-template-columns: var(--board-length) minmax(0, 1fr) calc(var(--card-width) + 1em);
+    grid-template-areas: "board hud hand";
+    margin-bottom: 0.7em;
   }
   #board {
-    width: min(60vw, 95vh);
-    height: min(60vw, 95vh);
+    margin-left: 0.7em;
+    width: var(--board-length);
+    height: var(--board-length);
+  }
+  #hud {
+    grid-template-areas:
+      "opponent"
+      "buttons"
+      "player";
+    margin-left: 0.5vw;
   }
   #hand {
     overflow-y: scroll;
     overflow-x: hidden;
-    margin-left: 1vw;
+    margin-left: 0.5vw;
     padding-right: 4vw;
     flex-direction: column;
   }
-  .playerdetails {
-    height: min(11vh, 7vw);
-    width: min(33vh, 17vw);
-    grid-template-columns: min(10vh, 6.6vw) minmax(0, 1fr);
+
+  #player {
+    align-self: end;
   }
+  #opponent {
+    align-self: start;
+  }
+
   .card {
     height: max(18vh, 18vw);
-    width: max(16vh, 16vw);
-  }
-  #infobox {
-    justify-self: center;
-    align-self: center;
-    height: max(80%, min(44vh, 22vw));
-  }
-  #infobox .info {
-    width: min(43vh, 19vw);
+    width: var(--card-width);
   }
   .dropdown .dismiss {
     right: 1px;
   }
+
+  #table[data-gamestate=jobfair] {
+    grid-template-areas: "board board hud";
+  }
   #jobfair {
-    grid-column: 2 / span 2;
-    grid-row: 1 / span 5;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-left: 2px inset #325;
-    margin-right: 2px;
   }
   #jobfair .candidate {
     min-height: 20vw;
@@ -67,23 +70,81 @@ body {
   }
 }
 
-@media (orientation: portrait) {
-  #table {
-    grid-template-columns: 28% 44% 28%;
-    grid-template-rows: min(60vh, 100vw) minmax(0, 5fr) minmax(0, 3fr) minmax(0, 5fr) minmax(0, 8fr);
+@media (max-aspect-ratio: 5/8) {
+  #table #buttons .uibutton {
+    color: transparent;
+    text-shadow: none;
+    background-position: center;
+  }
+}
+
+@media (max-aspect-ratio: 3/4) {
+  #table #hud {
     grid-template-areas:
-      "board    board    board"
-      "buttons  infobox  opponent"
-      "buttons  infobox  timer"
-      "buttons  infobox  player"
-      "hand     hand     hand";
+      "buttons buttons"
+      "opponent player";
+  }
+  #table #buttons {
+    grid-auto-flow: column;
+    min-height: 3em;
+  }
+  #table #hud #buttons button.uibutton {
+    grid-row: 1;
+  }
+}
+
+@media (min-aspect-ratio: 1/1) and (max-aspect-ratio: 3/2) {
+  #table #buttons .uibutton {
+    color: transparent;
+    text-shadow: none;
+    background-position: center;
+    height: 16vh;
+  }
+  #table .playerdetails {
+    grid-template-areas: 
+      "avatar timer"
+      "name name";
+    padding: 0.7em 0;
+  }
+  #table .playerdetails .avatar {
+    height: 4vw;
+    justify-self: start;
+  }
+}
+
+@media (min-aspect-ratio: 3/2) {
+  #buttons .uibutton {
+    font-family: 'summershand';
+    font-size: 250%;
+    padding-left: 1.2em;
+    border-width: 0.07em;
+    background-size: 6vw 6vw;
+    background-position: left center;
+  }
+}
+
+@media (orientation: portrait) {
+  :root {
+    --board-length: calc(min(100vw, 70vh) - 1em);
+    --card-height: min(20vh, max(16vw, 16vh));
+  }
+  #table {
+    grid-template-rows: var(--board-length) minmax(0, 1fr) calc(var(--card-height) + 1em);
+    grid-template-areas:
+      "board"
+      "hud"
+      "hand";
   }
   #table {
     padding-top: 0.13em;
   }
   #board {
-    width: min(60vh, 95vw);
-    height: min(60vh, 95vw);
+    width: var(--board-length);
+    height: var(--board-length);
+  }
+  #hud {
+    grid-template-areas: "opponent buttons player";
+    min-height: 0;
   }
   #hand {
     overflow-x: scroll;
@@ -91,42 +152,31 @@ body {
     flex-direction: row;
     padding-bottom: 4vh;
   }
-  .playerdetails {
-    height: min(9vw, 10vh);
-    width: min(26vw, 30vh);
-    grid-template-columns: min(8vw, 9vh) minmax(0, 1fr);
-  }
   .card {
-    height:15vh;
-    width: 15vh;
+    height:var(--card-height);
+    width: var(--card-height);
   }
-  #infobox {
-    align-self: center;
-    justify-self: center;
+
+  #buttons .uibutton {
+    padding-left: 2em;
   }
-  #infobox .info {
-    width: min(38vw, 24vh);
-    height: min(39vw, 24vh);
+
+  #table .playerdetails {
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   }
+  
   .dropdown .dismiss {
     left: 1px;
   }
+
   #table[data-gamestate=jobfair] {
-    grid-template-columns: 30% 40% 30%;
-    grid-template-rows: 70vh 11vh 8vh 11vh;
     grid-template-areas:
-      "jobfair  jobfair  jobfair"
-      "buttons  infobox  opponent"
-      "buttons  infobox  timer"
-      "buttons  infobox  player";
+      "board"
+      "board"
+      "hud";
   }
   #jobfair {
-    grid-area: jobfair;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    height: 100%;
-    border-top: 2px inset var(--ui-alt-dark);
-    border-bottom: 2px inset var(--ui-alt-dark);
-    margin-bottom: -0.5em;
   }
   #jobfair .candidate {
     min-height: 33vw;
@@ -146,7 +196,6 @@ body {
   display: none;
 }
 #table[data-gamestate=jobfair] #board,
-#table[data-gamestate=jobfair] #infobox,
 #table[data-gamestate=jobfair] #hand {
   display: none;
 }
@@ -205,6 +254,7 @@ body {
   padding: 0.9em;
   grid-auto-flow: row;
   grid-auto-rows: minmax(0, 1fr);
+  box-sizing: border-box;
 }
 
 .boardrow {
@@ -286,10 +336,6 @@ body {
 .unit.owned:hover {
   cursor: pointer;
 }
-/*
-#board .unit:not(.owned) {
-  transform: rotate(180deg);
-}*/
 
 .unit.north {
   background-color: var(--north-main);
@@ -418,7 +464,6 @@ body {
 
 .unowned .unit-ability,
 .candidate .unit-ability,
-.info .unit-ability,
 .card .unit-ability {
   overflow: visible;
   font-size: 80%;
@@ -554,14 +599,8 @@ body {
 .card .south .details-button {
   border-color: var(--north-main);
 }
-#infobox .unit button.details-button {
-  display: grid;
-  border: 1px outset inherit;
-  border-radius: 0.3em;
-}
 
-#table[data-yourturn=yes] #board .unit.owned.immobile,
-#table[data-yourturn=yes] #infobox .unit.owned.info {
+#table[data-yourturn=yes] #board .unit.owned.immobile {
   animation: none;
 }
 #table[data-yourturn=yes] .south.owned {
@@ -766,6 +805,15 @@ body {
 #board [data-uistate='selected'] #overlayButtons .details-button {
   visibility: visible;
 }
+
+/* hud */
+
+#hud {
+  display: grid;
+  grid-area: hud;
+  min-width: 0;
+}
+
 #table:not([data-yourturn="yes"]) #overlayButtons .ability-button {
   display: none;
 }
@@ -844,11 +892,6 @@ body {
   font-size: 180%;
 }
 
-#timer.timer {
-  font-size: 283%;
-  align-self: center;
-}
-
 .timer.urgent {
   font-weight: bold;
   color: var(--ui-main-saturated);
@@ -859,16 +902,14 @@ body {
   text-shadow: 1px 1px 1px var(--white-transparent-high);
 }
 
-.playerdetails .timer {
-  align-content: start;
-}
-
 /* UI - players */
 
 #opponent, #player {
   margin: 0.2em;
   place-content: center;
   display: grid;
+  min-width: 0;
+  min-height: 0;
 }
 
 #player {
@@ -886,61 +927,48 @@ body {
 .avatar {
   grid-area: avatar;
   place-self: center;
-  width: 100%;
   height: 100%;
 }
 
 .playerdetails {
   display: grid;
-  grid-template-rows: 2em 1.4em;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: 1.5em minmax(0, 1fr);
   grid-template-areas: 
     "avatar name"
     "avatar timer";
 }
 
-.playername {
-  width: 100%;
-  grid-area: name;
-  align-content: end;
+.playerdetails .timer {
+  align-content: start;
 }
 
 /* UI - buttons */
 
 #buttons {
   grid-auto-flow: row;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   display: grid;
   grid-area: buttons;
-  place-content: stretch;
-  place-self: stretch;
-  padding: 0 0.5em;
+  min-width: 0;
+  min-height: 0;
 }
 
-#readybutton,
-#counter,
-#returnbutton {
-  grid-column: 1 / span 2;
+#buttons .uibutton {
+  text-shadow: -0.1em -0.1em 0.2em var(--ui-alt-desaturated), 1px 1px 1px white;
 }
 
 #readybutton {
-  grid-row: 2;
-}
-
-#leavebutton,
-#settingsbutton {
-  grid-row: 1;
-  color: transparent;
-  background: var(--white-transparent-med) center / contain no-repeat;
+  grid-row: 3;
 }
 
 #leavebutton {
-  margin-left: 0.2em;
+  grid-row: 1;
   background-image: url('img/leave.png')
 }
 
 #settingsbutton {
-  margin-right: 0.2em;
+  grid-row: 2;
   background-image: url('img/sound.png');
 }
 
@@ -988,29 +1016,6 @@ body {
   -webkit-text-stroke: 1px var(--ui-main-dark);
 }
 
-
-/* UI - infobox */
-
-#infobox {
-  grid-area: infobox;
-  margin-left: 5%;
-  margin-right: 5%;
-  display: grid;
-}
-
-#infobox .unit {
-  margin: 0;
-  box-shadow: min(0.5vh, 0.5vw) min(0.6vh, 0.6vw) 1vw 1px var(--ui-main-dark-transparent);
-}
-
-.no-info {
-  font-family: 'summershand';
-  text-align: center;
-  grid-row: 2;
-  grid-column: 2;
-  font-size: 140%;
-}
-
 /* UI - dropdown */
 
 .dropdown {
@@ -1047,6 +1052,7 @@ body {
   box-sizing: border-box;
   padding: 2px;
   padding-right: 4px;
+  grid-area: board;
 }
 
 .candidate {

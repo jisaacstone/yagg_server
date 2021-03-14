@@ -3,7 +3,6 @@ import { gmeta } from './state.js';
 import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
 import * as Unit from './unit.js';
-import * as Infobox from './infobox.js';
 import * as Element from './element.js';
 import * as SFX from './sfx.js';
 import * as Soundtrack from './soundtrack.js';
@@ -40,7 +39,6 @@ export function deselect() {
         }
     }
     global.selected = {};
-    Infobox.clear();
     Unit.clearButtonOverlay();
     if (rb) {
         rb.remove();
@@ -101,7 +99,6 @@ function handleSomethingAlreadySelected(el, meta) {
         else if (sel.options && !sel.options.includes(el)) {
             console.log('not in options');
             // for now ignore clicks on things that are not move options
-            maybeSidebar(el);
             return true;
         }
         else {
@@ -110,12 +107,6 @@ function handleSomethingAlreadySelected(el, meta) {
         }
     }
     return false;
-}
-function maybeSidebar(el) {
-    const childEl = el.firstChild;
-    if (childEl) {
-        childEl.dispatchEvent(new Event('sidebar'));
-    }
 }
 function audioFor(el) {
     if (!el) {
@@ -128,7 +119,6 @@ function audioFor(el) {
 }
 function handleSelect(el, meta) {
     const options = [], audio = audioFor(el.firstElementChild);
-    maybeSidebar(el);
     if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
         Array.prototype.forEach.call(document.querySelectorAll(`.${gmeta.position}row .boardsquare`), el => {
             if (!el.firstChild) {
@@ -155,6 +145,7 @@ function handleSelect(el, meta) {
         }
     }
     SFX.play(audio);
+    Unit.overlayInfo(el.firstChild);
     el.dataset.uistate = 'selected';
     global.selected = { element: el, meta: meta, options: options };
 }
@@ -162,13 +153,11 @@ export function select(thisEl, meta) {
     function select() {
         Soundtrack.play();
         if (gmeta.boardstate === 'gameover') {
-            maybeSidebar(thisEl);
             return;
         }
         else if (gmeta.boardstate === 'battle' && (gmeta.position !== gmeta.turn || // not your turn
             (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile')) // cannot move
         )) {
-            maybeSidebar(thisEl);
             return;
         }
         if (handleSomethingAlreadySelected(thisEl, meta)) {
@@ -185,7 +174,6 @@ export function bind_candidate(candidate, index, unit) {
     candidate.onclick = (e) => {
         Soundtrack.play();
         const childEl = candidate.firstElementChild, audio = unit.name;
-        Infobox.clear();
         if (candidate.dataset.uistate === 'selected') {
             if (Jobfair.deselect(index)) {
                 SFX.play('deselect');
@@ -196,7 +184,6 @@ export function bind_candidate(candidate, index, unit) {
             if (Jobfair.select(index)) {
                 if (childEl) {
                     SFX.play(audio);
-                    childEl.dispatchEvent(new Event('sidebar'));
                     candidate.dataset.uistate = 'selected';
                 }
             }

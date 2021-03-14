@@ -32,13 +32,10 @@ export function stop() {
 }
 
 function getTimerEl(kind: string) {
-  if (kind === gmeta.position) {
+  if (kind === gmeta.position || kind === 'all') {
     return document.querySelector('#player .timer');
-  } else if (kind === 'north' || kind === 'south') {
-    return document.querySelector('#opponent .timer');
-  } else {
-    return document.querySelector('#timer');
   }
+  return document.querySelector('#opponent .timer');
 }
 
 function createInterval() {

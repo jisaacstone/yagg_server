@@ -8,11 +8,30 @@ import * as Event from './event.js';
 import * as Jobfair from './jobfair.js';
 import * as Board from './board.js';
 import * as Dialog from './dialog.js';
+import * as Element from './element.js';
 import * as LeaveButton from './leaveButton.js';
 import * as SFX from './sfx.js';
 import * as Soundtrack from './soundtrack.js';
 import * as Settings from './settings.js';
-function render_board(board, players) {
+function renderTable() {
+    const table = Element.create({
+        id: 'table',
+        children: [
+            Element.create({ id: 'board' }),
+            Element.create({ id: 'hand' }),
+            Element.create({
+                id: 'hud',
+                children: [
+                    Element.create({ id: 'player' }),
+                    Element.create({ id: 'opponent' }),
+                    Element.create({ id: 'buttons' }),
+                ]
+            })
+        ]
+    });
+    document.body.appendChild(table);
+}
+function renderBoard(board, players) {
     if (players !== 2) {
         return;
     }
@@ -32,7 +51,7 @@ function render_board(board, players) {
         }
     });
 }
-function render_jobfair(jobfair) {
+function renderJobfair(jobfair) {
     Event.game_started(jobfair)();
 }
 function render_(boardstate, phase, players) {
@@ -41,10 +60,10 @@ function render_(boardstate, phase, players) {
         return;
     }
     if (phase === 'jobfair') {
-        render_jobfair(boardstate);
+        renderJobfair(boardstate);
     }
     else if (phase === 'board') {
-        render_board(boardstate, players);
+        renderBoard(boardstate, players);
     }
 }
 function gamephase(board) {
@@ -144,6 +163,7 @@ function reporterr() {
     Request.post(`table/${tableid()}/report`, { report: reporttext, meta: State.gmeta });
 }
 window.onload = function () {
+    renderTable();
     SFX.loadSettings();
     Soundtrack.loadSettings();
     const mml = () => {

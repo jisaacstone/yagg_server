@@ -8,9 +8,9 @@ export function display(label = 'ready', onclick = null) {
     readyButton.id = 'readybutton';
     readyButton.className = `uibutton ${label}-b`;
     readyButton.innerHTML = label;
+    readyButton.setAttribute('title', label);
     if (!onclick) {
         onclick = () => {
-            document.getElementById('infobox').innerHTML = '';
             gameaction('ready', {}, 'board').then(() => {
                 readyButton.remove();
             }).catch(({ request }) => {

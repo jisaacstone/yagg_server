@@ -4,7 +4,6 @@ import { displayerror } from './err.js';
 import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
 import * as Unit from './unit.js';
-import * as Infobox from './infobox.js';
 import * as Element from './element.js';
 import * as SFX from './sfx.js';
 import * as Soundtrack from './soundtrack.js';
@@ -43,7 +42,6 @@ export function deselect() {
     }
   }
   global.selected = {};
-  Infobox.clear();
   Unit.clearButtonOverlay();
   if (rb) {
     rb.remove();
@@ -113,7 +111,6 @@ function handleSomethingAlreadySelected(el: HTMLElement, meta): boolean {
     } else if (sel.options && !sel.options.includes(el)) {
       console.log('not in options');
       // for now ignore clicks on things that are not move options
-      maybeSidebar(el);
       return true;
     } else {
       moveOrPlace(sel, { element: el, meta });
@@ -121,13 +118,6 @@ function handleSomethingAlreadySelected(el: HTMLElement, meta): boolean {
     }
   }
   return false;
-}
-
-function maybeSidebar(el: HTMLElement) {
-  const childEl = el.firstChild;
-  if (childEl) {
-    childEl.dispatchEvent(new Event('sidebar'));
-  }
 }
 
 function audioFor(el: HTMLElement) {
@@ -142,7 +132,6 @@ function audioFor(el: HTMLElement) {
 
 function handleSelect(el: HTMLElement, meta) {
   const options = [], audio = audioFor(el.firstElementChild as HTMLElement);
-  maybeSidebar(el);
   if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
     Array.prototype.forEach.call(
       document.querySelectorAll(`.${gmeta.position}row .boardsquare`),
@@ -171,6 +160,7 @@ function handleSelect(el: HTMLElement, meta) {
     }
   }
   SFX.play(audio);
+  Unit.overlayInfo(el.firstChild as HTMLElement);
   el.dataset.uistate = 'selected';
   global.selected = {element: el, meta: meta, options: options};
 }
@@ -179,13 +169,11 @@ export function select(thisEl, meta) {
   function select() {
     Soundtrack.play();
     if (gmeta.boardstate === 'gameover') {
-      maybeSidebar(thisEl);
       return;
     } else if (gmeta.boardstate === 'battle' && (
       gmeta.position !== gmeta.turn ||  // not your turn
       (!meta.inhand && thisEl.firstChild && thisEl.firstChild.className.includes('immobile')) // cannot move
     )){
-      maybeSidebar(thisEl);
       return;
     }
     if (handleSomethingAlreadySelected(thisEl, meta)) {
@@ -205,7 +193,6 @@ export function bind_candidate(candidate: HTMLElement, index: number, unit: Unit
     Soundtrack.play();
     const childEl = candidate.firstElementChild as HTMLElement,
       audio = unit.name;
-    Infobox.clear();
     if (candidate.dataset.uistate === 'selected') {
       if (Jobfair.deselect(index)) {
         SFX.play('deselect');
@@ -215,7 +202,6 @@ export function bind_candidate(candidate: HTMLElement, index: number, unit: Unit
       if (Jobfair.select(index)) {
         if (childEl) {
           SFX.play(audio);
-          childEl.dispatchEvent(new Event('sidebar'));
           candidate.dataset.uistate = 'selected';
         }
       }

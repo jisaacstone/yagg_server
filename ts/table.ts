@@ -14,7 +14,26 @@ import * as SFX from './sfx.js';
 import * as Soundtrack from './soundtrack.js';
 import * as Settings from './settings.js';
 
-function render_board(board, players: number) {
+function renderTable(): void {
+  const table = Element.create({
+    id: 'table',
+    children: [
+      Element.create({ id: 'board' }),
+      Element.create({ id: 'hand' }),
+      Element.create({
+        id: 'hud',
+        children: [
+          Element.create({ id: 'player' }),
+          Element.create({ id: 'opponent' }),
+          Element.create({ id: 'buttons' }),
+        ]
+      })
+    ]
+  });
+  document.body.appendChild(table);
+}
+
+function renderBoard(board, players: number) {
   if (players !== 2) {
     return;
   }
@@ -34,7 +53,7 @@ function render_board(board, players: number) {
   });
 }
 
-function render_jobfair(jobfair) {
+function renderJobfair(jobfair) {
   Event.game_started(jobfair)();
 }
 
@@ -44,9 +63,9 @@ function render_(boardstate, phase, players) {
     return;
   }
   if (phase === 'jobfair') {
-    render_jobfair(boardstate);
+    renderJobfair(boardstate);
   } else if (phase === 'board') {
-    render_board(boardstate, players)
+    renderBoard(boardstate, players)
   }
 }
 
@@ -157,6 +176,7 @@ function reporterr() {
 }
 
 window.onload = function() {
+  renderTable();
   SFX.loadSettings();
   Soundtrack.loadSettings();
   const mml = () => {

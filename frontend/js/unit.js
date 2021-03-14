@@ -103,12 +103,6 @@ function abilityButton(unit, el, unitSquare = null) {
 function owned({ player }) {
     return player === gmeta.position;
 }
-export function clearButtonOverlay() {
-    const overlay = document.getElementById('overlayButtons');
-    if (overlay) {
-        overlay.remove();
-    }
-}
 function abilityIcon(el, ability) {
     const abil = Element.create({
         className: 'unit-ability',
@@ -136,7 +130,14 @@ function renderAttrs(unit, el) {
         el.className = `monarch ${el.className}`;
     }
 }
-function overlayInfo(el) {
+// Overlay Buttons
+export function clearButtonOverlay() {
+    const overlay = document.getElementById('overlayButtons');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+export function overlayInfo(el) {
     const unit = units[el.id];
     console.log(unit);
     const qbutton = Element.create({
@@ -189,27 +190,6 @@ function renderTile(unit, el) {
     if (unit.ability) {
         abilityIcon(el, unit.ability);
     }
-    // @ts-ignore
-    if (el.sidebar) { // @ts-ignore
-        el.removeEventListener('sidebar', el.sidebar, false);
-    } // @ts-ignore
-    el.sidebar = () => {
-        const infobox = document.getElementById('infobox'), unitInfo = document.createElement('div');
-        unitInfo.className = el.className + ' info';
-        infoview(unit, unitInfo, el.parentNode);
-        infobox.innerHTML = '';
-        infobox.appendChild(unitInfo);
-        if (!anyDetails(unit)) {
-            unitInfo.appendChild(Element.create({
-                className: 'no-info',
-                innerHTML: 'no information'
-            }));
-        }
-        if (el.parentNode.className.includes('boardsquare')) {
-            overlayInfo(el);
-        }
-    }; // @ts-ignore
-    el.addEventListener('sidebar', el.sidebar, false);
 }
 function anyDetails(unit) {
     return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
@@ -336,10 +316,12 @@ function bindDetailsEvenet(unit, el) {
         detailViewFn(el, square)(e);
     }; // @ts-ignore
     if (el.detailsEvent) { // @ts-ignore
-        el.removeEventListener('details', el.detailsEvent);
+        el.removeEventListener('details', el.detailsEvent); // @ts-ignore
+        el.removeEventListener('dblclick', el.detailsEvent);
     } // @ts-ignore
     el.detailsEvent = eventListener;
     el.addEventListener('details', eventListener);
+    el.addEventListener('dblclick', eventListener);
 }
 function setClassName(unit, el) {
     let className = `unit ${unit.player}`;

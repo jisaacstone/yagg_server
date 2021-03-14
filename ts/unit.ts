@@ -145,13 +145,6 @@ function owned({ player }) {
   return player === gmeta.position;
 }
 
-export function clearButtonOverlay() {
-  const overlay = document.getElementById('overlayButtons');
-  if ( overlay ) {
-    overlay.remove();
-  }
-}
-
 function abilityIcon(el: HTMLElement, ability: Ability): void {
   const abil = Element.create({
     className: 'unit-ability',
@@ -183,7 +176,16 @@ function renderAttrs(unit: Unit, el: HTMLElement) {
   }
 }
 
-function overlayInfo(el: HTMLElement) {
+// Overlay Buttons
+
+export function clearButtonOverlay() {
+  const overlay = document.getElementById('overlayButtons');
+  if ( overlay ) {
+    overlay.remove();
+  }
+}
+
+export function overlayInfo(el: HTMLElement) {
   const unit = units[el.id];
   console.log(unit);
   const qbutton = Element.create({
@@ -243,28 +245,6 @@ function renderTile(unit: Unit, el: HTMLElement) {
   if (unit.ability) {
     abilityIcon(el, unit.ability);
   }
-  // @ts-ignore
-  if (el.sidebar) { // @ts-ignore
-    el.removeEventListener('sidebar', el.sidebar, false);
-  } // @ts-ignore
-  el.sidebar = () => {
-    const infobox = document.getElementById('infobox'),
-      unitInfo = document.createElement('div');
-    unitInfo.className = el.className + ' info';
-    infoview(unit, unitInfo, el.parentNode as HTMLElement);
-    infobox.innerHTML = '';
-    infobox.appendChild(unitInfo);
-    if (! anyDetails(unit)) {
-      unitInfo.appendChild(Element.create({
-        className: 'no-info',
-        innerHTML: 'no information'
-      }));
-    }
-    if ((el.parentNode as HTMLElement).className.includes('boardsquare')) {
-      overlayInfo(el);
-    }
-  }; // @ts-ignore
-  el.addEventListener('sidebar', el.sidebar, false);
 }
 
 function anyDetails(unit) {
@@ -417,10 +397,12 @@ function bindDetailsEvenet(unit: Unit, el: HTMLElement) {
     detailViewFn(el, square)(e);
   }; // @ts-ignore
   if (el.detailsEvent) {  // @ts-ignore
-    el.removeEventListener('details', el.detailsEvent);
+    el.removeEventListener('details', el.detailsEvent); // @ts-ignore
+    el.removeEventListener('dblclick', el.detailsEvent);
   } // @ts-ignore
   el.detailsEvent = eventListener;
   el.addEventListener('details', eventListener);
+  el.addEventListener('dblclick', eventListener);
 }
 
 function setClassName(unit: Unit, el: HTMLElement) {
