@@ -1,7 +1,7 @@
 import * as Event from './event.js';
 import { displayerror } from './err.js';
 import { gameaction } from './request.js';
-import * as readyButton from './ready.js';
+import * as Ready from './ready.js';
 import * as Instructions from './instructions.js';
 const state = {
     selected: new Set(),
@@ -49,11 +49,11 @@ function countDown() {
     const counter = document.getElementById('counter');
     counter.innerHTML = `${state.armySize - state.selected.size}`;
     if (state.selected.size == state.armySize) {
-        readyButton.display('recruit', () => {
+        Ready.display('recruit', () => {
             state.ready = 'READY';
             counter.remove();
             gameaction('recruit', { units: Array.from(state.selected) }, 'table').then(() => {
-                readyButton.hide();
+                Ready.waiting();
             }).catch(({ request }) => {
                 state.ready = 'not';
                 if (request.status === 400) {
@@ -86,7 +86,7 @@ export function deselect(index) {
     state.selected.delete(index);
     counter.innerHTML = `${state.armySize - state.selected.size}`;
     if (state.ready === 'displayed' && state.selected.size < state.armySize) {
-        readyButton.hide();
+        Ready.hide();
         state.ready = 'not';
     }
     return true;

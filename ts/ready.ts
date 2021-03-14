@@ -14,10 +14,16 @@ export function display(label = 'ready', onclick = null) {
   if (!onclick) {
     onclick = () => {
       gameaction('ready', {}, 'board').then(() => {
-        readyButton.remove();
+        waiting();
       }).catch(({ request }) => {
-        if (request.status === 400 && request.responseText.includes('notready')) {
-          displayerror('place your monarch first');
+        if (request.status === 400) {
+          if (request.responseText.includes('notready')) {
+            displayerror('place your monarch first');
+          } else {
+            displayerror(request.responseText);
+          }
+        } else {
+          displayerror('unknown error, please try again');
         }
       });
     };
@@ -28,6 +34,14 @@ export function display(label = 'ready', onclick = null) {
     onclick();
   }
   document.getElementById('buttons').appendChild(readyButton);
+}
+
+export function waiting() {
+  const readyButton = document.getElementById('readybutton');
+  if (readyButton) {
+    readyButton.innerHTML = 'waiting';
+    readyButton.className = `${readyButton.className} readywaiting`;
+  }
 }
 
 export function ensureDisplayed(label='ready', onclick=null) {

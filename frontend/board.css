@@ -19,8 +19,8 @@ body {
     --card-width: min(20vw, max(16vw, 16vh));
   }
   #table {
-    grid-template-columns: var(--board-length) minmax(0, 1fr) calc(var(--card-width) + 1em);
-    grid-template-areas: "board hud hand";
+    grid-template-columns: var(--board-length) calc(var(--card-width) + 1em) minmax(0, 1fr);
+    grid-template-areas: "board hand hud";
     margin-bottom: 0.7em;
   }
   #board {
@@ -116,7 +116,6 @@ body {
   #buttons .uibutton {
     font-family: 'summershand';
     font-size: 250%;
-    padding-left: 1.2em;
     border-width: 0.07em;
     background-size: 6vw 6vw;
     background-position: left center;
@@ -129,11 +128,11 @@ body {
     --card-height: min(20vh, max(16vw, 16vh));
   }
   #table {
-    grid-template-rows: var(--board-length) minmax(0, 1fr) calc(var(--card-height) + 1em);
+    grid-template-rows: var(--board-length) calc(var(--card-height) + 1em) minmax(0, 1fr);
     grid-template-areas:
       "board"
-      "hud"
-      "hand";
+      "hand"
+      "hud";
   }
   #table {
     padding-top: 0.13em;
@@ -887,7 +886,7 @@ body {
   place-content: center;
   color: var(--ui-alt-dark-dark);
   grid-area: timer;
-  text-shadow: 1px 1px 1px var(--white-transparent-med);
+  text-shadow: -1px -1px 2px var(--grey-transparent-med), 1px 1px 1px var(--white-transparent-med);
   font-family: 'summershand';
   font-size: 180%;
 }
@@ -899,7 +898,7 @@ body {
 
 .timer.relaxed {
   color: var(--ui-main-dark-transparent);
-  text-shadow: 1px 1px 1px var(--white-transparent-high);
+  text-shadow: -1px -1px 2px var(--grey-transparent-med), 1px 1px 1px var(--white-transparent-high);
 }
 
 /* UI - players */
@@ -940,10 +939,6 @@ body {
     "avatar timer";
 }
 
-.playerdetails .timer {
-  align-content: start;
-}
-
 /* UI - buttons */
 
 #buttons {
@@ -956,10 +951,16 @@ body {
 
 #buttons .uibutton {
   text-shadow: -0.1em -0.1em 0.2em var(--ui-alt-desaturated), 1px 1px 1px white;
+  margin: 0.2em 0;
 }
 
 #readybutton {
   grid-row: 3;
+}
+#readybutton.readywaiting {
+  background-color: var(--grey-transparent-med);
+  animation: glow 1s linear infinite;
+  background-image: url('img/waiting.webp');
 }
 
 #leavebutton {

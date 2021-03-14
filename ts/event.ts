@@ -178,7 +178,7 @@ export function player_ready(event): eventHandler {
   return noGrid(() => {
     if ( event.player === State.gmeta.position ) {
       (document.querySelector('#player .playername') as HTMLElement).dataset.ready = 'true';
-      Ready.hide();
+      Ready.waiting();
     } else {
       SFX.play('playerready');
       (document.querySelector('#opponent .playername') as HTMLElement).dataset.ready = 'true';
@@ -397,6 +397,7 @@ export function gameover({ winner, reason }): eventHandler {
       };
 
     State.gamestatechange('gameover');
+    Ready.hide();
     Timer.stop();
     State.turnchange(null);
 
