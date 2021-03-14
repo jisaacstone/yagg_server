@@ -3,7 +3,6 @@ import { gmeta } from './state.js';
 import * as Ready from './ready.js';
 import * as Jobfair from './jobfair.js';
 import * as Unit from './unit.js';
-import * as Element from './element.js';
 import * as SFX from './sfx.js';
 import * as Soundtrack from './soundtrack.js';
 const global = { selected: null };
@@ -63,19 +62,6 @@ function moveOrPlace(selected, target) {
     }
     deselect();
 }
-function displayReturnButton(el, meta) {
-    const buttons = document.getElementById('buttons'), button = Element.create({
-        tag: 'button',
-        className: 'uibutton',
-        id: 'returnbutton',
-        innerHTML: 'return to hand'
-    });
-    button.onclick = () => {
-        SFX.play('click');
-        action('return', { index: Unit.indexOf(el) }, deselect);
-    };
-    buttons.appendChild(button);
-}
 function handleSomethingAlreadySelected(el, meta) {
     // return "true" if select event was handled, false if logic should continue
     const sel = global.selected;
@@ -118,17 +104,14 @@ function audioFor(el) {
     return el.dataset.name;
 }
 function handleSelect(el, meta) {
-    const options = [], audio = audioFor(el.firstElementChild);
-    if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
+    const options = [], moveplace = gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el), audio = audioFor(el.firstElementChild);
+    if (meta.inhand || moveplace) {
         Array.prototype.forEach.call(document.querySelectorAll(`.${gmeta.position}row .boardsquare`), el => {
             if (!el.firstChild) {
                 el.dataset.uistate = 'moveoption';
                 options.push(el);
             }
         });
-        if (meta.ongrid) {
-            displayReturnButton(el, meta);
-        }
     }
     else {
         // on board

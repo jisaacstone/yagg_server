@@ -988,6 +988,10 @@ body {
   margin: 0.2em 0.5em;
 }
 
+.playername {
+  min-width: 3em;
+}
+
 #table[data-position=north] #player .playerdetails,
 #table[data-position=south] #opponent .playerdetails {
   background-image: url('img/nametag_n.png');

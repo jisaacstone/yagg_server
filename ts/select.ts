@@ -70,25 +70,6 @@ function moveOrPlace(selected, target) {
   deselect();
 }
 
-function displayReturnButton(el, meta) {
-  const buttons = document.getElementById('buttons'),
-    button = Element.create({
-      tag: 'button',
-      className: 'uibutton',
-      id: 'returnbutton',
-      innerHTML: 'return to hand'
-    });
-  button.onclick = () => {
-    SFX.play('click');
-    action(
-      'return',
-      {index: Unit.indexOf(el)},
-      deselect,
-    )
-  }
-  buttons.appendChild(button);
-}
-
 function handleSomethingAlreadySelected(el: HTMLElement, meta): boolean {
   // return "true" if select event was handled, false if logic should continue
   const sel = global.selected;
@@ -131,8 +112,10 @@ function audioFor(el: HTMLElement) {
 }
 
 function handleSelect(el: HTMLElement, meta) {
-  const options = [], audio = audioFor(el.firstElementChild as HTMLElement);
-  if (meta.inhand || (gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el))) {
+  const options = [],
+    moveplace = gmeta.boardstate === 'placement' && Unit.containsOwnedUnit(el),
+    audio = audioFor(el.firstElementChild as HTMLElement);
+  if (meta.inhand || moveplace) {
     Array.prototype.forEach.call(
       document.querySelectorAll(`.${gmeta.position}row .boardsquare`),
       el => {
@@ -142,9 +125,6 @@ function handleSelect(el: HTMLElement, meta) {
         }
       }
     );
-    if (meta.ongrid) {
-      displayReturnButton(el, meta);
-    }
   } else {
     // on board
     if (! Unit.containsOwnedUnit(el)) {

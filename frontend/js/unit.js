@@ -138,8 +138,10 @@ export function clearButtonOverlay() {
     }
 }
 export function overlayInfo(el) {
-    const unit = units[el.id];
-    console.log(unit);
+    const unit = units[el.id], parent = el.parentNode;
+    if (!parent.className.includes('boardsquare')) {
+        return;
+    }
     const qbutton = Element.create({
         tag: 'button',
         className: 'details-button uibutton',
@@ -153,7 +155,7 @@ export function overlayInfo(el) {
                 className: 'ability-button uibutton',
                 title: 'use ability',
             });
-            bindAbility(abutton, el.parentNode, unit, Select.deselect);
+            bindAbility(abutton, parent, unit, Select.deselect);
             allButtons.push(abutton);
         }
         if (gmeta.boardstate === 'placement') {
