@@ -90,6 +90,10 @@ body {
   }
   #table #hud #buttons button.uibutton {
     grid-row: 1;
+    border-radius: 0.6em;
+  }
+  #table #player, #table #opponent {
+    justify-content: stretch;
   }
 }
 
@@ -154,10 +158,6 @@ body {
   .card {
     height:var(--card-height);
     width: var(--card-height);
-  }
-
-  #buttons .uibutton {
-    padding-left: 2em;
   }
 
   #table .playerdetails {
@@ -951,7 +951,7 @@ body {
 
 #buttons .uibutton {
   text-shadow: -0.1em -0.1em 0.2em var(--ui-alt-desaturated), 1px 1px 1px white;
-  margin: 0.2em 0;
+  margin: 0.1em 0.1em;
 }
 
 #readybutton {

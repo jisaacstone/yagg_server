@@ -83,6 +83,7 @@ export function timer(event): eventHandler {
 
 export function battle_started(): eventHandler {
   return noGrid(() => {
+    Ready.hide();
     State.gamestatechange('battle');
   });
 }
@@ -182,6 +183,7 @@ export function player_ready(event): eventHandler {
     } else {
       SFX.play('playerready');
       (document.querySelector('#opponent .playername') as HTMLElement).dataset.ready = 'true';
+      Ready.hideIfWaiting();
     }
   });
 }

@@ -72,6 +72,7 @@ export function timer(event) {
 }
 export function battle_started() {
     return noGrid(() => {
+        Ready.hide();
         State.gamestatechange('battle');
     });
 }
@@ -160,6 +161,7 @@ export function player_ready(event) {
         else {
             SFX.play('playerready');
             document.querySelector('#opponent .playername').dataset.ready = 'true';
+            Ready.hideIfWaiting();
         }
     });
 }
