@@ -24,12 +24,12 @@ export function button(): HTMLElement {
 
 function show() {
   const okEl = Element.create({
-      className: 'uibutton',
+      className: 'uibutton ok-b',
       innerHTML: 'ok',
     }), 
     cancelEl = Element.create({
-      className: 'uibutton',
-      innerHTML: 'cancel',
+      className: 'uibutton cancel-b',
+      innerHTML: 'cancel'
     }), 
     fxvolume = Element.create({ tag: 'input' }) as HTMLInputElement,
     musicvolume = Element.create({ tag: 'input' }) as HTMLInputElement,

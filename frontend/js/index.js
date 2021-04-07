@@ -1,11 +1,11 @@
-import { request, post, gameaction } from './request.js';
+import { request, gameaction } from './request.js';
 import * as Player from './player.js';
 import * as Element from './element.js';
-import * as Err from './err.js';
 import * as Settings from './settings.js';
 import * as Dialog from './dialog.js';
 import * as Soundtrack from './soundtrack.js';
 import * as SFX from './sfx.js';
+import * as CreateTable from './createTable.js';
 const displayedTables = {};
 const configurations = {};
 function fetchConfigs(sel_el) {
@@ -120,18 +120,19 @@ window.onload = function () {
         window.setInterval(fetchTableData, 2000);
         document.getElementById('player').appendChild(renderPlayer(player));
         ct.onclick = () => {
-            const conf = sel_el.value;
-            if (!conf) {
-                Err.displayerror('select a game type');
-                return;
-            }
-            Player.check().then(() => {
-                post('table/new', { configuration: conf }).then(({ id }) => {
-                    gameaction('join', {}, 'table', id).then(() => {
-                        window.location.href = `board.html?table=${id}`;
-                    });
-                });
-            });
+            CreateTable.dialog();
+            //      const conf = sel_el.value;
+            //      if (! conf) {
+            //        Err.displayerror('select a game type');
+            //        return;
+            //      }
+            //      Player.check().then(() => {
+            //        post('table/new', { configuration: conf }).then(({ id }) => {
+            //          gameaction('join', {}, 'table', id).then(() => {
+            //            window.location.href = `board.html?table=${id}`;
+            //          });
+            //        });
+            //      });
         };
     });
 };

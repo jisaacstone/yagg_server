@@ -9,7 +9,7 @@ defmodule Yagg.Table do
   alias __MODULE__
 
   @enforce_keys [:id, :players, :board, :turn, :configuration, :history]
-  defstruct [:subscribors, :timer | @enforce_keys]
+  defstruct [:subscribors, :timer, :opts | @enforce_keys]
 
   @opaque history :: [Board.t]
 
@@ -21,21 +21,24 @@ defmodule Yagg.Table do
     turn: :nil | Player.position,
     configuration: Configuration.t,
     history: history,
-    timer: :nil | reference
+    timer: :nil | reference,
+    opts: %{atom => any},
   }
 
   defimpl Poison.Encoder, for: Table do
-    def encode(%{players: players, board: board, turn: turn, configuration: configuration, timer: timer}, options) do
-      time = case timer do
+    def encode(table, options) do
+      time = case table.timer do
         :nil -> :nil
         ref -> Process.read_timer(ref)
       end
       Poison.Encoder.Map.encode(%{
-          players: players,
-          board: board,
-          turn: turn,
-          configuration: configuration,
-          timer: time
+          players: table.players,
+          board: table.board,
+          turn: table.turn,
+          configuration: table.configuration,
+          timer: time,
+          opts: table.opts,
+          id: table.id,
         },
         options
       )
@@ -60,7 +63,7 @@ defmodule Yagg.Table do
   end
 
   @spec new(module) :: {:ok, t}
-  def new(configuration \\ Board.Configuration.Random) do
+  def new(configuration, opts \\ []) do
     config = configuration.new()
     id = "#{:erlang.unique_integer([:positive])}"
     table = %Table{
@@ -72,6 +75,7 @@ defmodule Yagg.Table do
       configuration: config,
       history: [],
       timer: nil,
+      opts: opts,
     }
     {:ok, _pid} = DynamicSupervisor.start_child(
       Yagg.TableSupervisor,

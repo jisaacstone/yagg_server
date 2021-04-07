@@ -172,3 +172,21 @@ body > div, body > form {
   border: none;
   padding: 0.5em 0 0.5em 1em;
 }
+
+/* create table */
+
+input[type="radio"] {
+  display: none;
+}
+
+label {
+  display: inline-block;
+  background-color: var(--ui-main-desaturated-transparent);
+  padding: 0 0.2em;
+  margin: 2px;
+  cursor: pointer;
+}
+
+input[type="radio"]:checked+label {
+  background-color: var(--ui-main-saturated);
+}

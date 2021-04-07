@@ -67,7 +67,6 @@ defmodule Yagg.Jobfair do
       if Enum.all?(indices, &Map.has_key?(fair.choices, &1)) do
         {:ok, Map.put(jobfair, position, %{fair | chosen: indices, ready: :true})}
       else
-        IO.inspect(indices: indices, choices: fair.choices, map: Enum.map(indices, fn(i) -> {i, Map.has_key?(fair.choices, i)} end))
         {:err, :badindex}
       end
     end

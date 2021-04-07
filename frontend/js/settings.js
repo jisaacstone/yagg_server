@@ -22,11 +22,11 @@ export function button() {
 }
 function show() {
     const okEl = Element.create({
-        className: 'uibutton',
+        className: 'uibutton ok-b',
         innerHTML: 'ok',
     }), cancelEl = Element.create({
-        className: 'uibutton',
-        innerHTML: 'cancel',
+        className: 'uibutton cancel-b',
+        innerHTML: 'cancel'
     }), fxvolume = Element.create({ tag: 'input' }), musicvolume = Element.create({ tag: 'input' }), mute = Element.create({ tag: 'input' }), fxsettings = SFX.settings(), stsettings = Soundtrack.settings(), optionsEl = Dialog.createDialog('options', Element.create({
         children: [
             Element.create({ innerHTML: 'sfx volume' }),

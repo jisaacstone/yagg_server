@@ -43,14 +43,43 @@ defmodule Yagg.Endpoint do
 
   post "/table/new" do
     {:ok, body, conn} = Conn.read_body(conn)
-    data = Poison.Parser.parse!(body, %{keys: :atoms!})
-    config = if Map.has_key?(data, :configuration) do
-      Enum.find(Configuration.all(), fn(c) -> c.name == data.configuration end).module
-    else
-      Configuration.Random
+    try do
+      Poison.Parser.parse!(body, %{keys: :atoms!})
+      |> extract_config()
+      |> extract_opts()
+      |> call_tablenew()
+    rescue
+      Poison.ParseError -> {:err, :malformed_json}
+    end |> to_response(conn)
+  end
+
+  defp extract_config(data) do
+    case Map.pop(data, :configuration) do
+      {:nil, _} -> {:err, :configuration_required}
+      {configname, data} ->
+        case Enum.find(Configuration.all(), fn(c) -> c.name == configname end) do
+          :nil -> {:err, :configuration_not_found}
+          %{module: config} -> {:ok, config, data}
+        end
     end
-    {:ok, %{id: table_id}} = Table.new(config)
-    respond(conn, 200, %{id: table_id})
+  end
+
+  defp extract_opts({:err, reason}), do: {:err, reason}
+  defp extract_opts({:ok, config, data}) do
+    opts = Enum.map(
+      data,
+      fn
+        ({k, s}) when is_binary(s) -> {k, String.to_existing_atom(s)}
+        (n) -> n
+      end
+    )
+    {:ok, config, opts}
+  end
+
+  defp call_tablenew({:err, reason}), do: {:err, reason}
+  defp call_tablenew({:ok, config, opts}) do
+    IO.inspect({config, opts})
+    IO.inspect(Table.new(config, opts))
   end
 
   get "/table" do
