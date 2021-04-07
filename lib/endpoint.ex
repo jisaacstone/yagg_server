@@ -72,30 +72,24 @@ defmodule Yagg.Endpoint do
         ({k, s}) when is_binary(s) -> {k, String.to_existing_atom(s)}
         (n) -> n
       end
-    )
+    ) |> Enum.into(%{})
     {:ok, config, opts}
   end
 
   defp call_tablenew({:err, reason}), do: {:err, reason}
   defp call_tablenew({:ok, config, opts}) do
-    IO.inspect({config, opts})
-    IO.inspect(Table.new(config, opts))
+    Table.new(config, opts)
   end
 
   get "/table" do
     tables = Table.list() |> Enum.map(
       fn (id) ->
         {:ok, table} = Table.get_state(id)
-        %{id: id, players: table.players, config: table.configuration, state: state(table.board)}
+        table
       end
     )
     respond(conn, 200, %{tables: tables})
   end
-
-  def state(%Yagg.Jobfair{}), do: :jobfair
-  def state(%{state: :battle}), do: :battle
-  def state(%{state: %{__struct__: stst}}), do: Module.split(stst) |> Enum.reverse() |> hd() |> String.downcase()
-  def state(other), do: other
 
   post "/board/:table_id/a/:action" do
     case prep_action(Board.Action, action, conn) do

@@ -11,22 +11,28 @@ import * as CreateTable from './createTable.js';
 const displayedTables = {};
 const configurations = {};
 
-function fetchConfigs(sel_el: HTMLInputElement) {
-  request('configurations').then(
-    (configs: any) => {
-      for (const config of configs) {
-        configurations[config.name] = config
-        sel_el.appendChild(
-          Element.create({ tag: 'option', innerHTML: config.name }));
-      }
-      sel_el.addEventListener('change', () => {
-        const configName = sel_el.value,
-          configuration = configurations[configName],
-          descriptionEl = document.getElementById('config-description');
-        descriptionEl.innerHTML = configuration.description;
-      })
-    }
-  );
+function render() {
+  const howto = Element.create({
+    tag: 'a',
+    className: 'uibutton',
+    innerHTML: 'how to play'
+  });
+  howto.setAttribute('href', 'howto.html');
+  document.body.appendChild(Element.create({ id: 'howto', children: [howto] }));
+  document.body.appendChild(Element.create({ id: 'settings' }));
+  document.body.appendChild(Element.create({ id: 'player' }));
+  document.body.appendChild(Element.create({
+    id: 'createdialog',
+    children: [
+      Element.create({ id: 'createtable', tag: 'button', className: 'uibutton', innerHTML: 'create new table' })
+    ]
+  }));
+  document.body.appendChild(Element.create({
+    id: 'tables',
+    children: [
+      Element.create({ tag: 'p', innerHTML: 'join a table' })
+    ]
+  }));
 }
 
 function displayTableData(tablesEl, data) {
@@ -38,13 +44,13 @@ function displayTableData(tablesEl, data) {
   });
 }
 
-function renderTable({ config }, child): HTMLElement {
+function renderTable({ configuration }, child): HTMLElement {
   return Element.create({
     className: 'table',
     children: [
       Element.create({
         className: 'config-name',
-        innerHTML: config.name}),
+        innerHTML: configuration.name}),
       child
     ]
   });
@@ -54,6 +60,9 @@ function displayTables(tablesEl, tables, currentId) {
   const toRemove = new Set(Object.keys(displayedTables));
   for (const table of tables) {
     if (table.state === "gameover") {
+      continue;
+    }
+    if (table.opts.type === "private") {
       continue;
     }
     if (currentId && table.players.some(({ player }) => player.id === currentId)) {
@@ -97,6 +106,7 @@ function displayTables(tablesEl, tables, currentId) {
 function fetchTableData() {
   const tables = document.getElementById('tables');
   request('table').then(tabledata => {
+    console.log({ tabledata });
     displayTableData(tables, tabledata);
   }).catch((e) => console.log({ e }));
 }
@@ -109,8 +119,8 @@ function renderPlayer({ id, name }): HTMLElement {
 }
 
 window.onload = function() {
-  const ct = document.getElementById('createtable'),
-    sel_el = document.getElementById('config') as HTMLInputElement;
+  render();
+  const ct = document.getElementById('createtable');
 
   SFX.loadSettings();
   Soundtrack.loadSettings();
@@ -122,37 +132,15 @@ window.onload = function() {
   };
   document.addEventListener('click', mml);
 
-  ct.style.display = 'hidden';
-  sel_el.onchange = () => {
-    if (sel_el.value) {
-      sel_el.style.display = 'block';
-    } else {
-      sel_el.style.display = 'hidden';
-    }
-  }
-
   document.getElementById('settings').appendChild(Settings.button());
 
   Player.check().then((player) => {
-    fetchConfigs(sel_el);
     fetchTableData();
     window.setInterval(fetchTableData, 2000);
     document.getElementById('player').appendChild(renderPlayer(player));
 
     ct.onclick = () => {
       CreateTable.dialog();
-//      const conf = sel_el.value;
-//      if (! conf) {
-//        Err.displayerror('select a game type');
-//        return;
-//      }
-//      Player.check().then(() => {
-//        post('table/new', { configuration: conf }).then(({ id }) => {
-//          gameaction('join', {}, 'table', id).then(() => {
-//            window.location.href = `board.html?table=${id}`;
-//          });
-//        });
-//      });
     };
   });
 };

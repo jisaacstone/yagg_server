@@ -39,10 +39,16 @@ defmodule Yagg.Table do
           timer: time,
           opts: table.opts,
           id: table.id,
+          state: state(table.board),
         },
         options
       )
     end
+
+    defp state(%Yagg.Jobfair{}), do: :jobfair
+    defp state(%{state: :battle}), do: :battle
+    defp state(%{state: %{__struct__: stst}}), do: Module.split(stst) |> Enum.reverse() |> hd() |> String.downcase()
+    defp state(other), do: other
   end
 
   def start_link(table, args \\ []) do

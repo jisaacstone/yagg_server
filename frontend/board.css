@@ -668,7 +668,6 @@ body {
 
 .descriptions {
   grid-area: ability;
-  display: grid;
   justify-self: center;
   align-self: start;
 }
