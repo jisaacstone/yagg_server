@@ -29,25 +29,6 @@ body > div, body > form {
   background-position: center;
 }
 
-#createdialog {
-  min-width: 45%;
-  max-width: 90%;
-  /*border: 0.2em solid var(--ui-alt-saturated);*/
-  padding: 1em;
-  margin: 1em;
-  display: grid;
-  color: var(--ui-alt-dark-dark);
-  row-gap: 0.5em;
-  text-shadow: 1px 1px 1px var(--white-transparent-low);
-}
-
-#createdialog label {
-  color: var(--ui-main-dark);
-  font-size: 280%;
-  text-align: center;
-  font-family: 'summershand'
-}
-
 #createtable {
   padding: 0.4em;
   max-width: 14em;
@@ -189,4 +170,43 @@ label {
 
 input[type="radio"]:checked+label {
   background-color: var(--ui-main-saturated);
+}
+
+.choices {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+
+#createdialog {
+  width: 80vw;
+  padding: 1em;
+  margin: 1em;
+  display: grid;
+  color: var(--ui-alt-dark-dark);
+  row-gap: 0.5em;
+  text-shadow: 1px 1px 1px var(--white-transparent-low);
+}
+
+#createdialog label {
+  color: var(--ui-main-dark);
+  font-size: 280%;
+  text-align: center;
+  font-family: 'summershand'
+}
+
+.fs-description {
+  display: grid;
+  place-self: center;
+  place-content: center;
+  min-height: 3em;
+  text-align: justify;
+  padding: 0.2em;
+}
+
+#createdialog button {
+  min-height: 2em;
+  padding: 0 2.5em;
+  place-self: center;
 }
