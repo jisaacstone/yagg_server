@@ -950,7 +950,8 @@ body {
 
 #buttons .uibutton {
   text-shadow: -0.1em -0.1em 0.2em var(--ui-alt-desaturated), 1px 1px 1px white;
-  margin: 0.1em 0.1em;
+  margin: 0.1em;
+  padding-left: 1em;
 }
 
 #readybutton {
