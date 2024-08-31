@@ -33,7 +33,7 @@ defmodule YaggTest.Action.Ability do
           {{4, 3}, unit}
         ])
     action = %Board.Action.Move{from_x: 4, from_y: 4, to_x: 4, to_y: 3}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
+    assert {%Board{}, events} = Board.Action.resolve(action, board, :north)
     assert Enum.find(events, fn(e) -> e != :nil and e.kind == :unit_died end)
     assert Enum.find(events, fn(e) -> e != :nil and e.kind == :add_to_hand end)
   end
@@ -49,7 +49,7 @@ defmodule YaggTest.Action.Ability do
           {{1, 2}, unitE},
         ])
     action = %Board.Action.Move{from_x: 2, from_y: 2, to_x: 2, to_y: 3}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{2, 2}] == :nil
     assert newboard.grid[{3, 2}] == :nil
     assert newboard.grid[{1, 2}] == unitE
@@ -77,7 +77,7 @@ defmodule YaggTest.Action.Ability do
           {{2, 2}, :block},
         ])
     action = %Board.Action.Ability{x: 2, y: 3}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert {%Board{} = newboard, _events} = Board.Action.resolve(action, board, :south)
     assert newboard.grid[{2, 3}] == :nil
     assert newboard.grid[{1, 3}].name == unitP.name
     assert newboard.grid[{0, 3}].name == unitM.name
@@ -128,7 +128,7 @@ defmodule YaggTest.Action.Ability do
     }
     action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 0, to_y: 3}
     board = %Board{grid: grid, state: :battle, hands: [], dimensions: {5, 5}, configuration: Board.Configuration.Alpha}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :north)
+    assert {%Board{}, _events} = Board.Action.resolve(action, board, :north)
   end
 
   test "timeout" do
@@ -142,7 +142,7 @@ defmodule YaggTest.Action.Ability do
     }
     action = %Board.Action.Move{from_x: 0, from_y: 2, to_x: 1, to_y: 2}
     board = %Board{grid: grid, state: :battle, hands: %{north: %{}, south: %{}}, dimensions: {5, 5}, configuration: Board.Configuration.Alpha}
-    assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
+    assert {%Board{}, _events} = Board.Action.resolve(action, board, :south)
   end
 
   test "spark" do
@@ -189,7 +189,7 @@ defmodule YaggTest.Action.Ability do
     ])
     action = %Board.Action.Move{from_x: 3, from_y: 2, to_x: 4, to_y: 2}
     assert {%Board{} = newboard, events} = Board.Action.resolve(action, board, :south)
-    assert event = Enum.find(events, fn(e) -> e != :nil and e.kind == :unit_died end)
+    assert _event = Enum.find(events, fn(e) -> e != :nil and e.kind == :unit_died end)
     assert %{name: :tinker} = newboard.grid[{4, 2}]
   end
 

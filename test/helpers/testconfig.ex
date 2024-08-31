@@ -4,7 +4,10 @@ alias Yagg.Board
 defmodule Helper.TestConfig do
   @behaviour Configuration
 
+  @impl Configuration
   def name(), do: :testconfig
+
+  @impl Configuration
   def description(), do: "testconfig"
 
   @impl Configuration

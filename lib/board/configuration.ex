@@ -4,6 +4,7 @@ alias Yagg.Jobfair
 alias Yagg.Event
 
 defmodule Yagg.Board.Configuration do
+  @moduledoc "Game settings, such as board size, etc"
   alias __MODULE__
 
   @enforce_keys [:name, :dimensions, :initial_module, :units, :terrain]

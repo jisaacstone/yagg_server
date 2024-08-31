@@ -58,7 +58,7 @@ defmodule YaggTest.Endpoint do
 
   test "game join" do
     %{id: id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
-    %{status: status, resp_body: body} = send_json("/table/new", "{}", id)
+    %{status: status, resp_body: body} = send_json("/table/new", ~s({"configuration": "fivers"}), id)
     assert status == 200
     assert %{"id" => gid} = Poison.decode!(body)
     {:ok, _pid} = Table.subscribe(gid, "player1")
@@ -167,7 +167,7 @@ defmodule YaggTest.Endpoint do
 
   test "bad action" do
     %{id: id, name: "bob"} = call_200("/player/guest", %{"name" => "bob"})
-    %{id: table_id} = call_200("/table/new", %{}, id)
+    %{id: table_id} = call_200("/table/new", %{"configuration" => "fivers"}, id)
     assert %{status: 400} = send_json(
       "/table/#{table_id}/a/oops",
       Poison.encode!(%{player: "p1"})

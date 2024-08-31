@@ -175,13 +175,17 @@ defmodule Yagg.Endpoint do
 
   defp to_response(result, conn) do
     case result do
-      :ok -> respond(conn, 204, "")
+      :ok -> respond(conn, 204)
       {:ok, resp} -> respond(conn, 200, resp)
       {:err, err} -> respond(conn, 400, %{error: err})
       # other -> respond(conn, 501, %{unexpected: other})
     end
   end
 
+  defp respond(conn, code) do
+    conn
+      |> send_resp(code, "")
+  end
   defp respond(conn, code, data) do
     conn
       |> put_resp_content_type("application/json")

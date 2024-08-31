@@ -53,7 +53,7 @@ defmodule YaggTest.Action.Move do
       {{0, 0}, Unit.Monarch.new(:south)},
     ])
     action = %Board.Action.Move{from_x: 1, from_y: 1, to_x: 1, to_y: 0}
-    assert {newboard, events} = Board.Action.resolve(action, board, :north)
+    assert {newboard, _events} = Board.Action.resolve(action, board, :north)
     assert %Board.State.Gameover{winner: :north} = newboard.state
   end
  

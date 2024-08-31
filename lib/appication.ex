@@ -1,4 +1,5 @@
 defmodule Yagg.Application do
+  @moduledoc "the http server"
   use Application
 
   def server_spec() do

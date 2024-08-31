@@ -43,6 +43,7 @@ defmodule YaggServer.MixProject do
       {:cors_plug, "~> 2.0"},
       {:plug_cowboy, "~> 2.2"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:credo, "~> 1.7", only: [:dev], runtime: false},
     ]
   end
 end

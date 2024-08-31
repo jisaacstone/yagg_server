@@ -4,6 +4,7 @@ alias Helper.TestConfig
 
 defmodule Helper.Board do
   def testconfig(starting_u, terr, dimen) do
+    Code.put_compiler_option(:ignore_module_conflict, true)
     contents = quote do
       def new() do
         %Configuration{

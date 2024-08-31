@@ -1,6 +1,7 @@
 alias Yagg.Table
 
 defmodule Table.Player do
+  @moduledoc "Player metadata for table"
   alias __MODULE__
   @derive {Poison.Encoder, only: [:id, :name]}
   @enforce_keys [:id, :name]
@@ -17,7 +18,7 @@ defmodule Table.Player do
   end
 
   def new(name) do
-    id = :erlang.phash2({node(), :erlang.now()})
+    id = :erlang.phash2({node(), :os.timestamp()})
     player = %Player{id: id, name: name}
     :true = :ets.insert(:players, {id, player})
     player

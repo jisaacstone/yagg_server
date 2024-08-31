@@ -8,6 +8,13 @@ alias Yagg.Table.Action
 defmodule Board.Configuration.AlphaTest do
   @behaviour Board.Configuration
 
+  @impl Board.Configuration
+  def name(), do: :at
+
+  @impl Board.Configuration
+  def description(), do: "at"
+
+  @impl Board.Configuration
   def new() do
     units = %{
       north: starting_units(:north),
