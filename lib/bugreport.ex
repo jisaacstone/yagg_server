@@ -4,7 +4,7 @@ defmodule Yagg.Bugreport do
   """
   def report(board, history, moves, report, meta) do
     {:ok, file} = File.open('bugreports', [:append])
-    _ = IO.inspect(file, report, label: "report")
+    IO.inspect(file, report, label: "report")
     _ = IO.inspect(file, DateTime.utc_now(), [])
     _ = IO.inspect(file, meta, pretty: :true)
     _ = IO.inspect(file, board, pretty: :true, width: :infinity)

@@ -1,3 +1,4 @@
+require Logger
 alias Yagg.{Table, Event, Board, Bugreport}
 alias Plug.Conn
 alias Yagg.Board.Configuration
@@ -167,8 +168,7 @@ defmodule Yagg.Endpoint do
         sse_loop(conn, pid)
       {:DOWN, _reference, :process, ^pid, _type} ->
         conn
-      other ->
-        IO.inspect(['OTHER MESSAGE', other])
+      _other ->
         sse_loop(conn, pid)
     end
   end
@@ -205,10 +205,10 @@ defmodule Yagg.Endpoint do
       {player, actiondata}
     rescue
       e in ArgumentError ->
-        IO.inspect(e)
+        Logger.info("prep_action error #{e}, namespace: #{namespace}, action: #{action}")
         {:err, :unknown_action}
       e in Poison.ParseError ->
-        IO.inspect(e)
+        Logger.info("prep_action error #{e}, namespace: #{namespace}, action: #{action}")
         {:err, :malformed_request}
     end
   end

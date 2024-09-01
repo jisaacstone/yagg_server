@@ -5,8 +5,10 @@ alias Yagg.Board.{State, Grid}
 alias Yagg.Jobfair
 
 defmodule Table.Timer do
+  @moduledoc "Timed events - initial setup, taking turns"
+
   def set(table, milliseconds) do
-    _ = if (table.timer) do
+    _ = if table.timer do
       Process.cancel_timer(table.timer)
     end
     timer = Process.send_after(self(), :timeout, milliseconds)
@@ -28,7 +30,6 @@ defmodule Table.Timer do
   def kill_table_timer(table) do
     milliseconds = 20 * 1000
     table = set(table, milliseconds)
-    IO.inspect(mils: milliseconds, timer: table.timer)
     table
   end
     

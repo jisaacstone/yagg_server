@@ -10,7 +10,7 @@ defmodule YaggServer.MixProject do
       deps: deps(),
       elixirc_paths: compiler_paths(Mix.env()),
       dialyzer: [
-        flags: [:unmatched_returns, :error_handling, :race_conditions, :unknown],
+        flags: [:unmatched_returns, :error_handling, :unknown],
       ],
       releases: [
         yagg: [
@@ -42,8 +42,8 @@ defmodule YaggServer.MixProject do
       {:gen_stage, "~> 1.0"},
       {:cors_plug, "~> 2.0"},
       {:plug_cowboy, "~> 2.2"},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:credo, "~> 1.7", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:credo, git: "https://github.com/jisaacstone/credo", only: [:dev], runtime: false},
     ]
   end
 end

@@ -1,7 +1,9 @@
+require Logger
 alias Yagg.Event
 alias Yagg.Table
 
 defmodule Yagg.Websocket do
+  @moduledoc "Handle websocket connectinos"
   @behaviour :cowboy_websocket
   @impl :cowboy_websocket
   def init(req, _state) do
@@ -31,7 +33,7 @@ defmodule Yagg.Websocket do
   end
 
   def websocket_handle(msg, state) do
-    IO.inspect([websocket_message: msg])
+    Logger.warning("Unexpected websocket message #{msg}")
     {:reply, {:text, "WHO ARE YOU!?"}, state}
   end
 
@@ -44,13 +46,13 @@ defmodule Yagg.Websocket do
     {:ok, state}
   end
   def websocket_info(ither, state) do
-    IO.inspect([ws_noexpect: ither])
+    Logger.warning("Unexpected websocket_info #{ither}")
     {:ok, state}
   end
 
   @impl :cowboy_websocket
-  def terminate(reason, req, _state) do
-    IO.inspect(ws_terminate: reason, req: req)
+  def terminate(_reason, _req, _state) do
+    Logger.warning("Websocket handler terminated")
     :ok
   end
 end
