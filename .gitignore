@@ -27,8 +27,8 @@ yagg_server-*.tar
 bugreports
 
 node_modules
-package-lock.json
 build/
 *.zip
 
+frontend/js/
 frontend/music

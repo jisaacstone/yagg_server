@@ -88,8 +88,7 @@ function displayTables(tablesEl, tables, currentId) {
           window.location.href = `board.html?table=${table.id}`;
         }).catch((e) => {
           Dialog.alert('join failed, unknown error, please try again').then(() => {
-            //reload
-            window.location = window.location;
+            window.location.reload();
           });
         });
       };
@@ -106,9 +105,8 @@ function displayTables(tablesEl, tables, currentId) {
 function fetchTableData() {
   const tables = document.getElementById('tables');
   request('table').then(tabledata => {
-    console.log({ tabledata });
     displayTableData(tables, tabledata);
-  }).catch((e) => console.log({ e }));
+  }).catch((e) => console.error({ e }));
 }
 
 function renderPlayer({ id, name }): HTMLElement {
@@ -126,7 +124,6 @@ window.onload = function() {
   Soundtrack.loadSettings();
   Soundtrack.setSoundtrack('menu');
   const mml = () => {
-    console.log('mml');
     Soundtrack.play();
     document.removeEventListener('click', mml);
   };

@@ -75,7 +75,7 @@ function handleSomethingAlreadySelected(el: HTMLElement, meta): boolean {
   const sel = global.selected;
   if (sel && sel.element) {
     if (!sel.element.firstChild) {
-      console.log({ error: 'no child of selected element', sel, el, meta });
+      console.warn({ error: 'no child of selected element', sel, el, meta });
       deselect();
       return true;
     }
@@ -90,7 +90,7 @@ function handleSomethingAlreadySelected(el: HTMLElement, meta): boolean {
       deselect();
       return false;
     } else if (sel.options && !sel.options.includes(el)) {
-      console.log('not in options');
+      console.warn('not in options');
       // for now ignore clicks on things that are not move options
       return true;
     } else {

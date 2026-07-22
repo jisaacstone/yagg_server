@@ -5,7 +5,7 @@ betest:
 	mix test && mix dialyzer
 
 server:
-	tsc && iex -S mix
+	./node_modules/.bin/tsc && iex -S mix
 
 built:
 	./febuild && docker build . -t yagg

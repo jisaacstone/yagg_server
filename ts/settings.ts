@@ -81,7 +81,6 @@ function show() {
     mute.setAttribute('checked', 'true');
   }
   mute.addEventListener('change', () => {
-    console.log('mutechange');
     if (mute.checked) {
       SFX.mute();
       Soundtrack.mute();

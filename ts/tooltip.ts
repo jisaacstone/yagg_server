@@ -9,7 +9,6 @@ export function addTooltip(el: HTMLElement, text: string) {
   });
   el.appendChild(tooltip);
   el.addEventListener('touchstart', () => {
-    console.log({ e: 'hover', el, text });
     el.classList.add('hover');
   }, false);
 }

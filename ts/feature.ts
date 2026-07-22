@@ -8,7 +8,7 @@ export function render(type: string): HTMLElement {
   } if (type === 'block') {
     return renderBlock();
   } 
-  console.log(`unknown feature type: ${type}`);
+  console.warn(`unknown feature type: ${type}`);
   return document.createElement('marquee');
 }
 

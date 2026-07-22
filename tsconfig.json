@@ -1,13 +1,11 @@
 {
     "compilerOptions": {
         "outDir": "./frontend/js",
+        "rootDir": "./ts",
         "allowJs": true,
         "target": "es6",
-        "lib": ["es2018", "dom", "dom.iterable", "scripthost"],
-        "baseUrl": ".",
-        "paths": {
-          "*": ["ts/*", "tstest/*"]
-        }
+        "strict": false,
+        "lib": ["es2018", "dom", "dom.iterable", "scripthost"]
     },
     "include": [
         "./ts/**/*"

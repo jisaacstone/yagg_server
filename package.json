@@ -1,0 +1,12 @@
+{
+  "name": "yagg-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "YAGG game frontend",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

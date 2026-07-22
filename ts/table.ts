@@ -180,7 +180,6 @@ window.onload = function() {
   SFX.loadSettings();
   Soundtrack.loadSettings();
   const mml = () => {
-    console.log('mml');
     Soundtrack.play();
     document.removeEventListener('click', mml);
   };
@@ -207,7 +206,7 @@ window.onload = function() {
       fetchgamestate();
       listen();
     }).catch((err) => {
-      console.log({ joinerror: err });
+      console.error({ joinerror: err });
       fetchgamestate();
       listen();
     });

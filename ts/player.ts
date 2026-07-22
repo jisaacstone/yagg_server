@@ -39,7 +39,7 @@ export function check(): Promise<PlayerData> {
   if (id && name) {
     return request(`player/${id}`, false).then((resp: any) => {
       if (resp.name !== name) {
-        console.log('warning: name mismatch');
+        console.warn('name mismatch');
         Storage.setItem('playerData', 'name', resp.name);
       }
       return { id, name: resp.name };
@@ -47,7 +47,6 @@ export function check(): Promise<PlayerData> {
       return post('player/guest', { id, name })
         .catch((err) => {
           console.error({ message: 'error recreating guest account', err });
-          console.log({"localstorage": "removePlayerData", id, name});
           Storage.removeItem('playerData', 'id');
           Storage.removeItem('playerData', 'name');
           return create();

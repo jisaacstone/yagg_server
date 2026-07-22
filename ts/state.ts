@@ -38,8 +38,6 @@ function instructions(stateName) {
         "Destroy your opponent's monarch, protect your monarch" :
         "Capture your opponent's flag, protect your flag";
     Instructions.dropdown(`battle-${monName}`, instructions);
-  } else {
-    console.log(`no instructions for ${stateName}`);
   }
 }
 

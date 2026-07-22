@@ -10,7 +10,7 @@ rm -f yagg.zip
 cp frontend/*.* build/
 cp -r frontend/icons build/
 
-tsc
+./node_modules/.bin/tsc
 cp -r frontend/js build
 cp -r frontend/sfx build
 

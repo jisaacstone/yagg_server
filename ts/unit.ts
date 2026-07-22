@@ -73,13 +73,11 @@ export function showTriggers(coord: Board.Coord, triggers: Triggers): void {
 export function hilight(coord: Board.Coord, className: string): Promise<any> {
   const el = document.querySelector(`#${Board.squareId(coord)} .${className}`) as HTMLElement;
   if (!el) {
-    console.log({ coord, className });
     return Promise.resolve(false);
   }
   //SFX.play('hilight');
   el.dataset.hilighted = 'true';
   el.classList.add('hilight');
-  console.log(el);
   return new Promise((resolve) => {
     setTimeout(() => {
       delete el.dataset.hilighted;
@@ -349,8 +347,6 @@ export function detailViewFn(el: HTMLElement, square: HTMLElement = null, unit =
   return (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log({ unit, s: units[el.id], id: el.id, units });
-
     SFX.play('click');
     const descriptions = describe(unit, square),
       portrait = Element.create({ className: 'unit-portrait' }),

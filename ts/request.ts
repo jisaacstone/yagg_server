@@ -1,22 +1,6 @@
-import { hostname, getname, tableid } from './urlvars.js';
+import { hostname, tableid } from './urlvars.js';
 import * as Player from './player.js';
 import * as Dialog from './dialog.js';
-
-const dn = {name: null};
-
-function _name_() {
-  // random name
-  if (! dn.name) {
-     dn.name = [...Array(8)].map(() => Math.random().toString(36)[2]).join('');
-  }
-  return dn.name;
-}
-
-function add_auth(request, method, url) {
-  // still no auth, get player name from query params
-  const name = getname() || _name_();
-  return request;
-}
 
 export function action(actType, args, cb=null) {
   gameaction(actType, args, 'board')
@@ -36,7 +20,7 @@ export function action(actType, args, cb=null) {
         } else if (request.responseText.includes('empty')) {
           //UI is messed up most likely
           Dialog.alert('oops, something went wrong').then(() => {
-            window.location = window.location;
+            window.location.reload();
           });
         }
       }
@@ -99,7 +83,6 @@ export function request(path: string, auth=true) {
         }
       });
       xhr.onerror = function (e) {
-        console.log({r: 'ONERRR', e});
         reject({request: xhr});
         throw e;
       };
@@ -117,7 +100,6 @@ export function post(path: string, body: any) {
     var xhr = new XMLHttpRequest();
     xhr.addEventListener('load', function() {
       if (xhr.status < 200 || xhr.status >= 300) {
-        console.log({status: xhr.status, text: xhr.responseText});
         reject({request: xhr});
       } else {
         try {

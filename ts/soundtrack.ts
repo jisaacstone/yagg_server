@@ -74,7 +74,6 @@ export function setVolume(volume: number): void {
 export function loadSettings() {
   const sv = Storage.getItem('music', 'volume'),
     sm = Storage.getItem('music', 'mute');
-  console.log({ sv, sm });
   if (sv) {
     setVolume(+sv);
   }

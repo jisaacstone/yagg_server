@@ -27,7 +27,7 @@ export function render(armySize: number) {
     if (state.armySize) {
       armySize = state.armySize;
     } else {
-      console.log({err: 'noarmysize', state, armySize});
+      console.warn({err: 'noarmysize', state, armySize});
     }
   } else {
     state.armySize = armySize;

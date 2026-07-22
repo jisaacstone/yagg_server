@@ -83,7 +83,7 @@ export function leave() {
   Request.gameaction('leave', {}, 'table').then(() => {
     window.location.href = 'index.html';
   }).catch((e) => {
-    console.log({error: e});
+    console.error({error: e});
     window.location.href = 'index.html';
   });
 }

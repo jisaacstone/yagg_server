@@ -24,7 +24,6 @@ let waits = 0;
 
 function handleNextEventQ(next) {
   if (Event[next.event]) {
-    console.log(next);
     try {
       const animation = Event[next.event](next);
       return animation().then(() => {
@@ -37,7 +36,7 @@ function handleNextEventQ(next) {
       console.error({error, next});
     }
   } else {
-    console.log({msg: `no event handler for ${next.event}`, next});
+    console.warn({msg: `no event handler for ${next.event}`, next});
   }
   return Promise.resolve('errored');
 }
@@ -71,7 +70,6 @@ function createWSEventListener() {
       );
     }
     state.eventListener.onclose = (event) => {
-      console.log({ wscb: 'onclose', event });
       clearInterval(state.interval);
     }
     state.eventListener.onerror = (event) => {

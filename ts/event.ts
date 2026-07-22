@@ -169,7 +169,6 @@ export function unit_placed(event): eventHandler {
       square.appendChild(unit);
       return SFX.play('place');
     } else {
-      console.log({ msg: `${event.x},${event.y} already occupied`, event });
       return Promise.resolve(false);
     }
   };
