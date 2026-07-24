@@ -1,5 +1,6 @@
 import * as Unit from './unit.js';
 import * as Event from './event.js';
+import * as Element from './element.js';
 import { displayerror } from './err.js';
 import { gameaction } from './request.js';
 import * as Ready from './ready.js';
@@ -13,10 +14,10 @@ const state = {
 }
 
 export function render(armySize: number) {
-  const jfel = document.getElementById('jobfair'),
+  const jfel = Element.getElement('jobfair'),
     jobfair = jfel || document.createElement('div'),
     counter = getCounter(),
-    table = document.getElementById('table');
+    table = Element.getElement('table');
 
   jobfair.innerHTML = '';
 
@@ -39,25 +40,25 @@ export function render(armySize: number) {
 }
 
 export function clear() {
-  const jobfair = document.getElementById('jobfair');
+  const jobfair = Element.getElement('jobfair');
   if (jobfair) {
     jobfair.remove();
   }
 }
 
 function getCounter(): HTMLElement {
-  const counter = document.getElementById('counter');
+  const counter = Element.getElement('counter');
   if (counter) {
     return counter;
   }
   const c = document.createElement('div');
   c.id = 'counter';
-  document.getElementById('buttons').appendChild(c);
+  Element.getElement('buttons').appendChild(c);
   return c;
 }
 
 function countDown() {
-  const counter = document.getElementById('counter');
+  const counter = Element.getElement('counter');
   counter.innerHTML = `${state.armySize - state.selected.size}`;
   if (state.selected.size == state.armySize) {
     Ready.display(
@@ -102,7 +103,7 @@ export function deselect(index) {
   if (state.ready === 'ready') {
     return false;
   }
-  const counter = document.getElementById('counter');
+  const counter = Element.getElement('counter');
   state.selected.delete(index);
   counter.innerHTML = `${state.armySize - state.selected.size}`;
   if (state.ready === 'displayed' && state.selected.size < state.armySize) {
@@ -117,7 +118,7 @@ export function unitdata(unitdata) {
     Event.candidate({ event: 'candidate', index: +index, unit })();
   }
   for (let index of unitdata.chosen) {
-    document.getElementById(`candidate-${index}`).dataset.uistate = 'selected';
+    Element.getElement(`candidate-${index}`).dataset.uistate = 'selected';
     select(index);
   }
   if (unitdata.ready) {

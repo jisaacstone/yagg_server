@@ -69,16 +69,12 @@ export function render(el: HTMLElement, dimensions: Dimensions) {
   el.style.backgroundImage = `url(img/grid_${dimensions.width}x${dimensions.height}_${gmeta.position}.png)`;
 }
 
-export function square(x: number, y: number): HTMLElement {
-  const el = document.getElementById(squareId({ x, y }));
-  if (!el) {
-    throw new Error(`square ${x},${y} not found`)
-  }
-  return el;
+export function square(coord: Coord): HTMLElement {
+  return Element.getElement(squareId(coord));
 }
 
 export function thingAt(x: number, y: number, objType?: string): HTMLElement | null {
-  const el = square(x, y),
+  const el = square({ x, y }),
     child = el.firstElementChild as HTMLElement;
   if (child) {
     if (objType && !child.className.includes(objType)) {
@@ -138,6 +134,6 @@ export function unitdata({ grid, hand }) {
 
 // clear board and hand
 export function clear() {
-  const board = document.getElementById('board');
+  const board = Element.getElement('board');
   board.innerHTML = '';
 }

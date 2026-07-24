@@ -3,7 +3,7 @@ import * as Select from './select.js';
 import * as Element from './element.js';
 
 export function createCard(unit: Unit.KnownUnit, index: number): HTMLElement {
-  const hand = document.getElementById('hand'),
+  const hand = Element.getElement('hand'),
     card = document.createElement('span'),
     unitEl = Unit.render(unit, index);
   card.dataset.index = `${index}`;
@@ -15,7 +15,7 @@ export function createCard(unit: Unit.KnownUnit, index: number): HTMLElement {
 }
 
 export function clear() {
-  const hand = document.getElementById('hand');
+  const hand = Element.getElement('hand');
   while (hand.firstChild) {
     hand.firstChild.remove();
   }

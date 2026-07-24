@@ -211,5 +211,5 @@ window.onload = function() {
       listen();
     });
   const settingsEl = Settings.button();
-  document.getElementById('buttons').appendChild(settingsEl);
+  Element.getElement('buttons').appendChild(settingsEl);
 };

@@ -44,7 +44,7 @@ function details(deets: string) {
 function sidebar(el: HTMLElement, text: string) {
   return () => {
     if (! Select.selected()) {
-      const infobox = document.getElementById('infobox'),
+      const infobox = Element.getElement('infobox'),
         info = Element.create({
           className: el.className + ' info',
           children: [

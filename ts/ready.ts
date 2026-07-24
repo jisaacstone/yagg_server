@@ -3,6 +3,7 @@ import { displayerror } from './err.js';
 import * as SFX from './sfx.js';
 import * as Select from './select.js';
 import * as Soundtrack from './soundtrack.js';
+import * as Element from './element.js';
 
 const state = {
   displayed: false,
@@ -38,7 +39,7 @@ export function display(label = 'ready', onclick = null) {
     Select.deselect();
     onclick();
   }
-  document.getElementById('buttons').appendChild(readyButton);
+  Element.getElement('buttons').appendChild(readyButton);
   state.displayed = true;
 }
 

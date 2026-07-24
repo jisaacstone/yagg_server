@@ -46,7 +46,7 @@ export function multi({ events }: PayloadOf<'multi'>): eventHandler {
 
 export function game_started(event: PayloadOf<'game_started'>): eventHandler {
   return noGrid(() => {
-    const board = document.getElementById('board'),
+    const board = Element.getElement('board'),
       state = (event.state || '').toLowerCase();
     Hand.clear();
     Ready.hide();
@@ -89,7 +89,7 @@ export function player_joined({ player, position }: PayloadOf<'player_joined'>):
   return noGrid(() => {
     const thisPlayer = Player.getLocal(),
       whois = thisPlayer.id == player.id ? 'player' : 'opponent',
-      container = document.getElementById(whois),
+      container = Element.getElement(whois),
       playerDetailsEl = Player.render(player);
 
     if (container.firstElementChild) {
@@ -102,7 +102,7 @@ export function player_joined({ player, position }: PayloadOf<'player_joined'>):
     container.appendChild(playerDetailsEl);
     if (whois === 'player') {
       State.gmeta.position = position;
-      document.getElementById('table').dataset.position = position;
+      Element.getElement('table').dataset.position = position;
     }
   });
 }
@@ -111,7 +111,7 @@ export function player_left({ player }: PayloadOf<'player_left'>): eventHandler 
   return noGrid(() => {
     const thisPlayer = Player.getLocal(),
       whois = thisPlayer.id == player.id ? 'player' : 'opponent',
-      container = document.getElementById(whois);
+      container = Element.getElement(whois);
     container.innerHTML = '';
     container.appendChild(Element.create({className: 'invisible'}));
   });
@@ -127,7 +127,7 @@ export function add_to_hand({ unit, index }: PayloadOf<'add_to_hand'>): eventHan
 
 export function unit_assigned({ x, y, index }: PayloadOf<'unit_assigned'>): eventHandler {
   return () => {
-      const square = Board.square(x, y),
+      const square = Board.square({ x, y }),
         unit = unitsbyindex[index];
       square.appendChild(unit);
       return SFX.play('place');
@@ -139,7 +139,7 @@ export function new_unit({ x, y, unit }: PayloadOf<'new_unit'>): eventHandler {
     const exist = Board.thingAt(x, y);
     let unitEl;
     if (!exist) {
-      const square = Board.square(x, y);
+      const square = Board.square({ x, y });
       unitEl = Unit.render(unit, 0);
       square.appendChild(unitEl);
     } else {
@@ -160,7 +160,7 @@ export function unit_changed(event: PayloadOf<'unit_changed'>): eventHandler {
 
 export function unit_placed(event: PayloadOf<'unit_placed'>): eventHandler {
   return () => {
-    const square = Board.square(event.x, event.y);
+    const square = Board.square(event);
     if (! square.firstChild) {
       // The wire payload is { x, y, player } (an opponent's face-down unit); the
       // reload path also passes revealed stats. Either is a valid BoardUnit, and
@@ -189,7 +189,7 @@ export function player_ready(event: PayloadOf<'player_ready'>): eventHandler {
 
 export function feature(event: PayloadOf<'feature'>): eventHandler {
   return () => {
-    const square = Board.square(event.x, event.y),
+    const square = Board.square(event),
       feature = Feature.render(event.feature);
     square.appendChild(feature);
     return Promise.resolve(true);
@@ -197,7 +197,7 @@ export function feature(event: PayloadOf<'feature'>): eventHandler {
 }
 
 export function unit_died(event: PayloadOf<'unit_died'>): eventHandler {
-  const square = Board.square(event.x, event.y),
+  const square = Board.square(event),
     animation = () => {
       const unit = square.firstChild as HTMLElement;
       if (! unit) {
@@ -218,10 +218,10 @@ export function unit_died(event: PayloadOf<'unit_died'>): eventHandler {
 }
 
 export function thing_moved(event: PayloadOf<'thing_moved'>): eventHandler {
-  const from = Board.square(event.from.x, event.from.y);
+  const from = Board.square(event.from);
   // `to` is a coordinate, unless it's the 'offscreen' / 'hand' sentinel
   if (typeof event.to !== 'string') {
-    const to = Board.square(event.to.x, event.to.y),
+    const to = Board.square(event.to),
       fromRect = from.getBoundingClientRect(),
       toRect = to.getBoundingClientRect(),
       animation = () => {
@@ -290,7 +290,7 @@ export function thing_moved(event: PayloadOf<'thing_moved'>): eventHandler {
     const animation = () => {
       const thing = from.firstChild as HTMLElement,
         thingRect = thing.getBoundingClientRect(),
-        handRect = document.getElementById('hand').getBoundingClientRect(),
+        handRect = Element.getElement('hand').getBoundingClientRect(),
         xpos = thingRect.left,
         ypos = thingRect.top,
         to_x = (handRect.left + handRect.right - thingRect.width) / 2,
@@ -436,7 +436,7 @@ export function turn({ player }: PayloadOf<'turn'>): eventHandler {
 
 export function candidate(event: PayloadOf<'candidate'>): eventHandler {
   return noGrid(() => {
-    const jf = document.getElementById('jobfair'),
+    const jf = Element.getElement('jobfair'),
       existing = document.getElementById(`candidate-${event.index}`);
     if (existing) {
       return;

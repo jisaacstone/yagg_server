@@ -3,7 +3,7 @@ import * as Request from './request.js';
 import * as Element from './element.js';
 
 function fetchUnits() {
-  const unitsEl = document.getElementById('units');
+  const unitsEl = Element.getElement('units');
   return Request.request('units').then(
     (units: Unit.KnownUnit[]) => {
       units.sort((a, b) => {

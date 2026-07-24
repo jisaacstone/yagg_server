@@ -7,6 +7,15 @@ export interface spec {
   children: HTMLElement[];
 }
 
+// Look up an element that must exist.
+export function getElement(id: string): HTMLElement {
+  const el = document.getElementById(id);
+  if (!el) {
+    throw new Error(`expected element #${id}`);
+  }
+  return el;
+}
+
 export function create({tag='div', className='', innerHTML='', id='', children=[], title='', value=''}) {
   const el = document.createElement(tag);
   if (className) {

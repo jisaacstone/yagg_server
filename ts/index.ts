@@ -103,7 +103,7 @@ function displayTables(tablesEl, tables, currentId) {
 }
 
 function fetchTableData() {
-  const tables = document.getElementById('tables');
+  const tables = Element.getElement('tables');
   request('table').then(tabledata => {
     displayTableData(tables, tabledata);
   }).catch((e) => console.error({ e }));
@@ -118,7 +118,7 @@ function renderPlayer({ id, name }): HTMLElement {
 
 window.onload = function() {
   render();
-  const ct = document.getElementById('createtable');
+  const ct = Element.getElement('createtable');
 
   SFX.loadSettings();
   Soundtrack.loadSettings();
@@ -129,12 +129,12 @@ window.onload = function() {
   };
   document.addEventListener('click', mml);
 
-  document.getElementById('settings').appendChild(Settings.button());
+  Element.getElement('settings').appendChild(Settings.button());
 
   Player.check().then((player) => {
     fetchTableData();
     window.setInterval(fetchTableData, 2000);
-    document.getElementById('player').appendChild(renderPlayer(player));
+    Element.getElement('player').appendChild(renderPlayer(player));
 
     ct.onclick = () => {
       CreateTable.dialog();

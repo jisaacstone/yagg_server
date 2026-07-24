@@ -3,6 +3,7 @@ import * as LeaveButton from './leaveButton.js';
 import * as SFX from './sfx.js';
 import * as Soundtrack from './soundtrack.js';
 import * as Board from './board.js';
+import * as Element from './element.js';
 
 export const gmeta: {
   position?: string;
@@ -14,7 +15,7 @@ export const gmeta: {
 
 export function setConfig(config: Board.Config) {
   gmeta.config = config;
-  document.getElementById('table').dataset.config = config.name;
+  Element.getElement('table').dataset.config = config.name;
 }
 
 function monarchName() {
@@ -47,7 +48,7 @@ export function isYourTurn(): boolean {
 }
 
 export function gamestatechange(newstate: string): void {
-  document.getElementById('table').dataset.gamestate = newstate;
+  Element.getElement('table').dataset.gamestate = newstate;
   gmeta.boardstate = newstate;
   instructions(newstate);
   Soundtrack.setSoundtrack(newstate);

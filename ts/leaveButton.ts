@@ -25,7 +25,7 @@ export function ensureCreated() {
         }
       );
     };
-    document.getElementById('buttons').appendChild(leavebutton);
+    Element.getElement('buttons').appendChild(leavebutton);
   } else if (['battle', 'placement'].includes(State.gmeta.boardstate)) {
     const leavebutton = Element.create({
       tag: 'button',
@@ -45,7 +45,7 @@ export function ensureCreated() {
         }
       );
     }
-    document.getElementById('buttons').appendChild(leavebutton);
+    Element.getElement('buttons').appendChild(leavebutton);
   } else if (State.gmeta.boardstate === 'gameover') {
     const leavebutton = Element.create({
       tag: 'button',
@@ -58,7 +58,7 @@ export function ensureCreated() {
       SFX.play('click');
       leave();
     };
-    document.getElementById('buttons').appendChild(leavebutton);
+    Element.getElement('buttons').appendChild(leavebutton);
   }
 }
 

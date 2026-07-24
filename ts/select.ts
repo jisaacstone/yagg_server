@@ -133,7 +133,7 @@ function handleSelect(el: HTMLElement, meta) {
     }
     for (const neighbor of [[meta.x + 1, meta.y], [meta.x - 1, meta.y], [meta.x, meta.y + 1], [meta.x, meta.y - 1]]) {
       const nel = document.getElementById(`c${neighbor[0]}-${neighbor[1]}`);
-      if (ismoveoption(nel)) {
+      if (nel && ismoveoption(nel)) {
         nel.dataset.uistate = 'moveoption';
         options.push(nel);
       }

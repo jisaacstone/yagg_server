@@ -1,4 +1,5 @@
 import * as Storage from './storage.js';
+import * as Element from './element.js';
 
 export function dropdown(key: string, text: string) {
   if (Storage.getItem('dropdown', key)) {
@@ -13,7 +14,7 @@ export function clear() {
 }
 
 function displayDropdown(key: string, text: string) {
-  const tableEl = document.getElementById('table'),
+  const tableEl = Element.getElement('table'),
     dropdownEl = document.createElement('div'),
     dropdownText = document.createElement('div'),
     dismiss = document.createElement('button');

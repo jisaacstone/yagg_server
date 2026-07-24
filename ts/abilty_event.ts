@@ -1,13 +1,14 @@
 import * as Board from './board.js';
 import * as SFX from './sfx.js';
+import * as Element from './element.js';
 
 export function projectile(event) {
-  const to = Board.square(event.to.x, event.to.y),
-    from = Board.square(event.from.x, event.from.y),
+  const to = Board.square(event.to),
+    from = Board.square(event.from),
     fromRect = from.getBoundingClientRect(),
     toRect = to.getBoundingClientRect(),
     projectile = createProjectile(event.subtype),
-    table = document.getElementById('table'),
+    table = Element.getElement('table'),
     animation = () => {
       return SFX.play(event.subtype).then(() => {
         table.appendChild(projectile);
@@ -66,7 +67,7 @@ export function scan({ x, y }) {
 }
 
 export function fire(event) {
-  const square = Board.square(event.x, event.y),
+  const square = Board.square(event),
     child = square.firstElementChild as HTMLElement;
   if (!square) {
     console.error({error: 'no such square', event});
