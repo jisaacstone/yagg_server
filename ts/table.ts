@@ -39,15 +39,15 @@ function renderBoard(board, players: number) {
   }
   Event.game_started(board)();
   if (board.ready) {
-    Event.player_ready({player: board.ready})();
+    Event.player_ready({event: 'player_ready', player: board.ready})();
   }
   Object.entries(board.grid).forEach(([coor, feature]: [string, any]) => {
     if (feature) {
-      const [x, y] = coor.split(',');
+      const [x, y] = coor.split(',').map(Number);
       if (feature.kind === 'unit') {
-        Event.unit_placed({x, y, ...feature})();
+        Event.unit_placed({event: 'unit_placed', x, y, ...feature})();
       } else {
-        Event.feature({x, y, feature})();
+        Event.feature({event: 'feature', x, y, feature})();
       }
     }
   });
@@ -165,7 +165,7 @@ function setstate(gamedata, phase) {
     }
   }
   if (gamedata.turn) {
-    Event.turn({player: gamedata.turn})();
+    Event.turn({event: 'turn', player: gamedata.turn})();
   }
   return players === 2;  // continue and fetch player hands
 }

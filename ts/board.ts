@@ -128,9 +128,9 @@ export function unitdata({ grid, hand }) {
   Array.prototype.forEach.call(
     Object.entries(hand),
     ([index, card]: [string, any]) => {
-      Event.add_to_hand({index: +index, unit: card.unit})();
+      Event.add_to_hand({event: 'add_to_hand', index: +index, unit: card.unit})();
       if (card.assigned) {
-        Event.unit_assigned({index: +index, x: card.assigned.x, y: card.assigned.y})();
+        Event.unit_assigned({event: 'unit_assigned', index: +index, x: card.assigned.x, y: card.assigned.y})();
       }
     }
   );

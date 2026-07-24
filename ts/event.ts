@@ -16,10 +16,11 @@ import * as Timer from './timer.js';
 import { leave } from './leaveButton.js';
 import * as SFX from './sfx.js';
 import * as Request from './request.js';
+import type { ServerEvent, EventHandler, EventHandlers, PayloadOf } from './protocol.js';
 
 const unitsbyindex = {};
 
-export type eventHandler = () => Promise<any>;
+export type eventHandler = EventHandler;
 
 function noGrid(fn: () => any): eventHandler {
   return () => Promise.resolve(fn());
@@ -29,25 +30,21 @@ function noOp() {
   return Promise.resolve(null);
 }
 
-export function multi({ events }): eventHandler {
-  const animations = [],
-    module = this;
+export function multi({ events }: PayloadOf<'multi'>): eventHandler {
+  const animations: eventHandler[] = [];
   for (const event of events) {
-    const result = module[event.event](event);
-    animations.push(result);
+    const handler = handlers[event.event] as ((e: ServerEvent) => eventHandler) | undefined;
+    if (handler) {
+      animations.push(handler(event));
+    }
   }
   if (animations.length > 0) {
-    const animation = () => {
-      return Promise.all(
-        animations.map((a) => a())
-      );
-    };
-    return animation;
+    return () => Promise.all(animations.map((a) => a()));
   }
   return noOp;
 }
 
-export function game_started(event): eventHandler {
+export function game_started(event: PayloadOf<'game_started'>): eventHandler {
   return noGrid(() => {
     const board = document.getElementById('board'),
       state = (event.state || '').toLowerCase();
@@ -75,7 +72,7 @@ export function game_started(event): eventHandler {
   });
 }
 
-export function timer(event): eventHandler {
+export function timer(event: PayloadOf<'timer'>): eventHandler {
   return noGrid(() => {
     Timer.set(event.timer, event.player);
   });
@@ -88,7 +85,7 @@ export function battle_started(): eventHandler {
   });
 }
 
-export function player_joined({ player, position }): eventHandler {
+export function player_joined({ player, position }: PayloadOf<'player_joined'>): eventHandler {
   return noGrid(() => {
     const thisPlayer = Player.getLocal(),
       whois = thisPlayer.id == player.id ? 'player' : 'opponent',
@@ -110,7 +107,7 @@ export function player_joined({ player, position }): eventHandler {
   });
 }
 
-export function player_left({ player }): eventHandler {
+export function player_left({ player }: PayloadOf<'player_left'>): eventHandler {
   return noGrid(() => {
     const thisPlayer = Player.getLocal(),
       whois = thisPlayer.id == player.id ? 'player' : 'opponent',
@@ -120,7 +117,7 @@ export function player_left({ player }): eventHandler {
   });
 }
 
-export function add_to_hand({ unit, index }): eventHandler {
+export function add_to_hand({ unit, index }: PayloadOf<'add_to_hand'>): eventHandler {
   return noGrid(() => {
     const unitEl = Hand.createCard(unit, index)
     unitsbyindex[index] = unitEl;
@@ -128,7 +125,7 @@ export function add_to_hand({ unit, index }): eventHandler {
   });
 }
 
-export function unit_assigned({ x, y, index }): eventHandler {
+export function unit_assigned({ x, y, index }: PayloadOf<'unit_assigned'>): eventHandler {
   return () => {
       const square = Board.square(x, y),
         unit = unitsbyindex[index];
@@ -137,7 +134,7 @@ export function unit_assigned({ x, y, index }): eventHandler {
   };
 }
 
-export function new_unit({ x, y, unit }): eventHandler {
+export function new_unit({ x, y, unit }: PayloadOf<'new_unit'>): eventHandler {
   const animation = () => {
     const exist = Board.thingAt(x, y);
     let unitEl;
@@ -157,14 +154,17 @@ export function new_unit({ x, y, unit }): eventHandler {
   return animation;
 }
 
-export function unit_changed(event): eventHandler {
-  return new_unit(event);  // for now
+export function unit_changed(event: PayloadOf<'unit_changed'>): eventHandler {
+  return new_unit({ ...event, event: 'new_unit' });  // for now
 }
 
-export function unit_placed(event): eventHandler {
+export function unit_placed(event: PayloadOf<'unit_placed'>): eventHandler {
   return () => {
     const square = Board.square(event.x, event.y);
     if (! square.firstChild) {
+      // The wire payload is { x, y, player } (an opponent's face-down unit); the
+      // reload path also passes revealed stats. Either is a valid BoardUnit, and
+      // render draws whatever fields are present.
       const unit = Unit.render(event, null)
       square.appendChild(unit);
       return SFX.play('place');
@@ -174,7 +174,7 @@ export function unit_placed(event): eventHandler {
   };
 }
 
-export function player_ready(event): eventHandler {
+export function player_ready(event: PayloadOf<'player_ready'>): eventHandler {
   return noGrid(() => {
     if ( event.player === State.gmeta.position ) {
       (document.querySelector('#player .playername') as HTMLElement).dataset.ready = 'true';
@@ -187,7 +187,7 @@ export function player_ready(event): eventHandler {
   });
 }
 
-export function feature(event): eventHandler {
+export function feature(event: PayloadOf<'feature'>): eventHandler {
   return () => {
     const square = Board.square(event.x, event.y),
       feature = Feature.render(event.feature);
@@ -196,7 +196,7 @@ export function feature(event): eventHandler {
   }
 }
 
-export function unit_died(event): eventHandler {
+export function unit_died(event: PayloadOf<'unit_died'>): eventHandler {
   const square = Board.square(event.x, event.y),
     animation = () => {
       const unit = square.firstChild as HTMLElement;
@@ -217,9 +217,10 @@ export function unit_died(event): eventHandler {
   return animation;
 }
 
-export function thing_moved(event): eventHandler {
+export function thing_moved(event: PayloadOf<'thing_moved'>): eventHandler {
   const from = Board.square(event.from.x, event.from.y);
-  if (event.to.x !== undefined && event.to.y !== undefined) {
+  // `to` is a coordinate, unless it's the 'offscreen' / 'hand' sentinel
+  if (typeof event.to !== 'string') {
     const to = Board.square(event.to.x, event.to.y),
       fromRect = from.getBoundingClientRect(),
       toRect = to.getBoundingClientRect(),
@@ -314,7 +315,7 @@ export function thing_moved(event): eventHandler {
   }
 }
 
-export function thing_gone(event): eventHandler {
+export function thing_gone(event: PayloadOf<'thing_gone'>): eventHandler {
   return () => {
     const thing = Board.thingAt(event.x, event.y);
     if (!thing) {
@@ -333,7 +334,7 @@ export function thing_gone(event): eventHandler {
   }
 }
 
-export function battle({ from, to }): eventHandler {
+export function battle({ from, to }: PayloadOf<'battle'>): eventHandler {
   // animation only, no lasting chages
   const animation = () => {
     return SFX.play('battle').then(() => {
@@ -388,7 +389,7 @@ export function battle({ from, to }): eventHandler {
   return animation;
 }
 
-export function gameover({ winner, reason }): eventHandler {
+export function gameover({ winner, reason }: PayloadOf<'gameover'>): eventHandler {
   return noGrid(() => {
     let message;
     const showRematch = ! reason || ! reason.toLowerCase().includes('opponent left'),
@@ -427,13 +428,13 @@ export function gameover({ winner, reason }): eventHandler {
   });
 }
 
-export function turn({ player }): eventHandler {
+export function turn({ player }: PayloadOf<'turn'>): eventHandler {
   return noGrid(() => {
     State.turnchange(player);
   });
 }
 
-export function candidate(event): eventHandler {
+export function candidate(event: PayloadOf<'candidate'>): eventHandler {
   return noGrid(() => {
     const jf = document.getElementById('jobfair'),
       existing = document.getElementById(`candidate-${event.index}`);
@@ -452,7 +453,7 @@ export function candidate(event): eventHandler {
   });
 }
 
-export function show_ability({ x, y, type, reveal }) {
+export function show_ability({ x, y, type, reveal }: PayloadOf<'show_ability'>): eventHandler {
   return noGrid(() => {
     Unit.showName({ x, y }, reveal.name);
     if (type === 'ability') {
@@ -465,7 +466,7 @@ export function show_ability({ x, y, type, reveal }) {
   });
 }
 
-export function ability_used(event): eventHandler {
+export function ability_used(event: PayloadOf<'ability_used'>): eventHandler {
   if (!AbilityEvent[event.type]) {
     console.error({error: 'no ability handler', event});
     return noGrid(() => {
@@ -482,3 +483,33 @@ export function table_shutdown(): eventHandler {
     });
   });
 }
+
+// Contract conformance: each value must match HandlerFor<its key>. This is what
+// lets multi() (above) and the dispatcher (eventlistener.ts) look a handler up
+// by event name and know its payload. `config_change` is intentionally absent
+// — the backend emits it but there is no client handler yet.
+export const handlers: EventHandlers = {
+  multi,
+  game_started,
+  battle_started,
+  timer,
+  player_joined,
+  player_left,
+  player_ready,
+  add_to_hand,
+  unit_assigned,
+  unit_placed,
+  new_unit,
+  unit_changed,
+  unit_died,
+  feature,
+  thing_moved,
+  thing_gone,
+  battle,
+  candidate,
+  show_ability,
+  ability_used,
+  gameover,
+  turn,
+  table_shutdown,
+};

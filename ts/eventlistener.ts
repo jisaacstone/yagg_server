@@ -1,8 +1,14 @@
 import { getname, tableid, hostname } from './urlvars.js';
 import * as Player from './player.js';
-import * as Event from './event.js';
+import { handlers } from './event.js';
+import type { ServerEvent, EventHandler } from './protocol.js';
 
-export const state = {
+export const state: {
+  eventListener: WebSocket | null;
+  interval: number | null;
+  timeout: number | null;
+  queue: ServerEvent[];
+} = {
   eventListener: null,
   interval: null,
   timeout: null,
@@ -16,16 +22,17 @@ export function listen() {
   }
 }
 
-function handleEvent(event) {
+function handleEvent(event: ServerEvent) {
   state.queue.push(event);
 }
 
 let waits = 0;
 
-function handleNextEventQ(next) {
-  if (Event[next.event]) {
+function handleNextEventQ(next: ServerEvent) {
+  const handler = handlers[next.event] as ((e: ServerEvent) => EventHandler) | undefined;
+  if (handler) {
     try {
-      const animation = Event[next.event](next);
+      const animation = handler(next);
       return animation().then(() => {
         return 'resolved';
       }).catch((error) => {
@@ -59,7 +66,7 @@ function createWSEventListener() {
     state.eventListener = new WebSocket(`${wshost}/ws/${tableid()}/${id}`);
 
     state.eventListener.onmessage = (event) => {
-      const evt = JSON.parse(event.data);
+      const evt = JSON.parse(event.data) as ServerEvent;
       handleEvent(evt);
     };
 

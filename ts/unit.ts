@@ -10,6 +10,8 @@ import * as Triggers from './triggers.js';
 import * as Tooltip from './tooltip.js';
 import * as SFX from './sfx.js';
 import * as Board from './board.js';
+import type { KnownUnit, BoardUnit } from './protocol.js';
+export type { KnownUnit, BoardUnit };
 
 interface Ability {
   name: string;
@@ -22,17 +24,7 @@ interface Triggers {
   death?: Ability;
 }
 
-export interface Unit {
-  name: string;
-  attack: number | "immobile";
-  defense: number;
-  player: null | string;
-  ability?: Ability;
-  triggers?: Triggers;
-  attributes: string[];
-}
-
-const units: {[key: string]: Unit} = {};
+const units: {[key: string]: BoardUnit} = {};
 
 export function showName(coord: Board.Coord, name: string): void {
   const squareId = Board.squareId(coord),
@@ -87,7 +79,7 @@ export function hilight(coord: Board.Coord, className: string): Promise<any> {
   });
 }
 
-function bindAbility(abilityButton: HTMLElement, square: HTMLElement | null, unit: Unit, cb = null) {
+function bindAbility(abilityButton: HTMLElement, square: HTMLElement | null, unit: BoardUnit, cb = null) {
   abilityButton.onclick = (e) => {
     if (! owned(unit)) {
       return;
@@ -125,7 +117,7 @@ function bindAbility(abilityButton: HTMLElement, square: HTMLElement | null, uni
   };
 }
 
-function abilityButton(unit: Unit, el: HTMLElement, unitSquare: HTMLElement = null) {
+function abilityButton(unit: BoardUnit, el: HTMLElement, unitSquare: HTMLElement = null) {
   const abilbut = Element.create({
       tag: 'button',
       className: 'unit-ability',
@@ -160,7 +152,7 @@ function convertAttr(att, value) {
   return `${value}`;
 }
 
-function renderAttrs(unit: Unit, el: HTMLElement) {
+function renderAttrs(unit: BoardUnit, el: HTMLElement) {
   for (const att of ['name', 'attack', 'defense']) {
     if (unit[att] !== null && unit[att] !== undefined) {
       el.appendChild(Element.create({
@@ -227,7 +219,7 @@ export function overlayInfo(el: HTMLElement) {
   el.appendChild(Element.create({ id: 'overlayButtons', children: allButtons }));
 }
 
-function renderTile(unit: Unit, el: HTMLElement) {
+function renderTile(unit: BoardUnit, el: HTMLElement) {
   // if we have no name we have nothing else
   if (unit.name) {
     renderAttrs(unit, el);
@@ -252,7 +244,7 @@ function anyDetails(unit) {
   return unit.name || unit.attack || unit.defense || unit.ability || unit.triggers;
 }
 
-function shortTriggers(el: HTMLElement, unit: Unit) {
+function shortTriggers(el: HTMLElement, unit: BoardUnit) {
   const triggers = Triggers.get(unit),
     triggerEls = [];
   if ( triggers.length === 0 ) {
@@ -270,7 +262,7 @@ function shortTriggers(el: HTMLElement, unit: Unit) {
   }));
 }
 
-function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
+function infoview(unit: BoardUnit, el: HTMLElement, squareEl: HTMLElement) {
   renderAttrs(unit, el);
   if (unit.name) {
     const qbutton = Element.create({
@@ -288,7 +280,7 @@ function infoview(unit: Unit, el: HTMLElement, squareEl: HTMLElement) {
   shortTriggers(el, unit);
 }
 
-function describe(unit: Unit, square: HTMLElement = null): HTMLElement {
+function describe(unit: BoardUnit, square: HTMLElement = null): HTMLElement {
   const descriptions = [],
     triggers = Triggers.get(unit);
   if (unit.ability) {
@@ -389,7 +381,7 @@ export function indexOf(square: HTMLElement) {
   return child && +child.dataset.index;
 }
 
-function bindDetailsEvenet(unit: Unit, el: HTMLElement) {
+function bindDetailsEvenet(unit: BoardUnit, el: HTMLElement) {
   const eventListener = (e) => {
     const parent = el.parentNode as HTMLElement,
       square = parent.className.includes('boardsquare') ? parent : null;
@@ -404,7 +396,7 @@ function bindDetailsEvenet(unit: Unit, el: HTMLElement) {
   el.addEventListener('dblclick', eventListener);
 }
 
-function setClassName(unit: Unit, el: HTMLElement) {
+function setClassName(unit: BoardUnit, el: HTMLElement) {
   let className = `unit ${unit.player}`;
   if (unit.player === gmeta.position) {
     className += ' owned';
@@ -420,7 +412,7 @@ function setClassName(unit: Unit, el: HTMLElement) {
 
 const addId = (() => {
   let nextId = 1;
-  return (unit: Unit, el: HTMLElement): void => {
+  return (unit: BoardUnit, el: HTMLElement): void => {
     if (! el.id) {
       el.id = `unit${nextId}`;
       nextId++;
@@ -431,14 +423,14 @@ const addId = (() => {
   }
 })();
 
-export function render_into(unit: Unit, el: HTMLElement): void {
+export function render_into(unit: BoardUnit, el: HTMLElement): void {
   addId(unit, el);
   bindDetailsEvenet(unit, el);
   setClassName(unit, el);
   return renderTile(unit, el);
 }
 
-export function render(unit: Unit, index): HTMLElement {
+export function render(unit: BoardUnit, index): HTMLElement {
   const unitEl = document.createElement('div');
   unitEl.dataset.index = index;
   render_into(unit, unitEl);

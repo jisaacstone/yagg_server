@@ -35,7 +35,7 @@ export function timingOf(trigger: string): string {
   return '?';
 }
 
-export function get(unit: Unit.Unit): Trigger[] {
+export function get(unit: Unit.BoardUnit): Trigger[] {
   const triggers: Trigger[] = [];
   if (! unit.attributes) {
     unit.attributes = [];

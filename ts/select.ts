@@ -164,11 +164,11 @@ export function select(thisEl, meta) {
   return select;
 }
 
-export function bind_hand(card: HTMLElement, index: number, unit: Unit.Unit) {
+export function bind_hand(card: HTMLElement, index: number, unit: Unit.KnownUnit) {
   card.onclick = select(card, { inhand: true, index, unit });
 }
 
-export function bind_candidate(candidate: HTMLElement, index: number, unit: Unit.Unit) {
+export function bind_candidate(candidate: HTMLElement, index: number, unit: Unit.KnownUnit) {
   candidate.onclick = (e) => {
     Soundtrack.play();
     const childEl = candidate.firstElementChild as HTMLElement,

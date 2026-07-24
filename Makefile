@@ -1,6 +1,9 @@
 fetest:
 	mocha jstest/test*.js --require esm
 
+typetest:
+	./node_modules/.bin/tsc -p tsconfig.strict.json
+
 betest:
 	mix test && mix dialyzer
 

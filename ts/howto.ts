@@ -5,7 +5,7 @@ import * as Element from './element.js';
 function fetchUnits() {
   const unitsEl = document.getElementById('units');
   return Request.request('units').then(
-    (units: Unit.Unit[]) => {
+    (units: Unit.KnownUnit[]) => {
       units.sort((a, b) => {
         if (a.name < b.name) {
           return -1;
@@ -13,8 +13,7 @@ function fetchUnits() {
         return 1;
       });
       for (const unit of units) {
-        unit.player = "unowned";
-        const unitEl = Unit.render(unit, 0);
+        const unitEl = Unit.render({ ...unit, player: 'unowned' }, 0);
         unitEl.onclick = Unit.detailViewFn(unitEl);
         unitsEl.appendChild(
           Element.create({
